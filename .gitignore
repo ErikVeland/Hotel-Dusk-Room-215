@@ -230,3 +230,13 @@ BUSINESS_PLAN.md
 ehthumbs.db
 Thumbs.db
 node_modules
+
+LEMMINGS_OPTIMISATION_PROMPT.md
+
+OPTIMISATION_PROMPT.md
+
+.swiftpm/xcode/xcuserdata/veland.xcuserdatad/xcschemes/
+
+*.xcuserstate
+
+HotelDuskDuo.xcodeproj/xcuserdata/veland.xcuserdatad/xcschemes/xcschememanagement.plist
