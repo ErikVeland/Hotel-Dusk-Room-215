@@ -21,6 +21,11 @@ struct HingeObserverView: UIViewRepresentable {
                 case .partiallyOpen: state = .partiallyOpen
                 default: return // An unavailable reading must not turn a closed puzzle over.
                 }
+                #if DEBUG
+                // Fixture runs on a simulator that boots folded: keep the book
+                // open. Release builds and unfixtured runs are unchanged.
+                if state == .closed, ProcessInfo.processInfo.environment["HOTEL_DUSK_FIXTURE"] != nil { return }
+                #endif
                 manager.receiveHardwareState(state, angleDegrees: Self.degrees(for: hinge))
             }
             view.addInteraction(interaction)

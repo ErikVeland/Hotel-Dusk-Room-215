@@ -12,6 +12,252 @@
       "source": "extracted/root/data/map/sdata/onoffobjs.dat",
       "bytes": 4036,
       "sha256": "8ba8e930bdec70e56109b36c368e05631731225222e714a0c6db04494b0350cc"
+    },
+    {
+      "name": "sdata/R102.srh",
+      "source": "extracted/root/data/map/sdata/R102.srh",
+      "bytes": 304,
+      "sha256": "60df2f81b2e112fef5a9e174ef99e87c6c887b415b49bec6cee45583ec29e91e"
+    },
+    {
+      "name": "sdata/R103.srh",
+      "source": "extracted/root/data/map/sdata/R103.srh",
+      "bytes": 280,
+      "sha256": "04703485fb8799e892a425c4bced3a64b1824d459e6145db5e49c8ab97f79a9d"
+    },
+    {
+      "name": "sdata/R104.srh",
+      "source": "extracted/root/data/map/sdata/R104.srh",
+      "bytes": 364,
+      "sha256": "f0284ae09ec1915ccbacbf03cbf66894662ffc499bb1991d74d47088e468875c"
+    },
+    {
+      "name": "sdata/R105.srh",
+      "source": "extracted/root/data/map/sdata/R105.srh",
+      "bytes": 192,
+      "sha256": "d4d55bf1bd1d8cfbc72c5afc76978b18a5af6aaf86afa4c63226c4a77eba0f66"
+    },
+    {
+      "name": "sdata/R106.srh",
+      "source": "extracted/root/data/map/sdata/R106.srh",
+      "bytes": 532,
+      "sha256": "009bb2523d16b2e47fb831e1445e5475c1c5eaff0117efa9f23772a851741389"
+    },
+    {
+      "name": "sdata/R107.srh",
+      "source": "extracted/root/data/map/sdata/R107.srh",
+      "bytes": 440,
+      "sha256": "e89c27847b72f612f2e7fab932719b40968ea2ec9e2d068809df40239562edb3"
+    },
+    {
+      "name": "sdata/R108.srh",
+      "source": "extracted/root/data/map/sdata/R108.srh",
+      "bytes": 568,
+      "sha256": "e85226f7ca3f8d7ef9a46ea7da16f869e723a80dfea6d2928c8241ade1109069"
+    },
+    {
+      "name": "sdata/R109.srh",
+      "source": "extracted/root/data/map/sdata/R109.srh",
+      "bytes": 136,
+      "sha256": "5fba6a15e67c3c92ca159b71c584dfff65fbd863922ee3c6a826fb4ca23db4e3"
+    },
+    {
+      "name": "sdata/R110.srh",
+      "source": "extracted/root/data/map/sdata/R110.srh",
+      "bytes": 136,
+      "sha256": "41981cd0526a3b12ff1be51fe8e5416f3ac385abc6dd0893271ad4f39b0b5f2d"
+    },
+    {
+      "name": "sdata/R111.srh",
+      "source": "extracted/root/data/map/sdata/R111.srh",
+      "bytes": 256,
+      "sha256": "fff77937c73fb17f8fda9b95f02750749a12e2ddca3e5ff83929d0ce98e7b8e3"
+    },
+    {
+      "name": "sdata/R112.srh",
+      "source": "extracted/root/data/map/sdata/R112.srh",
+      "bytes": 380,
+      "sha256": "3b8b625831d67a79bccf0195f9c354fdaf996983a42d738d2d2fa841c9264585"
+    },
+    {
+      "name": "sdata/R113.srh",
+      "source": "extracted/root/data/map/sdata/R113.srh",
+      "bytes": 296,
+      "sha256": "5d1c056730290a7a453a3902183c798add5b8cfd4af510fb4f3014da49b860a8"
+    },
+    {
+      "name": "sdata/R114.srh",
+      "source": "extracted/root/data/map/sdata/R114.srh",
+      "bytes": 312,
+      "sha256": "c8cd636fba0e867e1d1e64fc56761d29383b2234e7913afea63fdae9cac447af"
+    },
+    {
+      "name": "sdata/R115.srh",
+      "source": "extracted/root/data/map/sdata/R115.srh",
+      "bytes": 452,
+      "sha256": "2a1a549155e4b4ee90ca9de97f9d6d91bcb40c97a4cde3486fbc7027ccb42c02"
+    },
+    {
+      "name": "sdata/R116.srh",
+      "source": "extracted/root/data/map/sdata/R116.srh",
+      "bytes": 272,
+      "sha256": "c76eb039184e62bdb5a659d3dd21a95bbdccf5d0b6358d6cb3c2d080da2a91b4"
+    },
+    {
+      "name": "sdata/R117.srh",
+      "source": "extracted/root/data/map/sdata/R117.srh",
+      "bytes": 220,
+      "sha256": "e5722091c955e8123017bb880a156c8e0ec099d5dafabe4a7732fd3a06943288"
+    },
+    {
+      "name": "sdata/R118.srh",
+      "source": "extracted/root/data/map/sdata/R118.srh",
+      "bytes": 240,
+      "sha256": "4801e683a253de15fd0bf967ed2dda739c033378a2fd2d49b993c36d7ce9e257"
+    },
+    {
+      "name": "sdata/R119.srh",
+      "source": "extracted/root/data/map/sdata/R119.srh",
+      "bytes": 260,
+      "sha256": "7b95820a688c922dde65545087cecb7435da2954e12c0e28fa5d6af9aaa9d962"
+    },
+    {
+      "name": "sdata/R122.srh",
+      "source": "extracted/root/data/map/sdata/R122.srh",
+      "bytes": 120,
+      "sha256": "f925b1927894237eac6448c7e7201851c3eb626b88219e2f3175b45504297e4c"
+    },
+    {
+      "name": "sdata/R123.srh",
+      "source": "extracted/root/data/map/sdata/R123.srh",
+      "bytes": 344,
+      "sha256": "9258f483daf170fe731e626568204060c50120ac5e31e9f52aec401f6c438bf6"
+    },
+    {
+      "name": "sdata/R124.srh",
+      "source": "extracted/root/data/map/sdata/R124.srh",
+      "bytes": 288,
+      "sha256": "e3788f2b7c60071cf9e7a61751ed41e0a13e5a7da5c7cfd991d1127eed6bbf00"
+    },
+    {
+      "name": "sdata/R125.srh",
+      "source": "extracted/root/data/map/sdata/R125.srh",
+      "bytes": 308,
+      "sha256": "1646556e7cc4b97ee78284a05c091db051b46817f6c8d97df54064c7b76cb9de"
+    },
+    {
+      "name": "sdata/R126.srh",
+      "source": "extracted/root/data/map/sdata/R126.srh",
+      "bytes": 268,
+      "sha256": "382c8a4410fbf48d90bf67bf604cd1c49d564886fa83e128559a1ab0f7486259"
+    },
+    {
+      "name": "sdata/R201.srh",
+      "source": "extracted/root/data/map/sdata/R201.srh",
+      "bytes": 356,
+      "sha256": "0cb918338bc8d4981fc3f920637a3786460da3d8d24b4c346c23f37141e009ab"
+    },
+    {
+      "name": "sdata/R202.srh",
+      "source": "extracted/root/data/map/sdata/R202.srh",
+      "bytes": 356,
+      "sha256": "dfd2666df5868752944d9397a7bd5e5185343415f74f745e246986072d1080cd"
+    },
+    {
+      "name": "sdata/R203.srh",
+      "source": "extracted/root/data/map/sdata/R203.srh",
+      "bytes": 356,
+      "sha256": "63ce83dc50d857a9f9d3ed91c83f0aef522320bfa10aef0c45fee77be64f56a3"
+    },
+    {
+      "name": "sdata/R204.srh",
+      "source": "extracted/root/data/map/sdata/R204.srh",
+      "bytes": 296,
+      "sha256": "48ec4d9f546df82f206047f51aa8291a94a51fee359d51c40328b7768eeafa79"
+    },
+    {
+      "name": "sdata/R205.srh",
+      "source": "extracted/root/data/map/sdata/R205.srh",
+      "bytes": 456,
+      "sha256": "5708e82b6a9e4d3e39cf7981cd28a273526f5157c8e39720e47d5cc59b0ef3f3"
+    },
+    {
+      "name": "sdata/R206.srh",
+      "source": "extracted/root/data/map/sdata/R206.srh",
+      "bytes": 372,
+      "sha256": "b007a35055bad8a6abadef82d3351f7137d51e39bc7bc6043740dd67b1ffcf45"
+    },
+    {
+      "name": "sdata/R207.srh",
+      "source": "extracted/root/data/map/sdata/R207.srh",
+      "bytes": 328,
+      "sha256": "46b693c0c44c0e4f624127be40dd28140ea2b8ad96e3bab46706bc66afe7a7d6"
+    },
+    {
+      "name": "sdata/R208.srh",
+      "source": "extracted/root/data/map/sdata/R208.srh",
+      "bytes": 296,
+      "sha256": "e2d6a36ab8a4beb0852a893f4e8119b81e2f7cc9bf8079280b63fe85d14755d6"
+    },
+    {
+      "name": "sdata/R209.srh",
+      "source": "extracted/root/data/map/sdata/R209.srh",
+      "bytes": 480,
+      "sha256": "422d3f02dc471e8ea7f9a4f8de8c4047ae9b422245a66f467bcb6ee97f7d8d5f"
+    },
+    {
+      "name": "sdata/R210.srh",
+      "source": "extracted/root/data/map/sdata/R210.srh",
+      "bytes": 256,
+      "sha256": "947929cf57dc13da4bdb49d8524ced49dce3c55e7dcfc420d8c8e2afcbd5af44"
+    },
+    {
+      "name": "sdata/R211.srh",
+      "source": "extracted/root/data/map/sdata/R211.srh",
+      "bytes": 388,
+      "sha256": "6a1e11a2f0a132fe86ef97444bae2e9887be34964d609fcbc8b264c25c38d9f8"
+    },
+    {
+      "name": "sdata/R212.srh",
+      "source": "extracted/root/data/map/sdata/R212.srh",
+      "bytes": 284,
+      "sha256": "ff85dbe3ce7de180a8021628a2ef7ec04ec16c49210cf0e5ef14ee4ac75a4410"
+    },
+    {
+      "name": "sdata/R213.srh",
+      "source": "extracted/root/data/map/sdata/R213.srh",
+      "bytes": 524,
+      "sha256": "32d20e58304d23b0c3fb57f1337ab0c1ec0879345f83205ab571045e088d0fd6"
+    },
+    {
+      "name": "sdata/R301.srh",
+      "source": "extracted/root/data/map/sdata/R301.srh",
+      "bytes": 248,
+      "sha256": "a1aa4394e12801ff630442f100e517e0843355f0c629b75307be68ac67922cb4"
+    },
+    {
+      "name": "sdata/R302.srh",
+      "source": "extracted/root/data/map/sdata/R302.srh",
+      "bytes": 328,
+      "sha256": "c145e761c7ee9418e70dab53e9d6b8d5b69768f4633ab2d157d35384535162d5"
+    },
+    {
+      "name": "sdata/R304.srh",
+      "source": "extracted/root/data/map/sdata/R304.srh",
+      "bytes": 172,
+      "sha256": "c7d13921ba4e2b543336c559f6ab840633453ff551c09b11523da68fb5789982"
+    },
+    {
+      "name": "sdata/R305.srh",
+      "source": "extracted/root/data/map/sdata/R305.srh",
+      "bytes": 56,
+      "sha256": "df10cec772fb8389951b35e163028ae7d824ff6997695d76a4bb374da5093b36"
+    },
+    {
+      "name": "sdata/R401.srh",
+      "source": "extracted/root/data/map/sdata/R401.srh",
+      "bytes": 32,
+      "sha256": "99a5ca60723d9e48c86c7046357e57be87a7cfcf46b348b2ba46017ed918dc7b"
     }
   ]
 }

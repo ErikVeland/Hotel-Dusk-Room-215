@@ -59,6 +59,41 @@ public struct OriginalChoiceRecord: Sendable, Equatable {
     }
 }
 
+/// A chapter's `.ttk` keyword table (`EP1_.ttk`), read by the question menu
+/// at 0x0203D61C. Each 0x80-byte record holds the label (0x00–0x5F), the
+/// keyword ID (u16 at 0x60) and one flag byte per person (0x70 + person).
+/// A first byte of 0xFF ends the table.
+public struct OriginalKeywordTable: Sendable, Equatable {
+    public struct Record: Sendable, Equatable {
+        public let index: Int
+        public let labelBytes: Data
+        public let keywordID: UInt16
+        public let personFlags: [UInt8]
+        public var label: String { String(data: labelBytes, encoding: .isoLatin1) ?? "" }
+    }
+    public let records: [Record]
+
+    public init(decoded data: Data) throws {
+        let reader = OriginalBytes(data)
+        var records: [Record] = []
+        var offset = 0
+        while offset + 0x80 <= data.count, reader.bytes[offset] != 0xFF, records.count < 0x80 {
+            records.append(Record(index: records.count,
+                labelBytes: Data(try reader.zeroTerminated(offset, limit: 0x60)),
+                keywordID: try reader.u16(offset + 0x60),
+                personFlags: Array(try reader.range(offset + 0x70, 0x10))))
+            offset += 0x80
+        }
+        self.records = records
+    }
+
+    /// `EP1_R102` uses `EP1_.ttk`.
+    public static func chapterFile(for program: String) -> String? {
+        guard let underscore = program.firstIndex(of: "_") else { return nil }
+        return program[...underscore] + ".ttk"
+    }
+}
+
 public struct OriginalScriptProgram: Sendable {
     public let name: String
     public let text: OriginalTextTable

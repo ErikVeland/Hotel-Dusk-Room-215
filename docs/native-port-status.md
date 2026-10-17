@@ -12,6 +12,20 @@ The native game remains incomplete. You can play only the recovered Chapter 1 op
 2. Event 1: process 56, the entrance. Tap the door handle on the right page.
 3. Event 2: the lobby arrival. Play stops when Kyle can explore, because exploration is not recovered.
 
+The runner also plays the next story path, but normal play cannot reach it yet. The map walk to search area 2 and the 3D search view that picks the bell (node `obj02`) are not recovered. `OriginalEventRunner.lookInSearchView(area:subarea:table:)` takes that result and continues:
+
+4. Event 3: Kyle looks at the counter bell (mode 10 closeup).
+5. Event 4: process 24, overlay 32. Tap the bell three times, or tap the quit button. The quit result runs event 5, which asks the search view to reload, and play stops at exploration.
+6. Events 7 to 12: Dunning's arrival and the suite offer. Opcode 10 kind 5 shows the original choice prompt (KIF labels). The answer is a mode-5 event; the saved frame then resumes event 12.
+7. Event 16: process 25, overlay 1 (`CSign`). Drag right across each line of the registration card to sign it. The completed card returns 0; the quit button returns 1 or 2.
+8. Events 19 to 27: the name, the room key and the brochure. Opcode 6 adds each item and shows its notice pages.
+9. "Hold on" interrupts: on armed pages the touch page shows a pulsing icon. Pressing it plays the mode-6 event and its choice. The interrupted event then resumes and skips the `%!` lines.
+10. Event 28: the question menu. The menu lists the `EP1_.ttk` topics that Dunning can be asked about. Answers are mode-1 events; "Leave" plays the mode-4 exit.
+
+After the menu, the talk ends when the selector finds no event. Play then returns to exploration, which is not recovered. To ask the remaining topics, the original talks to Dunning again from exploration (mode 0).
+
+For simulator checks, a Debug build reads the environment variable `HOTEL_DUSK_FIXTURE`. `R102-bell-look` supplies the look result for area 2, subarea 2 at R102 exploration. `R102-sign` and `R102-event-N` play the original script with fixed inputs until process 25 or event N starts. These are isolated component inputs, like the reference runner's diagnostic writes. While one is set, a Debug build also ignores a closed hinge reading, because the iPhone Duo simulator can boot folded. Release builds ignore all of them, and the app shows no control for them.
+
 `OriginalEventRunner` connects the recovered selector, conditions, state commands, dialogue packets and event exits. It marks a completed event at (current map, event key), as `0x0203D61C` does through `0x02097FC0`. Opcodes that change only controller or display state continue without a drawing: 3, 26, 27, 28, 43, 44 and the empty dispatcher cases. All other unrecovered opcodes, exit modes and processes stop play and show the program, event and source offset.
 
 These parts of the slice are approximations:
@@ -20,6 +34,13 @@ These parts of the slice are approximations:
 - The entrance shows the original `u01`–`u03` and `d01`–`d03` panels, not the 3D R101 scene. An outline marks the original handle rectangle. Fades are counted for timing but not drawn.
 - Text control `%m0NN` starts `SEQ_BGM_NN`. The meaning of the other mode values is not known.
 - Text colours 1 and 2 use approximate ink tones. Portraits, talk backgrounds and character animation are not drawn.
+- The bell page shows `bell02` with `bell01` on top. The bell swing angle, the trick-button sprites and the talk background `R102_03` on the other screen are not drawn. Outlines mark the original bell rectangle and quit button.
+- The registration card shows `signnote` and reveals `signnote02` per field as the strokes grow. The pen sprite and fades are not drawn.
+- The choice prompt, the question menu and the interrupt icon use book typography, not the original menu graphics. The question menu does not list items that Kyle can show.
+- The menu's `+0x6C = -1` branch (a mode-26 answer from the partner's scene) is not recovered. Topic answers use the mode-1 branch.
+- The interrupt stays armed after a replay in the same way as `0x0203F57C`. When the original text window accepts a second press is not verified against the ROM.
+- The original shows a Chapter 1 title card after the entrance; the native slice does not.
+- The request stack at `0x021046B8` is kept in the runner. The map and search processes that read it are not recovered.
 - Screen 1 maps to the left page and screen 0 to the right page. Left-handed layout is not supported yet. The earlier demonstration was retired because it contained invented dialogue, arbitrary items, free room travel, chapter shortcuts and a procedural corridor. The white corridor rectangles were artifacts of that prototype, not original game graphics.
 
 ## Source-backed Swift modules

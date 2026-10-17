@@ -55,7 +55,7 @@ public enum OriginalEventCompletion {
             records = conditions.entries[Int(key)].second
         }
         switch mode {
-        case 3, 4, 5, 15:
+        case 2, 3, 4, 5, 15:
             var transition: OriginalEventTransition?
             if let records {
                 let index = mode == 15 ? max(0, Int(processReturn)) : 0
@@ -66,6 +66,16 @@ public enum OriginalEventCompletion {
             }
             return .completed(Completion(transition: transition,
                                          preventContextRestore: mode == 5 && transition != nil))
+        case 10...14:
+            // 0x0203E7C8, first update (+0x0A == 0): a transition is applied
+            // at once. Exits to modes other than 15 also start the closeup
+            // fade and sound (0x0204FE58, 0x02009D88), which are presentation.
+            // Without a transition, the closeup returns to the search view
+            // through fades and process state that are not recovered.
+            guard let first = records?.first, let transition = try OriginalEventTransition(record: first) else {
+                return .requiresOriginalHandler(mode: mode)
+            }
+            return .completed(Completion(transition: transition, preventContextRestore: false))
         case 6, 18, 19, 20, 23, 25, 29, 31, 32:
             return .completed(Completion(transition: nil, preventContextRestore: false))
         default: return .requiresOriginalHandler(mode: mode)

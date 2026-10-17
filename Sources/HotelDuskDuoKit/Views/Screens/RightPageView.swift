@@ -11,8 +11,16 @@ public struct RightPageView: View {
             }
             if let play = session.play {
                 switch play.runner.phase {
-                case .dialogue, .process, .waiting:
+                case .dialogue, .itemNotice, .process, .waiting:
                     OriginalPlayPage(play: play, screen: 0)
+                case .questions(let topics):
+                    Spacer()
+                    OriginalQuestionMenuView(play: play, topics: topics)
+                    Spacer()
+                case .choice(let choices):
+                    Spacer()
+                    OriginalChoiceView(play: play, choices: choices)
+                    Spacer()
                 case .exploration, .halted:
                     Spacer()
                     OriginalPlayStatusView(session: session, play: play)

@@ -82,6 +82,7 @@ public struct OriginalBitmapLibrary: Sendable {
     }
     public let manifest: Manifest
     private let root: URL
+    var resourceRoot: URL { root }
     public init(resourceRoot: URL) throws {
         root = resourceRoot.standardizedFileURL
         manifest = try JSONDecoder().decode(Manifest.self, from: Data(contentsOf:
@@ -97,6 +98,62 @@ public struct OriginalBitmapLibrary: Sendable {
         guard record.status == "decoded" else { throw OriginalDataError.unsupported(record.error ?? path) }
         let url = root.appendingPathComponent(path).standardizedFileURL
         guard url.path.hasPrefix(root.path + "/") else { throw OriginalDataError.invalid("Bitmap path leaves source directory") }
+        let data = try Data(contentsOf: url)
+        guard OriginalAnimationClip.digest(data) == record.payloadSHA256 else { throw OriginalDataError.checksum(path) }
+        return try .init(data: data)
+    }
+}
+
+/// Original 8-bit linear bitmap, as used by `trick/bell`. 0x021FCBEC reads its
+/// pixel array at base + u16 0x1C + u16 0x1A × 2 for the touch mask. Header:
+/// 16 zero bytes, u16 width, height, width, height, kind 4, palette count,
+/// palette offset. Pixels are row-major in source orientation.
+public struct OriginalLinearBitmap: Sendable {
+    public let width: Int
+    public let height: Int
+    public let indices: [UInt8]
+    public let palette: [UInt16]
+
+    public init(data: Data) throws {
+        let decoded = data.prefix(3) == Data([0x12, 0x3d, 0xda])
+            ? try OriginalContainer.decode(data, hasDirectoryRecord: false) : data
+        let r = OriginalBytes(decoded)
+        guard decoded.count >= 0x20, decoded.prefix(16).allSatisfy({ $0 == 0 }) else {
+            throw OriginalDataError.unsupported("Original linear bitmap header")
+        }
+        let w = Int(try r.u16(0x10)), h = Int(try r.u16(0x12))
+        let count = Int(try r.u16(0x1A)), paletteOffset = Int(try r.u16(0x1C))
+        guard try r.u16(0x14) == w, try r.u16(0x16) == h, try r.u16(0x18) == 4,
+              w > 0, h > 0, count == 256, paletteOffset == 0x20,
+              decoded.count == paletteOffset + count * 2 + w * h else {
+            throw OriginalDataError.invalid("Original linear bitmap section sizes")
+        }
+        width = w; height = h
+        palette = try (0..<count).map { try r.u16(paletteOffset + $0 * 2) }
+        indices = Array(try r.range(paletteOffset + count * 2, w * h))
+    }
+
+    public func rgba(transparentPaletteZero: Bool) -> Data {
+        var data = [UInt8](); data.reserveCapacity(width * height * 4)
+        for index in indices {
+            let packed = palette[Int(index)]
+            for shift in [0, 5, 10] {
+                let value = UInt8((packed >> shift) & 31)
+                data.append((value << 3) | (value >> 2))
+            }
+            data.append(transparentPaletteZero && index == 0 ? 0 : 255)
+        }
+        return Data(data)
+    }
+}
+
+extension OriginalBitmapLibrary {
+    /// Loads a member that the tiled-bitmap manifest leaves unresolved, after
+    /// checking its payload hash, as an original linear bitmap.
+    public func loadLinear(path: String) throws -> OriginalLinearBitmap {
+        guard let record = manifest.images.first(where: { $0.source == path }) else { throw OriginalDataError.missing(path) }
+        let url = resourceRoot.appendingPathComponent(path).standardizedFileURL
+        guard url.path.hasPrefix(resourceRoot.path + "/") else { throw OriginalDataError.invalid("Bitmap path leaves source directory") }
         let data = try Data(contentsOf: url)
         guard OriginalAnimationClip.digest(data) == record.payloadSHA256 else { throw OriginalDataError.checksum(path) }
         return try .init(data: data)

@@ -147,3 +147,83 @@ An emulator could execute the original logic, but it is outside the user's chose
 A valid new press requests sound archive 51/entry 0, optional rumble 1, and process return 0. The model animation advances by 0.75 each update. When it exceeds frame 40, both screens begin the original 100-update fade. Native effects retain the original fade mode and mask rather than assigning an unverified visual interpretation. The process waits for actual fade completion, then delays 100 updates and emits manager statuses 1 and 3. The final movement tick intentionally does not commit its local actor position, matching the source early return. All local counters and image stages are Codable for book closure.
 
 The native scene host still needs to apply the source resource loads, camera/rendering, fades, sound, and shared resource lifecycle calls. The state machine does not replace those with placeholder graphics or assume an unavailable renderer has completed a fade.
+
+## Chapter 1 counter bell and Dunning's arrival
+
+After lobby event 2, the next `EP1_R102` story path is event 3 (closeup), event 4 (process 24), events 5, 6 or 7, then event 8 (Dunning) and event 12. The native runner now plays events 3 to 12. It stops in event 12 at operation offset 3912, opcode 10 kind 5.
+
+### Search view look
+
+The search process (process 0x93, update `0x0203148C`) writes the closeup context. Phase 1 (`0x02031760`) handles input. Phase 2 (`0x02031944`) writes the talk session and requests the talk controller, process 0x7D.
+
+| Step | Address | Behavior |
+| --- | --- | --- |
+| Initialize | `0x02030B04` | Reads the area from message 0x2F into +0x0C. Loads `data/MAP/sdata/<map>.srh` and `.upv`. Allocates a new talk session (`0x02028160`). Sets +0x30 and +0x32 to -1. |
+| Touch | `0x0203314C` | On a release (`0x0209AF40`), `0x02033528` reads the picked model node name. A name `objNN` gives subarea NN in +0x44. |
+| Up-view test | `0x020331A8` | Calls `0x020B462C(srh, area, subarea)`. Values from 0 to 0xFFFE, with a valid `0x020B4A80` record, select case 2 (up view). Other values select case 0 (look). |
+| Look | `0x02031A0C` | Scene 0xFFFE (`0x02028240`). Mode 10, event 0 (`0x02028360`). Block 0, area +0x0C, subarea +0x44 and upView `ldrsh [+0x32]` on the stack (`0x0202847C`). Next process 0x7D. |
+
+The `.srh` layout is: u16 area count, u16 second count, 20-byte area records (u16 area, u16 entry count, 16-byte model name), 24-byte records, then 8-byte entries (u16 subarea, u16 upView ID). The pointer setup at `0x020B45E4` gives this layout. 37 of 41 tables end exactly after the entries. R119, R123, R126 and R304 have more bytes; these are kept but not interpreted.
+
+`R102.srh` area 2 is `R102_03`. Its subarea 2 entry has upView 0xFFFF, so the look branch is taken. The search model `map/R102/R102_s02/R102_s02.mdf` contains node `obj02`. Thus the bell look context is: scene 0xFFFE, mode 10, event 0, block 0, map 2, area 2, subarea 2, upView -1. Event 3 (`0a00 0300 0300 … 0202 0200`) matches it: packed map 2 and area 2 at byte 16, subarea 2 at byte 18. Its CHK condition requires event flag (2, 7) clear.
+
+Event 3 has mode 10. Completion `0x0203E7C8` applies its CHK exit (mode 15, scene 0xFFFE, event 4) at once. For an exit mode other than 15, it also starts a fade and a sound. Without an exit, the closeup returns to the search view; that path is not recovered.
+
+The map walk that opens search area 2 and the 3D search view that picks `obj02` are not recovered. These are the blocking systems for normal play.
+
+### Process 24: the bell
+
+Event 4 has mode 15 and byte 16 = 1, so process 24 runs. Factory `0x0200B334` case 0x18 passes slot 0x20 to `0x0200B2D8`. The table at `0x020E92A4` maps it to overlay 32, constructor `0x021FCB40`. The object size is 0x46C. Resources are `/data/trick/bell.tbl` and `bell.wpf` with `bell01.bin` and `bell02.bin`. `OriginalBellProcess` transcribes it.
+
+| Item | Address | Behavior |
+| --- | --- | --- |
+| Update | `0x021FD0A8` | Stage +0x2AE. Stage 0 runs `0x021FCBEC`, then enables all trick buttons. Stage 1 runs the ring machine. Stage 5 waits for the screen-0 fade, writes result 0 and returns 2. |
+| Ring machine | `0x021FD478` | A bell touch sets +0x43E to 2 and counts a ring in +0x448. The swing uses +0x440 × `0x3CAC0831`, then sound archive 37, entry 0. After 3 rings (+0x44A), it starts a fade, disables touches and buttons, plays archive 1, entry 0, and after 130 updates sets stage 5. |
+| Bell touch | `0x021FE3AC` | A new press inside the inclusive rectangle at `0x021FE7F8` (x′ 56–96, y′ 72–120), or on a nonzero `bell01.bin` pixel at index y′ × 256 + 255 − x′. Coordinates use the handedness transform at `0x02009920` and `0x02009960`. |
+| Quit | `0x0202778C`, `0x020267F0` | Button slot 5, x′ 228–252, y′ 156–188, when enabled. Plays archive 8, entry 2, fades screen 0, and sets +0x43C to 1. After the fade, the result is 1 and the update returns 2. |
+| Result | `0x02026E68` | The trick base writes through its +0x288 pointer, which message 0x1F supplies. The talk controller reads it as the process return. |
+| Hint request | `0x021FE468` | +0x466 values 1 and 2 write mode 20, pair (1, value) (`0x020282A4`) and request the talk process. Only update stages 2 and 3 set +0x466, and no code in overlay 32 enters them. The native host stops if a request occurs. |
+
+`bell01.bin` and `bell02.bin` are 8-bit linear bitmaps. After 16 zero bytes, the header holds width 256, height 192, width, height, kind 4, 256 colours and palette offset 0x20. Pixels follow at 0x220. The mask pointer at `0x021FCBEC` (base + u16 0x1C + u16 0x1A × 2) confirms the offsets. `bell01.bin` has 5,412 nonzero pixels. The draw at `0x021FD7B4` puts `bell01` (rotated by +0x444) and `bell02` on the 3D screen.
+
+Process returns 0, 1 and 2 select events 7, 5 and 6. Events 5 and 6 contain only opcode 21 with kind 5. The dispatcher sends opcodes 15, 17, 21, 32, 41 and 45 to `0x0203C4AC`, which pushes (s8 byte 2, s16 at byte 4) on the request stack at `0x021046B8` (push `0x020971D0`). Opcodes 52 and 53 push kinds 10 and 11. Opcode 16 also compares a string and is not transcribed. The search process consumes kind 5 at `0x020340D0` and reloads its view. Result 2 is not produced by any recovered overlay-32 path.
+
+### Opcodes on the path
+
+Opcode 9 (handler `0x0203C474`) calls `0x020401EC`. That function only stores 1 at controller +0x8C and returns 0. The dispatcher already stored the same value, so opcode 9 advances like other records. Opcodes 6 (`0x0203FBFC`) and 8 (`0x0203FD30`) do not occur on this path.
+
+Event 7 (mode 3, scene 0xFFFE) exits to scene 2, event 8. Event 8 exits to event 12. Event 12 ends with opcode 10 kind 5 at offset 3912. That handler (`0x0203C5CC`) passes each listed object record to `0x0204B728` and saves the session frame (`0x02028564`). On a second pass it writes 0 for each listed ID with `0x02097C80`, the helper that kind 2 also uses. It needs controller state that is not recovered, so play stops there.
+
+## Conversation systems
+
+### Event end and saved frames
+
+After every event the talk process calls `0x020544BC`, which calls `0x020283B0`. If session +0x2D8 (override) is zero and a frame is saved, the last frame is popped and committed, and +0x2DA becomes 1 unless the previous mode was 5. Otherwise the result is the commit byte +0x44. A true result selects again; a false result ends the talk. A push (`0x02028564`) sets the override, so the first restore after a push only clears it. Event setup (`0x0203A444`) clears +0x44 (`0x02028470`) after selection. If no event is selected, setup sets +0x14 to 3 and the talk ends.
+
+### Choice prompt
+
+Opcode 10 kind 5 (`0x0203C3E8`) pushes the frame (block, mode, event, operation + 1), marks each listed ID with `0x02097C80`, and enters UI state 0x6F with +0x64 = 2. KIF records give the label (48 bytes), the mode-5 event ID (field 0) and the option ID (field 3). State 0x6F (`0x0203CE9C`) writes mode 5 and the event with `0x0202824C`.
+
+### Item opcodes
+
+Opcode 6 (`0x0203FBFC`) adds the item in u16 2 with `0x02097914`, then opens a text window at the line in u16 8 for the number of pages in u16 10. Opcode 8 (`0x0203FD30`) stores a picture ID and selects picture state 0x13 or 0x14; it writes no game state.
+
+### Mode setup and completion
+
+`0x0203B0A8` starts each event by mode. Mode 1 marks the keyword in u16 0x12 as asked by the partner (`0x02098440`, which replaces the mask). Mode 3 skips all operations if every type-3 CHK record's ID is already marked (`0x02097CC4`). Modes 7 and 8 read type-2 records: s16 4 is a keyword and u16 2 is the menu block (+0x66).
+
+The partner (+0x0C) is the session scene ID when it is not 0xFFFF, 0xFFFE or 0xFFFD. In `EP1_R102`, scene 2 holds Dunning's events and person 2 is Dunning.
+
+`0x0203D61C` ends modes 0 and 1 with the CHK exit, or reopens the menu while topics remain and the partner's nibble at 0xD0C is positive. Mode 1 then runs `0x02055CF0`: a keyword is used (0x881) when a flag-1 person was asked, or when all flag-3 people were asked. Mode 7 reopens the menu only if an open topic is also one of its type-2 records; otherwise it follows its exit. Mode 8 always opens the menu. Mode 2 follows its exit.
+
+### Question menu
+
+The chapter `.ttk` file holds 0x80-byte records: label (0x00–0x5F), keyword ID (u16 0x60) and one flag per person (0x70 + person). A first byte of 0xFF ends the table. A topic is listed if it is available (0x880), not used (0x881), not asked by the partner (0x882 mask) and flagged for the partner. A topic answer selects mode 1 with the keyword in session +0x38 (`0x020282D8`), in block +0x66 when it is set (`0x02028350`). Leaving selects the mode-4 event that `0x020295B0` finds in the partner's scene and that block.
+
+### Interrupts
+
+`0x020401FC` runs with the record after each dialogue command. Opcode 5 calls `0x0204033C`: if opcode 9 is two records after the page, it arms the interrupt (+0x96), clears +0x94, and stores the block (+0x98) and opcode 9's event (+0x9A). Opcode 38 sets +0x94. Text state 0x10 (`0x0203D3B8`, reached through the jump table at `0x0203CEF4`) handles a press (+0x70 > 0): it pushes the current page, selects mode 6 with `0x02028268(+0x98, 6, +0x9A, 0)` and ends the event. It disarms when +0x94, a press or +0x95 is set. While session +0x2DA is set, the dispatcher skips non-dialogue opcodes, and `0x0203F57C` skips pages that start with `%!` or `%?` until the replay rule shows a page and clears the flag.
+
+## Process 25: the registration card
+
+The factory case 25 passes slot 0 to `0x0200B2D8`, which maps to overlay 1 (`CSign`). Update `0x021FCFEC` waits 30 updates, then reads held touches (`0x021FD234`). A touch that moves right by more than one pixel inside an unfilled field fills it. Field rectangles are at `0x021FE708` (x), `0x021FE718` (y), `0x021FE700` (width) and `0x021FE710` (height), in `0x02009920`/`0x02009960` coordinates. Strokes grow by two per update up to the widths (`0x021FD344`), with sound archive 25, entries 0 to 3. When all four fields are filled, the process waits 120 updates and returns 0. The quit button returns 2 if fields 0 to 2 are blank, else 1. `signnote.bin` is the blank card and `signnote02.bin` the completed card.

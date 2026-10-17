@@ -35,11 +35,28 @@ struct OriginalPlayPage: View {
     var body: some View {
         switch play.runner.phase {
         case .dialogue(let packet):
+            textPage(packet.pages.first(where: { $0.page == screen }))
+        case .itemNotice(_, let page):
+            textPage(page.page == screen ? page : nil)
+        case .process:
+            if play.sign != nil {
+                OriginalSignPageView(play: play, upper: screen == 1)
+            } else if play.bell != nil {
+                OriginalBellPageView(play: play, upper: screen == 1)
+            } else {
+                OriginalEntrancePanelView(play: play, upper: screen == 1)
+            }
+        default:
+            EmptyView()
+        }
+    }
+
+    private func textPage(_ shown: OriginalDialoguePacket.Page?) -> some View {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
                 // A page without visible text still carries portrait and cue
                 // controls, and the original still waits for a tap there.
-                if let page = packet.pages.first(where: { $0.page == screen }) {
+                if let page = shown {
                     OriginalDialoguePageView(page: page)
                     HStack {
                         Spacer()
@@ -54,10 +71,20 @@ struct OriginalPlayPage: View {
             .onTapGesture { play.advanceDialogue() }
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Continue")
-        case .process:
-            OriginalEntrancePanelView(play: play, upper: screen == 1)
-        default:
-            EmptyView()
-        }
+            .overlay(alignment: .bottomLeading) {
+                if screen == 0, play.runner.interruptAvailable {
+                    // The original pulses an icon on the touch screen
+                    // (0x02041C34) for as long as an interrupt is armed.
+                    Button { play.interrupt() } label: {
+                        Image(systemName: "exclamationmark.bubble.fill")
+                            .font(.largeTitle)
+                            .foregroundStyle(NovelStyle.redInk)
+                            .symbolEffect(.pulse)
+                            .frame(minWidth: 56, minHeight: 56)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Interrupt")
+                }
+            }
     }
 }

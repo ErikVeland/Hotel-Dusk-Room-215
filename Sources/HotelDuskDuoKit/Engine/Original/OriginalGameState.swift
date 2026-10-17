@@ -217,6 +217,34 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
         return []
     }
 
+    /// Keyword fields at 0x880 + ID × 4: available (0x02098544), used
+    /// (0x0209857C) and the s16 mask of people already asked (0x0209855C).
+    public func keywordAvailable(_ id: Int) -> Bool { (0..<128).contains(id) && bytes[0x880 + id * 4] != 0 }
+    public func keywordUsed(_ id: Int) -> Bool { (0..<128).contains(id) && bytes[0x881 + id * 4] != 0 }
+    public func keywordAsked(_ id: Int, person: Int) -> Bool {
+        guard (0..<128).contains(id), (0..<16).contains(person) else { return false }
+        return (Int16(bitPattern: read16(0x882 + id * 4)) >> person) & 1 != 0
+    }
+
+    /// 0x02098440 replaces the mask with this person's bit; it does not add it.
+    public mutating func markKeywordAsked(_ id: Int, person: Int) {
+        guard (0...0x80).contains(id), (0...0x10).contains(person) else { return }
+        write16(0x882 + id * 4, UInt16(truncatingIfNeeded: 1 << person))
+    }
+
+    /// 0x02098504: the keyword has no more questions to ask.
+    public mutating func markKeywordUsed(_ id: Int) {
+        guard (0..<0x80).contains(id) else { return }
+        bytes[0x881 + id * 4] = 1
+    }
+
+    /// 0x02097F6C: a signed nibble per person at 0xD0C, set to 6 on a new game.
+    public func personNibble(_ person: Int) -> Int {
+        guard person >= 0, 0xD0C + person / 2 < bytes.count else { return 0 }
+        let byte = bytes[0xD0C + person / 2]
+        return Int(person % 2 == 0 ? byte & 0x0F : byte >> 4)
+    }
+
     private mutating func setOriginalBit(base: Int, index: Int) throws {
         let offset = base + index / 8, shift = Int(UInt8(truncatingIfNeeded: index % 8))
         guard bytes.indices.contains(offset) else { throw OriginalDataError.invalid("Original flag write bounds") }
