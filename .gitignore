@@ -219,6 +219,8 @@ BUSINESS_PLAN.md
 # Miscellaneous
 *.bak
 *.backup
+*.tools/
+*/tools/
 .DS_Store
 *.DS_Store
 .DS_Store?
