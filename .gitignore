@@ -220,7 +220,7 @@ BUSINESS_PLAN.md
 *.bak
 *.backup
 *.tools/
-*/tools/
+*tools/
 .DS_Store
 *.DS_Store
 .DS_Store?
