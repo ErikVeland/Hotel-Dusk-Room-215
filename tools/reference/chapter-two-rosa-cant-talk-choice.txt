@@ -1,0 +1,18 @@
+load extracted/reference/chapter-two-rosa-stories-answer/page12.mln
+touch 75 96
+frames 3
+release
+frames 120
+capture interrupted
+save interrupted
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture choice
+save choice
+quit

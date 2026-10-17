@@ -1,0 +1,33 @@
+# Original reference. Output directory: extracted/reference/room215-phone-answer
+load extracted/reference/room215-phone-inspect/inspect.mln
+touch 90 86
+frames 3
+release
+frames 120
+capture selected
+save selected
+touch 90 86
+frames 3
+release
+frames 150
+capture ringing
+save ringing
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+capture rachel
+save rachel
+quit

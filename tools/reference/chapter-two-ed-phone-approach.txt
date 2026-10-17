@@ -1,0 +1,16 @@
+load extracted/reference/chapter-two-ed-door-approach/door.mln
+touch 127 20
+frames 95
+release
+frames 5
+touch 45 96
+frames 70
+release
+frames 5
+touch 127 20
+frames 20
+release
+frames 30
+capture approached
+save approached
+quit

@@ -1,0 +1,53 @@
+load extracted/reference/lobby-bell-08/advance6.mln
+capture arrival
+touch 175 140
+frames 160
+release
+frames 3
+capture wall
+touch 180 70
+frames 45
+release
+frames 3
+capture counter
+touch 15 74
+frames 3
+release
+frames 120
+capture search
+touch 15 170
+frames 3
+touch 15 110
+frames 30
+release
+frames 60
+capture pan
+touch 60 126
+frames 3
+release
+frames 60
+touch 60 126
+frames 3
+release
+frames 240
+capture bell-text
+keys ffe
+frames 3
+keys fff
+frames 240
+capture bell
+touch 180 96
+frames 3
+release
+frames 20
+touch 180 96
+frames 3
+release
+frames 20
+touch 180 96
+frames 3
+release
+frames 400
+capture dunning
+save dunning
+quit

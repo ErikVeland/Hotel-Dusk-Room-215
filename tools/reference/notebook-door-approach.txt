@@ -1,0 +1,19 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/notebook-door-approach
+load extracted/reference/notebook-leave-closeup/bed.mln
+touch 15 78
+frames 3
+release
+frames 120
+capture map
+touch 210 96
+frames 65
+release
+frames 30
+capture north
+touch 127 170
+frames 45
+release
+frames 120
+capture near
+save near
+quit

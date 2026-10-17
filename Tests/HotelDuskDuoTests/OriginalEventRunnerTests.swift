@@ -49,16 +49,14 @@ final class OriginalEventRunnerTests: XCTestCase {
         XCTAssertEqual(runner.game.value(for: .eventFlag(group: 2, index: 2)), true)
     }
 
-    func testCompletedArrivalHaltsInsteadOfReplaying() throws {
+    func testCompletedArrivalReturnsToExplorationInsteadOfReplaying() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
         game.setMap(2, previous: 1)
         game.markEventCompleted(group: 2, event: 0)
         // With the arrival already seen, no arrival event remains.
         let runner = try OriginalEventRunner(program: catalog.loadProgram("EP1_R102"), game: game)
-        guard case .halted(let halt) = runner.phase else { return XCTFail("Expected a halt") }
-        XCTAssertNil(halt.sourceOffset)
-        XCTAssertTrue(halt.reason.hasPrefix("No original event"))
+        XCTAssertEqual(runner.phase, .exploration(mapID: 2))
     }
 
     // MARK: R102 counter bell and Dunning's first conversation
@@ -96,8 +94,14 @@ final class OriginalEventRunnerTests: XCTestCase {
         XCTAssertEqual(context.sceneID, 0xFFFE)
         XCTAssertEqual(context.modeID, 10)
         XCTAssertEqual(context.upViewID, -1)
-        XCTAssertEqual(OriginalSearchSelection.look(table: table, mapID: 2, nowTime: 0, area: 2, subarea: 3),
-                       .upViewNotRecovered(upViewID: 0x0B))
+        guard case .closeup(let entry, let view) = OriginalSearchSelection.look(
+            table: table, mapID: 2, nowTime: 0, area: 2, subarea: 3) else {
+            return XCTFail("Expected a close-up entry event")
+        }
+        XCTAssertEqual(view, 0x0B)
+        XCTAssertEqual(entry.modeID, 10)
+        XCTAssertEqual(entry.upViewID, -1)
+        XCTAssertEqual(entry.subareaID, 3)
     }
 
     func testBellCloseupRunsEvent3ThenProcess24() throws {
@@ -130,10 +134,9 @@ final class OriginalEventRunnerTests: XCTestCase {
         XCTAssertNotNil(pagesByEvent[12])
         XCTAssertEqual(runner.game.value(for: .eventFlag(group: 2, index: 7)), true)
         XCTAssertEqual(runner.game.value(for: .eventFlag(group: 2, index: 8)), true)
-        // Event 12 ends with opcode 10 kind 5, which is not recovered.
-        guard case .halted(let halt) = runner.phase else { return XCTFail("Expected a halt in event 12") }
-        XCTAssertEqual(halt.eventIndex, 12)
-        XCTAssertEqual(halt.sourceOffset, 3912)
+        XCTAssertEqual(runner.eventIndex, 12)
+        guard case .choice(let options) = runner.phase else { return XCTFail("Expected Dunning's suite offer") }
+        XCTAssertEqual(options.map(\.eventID), [14, 13])
     }
 
     func testQuittingTheBellAsksTheSearchViewToReload() throws {
@@ -195,6 +198,8 @@ final class OriginalChoiceTests: XCTestCase {
             .init(id: 3, eventID: 14, label: "Say, a suite sounds nice."),
             .init(id: 2, eventID: 13, label: "Suites are for chumps."),
         ]))
+        XCTAssertTrue(runner.game.itemCheckFlag(2), "The menu marks each option before an answer")
+        XCTAssertTrue(runner.game.itemCheckFlag(3))
     }
 
     func testEitherAnswerReturnsToTheRegistrationCard() throws {

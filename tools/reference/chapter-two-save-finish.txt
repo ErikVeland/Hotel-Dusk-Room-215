@@ -1,0 +1,11 @@
+load extracted/reference/chapter-two-save-confirm/saved.mln
+frames 1200
+capture finished
+save finished
+keys ffe
+frames 2
+keys fff
+frames 300
+capture next
+save next
+quit

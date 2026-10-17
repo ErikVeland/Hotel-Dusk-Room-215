@@ -1,0 +1,15 @@
+# Inspect the save menu from the chapter boundary. Do not select or overwrite a save slot.
+load extracted/reference/chapter-one-review-final/page32.mln
+touch 78 55
+frames 3
+release
+frames 120
+capture selected
+save selected
+touch 78 55
+frames 3
+release
+frames 300
+capture slots
+save slots
+quit

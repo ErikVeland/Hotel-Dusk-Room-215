@@ -1,0 +1,8 @@
+load extracted/reference/chapter-two-suitcase-exit/returned.mln
+touch 15 48
+frames 2
+release
+frames 80
+capture items
+save items
+quit

@@ -1,0 +1,19 @@
+load extracted/reference/chapter-two-rosa-pager/page19.mln
+touch 210 96
+frames 68
+release
+frames 5
+capture north
+touch 127 20
+until32 02110190 00030011 240
+release
+frames 120
+capture central
+save central
+touch 210 96
+until32 02110190 00110027 200
+release
+frames 120
+capture upstairs
+save upstairs
+quit

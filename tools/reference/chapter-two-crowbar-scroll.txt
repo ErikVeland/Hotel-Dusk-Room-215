@@ -1,0 +1,10 @@
+load extracted/reference/chapter-two-crowbar-items/items.mln
+touch 185 175
+frames 3
+touch 125 175
+frames 3
+release
+frames 120
+capture scrolled
+save scrolled
+quit

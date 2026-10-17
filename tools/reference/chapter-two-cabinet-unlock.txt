@@ -1,0 +1,140 @@
+load extracted/reference/chapter-two-cabinet-combination-entry/ready.mln
+touch 125 30
+frames 3
+touch 35 30
+frames 3
+capture drag0_0
+release
+frames 90
+capture wheel0_0
+save wheel0_0
+touch 125 30
+frames 3
+touch 35 30
+frames 3
+capture drag0_1
+release
+frames 90
+capture wheel0_1
+save wheel0_1
+touch 125 94
+frames 3
+touch 35 94
+frames 3
+capture drag1_0
+release
+frames 90
+capture wheel1_0
+save wheel1_0
+touch 125 94
+frames 3
+touch 35 94
+frames 3
+capture drag1_1
+release
+frames 90
+capture wheel1_1
+save wheel1_1
+touch 125 94
+frames 3
+touch 35 94
+frames 3
+capture drag1_2
+release
+frames 90
+capture wheel1_2
+save wheel1_2
+touch 125 156
+frames 3
+touch 215 156
+frames 3
+capture drag2_0
+release
+frames 90
+capture wheel2_0
+save wheel2_0
+touch 125 156
+frames 3
+touch 215 156
+frames 3
+capture drag2_1
+release
+frames 90
+capture wheel2_1
+save wheel2_1
+frames 600
+capture returned
+save returned
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page0
+save page0
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page4
+save page4
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page5
+save page5
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page6
+save page6
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page7
+save page7
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page8
+save page8
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page9
+save page9
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page10
+save page10
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page11
+save page11
+quit

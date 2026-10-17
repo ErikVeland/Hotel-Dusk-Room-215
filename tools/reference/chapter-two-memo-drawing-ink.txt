@@ -1,0 +1,18 @@
+load extracted/reference/chapter-two-memo-torn-return/page15.mln
+touch 150 40
+frames 3
+capture dot
+touch 130 70
+frames 2
+capture line
+touch 100 100
+frames 2
+capture diagonal
+touch 40 175
+frames 2
+capture outside
+release
+frames 3
+capture released
+save released
+quit

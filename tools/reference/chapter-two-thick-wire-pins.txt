@@ -1,0 +1,139 @@
+load extracted/reference/chapter-two-thick-wire-insert/inserted.mln
+release
+frames 4
+touch 138 96
+frames 3
+touch 139 96
+frames 3
+touch 140 96
+frames 3
+touch 141 96
+frames 3
+touch 142 96
+frames 3
+touch 143 96
+frames 3
+touch 144 96
+frames 3
+touch 145 96
+frames 3
+touch 146 96
+frames 3
+touch 147 96
+frames 3
+touch 148 96
+frames 3
+touch 149 96
+frames 3
+touch 150 96
+frames 3
+touch 151 96
+frames 3
+touch 152 96
+frames 3
+touch 153 96
+frames 3
+touch 154 96
+frames 3
+touch 155 96
+frames 3
+touch 156 96
+frames 3
+capture pin0
+save pin0
+release
+frames 60
+capture release0
+touch 127 98
+frames 3
+touch 127 99
+frames 3
+touch 127 100
+frames 3
+touch 127 101
+frames 3
+touch 127 102
+frames 3
+touch 127 103
+frames 3
+touch 127 104
+frames 3
+touch 127 105
+frames 3
+touch 127 106
+frames 3
+touch 127 107
+frames 3
+touch 127 108
+frames 3
+touch 127 109
+frames 3
+touch 127 110
+frames 3
+touch 127 111
+frames 3
+touch 127 112
+frames 3
+touch 127 113
+frames 3
+touch 127 114
+frames 3
+touch 127 115
+frames 3
+touch 127 116
+frames 3
+touch 127 117
+frames 3
+capture pin1
+save pin1
+release
+frames 60
+capture release1
+touch 114 96
+frames 3
+touch 113 96
+frames 3
+touch 112 96
+frames 3
+touch 111 96
+frames 3
+touch 110 96
+frames 3
+touch 109 96
+frames 3
+touch 108 96
+frames 3
+touch 107 96
+frames 3
+touch 106 96
+frames 3
+touch 105 96
+frames 3
+touch 104 96
+frames 3
+touch 103 96
+frames 3
+touch 102 96
+frames 3
+touch 101 96
+frames 3
+touch 100 96
+frames 3
+touch 99 96
+frames 3
+touch 98 96
+frames 3
+touch 97 96
+frames 3
+touch 96 96
+frames 3
+touch 95 96
+frames 3
+capture pin2
+save pin2
+release
+frames 60
+capture release2
+frames 900
+capture finished
+save finished

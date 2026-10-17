@@ -1,0 +1,13 @@
+# Component continuation of the delivery fixture after Jeff's Room 213 conversation.
+load extracted/reference/jeff-room213-brochure-answer/page24.mln
+touch 210 96
+frames 18
+release
+frames 30
+touch 128 20
+frames 160
+release
+frames 180
+capture entrance
+save entrance
+quit

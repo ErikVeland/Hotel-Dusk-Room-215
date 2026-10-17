@@ -1,0 +1,28 @@
+load extracted/reference/chapter-two-thick-wire-pins/pin2.mln
+release
+until32 0221fc68 00040003 400
+capture turn_start
+save turn_start
+frames 25
+capture turn_mid
+until32 0221fc68 00010004 250
+capture camera_start
+save camera_start
+frames 30
+capture camera_mid
+until32 0221fc68 00030004 150
+capture lid_start
+save lid_start
+frames 10
+capture lid10
+frames 10
+capture lid20
+frames 10
+capture lid30
+frames 10
+capture lid40
+frames 30
+capture lid_done
+frames 200
+capture returned
+save returned

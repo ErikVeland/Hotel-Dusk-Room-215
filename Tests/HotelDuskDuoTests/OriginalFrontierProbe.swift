@@ -24,6 +24,8 @@ final class OriginalFrontierProbe: XCTestCase {
                 trail.append("p\(id)")
                 runner.finishProcess(returnValue: 0)
             case .waiting: runner.advanceWait()
+            case .picture(let id):
+                print("FRONTIER touch picture \(id) after \(trail.joined(separator: " "))"); return
             case .exploration where !looked:
                 looked = true
                 runner.lookInSearchView(area: 2, subarea: 2, table: try .bundled(map: "R102"))

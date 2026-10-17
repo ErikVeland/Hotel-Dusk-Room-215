@@ -1,0 +1,36 @@
+load extracted/reference/chapter-two-rosa-shifty-talk/page6.mln
+touch 85 96
+frames 10
+release
+frames 120
+touch 85 96
+frames 10
+release
+frames 120
+capture interrupted
+save interrupted
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page0
+save page0
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page3
+save page3
+quit

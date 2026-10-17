@@ -2,16 +2,19 @@ import Foundation
 import Combine
 
 /// Owns native game data and book state above the display lifecycle.
-/// Only the recovered Chapter 1 opening can be played; see OriginalPlaySession.
+/// The recovered route currently reaches the start of Chapter 2.
 @MainActor
 public final class GameSession: ObservableObject {
+    @Published public private(set) var chapterSaves: [OriginalChapterSave?] = Array(repeating: nil, count: 3)
+    @Published public private(set) var saveError: String?
+    private let saveStore: any OriginalChapterSaveStore
     @Published public private(set) var originalProgram: OriginalScriptProgram?
     @Published public private(set) var sourceError: String?
     @Published public var memoNotes: [String] = []
     @Published public var isMemoPadOpen = false
     @Published public private(set) var animationPreview: OriginalAnimationFrame?
     @Published public private(set) var animationPreviewID: String?
-    /// The recovered Chapter 1 opening, while it is being played.
+    /// The active recovered route.
     @Published public private(set) var play: OriginalPlaySession?
     @Published public var isJigsawPuzzleOpen = false {
         didSet {
@@ -34,7 +37,9 @@ public final class GameSession: ObservableObject {
 
     public init(hingeManager: DuoHingeManager? = nil,
                 audioController: AudioController = AudioController(),
-                jigsawPuzzleManager: JigsawPuzzleManager? = nil) {
+                jigsawPuzzleManager: JigsawPuzzleManager? = nil,
+                saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application) {
+        self.saveStore = saveStore
         self.hingeManager = hingeManager ?? DuoHingeManager()
         self.audioController = audioController
         self.jigsawPuzzleManager = jigsawPuzzleManager ?? JigsawPuzzleManager()
@@ -43,6 +48,7 @@ public final class GameSession: ObservableObject {
             scriptCatalog = nil
             sourceError = String(describing: error)
         }
+        refreshChapterSaves()
         observeFoldEvents()
     }
 
@@ -81,7 +87,7 @@ public final class GameSession: ObservableObject {
     public func startOriginalGame() {
         play?.stop()
         do {
-            let next = try OriginalPlaySession.chapterOne(audio: audioController)
+            let next = try OriginalPlaySession.chapterOne(audio: audioController, saveStore: saveStore)
             playCancellable = next.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
             play = next
             if isBookClosed { next.pause() }
@@ -94,6 +100,30 @@ public final class GameSession: ObservableObject {
         play?.stop()
         playCancellable = nil
         play = nil
+        refreshChapterSaves()
+    }
+
+    private func refreshChapterSaves() {
+        saveError = nil
+        for slot in 0..<3 {
+            do { chapterSaves[slot] = try saveStore.load(slot: slot) }
+            catch {
+                chapterSaves[slot] = nil
+                saveError = "Save slot \(slot + 1) could not be read: \(error)"
+            }
+        }
+    }
+
+    public func loadChapterSave(slot: Int) {
+        do {
+            guard let checkpoint = try saveStore.load(slot: slot) else { return }
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore)
+            play?.stop()
+            playCancellable = next.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+            play = next
+            saveError = nil
+            if isBookClosed { next.pause() }
+        } catch { saveError = "The saved game could not be loaded: \(error)" }
     }
 
     private func observeFoldEvents() {

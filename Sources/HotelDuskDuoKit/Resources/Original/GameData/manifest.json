@@ -258,6 +258,349 @@
       "source": "extracted/root/data/map/sdata/R401.srh",
       "bytes": 32,
       "sha256": "99a5ca60723d9e48c86c7046357e57be87a7cfcf46b348b2ba46017ed918dc7b"
+    },
+    {
+      "name": "R102.col",
+      "source": "extracted/unpacked_wpf/map/R102/R102/R102.col",
+      "bytes": 2466,
+      "sha256": "5e98ab458d6113b885687b804ee322703ba05ca8a167fcd01dc9f01c3c8029be",
+      "sourceMemberSHA256": "f36324c3b0278fd0c60e3fe6efb63795d810bd39a7e9d42f1a5a564de97b837d",
+      "decodedSHA256": "aef5a9a02dd252fcbe1563a2a946ee51438d02374b32f8c60b110c10ae16e07d"
+    },
+    {
+      "name": "R103.col",
+      "source": "extracted/unpacked_wpf/map/R103/R103/R103.col",
+      "bytes": 2183,
+      "sha256": "8c9cb50ee12ab5837f14cac676ce91d77d19c940b4d1d21ed999cc9c92db7684",
+      "sourceMemberSHA256": "3875cf9d975d059f1b4da7e66fee9f06e66e12ecb56d202cae1074a0d3c21f14",
+      "decodedSHA256": "32029682a716abee98e114259fac3e15b214f768e7bb02954af84dee2e94650f"
+    },
+    {
+      "name": "R114.col",
+      "source": "extracted/unpacked_wpf/map/R114/R114/R114.col",
+      "bytes": 2087,
+      "sha256": "d3e46b8b9a6e5f3a089acea8798cd836eb0c21f3bb0af2cc6acf01c908f2045c",
+      "sourceMemberSHA256": "7a16cda16726e7bd1fae1f582273625e5f61548ec7f36121fff54de1145ff93a",
+      "decodedSHA256": "aca6b213e294400069eda11925641ae83ddd2dcc08c38ae74c380e4048765fd0"
+    },
+    {
+      "name": "R115.col",
+      "source": "extracted/unpacked_wpf/map/R115/R115/R115.col",
+      "bytes": 1649,
+      "sha256": "5c941308dee02b87ac8470112e37f8740d3ff35754f8add59765b01b025a81c5",
+      "sourceMemberSHA256": "1ad6941296bc8245d0f881eb19dc1c04dda0bad95dae671bdb165b3a7202ef1e",
+      "decodedSHA256": "d63377ba4aa64d2a206763da6dd62599d11a5fa16db5c5093d3eb2b60ab527fd"
+    },
+    {
+      "name": "R117.col",
+      "source": "extracted/unpacked_wpf/map/R117/R117/R117.col",
+      "bytes": 1888,
+      "sha256": "3345b2497bcf131c48156cd422221a42a9673f6e6002f3c00e3ab5aaaf46bc92",
+      "sourceMemberSHA256": "fcbb8c767bb2ad20dc63af01cb179dd61d059d591ba18efbdf8bbbe8b112830b",
+      "decodedSHA256": "f4cf4a287ee10a3e8425f2c8f8e788511d7918e87f2e36703314490fb54f4186"
+    },
+    {
+      "name": "R119.col",
+      "source": "extracted/unpacked_wpf/map/R119/R119/R119.col",
+      "bytes": 1197,
+      "sha256": "e43142084b109fd2baf445ecf942743544efcd07a86c44476e2c9ce708b8c992",
+      "sourceMemberSHA256": "972b7a5261f6a0c4838029c86b0f71d112d6612cf0677eba6bda4457cf749a1d",
+      "decodedSHA256": "260a606634d8de5e6150931d462db62c8b3c7ebc566b5ae3cb8815663057ed3b"
+    },
+    {
+      "name": "R213.col",
+      "source": "extracted/unpacked_wpf/map/R213/R213/R213.col",
+      "bytes": 3054,
+      "sha256": "5f59ab721d4036efcd0720e47e529b6d560a61dc15a94815c623ab56acabce80",
+      "sourceMemberSHA256": "1dde3785b28916faeab973f0e36f20d60a2b0bd5f787f581ac68a1e18fefd3ba",
+      "decodedSHA256": "354208d519cb03c4a18c07c2f12b81460687a3b0d7a4e2158b4d052cf99691dd"
+    },
+    {
+      "name": "R205.col",
+      "source": "extracted/unpacked_wpf/map/R205/R205/R205.col",
+      "bytes": 2208,
+      "sha256": "1de73c6ce504aeb177148e85a3e90e75b4361e926c89ba29bc0957a5e2588767",
+      "sourceMemberSHA256": "345e467c7f029356afb4ec5ed01a5e4cd1536f209fccbc616894da00c8781e3a",
+      "decodedSHA256": "873949b80420c796d12331aecc32cb8d1d5028d63b40b5e37f30c52b1e7bf65c"
+    },
+    {
+      "name": "R211.col",
+      "source": "extracted/unpacked_wpf/map/R211/R211/R211.col",
+      "bytes": 1822,
+      "sha256": "a0b3cf4edc938dfe7e6891e5379af6d33e567ff302fd5d3398f70d1f9e90bd34",
+      "sourceMemberSHA256": "41692a39da043e0cc7866a18db3200b40d95e8ddd250babfdcee26c19701328f",
+      "decodedSHA256": "cfd99dcc256ab669a9d025e852995cbba14c19d26181a9f09926630cac33521d"
+    },
+    {
+      "name": "sdata/R102.upv",
+      "source": "extracted/root/data/map/sdata/R102.upv",
+      "bytes": 484,
+      "sha256": "45aa56805b9efda9dbad788cc9de0d8a2bc3477afb72392d1d3fada558345104"
+    },
+    {
+      "name": "sdata/R103.upv",
+      "source": "extracted/root/data/map/sdata/R103.upv",
+      "bytes": 564,
+      "sha256": "c06e49801f8f9c18cd61ea0ce6d13dc2ff22629f50406021d313aa9d7cc3161b"
+    },
+    {
+      "name": "sdata/R104.upv",
+      "source": "extracted/root/data/map/sdata/R104.upv",
+      "bytes": 104,
+      "sha256": "9496adb550884627df40e8b736c3f248a03d3bb3a991b0b0b6c27e6ebd1bc453"
+    },
+    {
+      "name": "sdata/R105.upv",
+      "source": "extracted/root/data/map/sdata/R105.upv",
+      "bytes": 104,
+      "sha256": "3e37057796db3206cba0fb04e905c97aea01c379df0021d413929c21d3673c66"
+    },
+    {
+      "name": "sdata/R106.upv",
+      "source": "extracted/root/data/map/sdata/R106.upv",
+      "bytes": 264,
+      "sha256": "ff9da936fadc48c407e128fc03550d618591873a95ab650d5cebc44cb81477bb"
+    },
+    {
+      "name": "sdata/R107.upv",
+      "source": "extracted/root/data/map/sdata/R107.upv",
+      "bytes": 364,
+      "sha256": "e6dc281fd50ae8afb61ea6c07591a3311c53b2872cacbf7db74d49fc29ca136a"
+    },
+    {
+      "name": "sdata/R108.upv",
+      "source": "extracted/root/data/map/sdata/R108.upv",
+      "bytes": 344,
+      "sha256": "cb1a9110627441e21bfc58736f5096b597bd1ddf1b51025f5f3a7f7d292489de"
+    },
+    {
+      "name": "sdata/R109.upv",
+      "source": "extracted/root/data/map/sdata/R109.upv",
+      "bytes": 144,
+      "sha256": "4414321a3a69f47fff0e57e814090e7bb660ad146d3621d6fe3b244317558d66"
+    },
+    {
+      "name": "sdata/R110.upv",
+      "source": "extracted/root/data/map/sdata/R110.upv",
+      "bytes": 104,
+      "sha256": "6a33fc3880f70f403fc87ec319c53482e55dd0221e7b0fdba9268232b30f3797"
+    },
+    {
+      "name": "sdata/R111.upv",
+      "source": "extracted/root/data/map/sdata/R111.upv",
+      "bytes": 104,
+      "sha256": "8cc17f66fa17d59ce1525e52ed3222ec6ffffe0cef400e0fcfc582455d3941d9"
+    },
+    {
+      "name": "sdata/R112.upv",
+      "source": "extracted/root/data/map/sdata/R112.upv",
+      "bytes": 564,
+      "sha256": "5a1e03ad4a1a102557072f88ba1406112740bbfd952b8c40029e8491202f5c6e"
+    },
+    {
+      "name": "sdata/R113.upv",
+      "source": "extracted/root/data/map/sdata/R113.upv",
+      "bytes": 204,
+      "sha256": "1e9aa0d9905b654e2921bada5d2f26b4a94bb02dead7c65a6a2bd1f90d5150bc"
+    },
+    {
+      "name": "sdata/R114.upv",
+      "source": "extracted/root/data/map/sdata/R114.upv",
+      "bytes": 304,
+      "sha256": "eacddc3fe8ea456876a65614de910b1539fdf64e73a51bf08b9720a55f1461fa"
+    },
+    {
+      "name": "sdata/R115.upv",
+      "source": "extracted/root/data/map/sdata/R115.upv",
+      "bytes": 1024,
+      "sha256": "01931a9fe6612b57da90afa51619dd0d4cd89194de6532894352d722639f1607"
+    },
+    {
+      "name": "sdata/R116.upv",
+      "source": "extracted/root/data/map/sdata/R116.upv",
+      "bytes": 204,
+      "sha256": "be1d86a85554df46f425430d35419b437aa5a22074970328f60e9b3f94e23b04"
+    },
+    {
+      "name": "sdata/R117.upv",
+      "source": "extracted/root/data/map/sdata/R117.upv",
+      "bytes": 884,
+      "sha256": "3c49f1d83d0a0cc0293de27f72f0654c70793691fbc27f3c3e73c6bdbff89d33"
+    },
+    {
+      "name": "sdata/R118.upv",
+      "source": "extracted/root/data/map/sdata/R118.upv",
+      "bytes": 584,
+      "sha256": "6de199e73df4337b25bd8433fefcacdc143f74cec2f692392bb4d4dc8dc79aca"
+    },
+    {
+      "name": "sdata/R119.upv",
+      "source": "extracted/root/data/map/sdata/R119.upv",
+      "bytes": 904,
+      "sha256": "3e644176c363cc0c2801c9e444855c7ae5a4b7efff5a9329e1ac3391f0505a77"
+    },
+    {
+      "name": "sdata/R122.upv",
+      "source": "extracted/root/data/map/sdata/R122.upv",
+      "bytes": 244,
+      "sha256": "d8f7c9b2095416bcd29c629bec64cf4b4d09a6e0efe0054bc9056466c1e8df45"
+    },
+    {
+      "name": "sdata/R123.upv",
+      "source": "extracted/root/data/map/sdata/R123.upv",
+      "bytes": 364,
+      "sha256": "bb95962f3daf385fa977302140cb5a2e4421c849a50f6461c509c8c7922c1796"
+    },
+    {
+      "name": "sdata/R124.upv",
+      "source": "extracted/root/data/map/sdata/R124.upv",
+      "bytes": 184,
+      "sha256": "051e3daa65c18b0c0d1f43c66ad20dd7417bac10313936ff817edae350e9c9fc"
+    },
+    {
+      "name": "sdata/R125.upv",
+      "source": "extracted/root/data/map/sdata/R125.upv",
+      "bytes": 164,
+      "sha256": "3afa7f306a75948030170c932e8d0d4e14eed7fd1a951c8453eff7ce957534c5"
+    },
+    {
+      "name": "sdata/R126.upv",
+      "source": "extracted/root/data/map/sdata/R126.upv",
+      "bytes": 264,
+      "sha256": "15e5f5ff9f7fa4e82e59e6457535cf720e0aff578587d60464b94072bcc169cc"
+    },
+    {
+      "name": "sdata/R201.upv",
+      "source": "extracted/root/data/map/sdata/R201.upv",
+      "bytes": 104,
+      "sha256": "5b827428053a38f06cb86a408a999b6598db1f704b2aff8643c29a03bba0869a"
+    },
+    {
+      "name": "sdata/R202.upv",
+      "source": "extracted/root/data/map/sdata/R202.upv",
+      "bytes": 104,
+      "sha256": "135dcfb385a150cb30a135094fa1b0c905cc15545714d8af1f2b27aa0f5ae529"
+    },
+    {
+      "name": "sdata/R203.upv",
+      "source": "extracted/root/data/map/sdata/R203.upv",
+      "bytes": 224,
+      "sha256": "457e92f66c9b61b07266c572609ed707023ad5ad1fc198c2d14c2deb5f9d1169"
+    },
+    {
+      "name": "sdata/R204.upv",
+      "source": "extracted/root/data/map/sdata/R204.upv",
+      "bytes": 104,
+      "sha256": "b37a530989450819074cddaa01d55d635c16ed02c88fc902e7215a5ebac4b88b"
+    },
+    {
+      "name": "sdata/R205.upv",
+      "source": "extracted/root/data/map/sdata/R205.upv",
+      "bytes": 584,
+      "sha256": "e1fb050cc42b49bca6a29cff8995756152e4f4d3c5bfc3444e616f9d16f414cd"
+    },
+    {
+      "name": "sdata/R206.upv",
+      "source": "extracted/root/data/map/sdata/R206.upv",
+      "bytes": 104,
+      "sha256": "46f899ad3033ffef535dd1d2fe15963bd41165e1143be4f53070c03dd4110a68"
+    },
+    {
+      "name": "sdata/R207.upv",
+      "source": "extracted/root/data/map/sdata/R207.upv",
+      "bytes": 344,
+      "sha256": "b1cf9520b22052d6bea62483eb5f18eb8b466f23794b21a91d0b7bfef2490b8d"
+    },
+    {
+      "name": "sdata/R208.upv",
+      "source": "extracted/root/data/map/sdata/R208.upv",
+      "bytes": 104,
+      "sha256": "58674efc5ff77865c6a1502d77d22e4819851df00a71df67fe905c690c4ef509"
+    },
+    {
+      "name": "sdata/R209.upv",
+      "source": "extracted/root/data/map/sdata/R209.upv",
+      "bytes": 304,
+      "sha256": "6ef819715756eba6e02810e5ea172a3c51ed3dcfff36c6011a67ca4d9b5e76b1"
+    },
+    {
+      "name": "sdata/R210.upv",
+      "source": "extracted/root/data/map/sdata/R210.upv",
+      "bytes": 104,
+      "sha256": "12687444e25a74934900058ebce9b0cbd95d299bf1b273b9486b25276a177c66"
+    },
+    {
+      "name": "sdata/R211.upv",
+      "source": "extracted/root/data/map/sdata/R211.upv",
+      "bytes": 704,
+      "sha256": "3ff39ff7be212800d5dbb6cd7a8e70c0dc0e33a7d5c6c1ef1e8441a1968c9f41"
+    },
+    {
+      "name": "sdata/R212.upv",
+      "source": "extracted/root/data/map/sdata/R212.upv",
+      "bytes": 284,
+      "sha256": "3f56bb3c85cfde0f88f6b73f0c9c30ebbe713b1daa9d8e35ca256d5181ef81e7"
+    },
+    {
+      "name": "sdata/R213.upv",
+      "source": "extracted/root/data/map/sdata/R213.upv",
+      "bytes": 1984,
+      "sha256": "bb60f792a7d5192bb46d5e6f74455a2a17a76b09296acb44b91e44dcb7c06fa4"
+    },
+    {
+      "name": "sdata/R301.upv",
+      "source": "extracted/root/data/map/sdata/R301.upv",
+      "bytes": 564,
+      "sha256": "0a6117e68df2605d9e8b4f0bd3ef4b746e74b182751aabf860a186c19255ec7b"
+    },
+    {
+      "name": "sdata/R302.upv",
+      "source": "extracted/root/data/map/sdata/R302.upv",
+      "bytes": 164,
+      "sha256": "3ad91f41f2c211596c22bf89972b6b88e9440d7eb3894fdf91ad13c40aaa2e87"
+    },
+    {
+      "name": "sdata/R304.upv",
+      "source": "extracted/root/data/map/sdata/R304.upv",
+      "bytes": 384,
+      "sha256": "fadc7f3282b1c7f274b51e8ead2d2c8df5acef8a3e67412d85d22695e5210e5d"
+    },
+    {
+      "name": "sdata/R305.upv",
+      "source": "extracted/root/data/map/sdata/R305.upv",
+      "bytes": 104,
+      "sha256": "b652c9e82380203269d20a89471b83e8283b69c180453b1ca2cac2393e624025"
+    },
+    {
+      "name": "itemtext.dat",
+      "source": "extracted/root/data/local/us/itemtext.dat",
+      "bytes": 2792,
+      "sha256": "32155b129b6791a90083991afab4f7cb8897cc5c8f0aaa85098f633c73823a91"
+    },
+    {
+      "name": "standplace.dat",
+      "source": "extracted/root/data/map/sdata/standplace.dat",
+      "bytes": 1396,
+      "sha256": "39abd86ce614ff805853254411ccd2585b39aa1d782c83317d0a7538c3e14440"
+    },
+    {
+      "name": "touchevent.lst",
+      "source": "extracted/root/data/map/sdata/touchevent.lst",
+      "bytes": 1764,
+      "sha256": "b0f94e6d2f81753865aac9a1f9f47f6500c0be5ab900b11c9ab7388e8581701c"
+    },
+    {
+      "name": "trickitem.bin",
+      "source": "extracted/root/data/system/trickitem.bin",
+      "bytes": 38,
+      "sha256": "5cf17737e21c0f413bee42f377fa5fff451f1dfd6cca424a8d2ef99023a41ca2"
+    },
+    {
+      "name": "map_search_permissions.bin",
+      "source": "extracted/recovered_logic/binaries/arm9.bin",
+      "address": "0x020DF940",
+      "bytes": 47,
+      "sha256": "c949dee337614d4d2b1be325b7dc3c8964b8e94d41c63861e4fcfe003726410f"
     }
   ]
 }

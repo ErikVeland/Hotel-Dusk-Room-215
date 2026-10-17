@@ -1,0 +1,13 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-r103-return
+load extracted/reference/melissa-downstairs-return/downstairs.mln
+touch 45 96
+frames 68
+release
+frames 5
+touch 127 170
+until32 02110190 00110003 120
+release
+frames 120
+capture returned
+save returned
+quit

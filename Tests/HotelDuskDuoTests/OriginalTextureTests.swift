@@ -11,8 +11,8 @@ final class OriginalTextureTests: XCTestCase {
     func testEveryRecoveredTextureMatchesIndependentPythonDecoder() throws {
         let library = try OriginalTextureLibrary.bundled()
         XCTAssertEqual(library.manifest.coverage.textures, 2957)
-        XCTAssertEqual(library.manifest.coverage.decoded, 2919)
-        XCTAssertEqual(library.manifest.coverage.unsupported, 38)
+        XCTAssertEqual(library.manifest.coverage.decoded, 2921)
+        XCTAssertEqual(library.manifest.coverage.unsupported, 36)
         var checked = 0
         for record in library.manifest.textures where record.status == "decoded" {
             let texture = try library.load(path: record.source)
@@ -25,7 +25,7 @@ final class OriginalTextureTests: XCTestCase {
             XCTAssertEqual(sha(texture.rgba), record.rgbaSHA256, record.source)
             checked += 1
         }
-        XCTAssertEqual(checked, 2919)
+        XCTAssertEqual(checked, 2921)
     }
 
     func testPaddedStorageRetainsOriginalDimensions() throws {
@@ -45,5 +45,17 @@ final class OriginalTextureTests: XCTestCase {
             XCTAssertThrowsError(try library.load(path: record.source), record.source)
         }
         XCTAssertThrowsError(try OriginalTexture(data: Data(repeating: 0, count: 31)))
+    }
+
+    func testLobbyBlockStreamRetainsPartialRowWithoutFillingMissingBlocks() throws {
+        let texture = try OriginalTextureLibrary.bundled().load(path: "map/R102/R102/laungr.dtx")
+        XCTAssertEqual(texture.logicalHeight, 162)
+        XCTAssertEqual(texture.storedHeight, 164)
+        XCTAssertEqual(texture.originalPixelData.count / 6, 1296)
+        for y in 160..<164 {
+            for x in 64..<128 {
+                XCTAssertEqual(texture.rgba[(y * 128 + x) * 4 + 3], 0)
+            }
+        }
     }
 }

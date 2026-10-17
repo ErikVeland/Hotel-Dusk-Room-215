@@ -1,0 +1,18 @@
+load extracted/reference/chapter-two-whistle/page8.mln
+touch 127 170
+frames 365
+release
+frames 60
+touch 45 96
+frames 12
+release
+frames 90
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 180
+capture door
+save door
+quit

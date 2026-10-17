@@ -1,0 +1,21 @@
+# Component continuation of the delivery fixture. Walk to the bed after Summer leaves.
+load extracted/reference/summer-parcel-departure/page15.mln
+touch 45 96
+frames 65
+release
+touch 127 20
+frames 30
+release
+touch 45 20
+frames 25
+release
+frames 60
+capture near
+save near
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

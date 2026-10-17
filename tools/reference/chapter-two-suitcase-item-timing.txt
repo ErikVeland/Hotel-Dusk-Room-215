@@ -1,0 +1,25 @@
+load extracted/reference/chapter-two-suitcase-cash/pencil_moved.mln
+touch 20 20
+frames 2
+release
+frames 4
+touch 20 20
+frames 2
+release
+until32 02221e88 00000001 100
+capture shade_start
+frames 10
+capture shade10
+until32 02221e88 00000002 100
+capture scale_start
+frames 10
+capture scale10
+frames 10
+capture scale20
+until32 02221e88 00000003 100
+capture hold_start
+frames 15
+capture hold15
+until32 02221e88 00000004 100
+capture response
+quit

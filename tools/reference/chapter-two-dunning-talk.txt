@@ -1,0 +1,76 @@
+load extracted/reference/chapter-two-dunning-arrival/page19.mln
+touch 210 96
+frames 28
+release
+frames 5
+touch 127 20
+frames 20
+release
+frames 30
+capture approached
+save approached
+touch 15 46
+frames 3
+release
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page0
+save page0
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page4
+save page4
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page5
+save page5
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page6
+save page6
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page7
+save page7
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page8
+save page8
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page9
+save page9
+quit

@@ -1,0 +1,19 @@
+# Original reference. Output directory: extracted/reference/dunning-hallway-entry
+load extracted/reference/helen-touch-pages/a5.mln
+touch 210 96
+frames 100
+release
+frames 180
+capture r103
+save r103
+touch 210 96
+frames 61
+release
+frames 10
+touch 127 20
+frames 100
+release
+frames 180
+capture central
+save central
+quit

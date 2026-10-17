@@ -1,0 +1,7 @@
+load extracted/reference/chapter-two-thick-wire-approach/inspect.mln
+touch 15 48
+frames 3
+release
+frames 120
+capture items
+save items

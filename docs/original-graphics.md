@@ -16,8 +16,8 @@ with 289 colour-grid frames, 2,957 DTX textures, and 296 MDF model resources.
 | `Br_bracelet_.anm`, 4 frames | Preserved; rejected because its first frame does not conform to the recovered ARM9 codec. No replacement is shown. |
 | 54 MTC files, 289 frames | Original 17 × 33 RGB555 vertex-colour grids decoded and hashed. Mesh placement and blending remain to be ported. |
 | All 347 ANM and 54 MTC payloads | Bundled without byte changes; the 32-byte WPF inline directory record is removed and separately hashed. |
-| 2,919 DTX textures | Original palettes, texel buffers and RGBA images decoded and hashed independently in Python and Swift. |
-| 38 DTX textures | Preserved; incomplete compressed block crops or invalid palette references remain unsupported. |
+| 2,921 DTX textures | Original palettes, texel buffers and RGBA images decoded and hashed independently in Python and Swift. |
+| 36 DTX textures | Preserved. Unchecked compressed block layouts or invalid palette references remain unsupported. |
 | 235 MDF models | 7,123 hierarchical nodes, 621,884 visible vertices and 594,401 hit-test vertices decoded. Original transforms, UVs, colours and draw order are retained. |
 | 61 MDF models | 60 `MDF_GL_100` test/effect resources and one older group-layout resource remain unsupported. |
 | 19 LRIM opening animations, 135 frames | All Nintendo LZ10 streams and original tile deltas decoded. Full frame hashes and checkpoint continuity are verified independently. |
@@ -112,17 +112,19 @@ not directly equal the DS GPU format numbers. `OriginalTexture` maps them to
 A3I5, A5I3, opaque indexed RGB555 and DS 4 × 4 compression, as selected by
 the original function at `0x02083cd0`. The 4 × 4 palette blends are calculated
 in five-bit colour space before expansion. The native decoder matches the
-independent Python decoder for all 2,919 supported textures.
+independent Python decoder for all 2,921 manifest-supported textures.
 
 Allocated, logical and stored dimensions remain distinct. Original padding
 present in a payload is retained; omitted texels are not manufactured.
 `0x020840b0` places the compressed-info pointer at
 `logicalWidth * logicalHeight / 4` bytes after the texels. The upload routine
 at `0x02083534` derives its transfer size from allocated width and logical
-height. The 38 unresolved files include incomplete block rows, width crops
-and three four-pixel-wide bar textures with palette references outside their
-stored palette. A rectangular image cannot be claimed for these without
-examining the original runtime memory transfers.
+height. The lobby work recovers the partial block row in `R102/laungr.dtx`
+where logical and allocated widths agree. Missing blocks remain transparent
+and are discarded. See [Lobby to bell](lobby-to-bell.md) for the transfer rule
+and checks. Room 215 also uses this decoder for the 32×36 `telephoe.dtx` payload. The 36 remaining manifest entries include unchecked block streams,
+width crops and invalid palette references. Full regeneration can decode more
+equivalent block streams, but those entries need separate review before promotion.
 
 ```sh
 python3 tools/decode_dtx.py \

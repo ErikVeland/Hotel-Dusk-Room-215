@@ -1,0 +1,95 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/louie-parcel
+load extracted/reference/louie-arrival-pages/page12.mln
+touch 100 96
+frames 3
+release
+frames 120
+capture selected
+save selected
+touch 100 96
+frames 3
+release
+frames 180
+capture taken
+save taken
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page4
+save page4
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page5
+save page5
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page6
+save page6
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page7
+save page7
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page8
+save page8
+quit

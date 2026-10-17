@@ -1,0 +1,8 @@
+load extracted/reference/chapter-two-crowbar-scroll/scrolled.mln
+touch 161 55
+frames 3
+release
+frames 180
+capture selected
+save selected
+quit

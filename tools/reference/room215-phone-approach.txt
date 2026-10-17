@@ -1,0 +1,9 @@
+# Original reference. Output directory: extracted/reference/room215-phone-approach
+load extracted/reference/room215-room/room.mln
+touch 127 20
+frames 60
+release
+frames 120
+capture west
+save west
+quit

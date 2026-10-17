@@ -1,0 +1,54 @@
+load extracted/reference/chapter-two-thick-wire-select/scrolled.mln
+touch 104 100
+frames 3
+release
+frames 120
+capture selected
+touch 29 55
+frames 3
+release
+frames 120
+touch 100 130
+frames 3
+release
+frames 120
+touch 100 130
+frames 3
+release
+frames 180
+capture used
+save used
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture puzzle
+save puzzle

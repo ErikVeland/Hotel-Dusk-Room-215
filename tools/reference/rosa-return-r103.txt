@@ -1,0 +1,14 @@
+# Component continuation of the delivery fixture after Rosa's 5:20 departure.
+load extracted/reference/rosa-parcel-departure/page36.mln
+touch 128 20
+frames 90
+release
+frames 30
+capture west
+touch 210 96
+until32 02110190 00020003 200
+release
+frames 120
+capture returned
+save returned
+quit

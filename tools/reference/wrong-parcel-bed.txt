@@ -1,0 +1,15 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/wrong-parcel-bed
+load extracted/reference/wrong-parcel-approach/near.mln
+touch 127 20
+frames 55
+release
+frames 90
+capture near
+save near
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

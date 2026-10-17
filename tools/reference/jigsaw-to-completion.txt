@@ -1,0 +1,273 @@
+load extracted/reference/r117-louie-help/puzzle.mln
+frames 60
+touch 16 79
+frames 3
+capture five-selected
+touch 21 81
+frames 2
+touch 26 82
+frames 2
+touch 32 84
+frames 2
+touch 37 86
+frames 2
+touch 42 87
+frames 2
+touch 48 89
+frames 2
+touch 53 91
+frames 2
+touch 58 93
+frames 2
+touch 63 94
+frames 2
+touch 68 96
+frames 2
+touch 74 98
+frames 2
+touch 79 99
+frames 2
+touch 84 101
+frames 2
+touch 90 103
+frames 2
+touch 95 105
+frames 2
+touch 100 106
+frames 2
+touch 105 108
+frames 2
+touch 110 110
+frames 2
+touch 116 111
+frames 2
+touch 121 113
+frames 2
+release
+frames 30
+capture five-placed
+save five-placed
+touch 16 39
+frames 3
+release
+frames 3
+touch 239 16
+frames 2
+release
+frames 25
+capture three-rotated
+touch 16 39
+frames 3
+touch 20 39
+frames 2
+touch 23 40
+frames 2
+touch 27 40
+frames 2
+touch 30 40
+frames 2
+touch 34 41
+frames 2
+touch 38 41
+frames 2
+touch 41 41
+frames 2
+touch 45 42
+frames 2
+touch 48 42
+frames 2
+touch 52 42
+frames 2
+touch 56 43
+frames 2
+touch 59 43
+frames 2
+touch 63 44
+frames 2
+touch 66 44
+frames 2
+touch 70 44
+frames 2
+touch 74 45
+frames 2
+touch 77 45
+frames 2
+touch 81 45
+frames 2
+touch 84 46
+frames 2
+touch 88 46
+frames 2
+release
+frames 5
+capture three-placed
+save three-placed
+touch 16 119
+frames 3
+touch 21 117
+frames 2
+touch 26 115
+frames 2
+touch 32 113
+frames 2
+touch 37 111
+frames 2
+touch 42 109
+frames 2
+touch 48 107
+frames 2
+touch 53 105
+frames 2
+touch 58 103
+frames 2
+touch 63 101
+frames 2
+touch 68 99
+frames 2
+touch 74 97
+frames 2
+touch 79 95
+frames 2
+touch 84 93
+frames 2
+touch 90 91
+frames 2
+touch 95 89
+frames 2
+touch 100 87
+frames 2
+touch 105 85
+frames 2
+touch 110 83
+frames 2
+touch 116 81
+frames 2
+touch 121 79
+frames 2
+release
+frames 5
+capture remaining-six
+save remaining-six
+touch 19 77
+frames 3
+release
+frames 3
+touch 239 16
+frames 2
+release
+frames 25
+capture remaining-nine-rotated
+touch 19 77
+frames 3
+touch 25 77
+frames 2
+touch 32 78
+frames 2
+touch 38 78
+frames 2
+touch 45 79
+frames 2
+touch 51 79
+frames 2
+touch 57 80
+frames 2
+touch 64 80
+frames 2
+touch 70 81
+frames 2
+touch 77 81
+frames 2
+touch 83 82
+frames 2
+touch 89 82
+frames 2
+touch 96 82
+frames 2
+touch 102 83
+frames 2
+touch 109 83
+frames 2
+touch 115 84
+frames 2
+touch 121 84
+frames 2
+touch 128 85
+frames 2
+touch 134 85
+frames 2
+touch 141 86
+frames 2
+touch 147 86
+frames 2
+release
+frames 5
+capture remaining-nine
+save remaining-nine
+touch 44 49
+frames 3
+touch 50 50
+frames 2
+touch 55 52
+frames 2
+touch 61 54
+frames 2
+touch 66 55
+frames 2
+touch 72 56
+frames 2
+touch 77 58
+frames 2
+touch 83 60
+frames 2
+touch 88 61
+frames 2
+touch 94 62
+frames 2
+touch 100 64
+frames 2
+touch 105 66
+frames 2
+touch 111 67
+frames 2
+touch 116 68
+frames 2
+touch 122 70
+frames 2
+touch 127 72
+frames 2
+touch 133 73
+frames 2
+touch 138 74
+frames 2
+touch 144 76
+frames 2
+touch 149 78
+frames 2
+touch 155 79
+frames 2
+release
+frames 5
+capture remaining-ten
+save remaining-ten
+touch 145 90
+frames 8
+capture last-selected
+release
+frames 12
+touch 239 16
+frames 8
+release
+frames 30
+capture last-rotated
+touch 145 90
+frames 6
+release
+frames 8
+capture last-solved
+frames 190
+capture last-complete
+save last-complete
+frames 90
+capture after-dialogue
+save after-dialogue
+quit

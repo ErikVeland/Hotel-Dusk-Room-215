@@ -1,0 +1,7 @@
+# Original reference. Output directory: extracted/reference/room215-paperclip-springback
+load extracted/reference/room215-paperclip-drag1/moved.mln
+release
+frames 60
+capture settled
+save settled
+quit

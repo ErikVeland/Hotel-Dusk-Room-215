@@ -1,0 +1,30 @@
+load extracted/reference/chapter-two-crowbar-entry/ready.mln
+touch 162 115
+frames 3
+capture held
+touch 150 112
+frames 20
+capture drag0
+touch 130 108
+frames 20
+capture drag1
+touch 110 103
+frames 20
+capture drag2
+touch 90 98
+frames 20
+capture drag3
+touch 70 93
+frames 20
+capture drag4
+touch 50 88
+frames 20
+capture drag5
+touch 30 83
+frames 20
+capture drag6
+release
+frames 120
+capture placed
+save placed
+quit

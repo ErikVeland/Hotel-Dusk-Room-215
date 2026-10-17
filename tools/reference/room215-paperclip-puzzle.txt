@@ -1,0 +1,9 @@
+# Original reference. Output directory: extracted/reference/room215-paperclip-puzzle
+load extracted/reference/room215-paperclip-selected/selected.mln
+touch 29 55
+frames 3
+release
+frames 240
+capture puzzle
+save puzzle
+quit

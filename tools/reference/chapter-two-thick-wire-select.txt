@@ -1,0 +1,57 @@
+load extracted/reference/chapter-two-thick-wire-items/items.mln
+touch 189 175
+frames 5
+touch 184 175
+frames 5
+touch 179 175
+frames 5
+touch 174 175
+frames 5
+touch 169 175
+frames 5
+touch 164 175
+frames 5
+touch 159 175
+frames 5
+touch 154 175
+frames 5
+touch 149 175
+frames 5
+touch 144 175
+frames 5
+touch 139 175
+frames 5
+touch 134 175
+frames 5
+touch 129 175
+frames 5
+touch 124 175
+frames 5
+touch 119 175
+frames 5
+touch 114 175
+frames 5
+touch 109 175
+frames 5
+touch 104 175
+frames 5
+touch 99 175
+frames 5
+touch 94 175
+frames 5
+touch 89 175
+frames 5
+touch 84 175
+frames 5
+touch 79 175
+frames 5
+touch 74 175
+frames 5
+touch 69 175
+frames 5
+touch 64 175
+frames 5
+release
+frames 120
+capture scrolled
+save scrolled

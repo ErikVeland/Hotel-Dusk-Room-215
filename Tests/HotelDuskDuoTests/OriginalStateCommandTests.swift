@@ -34,6 +34,28 @@ final class OriginalStateCommandTests: XCTestCase {
         XCTAssertEqual(game.value(for: .doorOpen(index: 42)), false)
     }
 
+    func testKeywordRemovalPreservesUsedAndAskedFields() throws {
+        let rows = try OriginalScriptCatalog.bundled().loadProgram("EP2_R119").blocks.tables[3]
+        let command = try XCTUnwrap(OriginalStateCommand(record: XCTUnwrap(rows.first { $0.sourceOffset == 644 })))
+        XCTAssertEqual(command, .keywordUnavailable(13))
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
+        try game.apply(.keywordAvailable([13, 127]))
+        game.markKeywordUsed(13)
+        game.markKeywordAsked(13, person: 2)
+        let before = game.bytes
+        try game.apply(command)
+        XCTAssertFalse(game.keywordAvailable(13))
+        XCTAssertTrue(game.keywordUsed(13))
+        XCTAssertTrue(game.keywordAsked(13, person: 2))
+        XCTAssertEqual(before.indices.filter { before[$0] != game.bytes[$0] }, [0x880 + 13 * 4])
+        try game.apply(.keywordUnavailable(127))
+        XCTAssertFalse(game.keywordAvailable(127))
+        let unchanged = game
+        try game.apply(.keywordUnavailable(-1))
+        try game.apply(.keywordUnavailable(128))
+        XCTAssertEqual(game, unchanged)
+    }
+
     func testInventoryReplacementPreservesOriginalPositionAndState() throws {
         let rows = try OriginalScriptCatalog.bundled().loadProgram("EP10_R301").blocks.tables[3]
         let command = try XCTUnwrap(OriginalStateCommand(record: XCTUnwrap(rows.first { $0.sourceOffset == 4424 })))

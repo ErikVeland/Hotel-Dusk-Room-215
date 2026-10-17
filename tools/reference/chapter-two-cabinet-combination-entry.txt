@@ -1,0 +1,52 @@
+load extracted/reference/chapter-two-cabinet-keypad/ready.mln
+touch 215 135
+frames 3
+release
+frames 3
+touch 215 135
+frames 3
+release
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture ready
+save ready
+quit

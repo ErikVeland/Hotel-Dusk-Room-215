@@ -6,6 +6,8 @@ This is a partial native port. Extracted graphics and text do not establish that
 
 The folding sequence belongs to Chapter 3, at 6:20 PM, in Room 219. Melissa first asks Kyle to assemble the full puzzle. The completed picture is Pinkie Rabbit. The earlier stairs encounter in Chapter 1 uses an incomplete version of the same picture; it is a separate story event.
 
+The [Chapter 1 jigsaw](chapter-one-jigsaw.md) now uses a recovered native process in normal play. Its five-piece layout, rotation, snapping, hints and outcomes have source and ROM comparisons. The table below describes the older development preview. Its eight-pixel snap radius does not apply to the new Chapter 1 process.
+
 | Element | Evidence | Port requirement |
 | --- | --- | --- |
 | Front, pieces, reverse, table | `extracted/unpacked_wpf/trick/zig/` | Decode and use the supplied ROM artwork. Keep the original piece silhouettes and reverse lettering. Do not substitute a generated rabbit, generic tile image, or typeset message. |
@@ -37,3 +39,7 @@ The complete Chapter 1 and Chapter 3 event scripts, inventory prerequisites, and
 All 30 package tests pass. These cover placement and rotation requirements, all 20 pieces, reopening before the hinge is flat, incomplete and inactive puzzle folds, repeated folds, and preservation of puzzle and session state. Rendered snapshots check both handedness settings, page edges, cover sizes, paper material and spine angles. Paper tests check finite settling and seeded variation. Six offscreen corridor renders check for white openings, and movement tests keep the camera inside the model. The current iOS simulator build, including the paperback material and corridor fixes, succeeds and is installed on the Duo simulator.
 
 The running iOS app exposes the original rotation controls, and selection and rotation were checked through accessibility actions. Native drag automation returned `noWindowsAvailable`; a complete touch drag-and-fold cycle still needs a hands-on check. The app owns one session above its display windows so a cover-to-inner-display transition does not create a new session. This preserves state during a running session; saving across process termination is a separate feature.
+
+## Suitcase key, 17 October 2026
+
+Process 37 now uses the original key insertion, turn counter, breakage and quit outcomes. Its original bag and key models are connected to normal Chapter 1 play. The complete game state matches the original after the broken-key dialogue and retry checkpoint. Rendering, caption, sound-timing and touch-ray limits remain explicit in [Suitcase key](suitcase-key.md). The paperclip state model now matches captured joint checkpoints, and its three story outcomes match full game state. Inventory launch and the native mesh renderer are connected. The normal route receives the thin wire. The thin-wire lock attempt now matches captured pin states and all three story outcomes. The normal route reaches its original failure dialogue. DS pixel matching and visual fades remain open. See [Thin-wire lock attempt](thin-wire-lock.md). See [Paperclip straightening](paperclip-straightening.md).

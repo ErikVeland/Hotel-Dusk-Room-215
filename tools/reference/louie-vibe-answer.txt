@@ -1,0 +1,265 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/louie-vibe-answer
+load extracted/reference/louie-work-answer/page18.mln
+touch 127 96
+frames 3
+release
+frames 180
+capture selected
+save selected
+touch 127 96
+frames 3
+release
+frames 180
+capture asked
+save asked
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page4
+save page4
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page5
+save page5
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page6
+save page6
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page7
+save page7
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page8
+save page8
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page9
+save page9
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page10
+save page10
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page11
+save page11
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page12
+save page12
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page13
+save page13
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page14
+save page14
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page15
+save page15
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page16
+save page16
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page17
+save page17
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page18
+save page18
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page19
+save page19
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page20
+save page20
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page21
+save page21
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page22
+save page22
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page23
+save page23
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page24
+save page24
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page25
+save page25
+quit

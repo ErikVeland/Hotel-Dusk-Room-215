@@ -1,0 +1,126 @@
+# Original reference. Output directory: extracted/reference/room215-suitcase-turn
+load extracted/reference/room215-suitcase-insert/inserted.mln
+release
+frames 10
+touch 125 86
+frames 3
+release
+frames 8
+capture turn1
+save turn1
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+capture turn10
+save turn10
+touch 125 86
+frames 3
+release
+frames 8
+capture turn11
+save turn11
+touch 125 86
+frames 3
+release
+frames 8
+capture turn12
+save turn12
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+capture turn21
+save turn21
+touch 125 86
+frames 3
+release
+frames 8
+capture turn22
+save turn22
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+touch 125 86
+frames 3
+release
+frames 8
+capture turn26
+save turn26
+frames 600
+capture broken
+save broken
+quit

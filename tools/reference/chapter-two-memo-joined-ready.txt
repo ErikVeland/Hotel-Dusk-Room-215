@@ -1,0 +1,5 @@
+load extracted/reference/chapter-two-crowbar-lift/finished.mln
+frames 180
+capture finished
+save finished
+quit

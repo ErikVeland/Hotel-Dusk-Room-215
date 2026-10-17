@@ -1,0 +1,6 @@
+load extracted/reference/chapter-two-thick-wire-use/puzzle.mln
+frames 2
+capture-geometry insertion
+load extracted/reference/chapter-two-thick-wire-opening/lid_start.mln
+frames 2
+capture-geometry opening

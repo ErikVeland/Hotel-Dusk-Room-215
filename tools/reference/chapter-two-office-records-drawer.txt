@@ -1,0 +1,18 @@
+load extracted/reference/chapter-two-office-records-ready/search.mln
+touch 90 130
+frames 3
+release
+frames 5
+touch 90 130
+frames 3
+release
+frames 120
+capture drawer
+save drawer
+keys ffe
+frames 2
+keys fff
+frames 120
+capture ready
+save ready
+quit

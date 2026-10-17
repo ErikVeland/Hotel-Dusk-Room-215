@@ -221,9 +221,9 @@ struct OriginalPlayStatusView: View {
     var body: some View {
         VStack(spacing: 16) {
             switch play.runner.phase {
-            case .exploration(let mapID):
+            case .exploration:
                 Text("End of the recovered opening").font(NovelStyle.title)
-                Text("Kyle is free to explore map \(mapID) here. Map movement (the walk to a search point) and the 3D search view (model-node picking at 0x02033528) are not recovered yet.")
+                Text("The playable route ends here. Further exploration and conversations are not available yet.")
                     .font(NovelStyle.body)
             case .halted(let halt):
                 Text("Play stopped").font(NovelStyle.title)
@@ -243,8 +243,10 @@ struct OriginalPlayStatusView: View {
     }
 }
 
-/// Options from an original choice prompt (opcode 10 kind 5), in the order
-/// the command lists them. The original menu graphics are not drawn yet.
+/**
+ * Ordinary choices and chapter review answers retain their original order.
+ * The original menu graphics are not drawn yet.
+ */
 struct OriginalChoiceView: View {
     @ObservedObject var play: OriginalPlaySession
     let choices: [OriginalEventRunner.Choice]
@@ -344,21 +346,37 @@ struct OriginalSignPageView: View {
 
 /// The question menu of event modes 7 and 8: the partner's open keywords
 /// from the chapter `.ttk`, and leaving the conversation. The original menu
-/// graphics and the item list are not drawn.
+/// graphics are not drawn.
 struct OriginalQuestionMenuView: View {
     @ObservedObject var play: OriginalPlaySession
     let topics: [OriginalEventRunner.Topic]
+    @State private var showsInventory = false
 
     var body: some View {
         VStack(spacing: 10) {
-            Text("Ask about").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
-            ForEach(topics, id: \.keyword) { topic in
-                Button(topic.label) { play.ask(topic.keyword) }
+            if showsInventory {
+                Text("Show an item").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
+                ForEach((try? play.runner.game.inventory.items) ?? [], id: \.self) { item in
+                    Button(play.itemNames[item] ?? String(item)) {
+                        showsInventory = false
+                        play.showItemInConversation(item)
+                    }.buttonStyle(BookTextButtonStyle())
+                }
+                Button("Cancel") { showsInventory = false }.buttonStyle(BookTextButtonStyle())
+            } else {
+                Text(topics.isEmpty ? "No questions" : "Ask about").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
+                ForEach(topics, id: \.keyword) { topic in
+                    Button(topic.label) { play.ask(topic.keyword) }
+                        .buttonStyle(BookTextButtonStyle())
+                }
+                InkRule().padding(.vertical, 6)
+                Button("Notebook") { play.openNotebook() }
+                    .buttonStyle(BookTextButtonStyle())
+                Button("Items") { showsInventory = true }
+                    .buttonStyle(BookTextButtonStyle())
+                Button("Leave") { play.leaveConversation() }
                     .buttonStyle(BookTextButtonStyle())
             }
-            InkRule().padding(.vertical, 6)
-            Button("Leave") { play.leaveConversation() }
-                .buttonStyle(BookTextButtonStyle())
         }
     }
 }

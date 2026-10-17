@@ -1,0 +1,49 @@
+# Component continuation of the delivery fixture. Output: jeff-room213-inspect.
+load extracted/reference/rosa-return-upstairs/upstairs.mln
+touch 128 20
+frames 22
+release
+frames 60
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture reminder
+save reminder
+touch 128 20
+frames 64
+release
+frames 30
+touch 45 96
+frames 8
+release
+frames 30
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 180
+capture door
+save door
+quit

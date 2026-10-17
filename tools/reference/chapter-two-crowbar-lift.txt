@@ -1,0 +1,79 @@
+load extracted/reference/chapter-two-crowbar-place/placed.mln
+touch 167 112
+frames 3
+capture held
+touch 160 116
+frames 3
+capture lift0
+save lift0
+touch 153 120
+frames 3
+capture lift1
+save lift1
+touch 146 124
+frames 3
+capture lift2
+save lift2
+touch 139 128
+frames 3
+capture lift3
+save lift3
+touch 132 132
+frames 3
+capture lift4
+save lift4
+touch 125 136
+frames 3
+capture lift5
+save lift5
+touch 118 140
+frames 3
+capture lift6
+save lift6
+release
+frames 600
+capture returned
+save returned
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture finished
+save finished
+quit

@@ -1,0 +1,45 @@
+load extracted/reference/chapter-two-memo-pull-ready/page9.mln
+touch 93 106
+frames 3
+capture held
+touch 60 145
+frames 10
+capture drag0
+touch 60 65
+frames 10
+capture drag1
+touch 60 145
+frames 10
+capture drag2
+touch 60 65
+frames 10
+capture drag3
+touch 60 145
+frames 10
+capture drag4
+touch 60 65
+frames 10
+capture drag5
+touch 60 145
+frames 10
+capture drag6
+touch 60 65
+frames 10
+capture drag7
+touch 60 145
+frames 10
+capture drag8
+touch 60 65
+frames 10
+capture drag9
+touch 60 145
+frames 10
+capture drag10
+touch 60 65
+frames 10
+capture drag11
+release
+frames 240
+capture result
+save result
+quit

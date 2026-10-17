@@ -45,10 +45,13 @@ class Texture:
                     "DTX pixel length matches neither logical nor allocated dimensions")
             self.width, self.height = self.allocated_width, self.allocated_height
         if self.mode == 7:
-            require(self.width % 4 == 0 and self.height % 4 == 0,
-                    "Compressed DTX crop is not a complete rectangle of 4x4 blocks")
+            require(self.width % 4 == 0 and len(self.pixel_data) % 6 == 0 and
+                    (self.height % 4 == 0 or self.width == self.allocated_width),
+                    "DTX compressed block layout")
             require(len(self.pixel_data) == self.width * self.height * 3 // 8,
                     "Invalid compressed DTX data length")
+            blocks_per_row = self.width // 4
+            self.height = ((len(self.pixel_data) // 6 + blocks_per_row - 1) // blocks_per_row) * 4
 
     def rgba(self):
         rgba = bytearray(self.width * self.height * 4)
@@ -67,7 +70,7 @@ class Texture:
                 else:
                     store(i, colour(value), 0 if self.mode == 4 and value == 0 else 31)
             return rgba
-        blocks = self.width * self.height // 16
+        blocks = len(self.pixel_data) // 6
         info_offset = blocks * 4
         for block in range(blocks):
             texels = struct.unpack_from("<I", self.pixel_data, block * 4)[0]

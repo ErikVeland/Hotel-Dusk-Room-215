@@ -1,0 +1,9 @@
+# Original reference. Output directory: extracted/reference/room215-enter
+load extracted/reference/room215-open/opened.mln
+touch 80 160
+frames 3
+release
+frames 180
+capture entered
+save entered
+quit

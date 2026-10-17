@@ -1,0 +1,25 @@
+load extracted/reference/chapter-two-crowbar-lift/lift3.mln
+release
+frames 1
+capture frame1
+frames 1
+capture frame2
+frames 1
+capture frame3
+frames 2
+capture frame5
+frames 3
+capture frame8
+frames 2
+capture frame10
+frames 2
+capture frame12
+frames 8
+capture frame20
+frames 8
+capture frame28
+frames 2
+capture frame30
+frames 2
+capture frame32
+quit

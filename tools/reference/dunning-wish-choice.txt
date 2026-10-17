@@ -1,0 +1,34 @@
+# Original reference. Output directory: extracted/reference/dunning-wish-choice
+load extracted/reference/dunning-wish-interrupt/before3.mln
+frames 180
+touch 85 96
+frames 3
+release
+frames 150
+capture interrupt
+save interrupt
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page4
+save page4
+quit

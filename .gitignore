@@ -221,6 +221,8 @@ BUSINESS_PLAN.md
 *.backup
 *.tools/
 *tools/
+!tools/
+__pycache__/
 .DS_Store
 *.DS_Store
 .DS_Store?

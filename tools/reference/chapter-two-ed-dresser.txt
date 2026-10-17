@@ -1,0 +1,17 @@
+load extracted/reference/chapter-two-ed-phone-approach/approached.mln
+touch 45 96
+frames 16
+release
+frames 5
+touch 127 20
+frames 60
+release
+frames 30
+capture approached
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

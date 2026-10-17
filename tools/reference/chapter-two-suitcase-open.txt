@@ -1,0 +1,35 @@
+load extracted/reference/chapter-two-thick-wire-opening/returned.mln
+frames 60
+keys ffe
+frames 2
+keys fff
+frames 120
+capture advance0
+keys ffe
+frames 2
+keys fff
+frames 120
+capture advance1
+keys ffe
+frames 2
+keys fff
+frames 120
+capture advance2
+keys ffe
+frames 2
+keys fff
+frames 120
+capture advance3
+keys ffe
+frames 2
+keys fff
+frames 120
+capture advance4
+save overview
+touch 95 96
+frames 2
+release
+frames 120
+capture lower
+save lower
+quit

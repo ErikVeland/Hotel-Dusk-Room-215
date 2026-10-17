@@ -1,0 +1,15 @@
+load extracted/reference/chapter-two-suitcase-cash/cash_taken.mln
+frames 4
+touch 15 175
+frames 2
+release
+frames 150
+capture overview
+save overview
+touch 15 175
+frames 2
+release
+frames 240
+capture returned
+save returned
+quit

@@ -1,0 +1,19 @@
+load extracted/reference/chapter-two-suitcase-open/overview.mln
+touch 150 96
+frames 2
+release
+frames 120
+capture upper
+save upper
+touch 155 30
+frames 2
+release
+frames 30
+capture map_selected
+touch 155 30
+frames 2
+release
+frames 120
+capture map_description
+save map_description
+quit

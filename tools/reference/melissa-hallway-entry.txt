@@ -1,0 +1,13 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-hallway-entry
+load extracted/reference/notebook-door-inspect/inspect.mln
+touch 210 96
+frames 18
+release
+frames 60
+touch 127 170
+frames 250
+release
+frames 180
+capture entry
+save entry
+quit

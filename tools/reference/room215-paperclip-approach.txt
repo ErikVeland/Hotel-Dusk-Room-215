@@ -1,0 +1,19 @@
+# Original reference. Output directory: extracted/reference/room215-paperclip-approach
+load extracted/reference/room215-suitcase-aftermath/step9.mln
+touch 210 96
+frames 50
+release
+frames 10
+touch 127 20
+frames 100
+release
+frames 120
+capture dresser
+save dresser
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

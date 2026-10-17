@@ -1,0 +1,15 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-piece-talk
+load extracted/reference/melissa-father-answer/page38.mln
+touch 210 170
+frames 12
+release
+frames 120
+capture near
+save near
+touch 15 48
+frames 3
+release
+frames 180
+capture talking
+save talking
+quit

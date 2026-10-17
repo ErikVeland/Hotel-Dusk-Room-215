@@ -1,0 +1,16 @@
+load extracted/reference/chapter-two-payment-knock/page11.mln
+touch 75 96
+frames 3
+release
+frames 120
+touch 75 96
+frames 3
+release
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture choice
+save choice
+quit

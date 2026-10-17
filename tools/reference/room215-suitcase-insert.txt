@@ -1,0 +1,39 @@
+# Original reference. Output directory: extracted/reference/room215-suitcase-insert
+load extracted/reference/room215-suitcase-key2/puzzle.mln
+touch 15 110
+frames 3
+capture held
+touch 30 100
+frames 8
+touch 40 100
+frames 8
+touch 50 100
+frames 8
+touch 60 100
+frames 8
+touch 70 100
+frames 8
+touch 80 100
+frames 8
+touch 90 100
+frames 8
+touch 100 100
+frames 8
+touch 110 100
+frames 8
+touch 120 100
+frames 8
+touch 130 100
+frames 8
+touch 140 100
+frames 8
+touch 150 100
+frames 8
+touch 160 100
+frames 8
+frames 180
+capture inserted
+save inserted
+release
+frames 10
+quit

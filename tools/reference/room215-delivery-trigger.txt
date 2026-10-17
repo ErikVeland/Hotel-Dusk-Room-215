@@ -1,0 +1,15 @@
+# Original reference. Output directory: extracted/reference/room215-delivery-trigger
+load extracted/reference/room215-delivery-knock/north.mln
+touch 210 96
+frames 120
+release
+frames 180
+capture near-door
+save near-door
+keys ffe
+frames 2
+keys fff
+frames 180
+capture dialogue
+save dialogue
+quit

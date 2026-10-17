@@ -1,0 +1,9 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-piece-bag
+load extracted/reference/melissa-piece-retalk/page4.mln
+touch 15 48
+frames 3
+release
+frames 180
+capture bag
+save bag
+quit

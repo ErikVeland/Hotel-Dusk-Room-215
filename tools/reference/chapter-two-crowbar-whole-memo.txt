@@ -1,0 +1,200 @@
+load extracted/reference/chapter-two-memo-quit/finished.mln
+touch 35 95
+frames 3
+release
+frames 5
+touch 35 95
+frames 3
+release
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture closeup
+touch 15 47
+frames 3
+release
+frames 180
+touch 185 175
+frames 3
+touch 125 175
+frames 3
+release
+frames 120
+touch 150 55
+frames 3
+release
+frames 120
+touch 29 55
+frames 3
+release
+frames 120
+touch 110 70
+frames 3
+release
+frames 5
+touch 110 70
+frames 3
+release
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture ready
+save ready
+touch 162 115
+frames 3
+touch 150 112
+frames 20
+touch 130 108
+frames 20
+touch 110 103
+frames 20
+touch 90 98
+frames 20
+touch 70 93
+frames 20
+touch 50 88
+frames 20
+touch 30 83
+frames 20
+release
+frames 120
+capture placed
+save placed
+touch 167 112
+frames 3
+touch 160 116
+frames 3
+touch 153 120
+frames 3
+touch 146 124
+frames 3
+touch 139 128
+frames 3
+touch 132 132
+frames 3
+touch 125 136
+frames 3
+touch 118 140
+frames 3
+release
+frames 600
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+frames 180
+capture finished
+save finished
+quit

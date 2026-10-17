@@ -21,12 +21,14 @@ Commands:
 - `touch X Y` and `release`: original 256×192 touch coordinates.
 - `lid 1` and `lid 0`: close and reopen the original DS lid input.
 - `capture NAME`: save both original 256×192 displays as PPM and all 4 MiB of ARM9 main RAM, based at `0x02000000`.
+- `capture-geometry NAME`: record the submitted polygon attributes, screen vertices, texture coordinates and colours. Also save display registers, texture memory and palette memory. This reads the original renderer state without changing game memory.
 - `save NAME`: save an emulator checkpoint under this run directory.
 - `load PATH`: restore an existing local checkpoint. Trace frame counters start at zero for the current run; they are relative to its input sequence.
 - `until32 ADDRESS VALUE LIMIT`: advance at most LIMIT frames until a main-RAM word equals VALUE (hexadecimal address and value).
 - `until-nonzero32 ADDRESS LIMIT`: advance until the word becomes nonzero.
 - `write8 ADDRESS VALUE`, `write16 ADDRESS VALUE`, `write32 ADDRESS VALUE`: write an aligned main-RAM diagnostic fixture (hexadecimal address and value). Every write is recorded in `inputs.txt`. A modified run is an isolated component test, not evidence of a normal story path. Keep its output separate from unmodified playthrough captures.
 - `trace-cinematic ADDRESS`: log the original queue's active object, handler and first state fields each frame in `cinematic-frames.csv`; hexadecimal ADDRESS is the controller base (opening: `022543f4`). Use `0` to stop tracing. This reads game memory without modifying it.
+- `trace-clock ADDRESS`: log process 126 counters, hand values and numeric time each frame in `clock-frames.csv`. ADDRESS is the hexadecimal process base. Use `0` to stop. This reads game memory without modifying it.
 - `quit`: stop the run.
 
 The microphone provides silence; network, DSi camera and accessory input are disabled. Captures cannot verify microphone puzzles until scripted microphone input is added. Cartridge save writes are confined to the trace directory. A checkpoint is specific to the pinned core build and supplied ROM.

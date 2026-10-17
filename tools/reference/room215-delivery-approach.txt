@@ -1,0 +1,9 @@
+# Original reference. Output directory: extracted/reference/room215-delivery-approach
+load extracted/reference/room215-thin-wire-aftermath/step10.mln
+touch 15 78
+frames 3
+release
+frames 120
+capture map
+save map
+quit

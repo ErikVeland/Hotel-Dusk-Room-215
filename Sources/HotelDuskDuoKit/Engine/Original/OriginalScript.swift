@@ -101,6 +101,7 @@ public struct OriginalScriptProgram: Sendable {
     public let choices: [OriginalChoiceRecord]
     public let blockData: Data
     public let conditionData: Data
+    public var review: OriginalChapterReview? = nil
     public var blocks: OriginalBlockGraph { get throws { try OriginalBlockGraph(decoded: blockData) } }
     public var conditions: OriginalConditions {
         get throws { try OriginalConditions(decoded: conditionData, eventCount: blocks.tables[2].count) }
@@ -159,6 +160,12 @@ public struct OriginalScriptCatalog: Sendable {
 
     public func loadProgram(_ name: String) throws -> OriginalScriptProgram {
         let debugName = "\(name).dbg"
+        let reviewName = name.firstIndex(of: "_").map { String(name[...$0]) + ".spn" }
+        let review = try reviewName.flatMap { file in
+            guard manifest.files.contains(where: { $0.name == file }) else { return nil as OriginalChapterReview? }
+            let data = try decodedFile(file)
+            return data.isEmpty ? nil : try OriginalChapterReview(decoded: data)
+        }
         let labels = manifest.files.contains { $0.name == debugName }
             ? try OriginalEventLabel.decode(decodedFile(debugName)) : []
         return try OriginalScriptProgram(name: name,
@@ -166,7 +173,7 @@ public struct OriginalScriptCatalog: Sendable {
             eventLabels: labels,
             choices: OriginalChoiceRecord.decode(decodedFile("\(name).kif")),
             blockData: decodedFile("\(name).blk"),
-            conditionData: decodedFile("\(name).chk"))
+            conditionData: decodedFile("\(name).chk"), review: review)
     }
 
     static func digest(_ data: Data) -> String {

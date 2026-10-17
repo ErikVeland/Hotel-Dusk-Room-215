@@ -1,0 +1,43 @@
+# Component continuation of the delivery fixture. Continue to the book-reading choice.
+load extracted/reference/summer-writer-question/page13.mln
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page4
+save page4
+quit

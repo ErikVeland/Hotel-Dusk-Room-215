@@ -4,6 +4,7 @@ import Foundation
 /// commands return nil, so their controller effects cannot be skipped silently.
 public enum OriginalStateCommand: Equatable, Sendable {
     case keywordAvailable([Int16])
+    case keywordUnavailable(Int16)
     case itemCheckFlags([Int16])
     case setPersonLocation(index: UInt16, location: UInt16, field6: UInt8, field7: Int8)
     case clearPersonLocation(index: UInt16)
@@ -43,6 +44,7 @@ public enum OriginalStateCommand: Equatable, Sendable {
         case 40: self = .byte87E(reader.bytes[2] != 0)
         case 42: self = .byte87F(reader.bytes[2])
         case 46: self = .flag13CC(index: try reader.u16(2))
+        case 47: self = .keywordUnavailable(Int16(bitPattern: try reader.u16(2)))
         case 51: self = .incrementCounter1380(reader.bytes[2] != 0)
         default: return nil
         }

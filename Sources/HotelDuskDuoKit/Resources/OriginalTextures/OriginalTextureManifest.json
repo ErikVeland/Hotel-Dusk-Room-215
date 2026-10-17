@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "coverage": {
     "textures": 2957,
-    "decoded": 2919,
-    "mode7": 1102,
+    "decoded": 2921,
+    "mode7": 1104,
     "mode2": 106,
-    "unsupported": 38,
+    "unsupported": 36,
     "mode3": 1603,
     "mode1": 108
   },
@@ -1491,8 +1491,18 @@
       "sourceSHA256": "5d3895f663ddadb54448cb17ddff0b4af7a8880e2fe5d98f25216779589d4f5b",
       "payloadSHA256": "15f79f86a19984af594d03409403cd7e976b31377715835d54be4e133e423b98",
       "payloadBytes": 13108,
-      "status": "unsupported",
-      "error": "Compressed DTX crop is not a complete rectangle of 4x4 blocks"
+      "status": "decoded",
+      "mode": 7,
+      "allocatedWidth": 128,
+      "allocatedHeight": 256,
+      "logicalWidth": 128,
+      "logicalHeight": 162,
+      "storedWidth": 128,
+      "storedHeight": 164,
+      "decodedSHA256": "f9756a2e1d76efbb387c583c6363c8e96ca8e8d9b7726962c11f65f2ac9d44d2",
+      "paletteSHA256": "be28aca3abb7c2083df7b4865f8d2fa860226fd94dbd5038bd275fa490e85a20",
+      "pixelDataSHA256": "cdccfbf1fab4e6e026f90030ee03dfa2f26ef271211c799719a768f4da6a579f",
+      "rgbaSHA256": "f71e40eedff25c63f4102e46b40b5689a46567af97b9b38af30003c2a73b94c3"
     },
     {
       "source": "map/R102/R102/light02.dtx",
@@ -37889,8 +37899,18 @@
       "sourceSHA256": "3ad82500e070a8557af18c9b2e8156526946088cb6d8e8654cb0603c261a1a1f",
       "payloadSHA256": "b9bb799c4fd10056e77d2ef51aa813f525d2320fd5af02042909fce0bc5344f0",
       "payloadBytes": 852,
-      "status": "unsupported",
-      "error": "Compressed DTX crop is not a complete rectangle of 4x4 blocks"
+      "status": "decoded",
+      "mode": 7,
+      "allocatedWidth": 32,
+      "allocatedHeight": 64,
+      "logicalWidth": 32,
+      "logicalHeight": 34,
+      "storedWidth": 32,
+      "storedHeight": 36,
+      "decodedSHA256": "e5c5098e392fd2a60831d6cf08b6428f799073290691832ab349b4a72d02b3f7",
+      "paletteSHA256": "49ff5ca6b8b93fded81968f3bf5f36a0ab452f3a304d435c9c36b1e29c71ff3d",
+      "pixelDataSHA256": "c805726241e4205529fd922c6c709df1f94ee62c7e855370252df3fc27121299",
+      "rgbaSHA256": "19c1d906cb8370fa7fdbac12d5e4402df406ba31f38c1bfeb03a3f4c9538eb8f"
     },
     {
       "source": "map/R205/R205/tv.dtx",

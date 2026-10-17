@@ -2,6 +2,16 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalEventCompletionTests: XCTestCase {
+    func testUnrecoveredLateChapterInspectionCounterStaysExplicit() throws {
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R205")
+        var bytes = Data(repeating: 0, count: OriginalGameState.byteCount)
+        bytes[0] = 9
+        bytes[4] = 40
+        let result = try OriginalEventCompletion.stateOnlyExit(event: program.blocks.tables[2][16],
+            conditions: program.conditions, game: OriginalGameState(snapshot: bytes))
+        XCTAssertEqual(result, .requiresOriginalHandler(mode: 10))
+    }
+
     func testOriginalNarrativeLaunchesItsEmbeddedProcessAndReturnsToItsNextEvent() throws {
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102")
         let graph = try program.blocks, conditions = try program.conditions

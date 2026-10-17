@@ -1,0 +1,15 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-to-stairs
+load extracted/reference/melissa-piece-departure/page11.mln
+touch 127 20
+frames 120
+release
+frames 30
+capture stairs
+save stairs
+touch 210 96
+frames 80
+release
+frames 120
+capture downstairs
+save downstairs
+quit

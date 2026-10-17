@@ -3,7 +3,7 @@ import Foundation
 import Metal
 
 /// Decodes original DTX texels. Allocated, logical and stored dimensions remain
-/// separate; missing texels and unresolved block crops are never synthesized.
+/// separate. Missing blocks remain transparent and are discarded by the renderer.
 public struct OriginalTexture: Sendable {
     public let mode: Int
     public let allocatedWidth: Int
@@ -51,8 +51,15 @@ public struct OriginalTexture: Sendable {
             width = aw
             height = ah
         }
-        if format == 7 && (width % 4 != 0 || height % 4 != 0) {
-            throw OriginalDataError.unsupported("DTX crop is not a complete rectangle of 4 by 4 blocks")
+        let blockCount = pixels.count / 6
+        if format == 7 {
+            guard width % 4 == 0, pixels.count % 6 == 0,
+                  height % 4 == 0 || width == aw else {
+                throw OriginalDataError.unsupported("DTX compressed block layout")
+            }
+            // 0x02083534 uploads a linear block stream using allocated width.
+            // Equal logical/allocated widths can end part-way through a block row.
+            height = ((blockCount + width / 4 - 1) / (width / 4)) * 4
         }
         let paletteReader = OriginalBytes(palette)
         let colours: [[Int]] = try (0..<paletteCount).map { index in
@@ -87,7 +94,7 @@ public struct OriginalTexture: Sendable {
                 }
             }
         } else {
-            let blocks = width * height / 16
+            let blocks = blockCount
             let p = OriginalBytes(Data(pixels))
             for block in 0..<blocks {
                 let texels = try p.u32(block * 4)

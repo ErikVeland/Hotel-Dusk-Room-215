@@ -18,9 +18,16 @@ public struct OriginalSearchTable: Equatable, Sendable {
         public let upViewID: UInt16
         public let raw: [UInt8]
     }
+    public struct Door: Equatable, Sendable {
+        public let areaID: UInt16
+        public let upViewID: UInt16
+        public let doorID: UInt16
+        public let name: String
+    }
 
     public let areas: [Area]
     public let secondRecords: [[UInt8]]
+    public let doors: [Door]
     public let trailingBytes: [UInt8]
 
     public init(data: Data) throws {
@@ -36,6 +43,12 @@ public struct OriginalSearchTable: Equatable, Sendable {
         var offset = 4 + areaCount * 20
         secondRecords = try (0..<secondCount).map { index in
             Array(try reader.range(offset + index * 24, 24))
+        }
+        doors = try (0..<secondCount).map { index in
+            let start = offset + index * 24
+            return Door(areaID: try reader.u16(start), upViewID: try reader.u16(start + 2),
+                doorID: try reader.u16(start + 4),
+                name: String(decoding: try reader.zeroTerminated(start + 8, limit: 16), as: UTF8.self))
         }
         offset += secondCount * 24
         var areas: [Area] = []
@@ -75,6 +88,11 @@ public struct OriginalSearchTable: Equatable, Sendable {
         guard let match = areas.first(where: { $0.areaID == area }) else { return nil }
         return match.entries.first(where: { $0.subareaID == subarea })?.upViewID
     }
+
+    /**
+     * 0x020B4894 and 0x020B48D8 return the first matching door view and area.
+     */
+    public func door(id: UInt16) -> Door? { doors.first { $0.doorID == id } }
 }
 
 /// The look branch of the search process (0x0203314C, then 0x02031944 case 0).
@@ -84,9 +102,10 @@ public enum OriginalSearchSelection {
         /// Case 0: scene 0xFFFE, mode 10, event 0, block 0, the area and the
         /// picked subarea, and upView from search-process field +0x32.
         case look(OriginalEventSelectionContext)
-        /// Case 2: an up-view resource exists. 0x020B4A80 and the up-view
-        /// table (`.upv`) are not transcribed, so this path stops.
-        case upViewNotRecovered(upViewID: UInt16)
+        /**
+         * Case 2 runs the same entry event before the host opens process 98.
+         */
+        case closeup(OriginalEventSelectionContext, upViewID: UInt16)
     }
 
     /// `subarea` is the two digits of the picked `objNN` model node
@@ -94,15 +113,14 @@ public enum OriginalSearchSelection {
     /// initializer 0x02030B04 sets to -1 and no recovered code changes.
     public static func look(table: OriginalSearchTable, mapID: Int16, nowTime: UInt16,
                             area: UInt16, subarea: UInt16, upViewField: Int16 = -1) -> Outcome {
-        // 0x020331AC: signed comparisons against 0xFFFF and zero.
-        if let upView = table.upViewID(area: area, subarea: subarea), upView < 0xFFFF {
-            return .upViewNotRecovered(upViewID: upView)
-        }
         var context = OriginalEventSelectionContext(sceneID: 0xFFFE, blockID: 0, modeID: 10, eventID: 0,
                                                     nowTime: nowTime, mapID: mapID)
         context.areaID = area
         context.subareaID = subarea
         context.upViewID = upViewField
+        if let upView = table.upViewID(area: area, subarea: subarea), upView < 0xFFFF {
+            return .closeup(context, upViewID: upView)
+        }
         return .look(context)
     }
 }

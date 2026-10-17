@@ -1,0 +1,43 @@
+# Original reference. Output directory: extracted/reference/room215-suitcase-quit-inserted
+load extracted/reference/room215-suitcase-insert/inserted.mln
+release
+frames 10
+touch 15 172
+frames 3
+release
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture returned
+save returned
+quit

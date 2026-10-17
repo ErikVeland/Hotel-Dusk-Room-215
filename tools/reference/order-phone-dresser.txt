@@ -1,0 +1,19 @@
+# Exploratory input from the retained inspection view. Use order-leave-parcel for the checked route.
+# Component continuation of the delivery fixture. Pass the bed and approach the dresser.
+load extracted/reference/order-phone-approach/near.mln
+touch 210 96
+frames 22
+release
+touch 127 20
+frames 80
+release
+frames 90
+capture near
+save near
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

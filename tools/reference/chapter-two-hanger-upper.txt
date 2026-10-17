@@ -1,0 +1,15 @@
+load extracted/reference/chapter-two-hanger-use/puzzle.mln
+touch 55 96
+frames 3
+release
+frames 120
+capture miss
+save miss
+touch 117 45
+frames 3
+capture first_contact
+save first_contact
+release
+frames 300
+capture first_cut
+save first_cut

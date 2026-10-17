@@ -1,0 +1,22 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/louie-departure
+# Use A alone so the final page does not also move Kyle on the floor plan.
+load extracted/reference/louie-career-answer/page46.mln
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page3
+save page3
+quit

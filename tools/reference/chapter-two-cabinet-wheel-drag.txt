@@ -1,0 +1,18 @@
+load extracted/reference/chapter-two-cabinet-combination-entry/ready.mln
+touch 125 30
+frames 3
+capture held
+touch 115 30
+frames 3
+capture drag0
+touch 105 30
+frames 3
+capture drag1
+touch 95 30
+frames 3
+capture drag2
+release
+frames 120
+capture released
+save released
+quit

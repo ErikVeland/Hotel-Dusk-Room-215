@@ -43,7 +43,7 @@ public enum OriginalEventCompletion {
     }
 
     public static func stateOnlyExit(event: OriginalBlockGraph.Record, conditions: OriginalConditions,
-                                     processReturn: Int16 = 0) throws -> Result {
+                                     processReturn: Int16 = 0, game: OriginalGameState? = nil) throws -> Result {
         let reader = OriginalBytes(event.raw)
         let mode = try reader.u16(0), key = Int16(bitPattern: try reader.u16(4))
         let records: [OriginalConditions.Record]?
@@ -55,7 +55,7 @@ public enum OriginalEventCompletion {
             records = conditions.entries[Int(key)].second
         }
         switch mode {
-        case 2, 3, 4, 5, 15:
+        case 2, 3, 4, 5, 15, 16:
             var transition: OriginalEventTransition?
             if let records {
                 let index = mode == 15 ? max(0, Int(processReturn)) : 0
@@ -73,10 +73,13 @@ public enum OriginalEventCompletion {
             // Without a transition, the closeup returns to the search view
             // through fades and process state that are not recovered.
             guard let first = records?.first, let transition = try OriginalEventTransition(record: first) else {
-                return .requiresOriginalHandler(mode: mode)
+                // 0x0203E7C8 restores the retained search/close-up after presentation waits.
+                // Map 40 in chapter 9 has a conditional counter write that still needs its controller context.
+                if mode == 10, game?.mapID == 40, game?.chapter == 9 { return .requiresOriginalHandler(mode: mode) }
+                return .completed(Completion(transition: nil, preventContextRestore: false))
             }
             return .completed(Completion(transition: transition, preventContextRestore: false))
-        case 6, 18, 19, 20, 23, 25, 29, 31, 32:
+        case 6, 18, 19, 20, 23, 25, 29, 30, 31, 32:
             return .completed(Completion(transition: nil, preventContextRestore: false))
         default: return .requiresOriginalHandler(mode: mode)
         }

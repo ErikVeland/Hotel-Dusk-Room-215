@@ -1,0 +1,15 @@
+# Save-menu component run in its own generated cartridge-save directory.
+load extracted/reference/chapter-two-save-menu/slots.mln
+touch 190 96
+frames 3
+release
+frames 120
+capture selected
+save selected
+touch 190 96
+frames 3
+release
+frames 300
+capture confirmed
+save confirmed
+quit

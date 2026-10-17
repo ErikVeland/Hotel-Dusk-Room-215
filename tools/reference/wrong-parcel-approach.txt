@@ -1,0 +1,15 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/wrong-parcel-approach
+load extracted/reference/louie-departure-boundary/returned.mln
+touch 45 96
+frames 95
+release
+frames 90
+capture near
+save near
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

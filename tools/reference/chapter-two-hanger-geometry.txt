@@ -1,0 +1,4 @@
+load extracted/reference/chapter-two-hanger-use/puzzle.mln
+frames 2
+capture-geometry puzzle
+capture puzzle

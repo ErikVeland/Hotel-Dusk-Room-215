@@ -1,0 +1,13 @@
+# Original reference. Output directory: extracted/reference/room215-phone-dresser
+load extracted/reference/room215-phone-approach/west.mln
+touch 210 96
+frames 35
+release
+frames 10
+touch 127 20
+frames 110
+release
+frames 120
+capture dresser
+save dresser
+quit

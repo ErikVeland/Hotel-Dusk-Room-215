@@ -1,0 +1,12 @@
+load extracted/reference/chapter-two-red-box-take/page13.mln
+touch 15 77
+frames 3
+release
+frames 120
+touch 15 77
+frames 3
+release
+frames 120
+capture walking
+save walking
+quit

@@ -50,6 +50,16 @@ final class OriginalModelTests: XCTestCase {
         XCTAssertEqual(try search.cameraMarkers(index: 2).targetFixed, camera.targetFixed)
     }
 
+    func testGameplayRenderingOmitsDebugHelpersWithoutRemovingHitGeometry() throws {
+        let model = try OriginalModelLibrary.bundled().load(path: "map/R211/R211/R211.mdf")
+        let helpers = Set(model.nodes.indices.filter { model.nodes[$0].name.hasPrefix("obj999") })
+        XCTAssertEqual(Set(helpers.map { model.nodes[$0].name }), ["obj9998", "obj9999"])
+        XCTAssertEqual(model.gameplayRenderNodes, Set(model.nodes.indices).subtracting(helpers))
+        for index in helpers {
+            XCTAssertTrue(model.groups.contains { $0.node == index && $0.hit != nil })
+        }
+    }
+
     func testUnsupportedVariantsAndMalformedCommandsFailExplicitly() throws {
         let library = try OriginalModelLibrary.bundled()
         for record in library.manifest.models where record.status == "unsupported" {

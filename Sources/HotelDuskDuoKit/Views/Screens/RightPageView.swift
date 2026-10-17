@@ -10,21 +10,27 @@ public struct RightPageView: View {
                 BookSettingsMenu(session: session)
             }
             if let play = session.play {
-                switch play.runner.phase {
-                case .dialogue, .itemNotice, .process, .waiting:
-                    OriginalPlayPage(play: play, screen: 0)
-                case .questions(let topics):
-                    Spacer()
-                    OriginalQuestionMenuView(play: play, topics: topics)
-                    Spacer()
-                case .choice(let choices):
-                    Spacer()
-                    OriginalChoiceView(play: play, choices: choices)
-                    Spacer()
-                case .exploration, .halted:
-                    Spacer()
-                    OriginalPlayStatusView(session: session, play: play)
-                    Spacer()
+                if play.chapterTransition != nil { OriginalChapterTransitionView(play: play, screen: 0) }
+                else if play.notebook != nil { OriginalNotebookView(play: play) }
+                else {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice, .picture, .process, .waiting:
+                        OriginalPlayPage(play: play, screen: 0)
+                    case .questions(let topics):
+                        Spacer()
+                        OriginalQuestionMenuView(play: play, topics: topics)
+                        Spacer()
+                    case .choice(let choices):
+                        Spacer()
+                        OriginalChoiceView(play: play, choices: choices)
+                        Spacer()
+                    case .exploration where play.lobby != nil:
+                        OriginalPlayPage(play: play, screen: 0)
+                    case .exploration, .halted:
+                        Spacer()
+                        OriginalPlayStatusView(session: session, play: play)
+                        Spacer()
+                    }
                 }
             } else if session.isMemoPadOpen {
                 MemoPadView(session: session)
@@ -41,13 +47,20 @@ public struct RightPageView: View {
                 Spacer()
                 Text("Native rewrite in progress")
                     .font(NovelStyle.title)
-                Text("Only the recovered Chapter 1 opening can be played. The opening cinematic is not ported, so play starts at Kyle's arrival.")
+                Text("Play starts at Kyle's arrival and currently reaches the start of Chapter 2.")
                     .font(NovelStyle.body)
                     .multilineTextAlignment(.center)
                 if session.canStartOriginalGame {
                     Button("Begin Chapter 1") { session.startOriginalGame() }
                         .buttonStyle(BookTextButtonStyle())
                 }
+                ForEach(0..<3, id: \.self) { slot in
+                    if session.chapterSaves[slot] != nil {
+                        Button("Load slot \(slot + 1) — Chapter 2") { session.loadChapterSave(slot: slot) }
+                            .buttonStyle(BookTextButtonStyle())
+                    }
+                }
+                if let error = session.saveError { Text(error).font(NovelStyle.caption) }
                 if session.sourceError != nil {
                     Text("The original game data could not be loaded.")
                         .font(NovelStyle.caption)

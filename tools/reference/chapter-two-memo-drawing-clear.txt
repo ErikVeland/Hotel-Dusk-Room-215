@@ -1,0 +1,8 @@
+load extracted/reference/chapter-two-memo-drawing-ink/released.mln
+touch 15 48
+frames 3
+release
+frames 120
+capture cleared
+save cleared
+quit

@@ -1,0 +1,23 @@
+# Original reference. Output directory: extracted/reference/room215-suitcase-inspect
+load extracted/reference/room215-phone-dialogue/call20.mln
+touch 15 78
+frames 3
+release
+frames 120
+touch 127 170
+frames 100
+release
+frames 10
+touch 45 96
+frames 50
+release
+frames 120
+capture near
+save near
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

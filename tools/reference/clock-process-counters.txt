@@ -1,0 +1,10 @@
+# Component capture from time-transition-fixture. Output: extracted/reference/clock-process-counters
+load extracted/reference/time-transition-fixture/page2.mln
+trace-clock 0238d4b0
+keys ffe
+frames 2
+keys fff
+frames 400
+capture returned
+save returned
+quit

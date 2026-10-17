@@ -1,0 +1,31 @@
+# Component continuation of the delivery fixture. Leave both close-up and bed inspection.
+load extracted/reference/order-sheet/page15.mln
+touch 15 78
+frames 3
+release
+frames 180
+capture bed
+save bed
+touch 15 78
+frames 3
+release
+frames 180
+capture room
+save room
+touch 210 96
+frames 25
+release
+frames 10
+touch 127 20
+frames 100
+release
+frames 90
+capture near
+save near
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

@@ -1,0 +1,15 @@
+# Original reference. Output directory: extracted/reference/room215-delivery-knock
+load extracted/reference/room215-delivery-approach/map.mln
+touch 210 96
+frames 60
+release
+frames 180
+capture north
+save north
+touch 127 20
+frames 100
+release
+frames 180
+capture west
+save west
+quit

@@ -1,0 +1,18 @@
+load extracted/reference/chapter-two-office-exit-approach/page9.mln
+touch 185 60
+frames 45
+capture diagonal
+touch 127 20
+frames 1
+capture west1
+frames 1
+capture west2
+frames 2
+capture west4
+frames 6
+capture west10
+frames 30
+release
+frames 30
+capture west40
+quit

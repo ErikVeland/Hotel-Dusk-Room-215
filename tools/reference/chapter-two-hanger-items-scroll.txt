@@ -1,0 +1,57 @@
+load extracted/reference/chapter-two-hanger-inspect/items.mln
+touch 189 175
+frames 10
+touch 185 175
+frames 5
+touch 180 175
+frames 5
+touch 175 175
+frames 5
+touch 170 175
+frames 5
+touch 165 175
+frames 5
+touch 160 175
+frames 5
+touch 155 175
+frames 5
+touch 150 175
+frames 5
+touch 145 175
+frames 5
+touch 140 175
+frames 5
+touch 135 175
+frames 5
+touch 130 175
+frames 5
+touch 125 175
+frames 5
+touch 120 175
+frames 5
+touch 115 175
+frames 5
+touch 110 175
+frames 5
+touch 105 175
+frames 5
+touch 100 175
+frames 5
+touch 95 175
+frames 5
+touch 90 175
+frames 5
+touch 85 175
+frames 5
+touch 80 175
+frames 5
+touch 75 175
+frames 5
+touch 70 175
+frames 5
+touch 65 175
+frames 5
+release
+frames 120
+capture scrolled
+save scrolled

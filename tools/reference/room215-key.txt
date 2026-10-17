@@ -1,0 +1,15 @@
+# Original reference. Output directory: extracted/reference/room215-key
+load extracted/reference/room215-inventory/inventory.mln
+touch 157 96
+frames 3
+release
+frames 180
+capture key
+save key
+touch 80 160
+frames 3
+release
+frames 180
+capture used
+save used
+quit

@@ -1,0 +1,43 @@
+# Original reference. Output directory: extracted/reference/room215-suitcase-key2
+load extracted/reference/room215-suitcase-look2/items.mln
+touch 195 96
+frames 3
+release
+frames 120
+touch 29 55
+frames 3
+release
+frames 120
+touch 100 130
+frames 3
+release
+frames 120
+touch 100 130
+frames 3
+release
+frames 180
+capture use
+save use
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+capture puzzle
+save puzzle
+quit

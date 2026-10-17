@@ -10,6 +10,14 @@ public struct OriginalModel: Sendable {
     public let nodes: [Node]
     public let groups: [Group]
 
+    /**
+     * 0x0208B6F0 omits obj999 helpers unless the original debug display is enabled.
+     * The hit pass at 0x0208BAAC retains them.
+     */
+    public var gameplayRenderNodes: Set<Int> {
+        Set(nodes.indices.filter { !nodes[$0].name.hasPrefix("obj999") })
+    }
+
     public struct Material: Sendable {
         public let name: String
         public let texture: String

@@ -1,0 +1,35 @@
+# Original reference. Output directory: extracted/reference/room215-paperclip-quit-untouched
+load extracted/reference/room215-paperclip-puzzle/puzzle.mln
+release
+frames 4
+touch 14 177
+frames 3
+release
+frames 180
+capture returned
+save returned
+keys ffe
+frames 2
+keys fff
+frames 150
+capture step1
+save step1
+keys ffe
+frames 2
+keys fff
+frames 150
+capture step2
+save step2
+keys ffe
+frames 2
+keys fff
+frames 150
+capture step3
+save step3
+keys ffe
+frames 2
+keys fff
+frames 150
+capture step4
+save step4
+quit

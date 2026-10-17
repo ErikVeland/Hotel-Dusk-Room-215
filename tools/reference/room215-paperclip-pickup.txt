@@ -1,0 +1,62 @@
+# Original reference. Output directory: extracted/reference/room215-paperclip-pickup
+load extracted/reference/room215-paperclip-brochure/closeup.mln
+touch 185 110
+frames 3
+release
+frames 120
+capture selected
+touch 185 110
+frames 3
+release
+frames 180
+capture picked
+save picked
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step1
+save step1
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step2
+save step2
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step3
+save step3
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step4
+save step4
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step5
+save step5
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step6
+save step6
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step7
+save step7
+keys ffe
+frames 2
+keys fff
+frames 120
+capture step8
+save step8
+quit

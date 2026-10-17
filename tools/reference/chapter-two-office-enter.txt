@@ -1,0 +1,16 @@
+load extracted/reference/chapter-two-payment-paid-follow/returned.mln
+touch 15 15
+frames 3
+release
+frames 120
+touch 80 32
+frames 3
+release
+frames 5
+touch 80 32
+frames 3
+release
+frames 600
+capture room
+save room
+quit

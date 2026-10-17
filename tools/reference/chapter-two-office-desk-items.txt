@@ -1,0 +1,37 @@
+load extracted/reference/chapter-two-office-desk-approach/search.mln
+touch 55 145
+frames 3
+release
+frames 5
+touch 55 145
+frames 3
+release
+frames 180
+capture entry
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture ready
+save ready
+quit

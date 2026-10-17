@@ -1,0 +1,42 @@
+load extracted/reference/chapter-two-memo-drawing-quit/finished.mln
+touch 30 100
+frames 3
+release
+frames 5
+touch 30 100
+frames 3
+release
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture closeup
+save closeup
+touch 15 47
+frames 3
+release
+frames 180
+capture items
+save items
+quit

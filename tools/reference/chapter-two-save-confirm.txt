@@ -1,0 +1,9 @@
+# Confirm slot 1 in the isolated generated cartridge save.
+load extracted/reference/chapter-two-save-slot/confirmed.mln
+touch 22 62
+frames 3
+release
+frames 300
+capture saved
+save saved
+quit

@@ -1,0 +1,63 @@
+load extracted/reference/chapter-two-memo-pull-ready/page9.mln
+touch 93 106
+frames 3
+capture held
+touch 93 102
+frames 2
+capture wiggle0
+touch 93 110
+frames 2
+capture wiggle1
+touch 93 102
+frames 2
+capture wiggle2
+touch 93 110
+frames 2
+capture wiggle3
+touch 93 102
+frames 2
+capture wiggle4
+touch 93 110
+frames 2
+capture wiggle5
+touch 93 102
+frames 2
+capture wiggle6
+touch 93 110
+frames 2
+capture wiggle7
+touch 93 102
+frames 2
+capture wiggle8
+touch 93 110
+frames 2
+capture wiggle9
+touch 93 102
+frames 2
+capture wiggle10
+touch 93 110
+frames 2
+capture wiggle11
+touch 93 102
+frames 2
+capture wiggle12
+touch 93 110
+frames 2
+capture wiggle13
+touch 93 102
+frames 2
+capture wiggle14
+touch 93 110
+frames 2
+capture wiggle15
+touch 93 102
+frames 2
+capture wiggle16
+touch 93 110
+frames 2
+capture wiggle17
+release
+frames 240
+capture result
+save result
+quit

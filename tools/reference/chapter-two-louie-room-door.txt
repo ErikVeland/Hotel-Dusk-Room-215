@@ -1,0 +1,22 @@
+load extracted/reference/chapter-two-left-hallway-entry/entered.mln
+touch 127 20
+frames 100
+release
+frames 5
+touch 210 96
+frames 187
+release
+frames 5
+touch 127 20
+frames 10
+release
+frames 30
+capture approached
+save approached
+touch 15 15
+frames 3
+release
+frames 180
+capture door
+save door
+quit

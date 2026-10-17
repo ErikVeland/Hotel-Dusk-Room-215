@@ -1,0 +1,15 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-piece-select
+load extracted/reference/melissa-piece-bag/bag.mln
+touch 130 96
+frames 3
+release
+frames 120
+capture selected
+save selected
+touch 130 96
+frames 3
+release
+frames 180
+capture confirmed
+save confirmed
+quit

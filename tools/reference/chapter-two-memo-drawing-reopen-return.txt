@@ -1,0 +1,32 @@
+load extracted/reference/chapter-two-memo-drawing-reopen/reopened.mln
+touch 14 168
+frames 3
+release
+frames 600
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture finished
+save finished
+quit

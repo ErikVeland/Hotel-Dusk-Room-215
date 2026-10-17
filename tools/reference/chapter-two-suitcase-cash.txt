@@ -1,0 +1,44 @@
+load extracted/reference/chapter-two-suitcase-open/lower.mln
+frames 4
+touch 23 40
+frames 2
+capture pencil_selected
+touch 23 140
+frames 1
+capture pencil_drag1
+frames 7
+capture pencil_drag8
+frames 22
+capture pencil_drag30
+release
+frames 4
+capture pencil_moved
+save pencil_moved
+touch 20 20
+frames 2
+release
+frames 4
+capture cash_selected
+touch 20 20
+frames 2
+release
+frames 120
+capture cash_notice
+save cash_notice
+keys ffe
+frames 2
+keys fff
+frames 120
+capture cash_advance0
+keys ffe
+frames 2
+keys fff
+frames 120
+capture cash_advance1
+keys ffe
+frames 2
+keys fff
+frames 120
+capture cash_advance2
+save cash_taken
+quit

@@ -1,0 +1,132 @@
+# Original reference. Output directory: extracted/reference/dunning-to-central-hall
+load extracted/reference/dunning-room-wish-answer/page35.mln
+frames 60
+touch 128 20
+frames 110
+release
+frames 5
+touch 211 96
+frames 110
+release
+frames 180
+capture helen
+save helen
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+capture after-helen
+save after-helen
+touch 211 96
+frames 110
+release
+frames 180
+capture r103
+save r103
+touch 211 96
+frames 61
+release
+frames 10
+touch 128 20
+frames 100
+release
+frames 180
+capture hallway
+save hallway
+quit

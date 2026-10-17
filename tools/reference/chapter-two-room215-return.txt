@@ -1,0 +1,19 @@
+load extracted/reference/chapter-two-helen-memories/memories.mln
+touch 210 96
+frames 21
+release
+touch 127 20
+frames 351
+release
+touch 45 96
+frames 21
+release
+frames 120
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 180
+capture door
+save door

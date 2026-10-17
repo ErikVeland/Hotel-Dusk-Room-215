@@ -1,0 +1,147 @@
+# Original reference. Output directory: extracted/reference/helen-touch-pages
+load extracted/reference/helen-after-dunning/page20.mln
+touch 30 96
+frames 3
+release
+frames 180
+capture touch1
+save touch1
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a1
+save a1
+touch 30 96
+frames 3
+release
+frames 180
+capture touch2
+save touch2
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a2
+save a2
+touch 30 96
+frames 3
+release
+frames 180
+capture touch3
+save touch3
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a3
+save a3
+touch 30 96
+frames 3
+release
+frames 180
+capture touch4
+save touch4
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a4
+save a4
+touch 30 96
+frames 3
+release
+frames 180
+capture touch5
+save touch5
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a5
+save a5
+touch 30 96
+frames 3
+release
+frames 180
+capture touch6
+save touch6
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a6
+save a6
+touch 30 96
+frames 3
+release
+frames 180
+capture touch7
+save touch7
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a7
+save a7
+touch 30 96
+frames 3
+release
+frames 180
+capture touch8
+save touch8
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a8
+save a8
+touch 30 96
+frames 3
+release
+frames 180
+capture touch9
+save touch9
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a9
+save a9
+touch 30 96
+frames 3
+release
+frames 180
+capture touch10
+save touch10
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a10
+save a10
+touch 30 96
+frames 3
+release
+frames 180
+capture touch11
+save touch11
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a11
+save a11
+touch 30 96
+frames 3
+release
+frames 180
+capture touch12
+save touch12
+keys ffe
+frames 2
+keys fff
+frames 180
+capture a12
+save a12
+quit

@@ -1,0 +1,58 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/louie-voice-choice
+load extracted/reference/louie-parcel/page6.mln
+frames 180
+touch 85 96
+frames 3
+release
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page4
+save page4
+keys ffe
+frames 2
+keys fff
+frames 180
+touch 30 96
+frames 3
+release
+frames 180
+capture page5
+save page5
+quit

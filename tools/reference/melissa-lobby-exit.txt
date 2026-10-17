@@ -1,0 +1,15 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-lobby-exit
+load extracted/reference/melissa-central-approach/approached.mln
+touch 127 20
+frames 45
+release
+frames 30
+capture aligned
+save aligned
+touch 45 96
+frames 80
+release
+frames 120
+capture returned
+save returned
+quit

@@ -1,0 +1,9 @@
+# Original reference. Output directory: extracted/reference/room215-paperclip-selected
+load extracted/reference/room215-paperclip-inventory/items.mln
+touch 103 80
+frames 3
+release
+frames 180
+capture selected
+save selected
+quit

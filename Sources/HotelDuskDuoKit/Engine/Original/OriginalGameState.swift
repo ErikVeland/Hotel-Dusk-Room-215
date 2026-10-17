@@ -2,24 +2,23 @@ import Foundation
 
 /// Defaults loaded by 0x020B4C28 and read by the original state initializer.
 public struct OriginalStateDefaults: Sendable {
+    public let doorTable: OriginalDoorTable
     public let doors: [Int16: Int16]
     public let doorCount: Int
     public let objects: [Int16: Int16]
 
     public init(doorData: Data, objectData: Data) throws {
-        let door = OriginalBytes(doorData), object = OriginalBytes(objectData)
-        let count = Int(Int16(bitPattern: try door.u16(0)))
+        doorTable = try OriginalDoorTable(data: doorData)
+        let object = OriginalBytes(objectData)
+        let count = doorTable.records.count
         let objectCount = Int(try object.u32(0))
-        guard count >= 0, count <= 50, doorData.count == 16 + count * 16,
-              objectCount <= (objectData.count - 4) / 48,
+        guard objectCount <= (objectData.count - 4) / 48,
               objectData.count == 4 + objectCount * 48 else {
             throw OriginalDataError.invalid("Original state default tables")
         }
         var doors: [Int16: Int16] = [:], objects: [Int16: Int16] = [:]
-        for index in 0..<count {
-            let offset = 16 + index * 16
-            let id = Int16(bitPattern: try door.u16(offset))
-            if doors[id] == nil { doors[id] = Int16(bitPattern: try door.u16(offset + 2)) }
+        for record in doorTable.records {
+            if doors[record.id] == nil { doors[record.id] = record.initialState }
         }
         for index in 0..<objectCount {
             let offset = 4 + index * 48
@@ -107,12 +106,182 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
     }
 
     public var snapshot: Data { Data(bytes) }
+
+    /**
+     * 0x02098800 clears the notebook notification when its editor opens.
+     */
+    public mutating func openNotebook() { bytes[0x87D] = 0 }
+
+    /**
+     * 0x02078DA8 stores the three writable pages in the original game state.
+     */
+    public mutating func storeNotebook(_ notebook: OriginalNotebook) {
+        for page in 0..<3 where bytes[0x13C8 + page] == 0 {
+            let start = 0x3558 + page * OriginalNotebook.packedSize
+            bytes.replaceSubrange(start..<(start + OriginalNotebook.packedSize), with: notebook.pages[page])
+        }
+    }
+
+    /**
+     * 0x02098AAC clears the person's item marker when an inventory item is shown.
+     */
+    public mutating func markItemShown(_ item: UInt8, person: Int16) {
+        guard (0..<18).contains(person), item < 88 else { return }
+        setBit(base: 0x13E4 + Int(person) * 11, index: Int(item), value: false)
+    }
+
+    /**
+     * 0x02097E28 reads the object flag bank at 0x852.
+     */
+    public func objectVisible(_ index: UInt16) -> Bool {
+        index < 256 && bytes[0x852 + Int(index / 8)] & (1 << (index % 8)) != 0
+    }
+
+    /**
+     * 0x02026DD4 records successful puzzle exits in the process-ID-minus-24 flag bank.
+     */
+    public mutating func markPuzzleCompleted(processID: UInt16) {
+        guard (24..<95).contains(processID) else { return }
+        setBit(base: 0x872, index: Int(processID - 24), value: true)
+    }
+
+    public var cabinetDialRetainedValue: UInt16 { read16(0x13D6) }
+
+    /**
+     * Overlay 10 stores 999 minus the displayed cabinet number when the process exits.
+     */
+    public mutating func storeCabinetDialValue(_ value: UInt16) { write16(0x13D6, value) }
+
+    /**
+     * 0x02027CF4 retains a nonzero puzzle random value at game offset 0x13D4.
+     */
+    public mutating func initialisePuzzleRandomInfo(seed: UInt32) -> UInt16 {
+        var value = read16(0x13D4), random = seed
+        while value == 0 {
+            random = random &* 0x5D588B65 &+ 0x269EC3
+            value = UInt16(truncatingIfNeeded: random >> 16)
+        }
+        write16(0x13D4, value)
+        return value
+    }
+
+    /**
+     * 0x020987CC copies the live state into the retry checkpoint. This does not write a save file.
+     */
+    public mutating func saveRetryCheckpoint() {
+        write16(0x1384, 0)
+        let current = Array(bytes[0..<0x1AAC])
+        bytes.replaceSubrange(0x1AAC..<0x3558, with: current)
+    }
     public var chapter: UInt16 { read16(0) }
     public var nowTime: UInt16 { read16(2) }
+    public var mapPosition: SIMD3<Float> {
+        SIMD3(Float(Int32(bitPattern: read32(8))), Float(Int32(bitPattern: read32(12))), Float(Int32(bitPattern: read32(16))))
+    }
+    public var facing: Float { Float(bitPattern: read32(20)) }
+
+
+    /**
+     * Map request 3 changes time and clears conversation blocks (0x02097E5C, 0x02097BEC).
+     */
+    mutating func applyTimeChange(_ value: Int16) {
+        write16(2, UInt16(bitPattern: value))
+        for offset in 0x176..<0x812 { bytes[offset] = 0 }
+    }
+
+    /**
+     * Request 4 resets chapter-local state before process 140 (0x0202C264, 0x020340D0).
+     */
+    mutating func beginChapter(_ chapter: UInt16) throws {
+        guard chapter < 10 else { throw OriginalDataError.invalid("Chapter number") }
+        applyTimeChange(0)
+        write16(0, chapter)
+        for offset in 0x812..<0x852 { bytes[offset] = 0 }
+        for offset in 0x880..<0xA80 { bytes[offset] = 0 }
+        for base in [0xD15, 0x14CC] {
+            for offset in base..<(base + 47 * 32) { bytes[offset] = 0 }
+        }
+        bytes[0x137B] = 1
+    }
+
+    /**
+     * Process 9 records the chapter time label and clears the transition flag (0x02017278).
+     */
+    mutating func beginChapterTitle(label: String) throws {
+        if nowTime == 0 { try setTimeLabel(label) }
+        bytes[0x137B] = 0
+    }
+
+    /**
+     * Process 126 copies its label, including its terminator, at 0x1346 (0x02098868).
+     */
+    mutating func setTimeLabel(_ label: String) throws {
+        let encoded = Array(label.utf8)
+        guard encoded.count < 0x22, !encoded.contains(0) else {
+            throw OriginalDataError.invalid("Saved time label")
+        }
+        bytes.replaceSubrange(0x1346..<(0x1346 + encoded.count + 1), with: encoded + [0])
+    }
     public var mapID: Int16 { Int16(bitPattern: read16(4)) }
     public var previousMapID: Int16 { Int16(bitPattern: read16(6)) }
 
-    /// 0x0209714C: a negative previous ID copies the old current map.
+    /**
+     * Overlay 2 reads and saves the Chapter 1 loose-piece mask at 0x02111638.
+     */
+    public var chapterOneJigsawMask: UInt32 {
+        get { UInt32(read16(0x14AC)) | UInt32(read16(0x14AE)) << 16 }
+        set { write32(0x14AC, newValue & 0xFFFFF) }
+    }
+
+    /**
+     * Returns the person's current conversation block (0x02097BB4).
+     */
+    public func conversationBlock(map: Int16, person: Int16) -> UInt16? {
+        guard (0..<47).contains(map), (0..<18).contains(person) else { return nil }
+        return read16(0x176 + Int(map) * 0x24 + Int(person) * 2)
+    }
+
+    /**
+     * Records the selected normal-script block (0x020296C4 and 0x02097B7C).
+     * Special scene IDs use person slot zero in the original state table.
+     */
+    public mutating func rememberConversationBlock(scene: UInt16, block: UInt16) {
+        guard (0..<47).contains(mapID) else { return }
+        let person = scene > 17 ? 0 : Int(scene)
+        write16(0x176 + Int(mapID) * 0x24 + person * 2, block)
+    }
+
+    /**
+     * Returns the model marker key used by 0x0202F824 to place a person.
+     */
+    public func personMarker(_ person: Int) -> Int? {
+        guard (0..<18).contains(person) else { return nil }
+        let offset = 0xCA4 + person * 4
+        let map = Int(Int16(bitPattern: read16(offset)))
+        let point = Int(Int8(bitPattern: bytes[offset + 2]))
+        guard map >= 0, point >= 0 else { return nil }
+        return map * 100 + point
+    }
+
+    /**
+     * 0x02097198 stores scripted map placement as fixed coordinates and a float angle.
+     */
+    public mutating func setMapPosition(_ position: SIMD3<Float>, facing: Float) {
+        for axis in 0..<3 { write32(8 + axis * 4, UInt32(bitPattern: Int32(position[axis]))) }
+        write32(20, facing.bitPattern)
+    }
+
+    /**
+     * Map construction at 0x02029B78 marks the room through 0x020982C8.
+     */
+    public mutating func markMapVisited() {
+        guard (0..<47).contains(mapID) else { return }
+        bytes[0x1388 + Int(mapID)] |= 1
+    }
+
+    /**
+     * 0x0209714C: a negative previous ID copies the old current map.
+     */
     public mutating func setMap(_ map: Int16, previous: Int16) {
         write16(6, UInt16(bitPattern: previous < 0 ? mapID : previous))
         write16(4, UInt16(bitPattern: map))
@@ -171,6 +340,9 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
         switch command {
         case .keywordAvailable(let ids):
             for id in ids where id >= 0 && id < 128 { bytes[0x880 + Int(id) * 4] = 1 }
+        case .keywordUnavailable(let id):
+            // 0x020984E4 clears availability and preserves the used and person fields.
+            if id >= 0 && id < 128 { bytes[0x880 + Int(id) * 4] = 0 }
         case .itemCheckFlags(let ids):
             for id in ids where id >= 0 && id < 256 {
                 bytes[0x812 + Int(id / 4)] |= UInt8(1 << ((id % 4) * 2))
@@ -288,6 +460,10 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
     private mutating func write16(_ offset: Int, _ value: UInt16) {
         bytes[offset] = UInt8(truncatingIfNeeded: value); bytes[offset + 1] = UInt8(truncatingIfNeeded: value >> 8)
     }
+    private func read32(_ offset: Int) -> UInt32 {
+        UInt32(read16(offset)) | UInt32(read16(offset + 2)) << 16
+    }
+
     private mutating func write32(_ offset: Int, _ value: UInt32) {
         for index in 0..<4 { bytes[offset + index] = UInt8(truncatingIfNeeded: value >> (index * 8)) }
     }

@@ -1,0 +1,15 @@
+# Face the room door from the Chapter 2 arrival position.
+load extracted/reference/chapter-two-room/page4.mln
+touch 210 96
+frames 115
+release
+frames 90
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 180
+capture exit
+save exit
+quit

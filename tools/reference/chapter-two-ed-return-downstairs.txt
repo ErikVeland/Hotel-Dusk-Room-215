@@ -1,0 +1,26 @@
+load extracted/reference/chapter-two-ed-phone-finish/returned.mln
+touch 127 170
+frames 100
+release
+frames 5
+touch 210 96
+frames 100
+release
+frames 30
+touch 15 15
+frames 3
+release
+frames 180
+capture corridor
+save corridor
+touch 127 170
+frames 270
+release
+frames 5
+touch 210 96
+until32 02110190 00270011 160
+release
+frames 120
+capture central
+save central
+quit

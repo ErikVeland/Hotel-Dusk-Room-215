@@ -5,6 +5,8 @@ import Foundation
 /// exit mode or process whose original behavior is not recovered. It never
 /// skips a story command to keep playing.
 public struct OriginalEventRunner: Sendable {
+    private var inventoryProcess: OriginalInventoryProcessTable.Record?
+    var hasInventoryProcess: Bool { inventoryProcess != nil }
     public struct Halt: Equatable, Sendable {
         public let reason: String
         public let program: String
@@ -19,26 +21,32 @@ public struct OriginalEventRunner: Sendable {
         case process(id: UInt16)
         /// Opcode 11 blocks the stated number of original updates.
         case waiting(updates: Int)
-        /// A normal event ended without a CHK transition. The original returns
-        /// to map exploration, which this rewrite has not recovered.
+        /// A normal event ended without a CHK transition. The host resumes map exploration.
         case exploration(mapID: Int16)
-        /// Opcode 10 kind 5 hands control to UI state 0x6F (0x0203CE9C).
+        /**
+         * Ordinary choices and chapter reviews use UI state 0x6F (0x0203CE9C).
+         */
         case choice([Choice])
         /// Opcode 6 (0x0203FBFC): text pages announcing an item just added.
         case itemNotice(itemID: UInt8, page: OriginalDialoguePacket.Page)
+        /**
+         * Opcode 8 waits for the original touch-picture process to return.
+         */
+        case picture(id: UInt16)
         /// Event modes 7 and 8 open the question menu (UI state 0x6F, +0x64 = 0).
         case questions([Topic])
         case halted(Halt)
     }
 
-    /// One option of an original choice prompt. KIF records carry the label,
-    /// the mode-5 event ID in field 0 and the option ID in field 3.
     /// A keyword the partner can be asked about, from the chapter `.ttk`.
     public struct Topic: Equatable, Sendable {
         public let keyword: Int16
         public let label: String
     }
 
+    /**
+     * KIF field 0 names the answer event; field 3 identifies the option in the native menu.
+     */
     public struct Choice: Equatable, Sendable {
         public let id: UInt16
         public let eventID: UInt16
@@ -48,14 +56,12 @@ public struct OriginalEventRunner: Sendable {
     /// Opcodes whose dispatcher cases (0x0203BC9C) only change controller or
     /// display state: portraits and backgrounds (3, 26, 27, 28), animation
     /// start and wait (43, 44), and empty cases. They do not write game state.
-    /// Opcode 8 (0x0203FD30) stores an item picture ID at controller +0x10 and
-    /// selects picture state 0x13 or 0x14; it writes no game state.
-    public static let presentationOpcodes: Set<UInt8> = [0, 1, 2, 3, 5, 7, 8, 14, 20, 22, 26, 27, 28, 38, 43, 44, 48]
+    public static let presentationOpcodes: Set<UInt8> = [0, 1, 2, 3, 5, 7, 14, 20, 22, 26, 27, 28, 38, 43, 44, 48]
     /// Opcode 9 (handler 0x0203C474) calls 0x020401EC, which only sets the advance flag at
     /// controller +0x8C (already set on entry) and returns 0.
     public static let advanceOnlyOpcodes: Set<UInt8> = [9]
     /// Handler 0x0203C4AC: these opcodes push (s8 byte 2, s16 at 4)
-    /// with 0x020971D0. Opcode 16 also compares a string and is excluded.
+    /// with 0x020971D0. Opcode 16 has a separate clock-process handler.
     public static let processRequestOpcodes: Set<UInt8> = [15, 17, 21, 32, 41, 45]
 
     /// One entry of the stack at 0x021046B8 (+0x14 base, +0x18 count). The map
@@ -75,8 +81,10 @@ public struct OriginalEventRunner: Sendable {
     /// Presentation commands that the native renderer does not draw yet.
     public private(set) var unrenderedPresentation: [String] = []
     public private(set) var processRequests: [ProcessRequest] = []
+    public private(set) var timeTransition: OriginalTimeTransition?
     private let graph: OriginalBlockGraph
     private let conditions: OriginalConditions
+    private let scope: OriginalProgramScope
     private var operations: [OriginalBlockGraph.Record] = []
     private var operationIndex = 0
     private var processReturn: Int16 = 0
@@ -86,6 +94,8 @@ public struct OriginalEventRunner: Sendable {
     public private(set) var partner: Int16?
     /// Controller +0x66: the block holding the menu's answers and exit.
     private var askBlock: Int16 = -1
+    private var questionOrder: [Int16] = []
+    public private(set) var reviewQuestionIndex = 0
     /// Talk controller fields for the "hold on" interrupt. They persist for
     /// the whole talk, like the controller object that owns them.
     public struct Interrupt: Equatable, Sendable {
@@ -123,14 +133,24 @@ public struct OriginalEventRunner: Sendable {
     }
 
     public init(program: OriginalScriptProgram, game: OriginalGameState,
-                keywords: OriginalKeywordTable? = nil) throws {
+                keywords: OriginalKeywordTable? = nil,
+                selection: OriginalEventSelectionContext? = nil,
+                scope: OriginalProgramScope = .normal, deferArrival: Bool = false) throws {
         self.program = program
         self.game = game
         self.keywords = keywords
+        self.scope = scope
         graph = try program.blocks
         conditions = try program.conditions
         session = .mapSession(nowTime: game.nowTime, mapID: game.mapID)
         phase = .exploration(mapID: game.mapID)
+        if deferArrival { return }
+        if let selection {
+            session.selection = selection
+            session.eventCommitted = true
+            selectNext()
+            return
+        }
         var evaluating = session
         let state = game, checks = conditions
         let outcome = try OriginalArrivalSelector.select(graph: graph, previousMapID: game.previousMapID,
@@ -148,15 +168,13 @@ public struct OriginalEventRunner: Sendable {
     /// which also sets the commit byte +0x44). The talk controller (process
     /// 0x7D) then selects with 0x020551B8.
     ///
-    /// The map walk that opens a search area and the 3D search view that picks
-    /// `objNN` (0x02033528) are not recovered; callers supply that result.
+    /// The host supplies the picked `objNN` result (0x02033528). The native
+    /// R102 counter route provides it through original model hit geometry.
     public mutating func lookInSearchView(area: UInt16, subarea: UInt16, table: OriginalSearchTable) {
         guard case .exploration = phase else { return }
         switch OriginalSearchSelection.look(table: table, mapID: game.mapID, nowTime: game.nowTime,
                                             area: area, subarea: subarea) {
-        case .upViewNotRecovered(let upView):
-            halt("Search up view \(upView) (0x020B4A80, .upv) is not recovered")
-        case .look(let context):
+        case .look(let context), .closeup(let context, _):
             interrupt = Interrupt()
             var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
             fresh.selection = context
@@ -164,6 +182,209 @@ public struct OriginalEventRunner: Sendable {
             session = fresh
             selectNext()
         }
+    }
+
+    /**
+     * Process 98 selects mode 11 with the confirmed layer's event ID (0x02062038).
+     */
+    public mutating func lookInCloseup(area: UInt16, subarea: UInt16, event: Int16) {
+        lookInCloseup(area: area, subarea: subarea, event: event, mode: 11)
+    }
+
+    /**
+     * 0x02062C08 selects mode 12 after the detail image has loaded.
+     */
+    public mutating func lookInCloseupDetail(area: UInt16, subarea: UInt16, event: Int16) {
+        lookInCloseup(area: area, subarea: subarea, event: event, mode: 12)
+    }
+
+    private mutating func lookInCloseup(area: UInt16, subarea: UInt16, event: Int16, mode: UInt16) {
+        guard case .exploration = phase else { return }
+        var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        fresh.selection.sceneID = 0xFFFE
+        fresh.selection.blockID = 0
+        fresh.selection.modeID = mode
+        fresh.selection.eventID = 0
+        fresh.selection.areaID = area
+        fresh.selection.subareaID = subarea
+        fresh.selection.upViewID = event
+        fresh.eventCommitted = true
+        session = fresh
+        interrupt = Interrupt()
+        selectNext()
+    }
+
+    /**
+     * 0x0203A444 tries System after a normal search or close-up selection finds no event.
+     */
+    public func searchFallback(catalog: OriginalScriptCatalog) throws -> Self? {
+        guard scope == .normal, case .exploration = phase, eventIndex == nil,
+              let context = lastSelectionMiss, context == session.selection,
+              ((10...12).contains(context.modeID) || context.modeID == 16) else { return nil }
+        return try Self(program: catalog.loadProgram("System"), game: game,
+                        selection: context, scope: .system)
+    }
+
+    /**
+     * Restores the map runner after its shared search response ends.
+     */
+    public mutating func resumeSearch(after response: Self) {
+        guard case .exploration = phase, case .exploration = response.phase, response.scope == .system else { return }
+        game = response.game
+        unrenderedPresentation += response.unrenderedPresentation
+        processRequests += response.processRequests
+        lastSelectionMiss = nil
+    }
+
+    /**
+     * Search-process state 1 at 0x02031944 selects mode 16 with area, object and item IDs.
+     */
+    public mutating func useItemInSearchView(_ item: UInt8, area: UInt16, subarea: UInt16) {
+        guard case .exploration = phase, (try? game.inventory.items.contains(item)) == true else { return }
+        var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        fresh.selection.sceneID = 0xFFFE
+        fresh.selection.blockID = 0
+        fresh.selection.eventID = 0
+        fresh.selection.modeID = 16
+        fresh.selection.areaID = area
+        fresh.selection.subareaID = subarea
+        fresh.selection.checkItemID = Int16(item)
+        fresh.selection.upViewID = -1
+        fresh.eventCommitted = true
+        session = fresh
+        interrupt = Interrupt()
+        selectNext()
+    }
+
+    /**
+     * Close-up state 11 at 0x02063BDC uses mode 16, area FFFF and the selected component event.
+     */
+    public mutating func useItemInCloseup(_ item: UInt8, event: Int16) {
+        useItemInSearchView(item, area: 0xFFFF, subarea: UInt16(bitPattern: event))
+    }
+
+    /**
+     * Door entry uses mode 13. Component inspection uses mode 14 and item use uses mode 16.
+     */
+    public mutating func interactWithDoor(area: UInt16, upView: Int16? = nil, item: UInt8? = nil) {
+        guard case .exploration = phase else { return }
+        var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        fresh.selection.sceneID = 0xFFFE
+        fresh.selection.blockID = 0
+        fresh.selection.eventID = 0
+        fresh.selection.areaID = item == nil ? area : 0xFFFF
+        fresh.selection.subareaID = item == nil ? 1 : UInt16(bitPattern: upView ?? -1)
+        fresh.selection.upViewID = item == nil ? upView ?? -1 : -1
+        fresh.selection.modeID = item != nil ? 16 : upView == nil ? 13 : 14
+        if let item { fresh.selection.checkItemID = Int16(item) }
+        fresh.eventCommitted = true
+        session = fresh
+        interrupt = Interrupt()
+        selectNext()
+    }
+
+    /**
+     * Starts a map conversation using the saved person block (0x0202DEC4).
+     * The first mode-0 row supplies the event ID through 0x020295B0.
+     */
+    public mutating func talkToPerson(_ person: Int16) {
+        guard case .exploration = phase, let block = game.conversationBlock(map: game.mapID, person: person) else { return }
+        let scene = UInt16(bitPattern: person)
+        let event = firstEvent(person: scene, block: block, mode: 0) ?? 0
+        var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        fresh.selection.sceneID = scene
+        fresh.commit(.init(blockID: block, modeID: 0, eventID: event, operationIndex: 0))
+        session = fresh
+        interrupt = Interrupt()
+        askBlock = -1
+        partner = person
+        selectNext()
+    }
+
+    /**
+     * 0x0202E158 starts a normal talk when a map region has a permitted event.
+     */
+    @discardableResult
+    public mutating func enterMapRegion(_ region: UInt16) -> Bool {
+        guard case .exploration = phase else { return false }
+        var evaluating = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        let state = game, checks = conditions
+        do {
+            let outcome = try OriginalRegionSelector.select(graph: graph, region: region, nowTime: game.nowTime) {
+                try evaluating.evaluate($0, conditions: checks, game: state)
+            }
+            switch outcome {
+            case .noMatch: return false
+            case .unresolved: enter(outcome)
+            case .selected:
+                session = evaluating
+                interrupt = Interrupt()
+                askBlock = -1
+                partner = nil
+                selectNext()
+            }
+        } catch { halt("Map region \(region) could not be selected: \(error)") }
+        return true
+    }
+
+    /**
+     * Returns true when departure starts a script or stops on an unresolved condition.
+     */
+    @discardableResult
+    public mutating func beginMapDeparture(to destination: Int16) -> Bool {
+        guard case .exploration = phase else { return false }
+        var evaluating = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        let state = game, checks = conditions
+        do {
+            let outcome = try OriginalRegionSelector.departure(graph: graph, destination: destination, nowTime: game.nowTime) {
+                try evaluating.evaluate($0, conditions: checks, game: state)
+            }
+            switch outcome {
+            case .noMatch: return false
+            case .unresolved: enter(outcome)
+            case .selected:
+                session = evaluating
+                interrupt = Interrupt()
+                askBlock = -1
+                partner = nil
+                selectNext()
+            }
+        } catch { halt("Departure to map \(destination) could not be selected: \(error)") }
+        return true
+    }
+
+    /**
+     * Retains game state and applies the destination's arrival selection.
+     */
+    public func moving(to map: Int16, program: OriginalScriptProgram) throws -> Self {
+        var state = game
+        state.setMap(map, previous: game.mapID)
+        state.markMapVisited()
+        return try Self(program: program, game: state, keywords: keywords)
+    }
+
+    /**
+     * The map host applies the recovered scripted placement to persistent state.
+     */
+    mutating func setMapPosition(_ position: SIMD3<Float>, facing: Float) {
+        game.setMapPosition(position, facing: facing)
+    }
+
+    /**
+     * The map host consumes the chapter request after the review returns.
+     */
+    mutating func prepareChapter(_ chapter: UInt16, position: SIMD3<Float>, facing: Float) throws {
+        try game.beginChapter(chapter)
+        game.setMap(game.mapID, previous: game.mapID)
+        game.setMapPosition(position, facing: facing)
+    }
+
+    /**
+     * Chapter 2 uses the source label, including its leading space.
+     */
+    mutating func beginChapterTitle() throws {
+        guard game.chapter == 1 else { throw OriginalDataError.unsupported("Chapter title") }
+        try game.beginChapterTitle(label: " 05:30PM")
     }
 
     /// The player dismissed the current text page.
@@ -186,11 +407,27 @@ public struct OriginalEventRunner: Sendable {
         else { operationIndex += 1; run() }
     }
 
+    /**
+     * Resumes after the picture child returns. The following opcode owns item acquisition.
+     */
+    public mutating func finishPicture() {
+        guard case .picture = phase else { return }
+        operationIndex += 1
+        run()
+    }
+
     /// The player picked an option. 0x0203C3E8 state 0 pushed the return
     /// frame (0x02028564), state 1 marked each listed ID (0x02097C80), and
     /// state 0x6F with +0x64 = 2 sets mode 5 and the option's event
     /// (0x0202824C). The talk process then restores (0x020544BC).
     public mutating func choose(_ id: UInt16) {
+        if session.selection.modeID == 24, case .choice(let choices) = phase,
+           let picked = choices.first(where: { $0.id == id }) {
+            session.commit(.init(blockID: session.selection.blockID, modeID: 17,
+                                 eventID: picked.eventID, operationIndex: 0))
+            endTalkEvent()
+            return
+        }
         guard case .choice(let choices) = phase, let picked = choices.first(where: { $0.id == id }),
               let pending = pendingChoice, let index = eventIndex else { return }
         pendingChoice = nil
@@ -204,8 +441,6 @@ public struct OriginalEventRunner: Sendable {
                                              operationIndex: Int16(operationIndex + 1)))
         }
         session.restoreOverride = 1
-        do { try game.apply(.itemCheckFlags(pending.ids)) }
-        catch { return halt("Choice flags failed: \(error)", sourceOffset: pending.record.sourceOffset) }
         session.selection.modeID = 5
         session.selection.eventID = picked.eventID
         session.operationIndex = 0
@@ -215,9 +450,198 @@ public struct OriginalEventRunner: Sendable {
 
     /// The embedded process finished with its process-manager return value.
     public mutating func finishProcess(returnValue: Int16) {
-        guard case .process = phase else { return }
+        guard case .process = phase, inventoryProcess == nil else { return }
+        if timeTransition != nil {
+            timeTransition = nil
+            operationIndex += 1
+        }
         processReturn = returnValue
         run()
+    }
+
+    /**
+     * The map consumes request 3 after the child and parent talk have returned.
+     */
+    mutating func consumeTimeRequest(_ value: Int16) {
+        game.applyTimeChange(value)
+        session.selection.nowTime = game.nowTime
+    }
+
+    /**
+     * Overlay 12 marks process 37 complete only after the key breaks.
+     */
+    public mutating func finishSuitcaseKey(returnValue: Int16) {
+        guard case .process(37) = phase else { return }
+        if returnValue == 0 { game.markPuzzleCompleted(processID: 37) }
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
+     * Overlay 12 marks the completed wire attempt before the shared script handles its outcome.
+     */
+    public mutating func finishThinWire(returnValue: Int16) {
+        guard case .process(let id) = phase, id == 29 || id == 33 else { return }
+        if returnValue == 0 { game.markPuzzleCompleted(processID: id) }
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
+     * Process 33 marks completion before the lock turns and the suitcase opens.
+     */
+    public mutating func markThickWireCompleted() {
+        guard case .process(33) = phase else { return }
+        game.markPuzzleCompleted(processID: 33)
+    }
+
+    /**
+     * Overlay 24 awards an item before its acquisition animation and shared response.
+     */
+    public mutating func takeSuitcaseItem(_ item: UInt8) throws {
+        guard case .process(35) = phase else { return }
+        try game.apply(.addInventory(id: UInt16(item)))
+    }
+
+    /**
+     * The process 35 destructor always records puzzle flag 11.
+     */
+    public mutating func finishSuitcaseContents() {
+        guard case .process(35) = phase else { return }
+        game.markPuzzleCompleted(processID: 35)
+        finishProcess(returnValue: 0)
+    }
+
+    /**
+     * Overlay 4 marks process 32 complete only when the two cuts produce usable wire.
+     */
+    public mutating func finishHanger(returnValue: Int16) {
+        guard case .process(32) = phase else { return }
+        if returnValue == 0 { game.markPuzzleCompleted(processID: 32) }
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
+     * Overlay 6 records a completed memo pull only when the paper tears.
+     */
+    public mutating func finishMemoPull(returnValue: Int16) {
+        guard case .process(27) = phase else { return }
+        if returnValue == 0 { game.markPuzzleCompleted(processID: 27) }
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
+     * Overlay 10 retains the wheel number and marks only a successful cabinet unlock.
+     */
+    public mutating func finishCabinetDial(returnValue: Int16, retainedValue: UInt16) {
+        guard case .process(31) = phase else { return }
+        if returnValue == 0 { game.markPuzzleCompleted(processID: 31) }
+        game.storeCabinetDialValue(retainedValue)
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
+     * Overlay 5 records process 30 completion only after a successful lift.
+     */
+    public mutating func finishCrowbar(returnValue: Int16) {
+        guard case .process(30) = phase else { return }
+        if returnValue == 0 { game.markPuzzleCompleted(processID: 30) }
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
+     * Overlay 4 records the successful cut before its completion fade and return.
+     */
+    public mutating func markHangerCutCompleted() {
+        guard case .process(32) = phase else { return }
+        game.markPuzzleCompleted(processID: 32)
+    }
+
+    public mutating func saveRetryCheckpoint() { game.saveRetryCheckpoint() }
+
+    /**
+     * Clears the original notebook notification without advancing the parent event.
+     */
+    public mutating func openNotebook() { game.openNotebook() }
+
+    /**
+     * Stores writable ink while retaining the parent event selection.
+     */
+    public mutating func storeNotebook(_ notebook: OriginalNotebook) { game.storeNotebook(notebook) }
+
+    public mutating func memoRandomInfo(seed: UInt32) -> UInt16 {
+        game.initialisePuzzleRandomInfo(seed: seed)
+    }
+
+    /**
+     * Starts a table-selected inventory process while retaining the search runner.
+     */
+    public mutating func beginInventoryProcess(item: UInt8, table: OriginalInventoryProcessTable) throws -> Bool {
+        guard scope == .normal, case .exploration = phase,
+              let record = try table.process(for: item, game: game) else { return false }
+        inventoryProcess = record
+        phase = .process(id: record.processID)
+        return true
+    }
+
+    /**
+     * 0x0202830C selects the System response using the inventory row and process result.
+     */
+    public mutating func finishInventoryProcess(returnValue: Int16, catalog: OriginalScriptCatalog) throws -> Self {
+        guard let record = inventoryProcess, phase == .process(id: record.processID), [28, 34].contains(record.processID) else {
+            throw OriginalDataError.unsupported("Inventory process completion")
+        }
+        var returnedGame = game
+        if returnValue == 0 { returnedGame.markPuzzleCompleted(processID: record.processID) }
+        var context = OriginalEventSelectionContext(sceneID: 0xFFFE, blockID: 0, modeID: 30,
+            eventID: 0, nowTime: game.nowTime, mapID: game.mapID)
+        context.pairA = record.index
+        context.pairB = returnValue
+        let response = try Self(program: catalog.loadProgram("System"), game: returnedGame,
+                                selection: context, scope: .system)
+        game = returnedGame
+        inventoryProcess = nil
+        phase = .exploration(mapID: game.mapID)
+        return response
+    }
+
+    /**
+     * Keeps missing process presentation visible in the same trace as script presentation.
+     */
+    public mutating func recordUnrenderedProcessCaption(processID: UInt16, caption: Int) {
+        unrenderedPresentation.append("process\(processID):caption\(caption)")
+    }
+
+    public mutating func recordUnrenderedRumble(processID: UInt16) {
+        unrenderedPresentation.append("process\(processID):rumble")
+    }
+
+    /**
+     * The jigsaw destructor saves its loose-piece mask before the process returns.
+     */
+    public mutating func finishJigsaw(returnValue: Int16, looseMask: UInt32) {
+        guard case .process(26) = phase else { return }
+        game.chapterOneJigsawMask = looseMask
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
+     * Mode 20 uses System scene 202 and the pair written by 0x020282A4.
+     */
+    public func processHint(catalog: OriginalScriptCatalog, pairA: Int16, pairB: Int16) throws -> Self {
+        var context = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID).selection
+        context.modeID = 20
+        context.pairA = pairA
+        context.pairB = pairB
+        return try Self(program: catalog.loadProgram("System"), game: game, selection: context, scope: .system)
+    }
+
+    /**
+     * A child hint returns its game state while the parent retains its process and script position.
+     */
+    public mutating func resumeProcess(after hint: Self) {
+        guard case .process = phase, case .exploration = hint.phase, hint.scope == .system else { return }
+        game = hint.game
+        unrenderedPresentation += hint.unrenderedPresentation
+        processRequests += hint.processRequests
     }
 
     public mutating func halt(_ reason: String, sourceOffset: Int? = nil) {
@@ -245,7 +669,11 @@ public struct OriginalEventRunner: Sendable {
     public private(set) var lastSelectionMiss: OriginalEventSelectionContext?
 
     private mutating func begin(eventIndex index: Int) {
+        if case .exploration = phase { questionOrder.removeAll() }
         eventIndex = index
+        // The new event must not inherit the previous event's skipped-page marker.
+        interrupt.replayMark = false
+        lastSelectionMiss = nil
         eventTrail.append(index)
         processReturn = 0
         // 0x0203A444 clears the commit byte (0x02028470) once an event is set up.
@@ -254,6 +682,8 @@ public struct OriginalEventRunner: Sendable {
         // partner; otherwise the previous partner stays.
         let scene = session.selection.sceneID
         if scene < 0xFFFD { partner = Int16(bitPattern: scene) }
+        // 0x0203A444 stores the block for normal and System events (source kind 0 or 1).
+        game.rememberConversationBlock(scene: scene, block: session.selection.blockID)
         do {
             operations = try graph.operations(forEvent: index)
             operationIndex = Int(max(0, session.operationIndex))
@@ -328,6 +758,18 @@ public struct OriginalEventRunner: Sendable {
         }
     }
 
+    /**
+     * 0x0204B728 appends new questions without moving the existing menu entries.
+     */
+    private mutating func openQuestions(_ available: [Topic]) {
+        let byID = Dictionary(uniqueKeysWithValues: available.map { ($0.keyword, $0) })
+        questionOrder.removeAll { byID[$0] == nil }
+        for topic in available where !questionOrder.contains(topic.keyword) {
+            questionOrder.append(topic.keyword)
+        }
+        phase = .questions(questionOrder.compactMap { byID[$0] })
+    }
+
     /// State 0x6F, +0x64 = 0, with a keyword. The topic's answer is a mode-1
     /// event selected by keyword (0x020282D8), in block +0x66 when one is set
     /// (0x02028350). The +0x6C = -1 branch through mode 26 is not recovered.
@@ -342,20 +784,49 @@ public struct OriginalEventRunner: Sendable {
         endTalkEvent()
     }
 
+    /**
+     * 0x02045724 selects a shown-item response before returning from the inventory menu.
+     */
+    public mutating func showItem(_ item: UInt8) {
+        guard case .questions = phase, let partner,
+              (try? game.inventory.items.contains(item)) == true else { return }
+        var evaluating = session
+        let state = game, checks = conditions
+        do {
+            let outcome = try OriginalShownItemSelector.select(graph: graph, person: UInt16(bitPattern: partner),
+                item: item, nowTime: game.nowTime) {
+                    try evaluating.evaluate($0, conditions: checks, game: state)
+                }
+            switch outcome {
+            case .selected:
+                session = evaluating
+                session.selection.areaID = .max
+                session.selection.subareaID = .max
+                session.selection.checkItemID = Int16(item)
+                session.operationIndex = 0
+                game.markItemShown(item, person: partner)
+                interrupt = Interrupt()
+                selectNext()
+            case .unresolved: enter(outcome)
+            case .noMatch: halt("The shared response for showing this item is not recovered")
+            }
+        } catch { halt("The shown-item response could not be selected: \(error)") }
+    }
+
     /// State 0x6F with no keyword (+0x68 = -1): the partner's mode-4 event in
     /// the menu block (0x020295B0), selected with 0x02028268 or 0x0202824C.
     public mutating func leave() {
         guard case .questions = phase, let partner else { return }
         let block = askBlock >= 1 ? UInt16(bitPattern: askBlock) : session.selection.blockID
-        guard let event = leaveEvent(person: UInt16(bitPattern: partner), block: block) else {
+        guard let event = firstEvent(person: UInt16(bitPattern: partner), block: block, mode: 4) else {
             return halt("No mode-4 exit for person \(partner) in block \(block)")
         }
         session.commit(.init(blockID: block, modeID: 4, eventID: event, operationIndex: 0))
         endTalkEvent()
     }
 
-    /// 0x020295B0: scene = person, block ID and current time, first mode-4 row.
-    private func leaveEvent(person: UInt16, block: UInt16) -> UInt16? {
+    /// 0x020295B0: scene = person, block ID and current time, first matching mode.
+    private func firstEvent(person: UInt16, block: UInt16, mode: UInt16) -> UInt16? {
         for scene in graph.tables[0] {
             guard (try? OriginalBytes(scene.raw).u16(0)) == person, let blocks = scene.children else { continue }
             for blockIndex in blocks {
@@ -364,7 +835,7 @@ public struct OriginalEventRunner: Sendable {
                       let events = graph.tables[1][blockIndex].children else { continue }
                 for index in events {
                     let event = OriginalBytes(graph.tables[2][index].raw)
-                    if (try? event.u16(0)) == 4 { return try? event.u16(2) }
+                    if (try? event.u16(0)) == mode { return try? event.u16(2) }
                 }
             }
         }
@@ -381,9 +852,13 @@ public struct OriginalEventRunner: Sendable {
                 case 4:
                     let following = operationIndex + 1 < operations.count ? operations[operationIndex + 1] : nil
                     let packet = try OriginalDialoguePacket(record: record, following: following, text: program.text)
-                    if session.restoredFromNonDialogue, skipReplayedPage(packet, following: following) {
-                        operationIndex += packet.consumedRecordCount
-                        continue
+                    if session.restoredFromNonDialogue {
+                        let skipped = skipReplayedPage(packet, following: following)
+                        if interrupt.window || interrupt.keepShared { disarmInterrupt() }
+                        if skipped {
+                            operationIndex += packet.consumedRecordCount
+                            continue
+                        }
                     }
                     if let following { followUp(dialogueAt: operationIndex, next: following) }
                     // Text state 0x10 disarms on the first update of a page
@@ -406,6 +881,19 @@ public struct OriginalEventRunner: Sendable {
                     let reader = OriginalBytes(record.raw)
                     processRequests.append(ProcessRequest(kind: Int8(bitPattern: reader.bytes[2]),
                                                           value: Int16(bitPattern: try reader.u16(4))))
+                case 16:
+                    let transition = try OriginalTimeTransition(record: record)
+                    processRequests.append(transition.request)
+                    game.setMap(game.mapID, previous: 0)
+                    if transition.presentsClock {
+                        try game.setTimeLabel(transition.clockLabel)
+                        timeTransition = transition
+                        phase = .process(id: 126)
+                        return
+                    }
+                case 8:
+                    phase = .picture(id: try OriginalBytes(record.raw).u16(2))
+                    return
                 case 6:
                     // State 1 adds the item with 0x02097914 and opens a text
                     // window: u16 at 8 is the first line, u16 at 10 the page count.
@@ -439,9 +927,16 @@ public struct OriginalEventRunner: Sendable {
                         return Choice(id: UInt16(bitPattern: id), eventID: UInt16(truncatingIfNeeded: kif.fields[0]),
                                       label: String(data: kif.labelBytes, encoding: .isoLatin1) ?? "")
                     }
+                    /**
+                     * 0x0203BC9C marks all options before it opens the choice menu.
+                     */
+                    try game.apply(.itemCheckFlags(ids))
                     pendingChoice = (record, ids)
                     phase = .choice(choices)
                     return
+                case 47:
+                    try game.apply(.keywordUnavailable(Int16(bitPattern: OriginalBytes(record.raw).u16(2))))
+                    unrenderedPresentation.append("keywordRemoval@\(record.sourceOffset)")
                 case 52, 53:
                     // Handlers 0x0203CABC and 0x0203CAD0: fixed kinds 10 and 11, value 0.
                     processRequests.append(ProcessRequest(kind: opcode == 52 ? 10 : 11, value: 0))
@@ -467,23 +962,23 @@ public struct OriginalEventRunner: Sendable {
         let first = packet.pages.first?.entries.first?.bytes ?? Data()
         if first.starts(with: [0x25, 0x21]) { interrupt.replayMark = true; return true }   // "%!"
         if first.starts(with: [0x25, 0x3F]) { return true }                                // "%?"
+        var skip = false
         if interrupt.shared == 0 || interrupt.window {
             if !interrupt.window {
                 interrupt.shared = 1
                 if let following { followUp(dialogueAt: operationIndex, next: following) }
-                return true
-            }
-            interrupt.replayMark = true
+                skip = true
+            } else { interrupt.replayMark = true }
         } else {
             if let following { followUp(dialogueAt: operationIndex, next: following) }
-            return true
+            skip = true
         }
         if interrupt.replayMark {
             interrupt.window = false
             interrupt.replayMark = false
             session.restoredFromNonDialogue = false   // 0x020285D4
         }
-        return false
+        return skip
     }
 
     /// 0x020401FC with the record after a dialogue command.
@@ -562,14 +1057,29 @@ public struct OriginalEventRunner: Sendable {
         guard let key = try? Int16(bitPattern: reader.u16(4)) else {
             return halt("Event key is truncated", sourceOffset: event.sourceOffset)
         }
-        game.markEventCompleted(group: game.mapID, event: key)
+        if scope == .normal { game.markEventCompleted(group: game.mapID, event: key) }
+        if let mode = try? reader.u16(0), mode == 17 || mode == 24 {
+            completeReview(mode: mode, event: event)
+            return
+        }
+        if (try? reader.u16(0)) == 27 {
+            guard let topics = topics() else { return halt("The shown-item response needs a conversation partner and keyword table") }
+            let transition = key >= 0 && conditions.entries.indices.contains(Int(key))
+                ? conditions.entries[Int(key)].second?.first.flatMap { try? OriginalEventTransition(record: $0) } : nil
+            session.operationIndex = 0
+            if topics.isEmpty, let transition {
+                transition.apply(to: &session)
+                endTalkEvent()
+            } else { openQuestions(topics) }
+            return
+        }
         if let mode = try? reader.u16(0), [0, 1, 7, 8].contains(mode) {
             return completeConversation(mode: mode, event: event, key: key)
         }
         let result: OriginalEventCompletion.Result
         do {
             result = try OriginalEventCompletion.stateOnlyExit(event: event, conditions: conditions,
-                                                               processReturn: processReturn)
+                                                               processReturn: processReturn, game: game)
         } catch {
             return halt("Event exit failed: \(error)", sourceOffset: event.sourceOffset)
         }
@@ -580,6 +1090,44 @@ public struct OriginalEventRunner: Sendable {
             completion.apply(to: &session)
             endTalkEvent()
         }
+    }
+
+    /**
+     * 0x0203D61C opens conditional review answers, retries mistakes and advances correct answers.
+     */
+    private mutating func completeReview(mode: UInt16, event: OriginalBlockGraph.Record) {
+        guard let review = program.review, review.questions.indices.contains(reviewQuestionIndex) else {
+            return halt("The chapter review question is unavailable", sourceOffset: event.sourceOffset)
+        }
+        let question = review.questions[reviewQuestionIndex]
+        if mode == 24 {
+            do {
+                let choices = try question.answers.filter { $0.available(in: game) }.map { answer -> Choice in
+                    guard let record = program.choices.first(where: { $0.fields[0] == UInt32(answer.eventID) }) else {
+                        throw OriginalDataError.missing("Review answer \(answer.eventID)")
+                    }
+                    return Choice(id: UInt16(truncatingIfNeeded: record.fields[3]), eventID: answer.eventID,
+                                  label: String(data: record.labelBytes, encoding: .isoLatin1) ?? "")
+                }
+                guard !choices.isEmpty else { throw OriginalDataError.invalid("Empty chapter review menu") }
+                phase = .choice(choices)
+            } catch { halt("The chapter review answers could not be loaded: \(error)", sourceOffset: event.sourceOffset) }
+            return
+        }
+        guard let answer = question.answers.first(where: { $0.eventID == session.selection.eventID }) else {
+            return halt("The chapter review answer is unavailable", sourceOffset: event.sourceOffset)
+        }
+        if answer.advances {
+            reviewQuestionIndex += 1
+            if question.nextEvent == .max {
+                if game.chapter + 1 < 10 { processRequests.append(.init(kind: 4, value: Int16(game.chapter + 1))) }
+                endTalkEvent()
+                return
+            }
+        }
+        session.commit(.init(blockID: session.selection.blockID, modeID: 24,
+                             eventID: answer.advances ? question.nextEvent : question.promptEvent, operationIndex: 0))
+        endTalkEvent()
     }
 
     /// 0x0203D61C for conversation modes 0, 1, 7 and 8.
@@ -593,7 +1141,7 @@ public struct OriginalEventRunner: Sendable {
         let nibble = game.personNibble(Int(partner ?? 0))
         switch mode {
         case 8:
-            phase = .questions(topics)
+            openQuestions(topics)
             return
         case 7:
             // The menu reopens only if an open topic is also one of this
@@ -602,7 +1150,7 @@ public struct OriginalEventRunner: Sendable {
                 try? Int16(bitPattern: OriginalBytes($0.raw).u16(4))
             })
             if topics.contains(where: { listed.contains($0.keyword) }) {
-                phase = .questions(topics)
+                openQuestions(topics)
                 return
             }
             transition?.apply(to: &session)
@@ -610,7 +1158,7 @@ public struct OriginalEventRunner: Sendable {
             defer { if mode == 1 { exhaustKeywords() } }
             if let transition { transition.apply(to: &session) }
             else if !topics.isEmpty, nibble > 0 {
-                phase = .questions(topics)
+                openQuestions(topics)
                 return
             }
         }
@@ -651,7 +1199,7 @@ public struct OriginalEventRunner: Sendable {
         var evaluating = session
         let state = game, checks = conditions
         do {
-            let outcome = try OriginalEventSelector.select(graph: graph, context: context,
+            let outcome = try OriginalEventSelector.select(graph: graph, context: context, scope: scope,
                 evaluate: { try evaluating.evaluate($0, conditions: checks, game: state) },
                 applyEffect: { evaluating.apply($0) })
             session = evaluating

@@ -1,0 +1,19 @@
+# Component continuation of the delivery fixture. Return to the upstairs corridor at 5:20.
+load extracted/reference/rosa-return-r103/returned.mln
+touch 210 96
+frames 62
+release
+frames 30
+touch 128 20
+until32 02110190 00030011 130
+release
+frames 120
+capture central
+save central
+touch 210 96
+until32 02110190 00110027 160
+release
+frames 120
+capture upstairs
+save upstairs
+quit

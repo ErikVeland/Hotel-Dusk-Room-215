@@ -9,6 +9,1768 @@ import AppKit
 /// can be checked without unfolding a simulator. Set SNAPSHOT_DIR to write PNGs.
 @MainActor
 final class LayoutSnapshotTests: XCTestCase {
+    func testRenderPlayableLobbyAndRingBellThroughSession() throws {
+        try runChapterOneRoute(completeDunningQuestions: false)
+    }
+
+    func testRenderRequiredDunningQuestionsAndDeliveryKnock() throws {
+        try runChapterOneRoute(completeDunningQuestions: true)
+    }
+
+    private func runChapterOneRoute(completeDunningQuestions: Bool) throws {
+        let audio = AudioController()
+        audio.isMuted = true
+        let runner = try OriginalEventRunner.chapterOneArrival(catalog: .bundled(), defaults: .bundled())
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: try .bundled(),
+                                       jigsawSeed: { 0x3DEAC027 })
+        defer { play.stop() }
+        for _ in 0..<20 {
+            guard case .dialogue = play.runner.phase else { break }
+            play.advanceDialogue()
+        }
+        XCTAssertEqual(play.runner.phase, .process(id: 56))
+        for _ in 0..<900 {
+            guard case .process(56) = play.runner.phase else { break }
+            if play.entrance?.awaitingHandle == true { play.touchEntrance(pageX: 92, pageY: 175) }
+            play.advanceFrame()
+        }
+        for _ in 0..<10 {
+            guard case .dialogue = play.runner.phase else { break }
+            play.advanceDialogue()
+        }
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+        XCTAssertNotNil(play.lobby)
+        let size = CGSize(width: 768, height: 600)
+        func pages() -> some View {
+            HStack {
+                ZStack {
+                    Color.clear
+                    OriginalPlayPage(play: play, screen: 1)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                Group {
+                    switch play.runner.phase {
+                    case .choice(let choices): OriginalChoiceView(play: play, choices: choices)
+                    case .questions(let topics): OriginalQuestionMenuView(play: play, topics: topics)
+                    default: OriginalPlayPage(play: play, screen: 0)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }.padding(24).background(Color.white).frame(width: size.width, height: size.height)
+        }
+        play.pause()
+        _ = try capture(pages(), size: size, name: "play_lobby_arrival")
+        play.resume()
+        play.holdLobbyTouch(x: 140, y: 80)
+        for _ in 0..<160 { play.advanceFrame() }
+        play.holdLobbyTouch(x: 70, y: 75)
+        for _ in 0..<46 { play.advanceFrame() }
+        let position = try XCTUnwrap(play.lobby?.position)
+        play.pause()
+        play.advanceFrame()
+        XCTAssertEqual(play.lobby?.position, position)
+        play.resume()
+        play.advanceFrame()
+        XCTAssertEqual(play.lobby?.position, position, "Resume must clear held movement")
+        play.inspectLobbyCounter()
+        XCTAssertEqual(play.lobby?.mode, .counter)
+        play.panLobbyCounter(0)
+        play.selectLobbyObject(x: 126, y: 195)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 2), "First tap selects")
+        XCTAssertEqual(play.lobby?.selectedNode, "obj02")
+        play.pause()
+        _ = try capture(pages(), size: size, name: "play_counter_selected")
+        play.resume()
+        play.confirmLobbyObject()
+        XCTAssertEqual(play.runner.eventIndex, 3)
+        play.advanceDialogue()
+        XCTAssertEqual(play.runner.phase, .process(id: 24))
+        for _ in 0..<80 { play.advanceFrame() }
+        XCTAssertEqual(play.bell?.awaitingTouch, true)
+        // Quit the bell and return to the same counter camera.
+        play.touchEntrance(pageX: 170, pageY: 240)
+        for _ in 0..<100 { play.advanceFrame() }
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+        XCTAssertEqual(play.lobby?.mode, .counter)
+        XCTAssertEqual(play.lobby?.pan, 0)
+        play.selectLobbyObject(x: 126, y: 195)
+        play.selectLobbyObject(x: 126, y: 195)
+        XCTAssertEqual(play.runner.eventIndex, 3)
+        play.advanceDialogue()
+        for _ in 0..<80 { play.advanceFrame() }
+        play.pause()
+        _ = try capture(pages(), size: size, name: "play_bell")
+        play.resume()
+        for _ in 0..<3 {
+            play.touchEntrance(pageX: 96, pageY: 75)
+            for _ in 0..<12 { play.advanceFrame() }
+        }
+        for _ in 0..<400 { play.advanceFrame() }
+        XCTAssertEqual(play.runner.eventIndex, 7)
+        guard case .dialogue = play.runner.phase else { return XCTFail("Expected Dunning's arrival") }
+        var signed = false
+        var collectedPictures: [UInt16] = []
+        for _ in 0..<600 {
+            switch play.runner.phase {
+            case .dialogue where completeDunningQuestions && play.runner.interruptAvailable: play.interrupt()
+            case .dialogue, .itemNotice: play.advanceDialogue()
+            case .choice(let options):
+                let selected = completeDunningQuestions ? (options.first(where: { [1, 5, 6, 9].contains($0.id) }) ?? options[0]) : options[0]
+                play.choose(selected.id)
+            case .questions(let topics):
+                if let topic = topics.first { play.ask(topic.keyword) }
+                else { play.leaveConversation() }
+            case .waiting: play.advanceFrame()
+            case .picture(let id):
+                collectedPictures.append(id)
+                play.touchPicture(pageX: 96, pageY: 215)
+                play.releasePicture()
+                XCTAssertEqual(play.touchPicture?.selected, true)
+                play.touchPicture(pageX: 96, pageY: 215)
+                play.releasePicture()
+                for _ in 0..<22 { play.advanceFrame() }
+            case .process(25):
+                for _ in 0..<40 { play.advanceFrame() }
+                for row in [100, 140, 175, 200] {
+                    play.holdTouch(pageX: 60, pageY: row)
+                    play.advanceFrame()
+                    play.holdTouch(pageX: 70, pageY: row)
+                    play.advanceFrame()
+                    play.releaseTouch()
+                    for _ in 0..<300 { play.advanceFrame() }
+                }
+                signed = true
+            case .exploration(2):
+                XCTAssertTrue(signed)
+                XCTAssertEqual(collectedPictures, [1, 2, 3])
+                XCTAssertEqual(play.lobby?.mode, .walking)
+                XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 2)
+                XCTAssertEqual(play.lobby?.canInspectCounter(in: play.runner.game), false)
+                play.inspectLobbyCounter()
+                XCTAssertEqual(play.lobby?.mode, .walking)
+                play.pause()
+                play.talkToNearbyPerson()
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                _ = try capture(pages(), size: size, name: "play_lobby_after_registration")
+                play.resume()
+                play.talkToNearbyPerson()
+                XCTAssertEqual(play.runner.eventIndex, 50)
+                XCTAssertEqual(play.runner.partner, 2)
+                for _ in 0..<100 {
+                    if case .dialogue = play.runner.phase { play.advanceDialogue() }
+                    else if case .questions = play.runner.phase { play.leaveConversation() }
+                    else { break }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                if completeDunningQuestions { XCTAssertTrue((0...2).allSatisfy { play.runner.game.keywordUsed($0) }) }
+                play.holdLobbyTouch(x: 20, y: 128)
+                for _ in 0..<110 { play.advanceFrame() }
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<110 {
+                    guard case .exploration = play.runner.phase else { break }
+                    play.advanceFrame()
+                }
+                XCTAssertEqual(play.runner.eventIndex, 55)
+                XCTAssertEqual(try XCTUnwrap(play.lobby?.position.z), -7777, accuracy: 4)
+                for _ in 0..<100 {
+                    guard case .dialogue = play.runner.phase else { break }
+                    play.advanceDialogue()
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<110 {
+                    guard play.runner.game.mapID == 2 else { break }
+                    play.advanceFrame()
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
+                XCTAssertEqual(play.runner.game.previousMapID, 2)
+                XCTAssertEqual(play.lobby?.mapID, 3)
+                XCTAssertEqual(play.lobby?.position, .init(28, 12288, 16679))
+                XCTAssertEqual(try XCTUnwrap(play.lobby?.facing), .pi, accuracy: 0.002)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_r103_entry")
+                play.resume()
+                play.holdLobbyTouch(x: 96, y: 210)
+                for _ in 0..<60 {
+                    guard play.runner.game.mapID == 3 else { break }
+                    play.advanceFrame()
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                XCTAssertEqual(play.runner.game.previousMapID, 3)
+                XCTAssertEqual(play.lobby?.position, .init(-8190, 12288, -26467))
+                XCTAssertEqual(try XCTUnwrap(play.lobby?.facing), 0, accuracy: 0.002)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_r102_return")
+                play.resume()
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<60 {
+                    guard play.runner.game.mapID == 2 else { break }
+                    play.advanceFrame()
+                }
+                XCTAssertEqual(play.runner.game.mapID, 3)
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<61 { play.advanceFrame() }
+                if !completeDunningQuestions {
+                    for event in 0..<3 {
+                        play.holdLobbyTouch(x: 20, y: 128)
+                        for _ in 0..<120 {
+                            guard case .exploration = play.runner.phase else { break }
+                            play.advanceFrame()
+                        }
+                        XCTAssertEqual(play.runner.eventIndex, event)
+                        for _ in 0..<60 {
+                            guard case .dialogue = play.runner.phase else { break }
+                            play.advanceDialogue()
+                        }
+                        XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
+                    }
+                }
+                play.holdLobbyTouch(x: 20, y: 128)
+                for _ in 0..<100 {
+                    guard play.runner.game.mapID == 3 else { break }
+                    play.advanceFrame()
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 17))
+                XCTAssertEqual(play.runner.game.previousMapID, 3)
+                XCTAssertEqual(play.lobby?.position, .init(6636, 12288, 4014))
+                XCTAssertEqual(try XCTUnwrap(play.lobby?.facing), -1.572017, accuracy: 0.002)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_r117_entry")
+                play.resume()
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<140 {
+                    guard case .exploration = play.runner.phase else { break }
+                    play.advanceFrame()
+                }
+                XCTAssertEqual(play.runner.eventIndex, 15)
+                XCTAssertEqual(play.lobby?.position, .init(6636, 12288, -7301))
+                for _ in 0..<20 {
+                    guard case .dialogue = play.runner.phase else { break }
+                    play.advanceDialogue()
+                }
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<130 {
+                    guard case .exploration = play.runner.phase else { break }
+                    play.advanceFrame()
+                }
+                XCTAssertEqual(play.runner.eventIndex, 10)
+                for _ in 0..<100 {
+                    guard case .dialogue = play.runner.phase else { break }
+                    play.advanceDialogue()
+                }
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_r117_stairs_conversation")
+                XCTAssertEqual(play.runner.eventIndex, 35)
+                guard case .questions(let topics) = play.runner.phase else { return XCTFail("Expected Melissa's question menu") }
+                XCTAssertEqual(topics.map(\.keyword), [8])
+                play.resume()
+                play.ask(8)
+                for _ in 0..<100 {
+                    guard case .dialogue = play.runner.phase else { break }
+                    if play.runner.eventIndex == 41, play.runner.interruptAvailable {
+                        play.interrupt()
+                        break
+                    }
+                    play.advanceDialogue()
+                }
+                XCTAssertEqual(play.runner.eventIndex, 44)
+                for _ in 0..<20 {
+                    guard case .dialogue = play.runner.phase else { break }
+                    play.advanceDialogue()
+                }
+                guard case .choice(let options) = play.runner.phase else { return XCTFail("Expected the help choice") }
+                XCTAssertEqual(options.map(\.id), [23, 22])
+                play.choose(22)
+                for _ in 0..<100 {
+                    guard case .dialogue = play.runner.phase else { break }
+                    play.advanceDialogue()
+                }
+                XCTAssertEqual(play.runner.eventIndex, 48)
+                XCTAssertEqual(play.runner.phase, .process(id: 26))
+                for _ in 0..<4 { play.advanceFrame() }
+                XCTAssertEqual(play.jigsaw?.placedCount, 15)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_jigsaw")
+                play.resume()
+                // Release a loose piece, then allow the original idle hint to run.
+                play.dragJigsaw(pageX: 79, pageY: 239)
+                XCTAssertEqual(play.jigsaw?.selected, 5)
+                play.releaseJigsaw()
+                for _ in 0..<340 { play.advanceFrame() }
+                XCTAssertEqual(play.runner.program.name, "System")
+                guard case .dialogue = play.runner.phase else { return XCTFail("Expected the jigsaw hint") }
+                for _ in 0..<10 {
+                    guard case .dialogue = play.runner.phase else { break }
+                    play.advanceDialogue()
+                }
+                XCTAssertEqual(play.runner.program.name, "EP1_R117")
+                XCTAssertEqual(play.runner.eventIndex, 48)
+                for _ in 0..<32 { play.advanceFrame() }
+                for index in [3, 5, 6, 9, 10] {
+                    let piece = try XCTUnwrap(play.jigsaw?.pieces[index])
+                    let centre = OriginalJigsawProjection.centre(piece)
+                    let x = centre.x, y = centre.y
+                    XCTAssertTrue((0..<192).contains(x) && (0..<256).contains(y))
+                    play.dragJigsaw(pageX: x, pageY: y)
+                    XCTAssertEqual(play.jigsaw?.selected, index)
+                    if piece.angle != 1.5 {
+                        play.releaseJigsaw()
+                        for _ in 0..<2 { play.advanceFrame() }
+                        play.rotateJigsaw(increasing: false)
+                        for _ in 0..<20 { play.advanceFrame() }
+                        play.dragJigsaw(pageX: x, pageY: y)
+                    }
+                    let target = OriginalJigsawProcess.target(index)
+                    play.dragJigsaw(pageX: 96 + Float(target.x + 2048) / 4096 * OriginalJigsawProjection.pixelsPerUnit,
+                                    pageY: 128 - (Float(target.y + 2048) / 4096 + 0.5) * OriginalJigsawProjection.pixelsPerUnit)
+                    play.releaseJigsaw()
+                    XCTAssertEqual(play.jigsaw?.isPlaced(index), true)
+                    for _ in 0..<2 { play.advanceFrame() }
+                }
+                XCTAssertEqual(play.jigsaw?.placedCount, 20)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_jigsaw_complete")
+                play.resume()
+                for _ in 0..<250 { play.advanceFrame() }
+                XCTAssertNil(play.jigsaw)
+                XCTAssertEqual(play.runner.game.chapterOneJigsawMask, 0)
+                XCTAssertEqual(play.runner.eventIndex, 51)
+                guard case .dialogue = play.runner.phase else { return XCTFail("Expected the completed jigsaw conversation: \(play.runner.phase)") }
+                for _ in 0..<200 {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .picture(id: 4))
+                XCTAssertFalse(try play.runner.game.inventory.items.contains(3))
+                play.advanceDialogue()
+                XCTAssertEqual(play.runner.phase, .picture(id: 4))
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_dropped_piece")
+                play.touchPicture(pageX: 100, pageY: 128)
+                XCTAssertEqual(play.touchPicture?.selected, false)
+                play.resume()
+                play.touchPicture(pageX: 100, pageY: 128)
+                play.releasePicture()
+                XCTAssertEqual(play.touchPicture?.selected, true)
+                play.touchPicture(pageX: 100, pageY: 128)
+                play.releasePicture()
+                for _ in 0..<22 { play.advanceFrame() }
+                guard case .itemNotice(3, _) = play.runner.phase else { return XCTFail("Expected the dropped-piece item notice: \(play.runner.phase)") }
+                XCTAssertTrue(try play.runner.game.inventory.items.contains(3))
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_dropped_piece_acquired")
+                play.resume()
+                for _ in 0..<200 {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                XCTAssertEqual(play.lobby?.mapID, 39)
+                XCTAssertEqual(play.lobby?.position, .init(16449, 12288, 6766))
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_r213_entry")
+                play.resume()
+                play.holdLobbyTouch(x: 20, y: 128)
+                for _ in 0..<21 { play.advanceFrame() }
+                XCTAssertEqual(play.lobby?.position, .init(8784, 12288, 6766))
+                XCTAssertEqual(play.runner.eventIndex, 2)
+                guard case .dialogue = play.runner.phase else { return XCTFail("Expected Jeff's entrance: \(play.runner.phase)") }
+                play.releaseLobbyTouch()
+                var jeffChoices: [UInt16] = [], jeffTopics: [Int16] = []
+                for _ in 0..<300 {
+                    if case .exploration = play.runner.phase { break }
+                    switch play.runner.phase {
+                    case .dialogue where play.runner.interruptAvailable: play.interrupt()
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .choice(let options):
+                        let option = try XCTUnwrap(options.first)
+                        jeffChoices.append(option.id)
+                        play.choose(option.id)
+                    case .questions(let topics):
+                        if let topic = topics.first(where: { $0.keyword == 9 }) ?? topics.first {
+                            jeffTopics.append(topic.keyword)
+                            play.ask(topic.keyword)
+                        } else { play.leaveConversation() }
+                    case .waiting: play.advanceFrame()
+                    default: return XCTFail("Jeff's conversation stopped: \(play.runner.phase)")
+                    }
+                }
+                XCTAssertEqual(jeffChoices, [24, 26, 28])
+                XCTAssertEqual(jeffTopics, [9, 4])
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                XCTAssertEqual(play.lobby?.position, .init(8784, 12288, 6766))
+                XCTAssertEqual(play.runner.game.value(for: .gameFlag(index: 35)), true)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_jeff_complete")
+                play.resume()
+                play.holdLobbyTouch(x: 20, y: 128)
+                for _ in 0..<233 { play.advanceFrame() }
+                play.holdLobbyTouch(x: 96, y: 210)
+                for _ in 0..<9 { play.advanceFrame() }
+                play.releaseLobbyTouch()
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                XCTAssertEqual(play.lobby?.position, .init(-76261, 12288, 10051))
+                XCTAssertEqual(play.lobby?.nearbyDoor(in: play.runner.game, table: try OriginalStateDefaults.bundled().doorTable), 31)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_door_near")
+                play.resume()
+                play.inspectNearbyDoor()
+                XCTAssertEqual(play.runner.eventIndex, 25)
+                for _ in 0..<20 { if case .dialogue = play.runner.phase { play.advanceDialogue() } }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                XCTAssertEqual(play.door?.doorID, 32)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_door")
+                play.useItemAtDoor(1)
+                play.selectDoorComponent(x: 160, y: 175)
+                XCTAssertNil(play.door?.item)
+                XCTAssertNil(play.door?.selected)
+                play.resume()
+                play.leaveDoor()
+                XCTAssertNil(play.door)
+                XCTAssertEqual(play.lobby?.position, .init(-76261, 12288, 10051))
+                play.inspectNearbyDoor()
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                XCTAssertEqual(play.door?.doorID, 32)
+                play.useItemAtDoor(1)
+                play.selectDoorComponent(x: 160, y: 175)
+                XCTAssertEqual(play.door?.selected, 2)
+                XCTAssertEqual(play.runner.game.value(for: .doorOpen(index: 32)), true)
+                play.selectDoorComponent(x: 160, y: 175)
+                XCTAssertEqual(play.runner.eventIndex, 26)
+                for _ in 0..<20 { if case .dialogue = play.runner.phase { play.advanceDialogue() } }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                XCTAssertEqual(play.runner.game.value(for: .doorOpen(index: 32)), false)
+                XCTAssertTrue(try play.runner.game.inventory.items.contains(1))
+                play.selectDoorComponent(x: 160, y: 175)
+                play.selectDoorComponent(x: 160, y: 175)
+                XCTAssertEqual(play.runner.eventIndex, 27)
+                for _ in 0..<20 {
+                    if play.door != nil, case .dialogue = play.runner.phase { play.advanceDialogue() }
+                }
+                XCTAssertNil(play.door)
+                XCTAssertEqual(play.runner.program.name, "EP1_R205")
+                for _ in 0..<300 {
+                    switch play.runner.phase {
+                    case .dialogue: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertEqual(play.lobby?.position, .init(7291, 12288, 16630))
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_entered")
+                play.resume()
+                play.holdLobbyTouch(x: 20, y: 128)
+                for _ in 0..<60 { play.advanceFrame() }
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<34 { play.advanceFrame() }
+                play.holdLobbyTouch(x: 20, y: 128)
+                for _ in 0..<110 { play.advanceFrame() }
+                play.releaseLobbyTouch()
+                XCTAssertEqual(play.lobby?.position, .init(-16687, 12288, 7450))
+                play.inspectLobbyCounter()
+                XCTAssertEqual(play.lobby?.mode, .counter)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_telephone")
+                play.resume()
+                play.selectLobbyObject(x: 86, y: 165)
+                XCTAssertEqual(play.lobby?.selectedNode, "obj01")
+                play.selectLobbyObject(x: 86, y: 165)
+                XCTAssertEqual(play.runner.eventIndex, 9)
+                for _ in 0..<500 {
+                    switch play.runner.phase {
+                    case .dialogue: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 31, index: 12)), true)
+                if completeDunningQuestions {
+                    XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 31, index: 14)), true)
+                    play.selectLobbyObject(x: 86, y: 165)
+                    play.selectLobbyObject(x: 86, y: 165)
+                    XCTAssertEqual(play.runner.eventIndex, 10)
+                    for _ in 0..<500 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 31, index: 15)), true)
+                }
+                XCTAssertEqual(play.lobby?.mode, .counter)
+                play.leaveLobbyCounter()
+                XCTAssertEqual(play.lobby?.mode, .walking)
+                XCTAssertEqual(play.lobby?.position, .init(-16687, 12288, 7450))
+                play.holdLobbyTouch(x: 170, y: 128)
+                for _ in 0..<98 { play.advanceFrame() }
+                play.holdLobbyTouch(x: 96, y: 210)
+                for _ in 0..<49 { play.advanceFrame() }
+                play.releaseLobbyTouch()
+                XCTAssertEqual(play.lobby?.position, .init(9773, 12288, 18858))
+                play.inspectLobbyCounter()
+                XCTAssertEqual(play.lobby?.searchAreaID, 3)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_suitcase")
+                play.resume()
+                play.selectLobbyObject(x: 130, y: 155)
+                play.selectLobbyObject(x: 130, y: 155)
+                XCTAssertEqual(play.runner.eventIndex, 16)
+                for _ in 0..<100 {
+                    switch play.runner.phase {
+                    case .dialogue: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                play.useItemInSearchView(21)
+                XCTAssertEqual(play.searchItem, 21)
+                play.useItemInSearchView(nil)
+                XCTAssertNil(play.searchItem)
+                play.useItemInSearchView(21)
+                play.selectLobbyObject(x: 130, y: 155)
+                play.selectLobbyObject(x: 130, y: 155)
+                XCTAssertEqual(play.runner.phase, .process(id: 37))
+                XCTAssertNotNil(play.suitcaseKey)
+                play.advanceFrame()
+                play.advanceFrame()
+                play.holdSuitcaseTouch(x: 110, y: 240)
+                for _ in 0..<3 { play.advanceFrame() }
+                for y in stride(from: 225, through: 95, by: -10) {
+                    play.holdSuitcaseTouch(x: 100, y: Float(y))
+                    for _ in 0..<8 { play.advanceFrame() }
+                }
+                for _ in 0..<180 { play.advanceFrame() }
+                play.releaseSuitcaseTouch()
+                play.advanceFrame()
+                XCTAssertEqual(play.suitcaseKey?.stage, 5)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_suitcase_key_inserted")
+                play.resume()
+                for _ in 0..<21 {
+                    play.holdSuitcaseTouch(x: 86, y: 130)
+                    for _ in 0..<3 { play.advanceFrame() }
+                    play.releaseSuitcaseTouch()
+                    for _ in 0..<8 { play.advanceFrame() }
+                }
+                XCTAssertTrue(play.suitcaseKey?.isBroken == true)
+                for _ in 0..<600 { play.advanceFrame() }
+                XCTAssertNil(play.suitcaseKey)
+                for _ in 0..<300 {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 13)), true)
+                XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 31, index: 25)), true)
+                XCTAssertTrue(try play.runner.game.inventory.items.contains(29))
+                XCTAssertFalse(try play.runner.game.inventory.items.contains(21))
+                XCTAssertEqual(Array(play.runner.game.bytes[0..<0x1AAC]), Array(play.runner.game.bytes[0x1AAC..<0x3558]))
+                if completeDunningQuestions {
+                    play.leaveLobbyCounter()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<180 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.eventIndex, 30)
+                    XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 31, index: 28)), true)
+                    guard case .dialogue = play.runner.phase else { return XCTFail("Expected the parcel knock") }
+                    for _ in 0..<3 { play.advanceDialogue() }
+                    guard case .dialogue(let parcel) = play.runner.phase else { return XCTFail("Expected the parcel announcement") }
+                    XCTAssertEqual(parcel.pages.first?.entries.first?.index, 751)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_room215_delivery_knock")
+                    play.resume()
+                    play.advanceDialogue()
+                    XCTAssertEqual(play.runner.timeTransition?.clockLabel, "05:10PM")
+                    XCTAssertEqual(play.runner.game.previousMapID, 0)
+                    XCTAssertEqual(play.runner.game.nowTime, 0)
+                    XCTAssertNotNil(play.clock)
+                    for _ in 0..<240 { play.advanceFrame() }
+                    XCTAssertTrue(try XCTUnwrap(play.clock).showsLabel)
+                    play.pause()
+                    let pausedClock = play.clock
+                    for _ in 0..<30 { play.advanceFrame() }
+                    XCTAssertEqual(play.clock, pausedClock)
+                    _ = try capture(pages(), size: size, name: "play_room215_clock")
+                    play.resume()
+                    for _ in 0..<300 where play.clock != nil { play.advanceFrame() }
+                    XCTAssertNil(play.clock)
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                    XCTAssertEqual(play.runner.game.nowTime, 1)
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<180 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.nearbyDoor, 39)
+                    play.inspectNearbyDoor()
+                    XCTAssertNil(play.door)
+                    for _ in 0..<30 where play.runner.eventIndex != 32 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.eventIndex, 32)
+                    guard case .dialogue = play.runner.phase else { return XCTFail("Expected Louie's arrival") }
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_room215_louie_arrival")
+                    play.resume()
+                    for _ in 0..<30 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .picture(id: 5))
+                    play.touchPicture(pageX: 96, pageY: 155)
+                    play.releasePicture()
+                    XCTAssertEqual(play.touchPicture?.selected, true)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_louie_parcel_selected")
+                    play.resume()
+                    play.touchPicture(pageX: 96, pageY: 155)
+                    play.releasePicture()
+                    for _ in 0..<24 { play.advanceFrame() }
+                    guard case .dialogue = play.runner.phase else { return XCTFail("Expected the parcel handover dialogue") }
+                    for _ in 0..<50 {
+                        if play.runner.interruptAvailable { play.interrupt(); break }
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    for _ in 0..<20 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    guard case .choice(let louieChoices) = play.runner.phase else { return XCTFail("Expected Louie's voice choices: \(play.runner.phase)") }
+                    XCTAssertEqual(louieChoices.map(\.id), [40, 41])
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_louie_voice_choice")
+                    play.resume()
+                    play.choose(40)
+                    for _ in 0..<50 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .picture(id: 7))
+                    play.touchPicture(pageX: 120, pageY: 95)
+                    play.releasePicture()
+                    XCTAssertEqual(play.touchPicture?.selected, true)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_louie_chin_selected")
+                    play.resume()
+                    play.touchPicture(pageX: 120, pageY: 95)
+                    play.releasePicture()
+                    for _ in 0..<24 { play.advanceFrame() }
+                    for _ in 0..<200 {
+                        switch play.runner.phase {
+                        case .dialogue where play.runner.interruptAvailable: play.interrupt()
+                        case .dialogue: play.advanceDialogue()
+                        case .choice(let choices):
+                            let choice = try XCTUnwrap(choices.first { [42, 44].contains($0.id) })
+                            play.choose(choice.id)
+                        case .questions: break
+                        default: return XCTFail("Louie's introduction stopped at \(play.runner.phase)")
+                        }
+                        if case .questions = play.runner.phase { break }
+                    }
+                    guard case .questions(let louieTopics) = play.runner.phase else { return XCTFail("Expected Louie's question menu") }
+                    XCTAssertEqual(louieTopics.map(\.keyword).sorted(), [10, 12, 13])
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_louie_questions")
+                    play.resume()
+                    var louieAsked: [Int16] = []
+                    for _ in 0..<300 {
+                        switch play.runner.phase {
+                        case .dialogue where play.runner.interruptAvailable: play.interrupt()
+                        case .dialogue: play.advanceDialogue()
+                        case .choice(let choices):
+                            let choice = try XCTUnwrap(choices.first { [46, 48].contains($0.id) })
+                            play.choose(choice.id)
+                        case .questions(let topics):
+                            if let keyword = [Int16(12), 10, 11, 13].first(where: { id in topics.contains { $0.keyword == id } }) {
+                                louieAsked.append(keyword)
+                                play.ask(keyword)
+                            } else { play.leaveConversation() }
+                        case .exploration: break
+                        default: return XCTFail("Louie's answers stopped at \(play.runner.phase)")
+                        }
+                        if case .exploration = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(louieAsked, [12, 10, 11, 13])
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                    XCTAssertTrue((10...13).allSatisfy { play.runner.game.keywordUsed($0) })
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_room215_after_louie")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<65 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<30 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 20, y: 210)
+                    for _ in 0..<25 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.lobby?.nearbySearchArea, 2)
+                    play.inspectLobbyCounter()
+                    XCTAssertEqual(play.lobby?.mode, .counter)
+                    XCTAssertEqual(play.lobby?.searchAreaID, 2)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_wrong_parcel_bed")
+                    play.resume()
+                    play.selectLobbyObject(x: 135, y: 170)
+                    XCTAssertEqual(play.lobby?.selectedNode, "obj02")
+                    play.selectLobbyObject(x: 135, y: 170)
+                    for _ in 0..<20 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.closeup?.view.id, 251)
+                    XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 31, index: 71)), true)
+                    XCTAssertTrue(play.runner.game.objectVisible(1))
+                    XCTAssertFalse(play.runner.game.objectVisible(2))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_wrong_parcel_notebook")
+                    play.resume()
+                    play.selectCloseupComponent(x: 95, y: 150)
+                    play.selectCloseupComponent(x: 95, y: 150)
+                    XCTAssertEqual(play.runner.eventIndex, 74)
+                    for _ in 0..<40 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        default: break
+                        }
+                    }
+                    XCTAssertTrue(try play.runner.game.inventory.items.contains(5))
+                    XCTAssertTrue(play.runner.game.keywordAvailable(14))
+                    XCTAssertEqual(play.closeupImage?.hit(pageX: 95, pageY: 150), 0)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_wrong_parcel_empty")
+                    play.resume()
+                    play.leaveSearchCloseup()
+                    play.leaveLobbyCounter()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<65 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<45 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<80 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.nearbyDoor, 39)
+                    play.inspectNearbyDoor()
+                    XCTAssertNil(play.door)
+                    XCTAssertEqual(play.runner.game.mapID, 39)
+                    XCTAssertEqual(play.lobby?.mapName, "R213")
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_notebook_hallway")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<18 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<250 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.eventIndex, 32)
+                    for _ in 0..<20 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<150 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 20, y: 45)
+                    for _ in 0..<18 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 11)
+                    play.talkToNearbyPerson()
+                    XCTAssertEqual(play.runner.eventIndex, 34)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_melissa_conversation")
+                    play.resume()
+                    var melissaChoices: [UInt16] = []
+                    var melissaQuestions: [Int16] = []
+                    for _ in 0..<500 {
+                        switch play.runner.phase {
+                        case .dialogue where play.runner.interruptAvailable: play.interrupt()
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        case .choice(let options):
+                            guard let choice = options.first(where: { [31, 33].contains($0.id) }) else {
+                                return XCTFail("Unexpected Melissa choice")
+                            }
+                            melissaChoices.append(choice.id)
+                            play.choose(choice.id)
+                        case .questions(let topics):
+                            guard let topic = topics.first(where: { [15, 16].contains($0.keyword) }) else {
+                                return XCTFail("Expected Melissa's next question")
+                            }
+                            melissaQuestions.append(topic.keyword)
+                            play.ask(topic.keyword)
+                        case .picture: break
+                        default: return XCTFail("Melissa's conversation stopped at \(play.runner.phase)")
+                        }
+                        if case .picture = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(melissaChoices, [31, 33])
+                    XCTAssertEqual(melissaQuestions, [15, 16])
+                    XCTAssertEqual(play.runner.phase, .picture(id: 22))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_melissa_notebook")
+                    play.resume()
+                    play.touchPicture(pageX: 96, pageY: 225)
+                    play.releasePicture()
+                    XCTAssertEqual(play.touchPicture?.selected, true)
+                    play.touchPicture(pageX: 96, pageY: 225)
+                    play.releasePicture()
+                    for _ in 0..<24 { play.advanceFrame() }
+                    for _ in 0..<30 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    XCTAssertEqual(play.runner.game.bytes[0x87B] & 1, 1)
+                    XCTAssertTrue(try play.runner.game.inventory.items.contains(3))
+                    play.talkToNearbyPerson()
+                    for _ in 0..<20 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .questions([]))
+                    play.pause()
+                    _ = try capture(OriginalQuestionMenuView(play: play, topics: [])
+                        .padding(24).frame(width: size.width / 2, height: size.height)
+                        .background(Color.white), size: CGSize(width: size.width / 2, height: size.height),
+                        name: "play_melissa_piece_return_menu")
+                    play.resume()
+                    play.showItemInConversation(3)
+                    XCTAssertEqual(play.runner.eventIndex, 50)
+                    for _ in 0..<40 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                        if case .questions = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(play.runner.phase, .questions([]))
+                    XCTAssertFalse(try play.runner.game.inventory.items.contains(3))
+                    play.openNotebook()
+                    XCTAssertEqual(play.notebook?.pageCount, 4)
+                    XCTAssertEqual(play.runner.game.bytes[0x87D], 0)
+                    for _ in 0..<3 { play.turnNotebookPage(forward: true) }
+                    XCTAssertEqual(play.notebook?.page, 3)
+                    XCTAssertEqual(play.notebook?.canEdit, false)
+                    XCTAssertNotNil(play.notebookImage)
+                    let memoPhase = play.runner.phase
+                    play.leaveConversation()
+                    XCTAssertEqual(play.runner.phase, memoPhase, "The notebook retains its parent conversation")
+                    play.pause()
+                    play.turnNotebookPage(forward: true)
+                    XCTAssertEqual(play.notebook?.page, 3)
+                    _ = try capture(pages(), size: size, name: "play_melissa_drawing")
+                    play.resume()
+                    play.closeNotebook()
+                    XCTAssertNil(play.notebook)
+                    XCTAssertEqual(play.runner.phase, memoPhase)
+                    play.leaveConversation()
+                    for _ in 0..<100 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                        if case .exploration = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 39, index: 55)), true)
+                    XCTAssertNil(play.runner.game.personMarker(11))
+                    play.openNotebook()
+                    XCTAssertEqual(play.notebook?.page, 0)
+                    play.holdNotebookTouch(x: 100, y: 100)
+                    for _ in 0..<3 { play.advanceFrame() }
+                    play.holdNotebookTouch(x: 100, y: 120)
+                    for _ in 0..<3 { play.advanceFrame() }
+                    play.releaseNotebook()
+                    let ink = play.notebook?.pixels
+                    XCTAssertTrue(ink?.contains(1) == true)
+                    play.closeNotebook()
+                    play.openNotebook()
+                    XCTAssertEqual(play.notebook?.pixels, ink)
+                    play.clearNotebookPage()
+                    play.closeNotebook()
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_melissa_departure")
+                    play.resume()
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<200 {
+                        if (play.lobby?.position.x ?? 0) <= 21000 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<160 {
+                        if play.lobby?.mapID != 39 { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 17))
+                    XCTAssertEqual(play.lobby?.mapID, 17)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_after_melissa_downstairs")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<120 {
+                        if (play.lobby?.position.z ?? 0) >= 4500 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<160 {
+                        if play.lobby?.mapID != 17 { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
+                    XCTAssertEqual(play.lobby?.mapID, 3)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_after_melissa_r103")
+                    play.resume()
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<100 {
+                        if (play.lobby?.position.x ?? -1) >= 0 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<160 {
+                        if play.lobby?.mapID != 3 { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                    XCTAssertEqual(play.lobby?.mapID, 2)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_mila_lobby_return")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<20 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<150 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<60 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.eventIndex, 66)
+                    for _ in 0..<30 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                    XCTAssertEqual(play.lobby?.position, SIMD3(15811, 12288, -737))
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<35 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 170, y: 210)
+                    for _ in 0..<14 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 5)
+                    play.talkToNearbyPerson()
+                    XCTAssertEqual(play.runner.eventIndex, 67)
+                    for _ in 0..<40 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .picture(id: 24))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_mila_shoulder")
+                    play.resume()
+                    play.touchPicture(pageX: 96, pageY: 225)
+                    play.releasePicture()
+                    XCTAssertEqual(play.touchPicture?.selected, true)
+                    play.touchPicture(pageX: 96, pageY: 225)
+                    play.releasePicture()
+                    for _ in 0..<24 { play.advanceFrame() }
+                    for _ in 0..<100 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                        if case .exploration = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                    XCTAssertEqual(play.runner.game.personMarker(3), 203)
+                    XCTAssertEqual(play.lobby?.position, SIMD3(15811, 12288, 17285))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_rosa_introduction")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<30 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 3)
+                    play.talkToNearbyPerson()
+                    XCTAssertEqual(play.runner.eventIndex, 70)
+                    var rosaChoices: [UInt16] = []
+                    var rosaQuestions: [Int16] = []
+                    for _ in 0..<500 {
+                        switch play.runner.phase {
+                        case .dialogue where play.runner.interruptAvailable: play.interrupt()
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        case .choice(let options):
+                            guard let choice = options.first(where: { [10, 13].contains($0.id) }) else {
+                                return XCTFail("Unexpected Rosa choice")
+                            }
+                            rosaChoices.append(choice.id)
+                            play.choose(choice.id)
+                        case .questions(let topics):
+                            guard let keyword = [Int16(21), 22, 23, 14].first(where: { keyword in topics.contains { $0.keyword == keyword } }) else {
+                                return XCTFail("Expected Rosa's next question")
+                            }
+                            rosaQuestions.append(keyword)
+                            play.ask(keyword)
+                        case .process(126): break
+                        default: return XCTFail("Rosa's conversation stopped at \(play.runner.phase)")
+                        }
+                        if case .process(126) = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(rosaChoices, [10, 13])
+                    XCTAssertEqual(rosaQuestions, [21, 22, 23, 14])
+                    XCTAssertEqual(play.runner.phase, .process(id: 126))
+                    for _ in 0..<2000 {
+                        guard case .process(126) = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    for _ in 0..<30 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+                    XCTAssertEqual(play.runner.game.nowTime, 2)
+                    XCTAssertNil(play.runner.game.personMarker(3))
+                    XCTAssertNil(play.runner.game.personMarker(5))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_rosa_departure_520")
+                    play.resume()
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<100 {
+                        if (play.lobby?.position.x ?? 0) <= -8000 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<200 {
+                        guard play.lobby?.mapID == 2 else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<62 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<130 {
+                        guard play.lobby?.mapID == 3 else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 17))
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<160 {
+                        guard play.lobby?.mapID == 17 else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<40 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.eventIndex, 62)
+                    for _ in 0..<10 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<80 {
+                        if (play.lobby?.position.x ?? 0) <= -14500 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<9 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.nearbyDoor, 29)
+                    play.inspectNearbyDoor()
+                    XCTAssertEqual(play.door?.destination, 29)
+                    XCTAssertEqual(play.door?.area, 5)
+                    XCTAssertEqual(play.door?.view.id, 333)
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_jeff_room213_door")
+                    play.resume()
+                    play.selectDoorComponent(x: 96, y: 125)
+                    XCTAssertEqual(play.door?.selected, 1)
+                    play.selectDoorComponent(x: 96, y: 125)
+                    XCTAssertEqual(play.runner.eventIndex, 76)
+                    var jeffQuestions: [Int16] = []
+                    var jeffChoices: [UInt16] = []
+                    for _ in 0..<200 {
+                        switch play.runner.phase {
+                        case .dialogue where play.runner.interruptAvailable: play.interrupt()
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        case .questions(let topics):
+                            guard let keyword = [Int16(26), 27].first(where: { keyword in topics.contains { $0.keyword == keyword } }) else {
+                                return XCTFail("Expected Jeff's next Mila question")
+                            }
+                            jeffQuestions.append(keyword)
+                            play.ask(keyword)
+                        case .choice(let choices):
+                            guard choices.contains(where: { $0.id == 36 }) else { return XCTFail("Expected Jeff's request choice") }
+                            jeffChoices.append(36)
+                            play.choose(36)
+                        case .exploration: break
+                        default: return XCTFail("Jeff's return conversation stopped at \(play.runner.phase)")
+                        }
+                        if case .exploration = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(jeffQuestions, [26, 27])
+                    XCTAssertEqual(jeffChoices, [36])
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    XCTAssertNil(play.door)
+                    XCTAssertTrue(play.runner.game.keywordAsked(27, person: 6))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_jeff_room213_departure")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<25 {
+                        if (play.lobby?.position.z ?? 0) <= 6500 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<200 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.eventIndex, 63)
+                    for _ in 0..<100 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                        if case .questions = play.runner.phase { break }
+                    }
+                    guard case .questions(let irisTopics) = play.runner.phase else { return XCTFail("Expected Iris's question menu") }
+                    XCTAssertEqual(irisTopics.map(\.keyword), [24])
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_iris_question")
+                    play.resume()
+                    play.ask(24)
+                    for _ in 0..<100 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                        if case .choice = play.runner.phase { break }
+                    }
+                    guard case .choice(let irisChoices) = play.runner.phase else { return XCTFail("Expected Iris's work question") }
+                    XCTAssertEqual(irisChoices.map(\.id), [34, 35])
+                    play.choose(34)
+                    for _ in 0..<300 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                        if case .exploration = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    XCTAssertTrue(play.runner.game.keywordAsked(24, person: 9))
+                    XCTAssertTrue(play.runner.game.keywordAvailable(25))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_iris_louie_departure")
+                    play.resume()
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<100 {
+                        if (play.lobby?.position.x ?? 0) <= -77400 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<9 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.nearbyDoor, 31)
+                    play.inspectNearbyDoor()
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<40 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<120 {
+                        guard case .exploration = play.runner.phase else { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.eventIndex, 78)
+                    for _ in 0..<20 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                    XCTAssertTrue(play.runner.game.value(for: .eventFlag(group: 31, index: 78)) == true)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_summer_delivery_knock")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<120 {
+                        if (play.lobby?.position.z ?? 0) <= -12000 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<70 {
+                        if (play.lobby?.position.x ?? 0) >= 9800 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<14 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.nearbyDoor, 39)
+                    play.inspectNearbyDoor()
+                    var summerChoices: [UInt16] = []
+                    var summerQuestions: [Int16] = []
+                    var summerInterrupts: Set<UInt16> = []
+                    for _ in 0..<500 {
+                        switch play.runner.phase {
+                        case .dialogue where play.runner.interruptAvailable && !summerInterrupts.contains(play.runner.interrupt.event):
+                            summerInterrupts.insert(play.runner.interrupt.event)
+                            play.interrupt()
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        case .choice(let choices):
+                            guard let choice = choices.first(where: { [UInt16(52), 55, 57, 58].contains($0.id) }) else {
+                                return XCTFail("Expected Summer's next guide answer")
+                            }
+                            summerChoices.append(choice.id)
+                            play.choose(choice.id)
+                        case .questions(let topics):
+                            guard let keyword = [Int16(29), 30].first(where: { keyword in topics.contains { $0.keyword == keyword } }) else {
+                                return XCTFail("Expected Summer's next question")
+                            }
+                            summerQuestions.append(keyword)
+                            play.ask(keyword)
+                        case .picture: break
+                        default: return XCTFail("Summer's conversation stopped at \(play.runner.phase)")
+                        }
+                        if case .picture = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(summerChoices, [52, 55, 57, 58])
+                    XCTAssertEqual(summerInterrupts, [89, 92])
+                    XCTAssertEqual(summerQuestions, [29, 30])
+                    XCTAssertEqual(play.runner.phase, .picture(id: 6))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_summer_parcel")
+                    play.resume()
+                    play.touchPicture(pageX: 30, pageY: 100)
+                    play.releasePicture()
+                    XCTAssertEqual(play.touchPicture?.selected, true)
+                    play.touchPicture(pageX: 30, pageY: 100)
+                    play.releasePicture()
+                    for _ in 0..<24 { play.advanceFrame() }
+                    for _ in 0..<100 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                        if case .exploration = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                    XCTAssertFalse(try play.runner.game.inventory.items.contains(5))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_summer_departure")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<65 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<30 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 20, y: 210)
+                    for _ in 0..<120 {
+                        if play.lobby?.nearbySearchArea == 2 { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.lobby?.nearbySearchArea, 2)
+                    play.inspectLobbyCounter()
+                    play.selectLobbyObject(x: 55, y: 195)
+                    XCTAssertEqual(play.lobby?.selectedNode, "obj03")
+                    play.selectLobbyObject(x: 55, y: 195)
+                    for _ in 0..<20 {
+                        guard case .dialogue = play.runner.phase else { break }
+                        play.advanceDialogue()
+                    }
+                    XCTAssertEqual(play.closeup?.view.id, 253)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_order_parcel_contents")
+                    play.resume()
+                    play.selectCloseupComponent(x: 65, y: 135)
+                    play.selectCloseupComponent(x: 65, y: 135)
+                    for _ in 0..<40 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        default: break
+                        }
+                    }
+                    XCTAssertTrue(try play.runner.game.inventory.items.contains(49))
+                    play.selectCloseupComponent(x: 161, y: 219)
+                    play.selectCloseupComponent(x: 161, y: 219)
+                    XCTAssertEqual(play.runner.eventIndex, 118)
+                    for _ in 0..<40 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        default: break
+                        }
+                    }
+                    XCTAssertTrue(try play.runner.game.inventory.items.contains(6))
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_order_documents_collected")
+                    play.resume()
+                    play.leaveSearchCloseup()
+                    play.leaveLobbyCounter()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<80 {
+                        if (play.lobby?.position.z ?? 0) <= 7450 { break }
+                        play.advanceFrame()
+                    }
+                    play.holdLobbyTouch(x: 20, y: 128)
+                    for _ in 0..<100 {
+                        if play.lobby?.nearbySearchArea == 1 { break }
+                        play.advanceFrame()
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.lobby?.nearbySearchArea, 1)
+                    play.inspectLobbyCounter()
+                    play.selectLobbyObject(x: 86, y: 165)
+                    play.selectLobbyObject(x: 86, y: 165)
+                    XCTAssertEqual(play.runner.eventIndex, 121)
+                    for _ in 0..<500 {
+                        switch play.runner.phase {
+                        case .dialogue, .itemNotice: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    guard case .choice(let firstReview) = play.runner.phase else { return XCTFail("Expected the first chapter review question") }
+                    XCTAssertEqual(firstReview.map(\.id), [60, 61, 62])
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_one_review_first")
+                    play.resume()
+                    for answer: UInt16 in [61, 63, 68, 70] {
+                        play.choose(answer)
+                        for _ in 0..<200 {
+                            switch play.runner.phase {
+                            case .dialogue: play.advanceDialogue()
+                            case .waiting: play.advanceFrame()
+                            default: break
+                            }
+                            if case .choice = play.runner.phase { break }
+                        }
+                    }
+                    guard case .choice(let lastReview) = play.runner.phase else { return XCTFail("Expected the last chapter review question") }
+                    XCTAssertEqual(lastReview.map(\.id), [72, 73, 74])
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_one_review_last")
+                    play.resume()
+                    play.choose(72)
+                    for _ in 0..<200 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    XCTAssertEqual(play.runner.reviewQuestionIndex, 5)
+                    XCTAssertEqual(play.runner.processRequests.last, .init(kind: 4, value: 1))
+                    XCTAssertEqual(play.chapterTransition?.stage, .prompt)
+                    XCTAssertEqual(play.runner.game.chapter, 1)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_save_prompt")
+                    play.resume()
+                    play.answerChapterSave(false)
+                    XCTAssertEqual(play.chapterTransition?.stage, .title)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_title")
+                    play.resume()
+                    play.continueChapterTitle()
+                    XCTAssertNil(play.chapterTransition)
+                    XCTAssertEqual(play.runner.program.name, "EP2_R205")
+                    XCTAssertEqual(play.runner.eventIndex, 0)
+                    for _ in 0..<100 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                    XCTAssertEqual(play.lobby?.mode, .walking)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_room215")
+                    play.resume()
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<114 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.nearbyDoor, 39)
+                    play.inspectNearbyDoor()
+                    XCTAssertEqual(play.runner.program.name, "EP2_R213")
+                    play.holdLobbyTouch(x: 96, y: 45)
+                    for _ in 0..<17 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<145 {
+                        if case .exploration = play.runner.phase { play.advanceFrame() }
+                    }
+                    play.releaseLobbyTouch()
+                    for _ in 0..<40 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<85 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 3)
+                    play.talkToNearbyPerson()
+                    var chapterTwoRosaQuestions: [Int16] = []
+                    var chapterTwoRosaAnswers: [UInt16] = []
+                    var chapterTwoRosaInterrupts: Set<UInt16> = []
+                    for _ in 0..<400 {
+                        switch play.runner.phase {
+                        case .dialogue where play.runner.interruptAvailable && !chapterTwoRosaInterrupts.contains(play.runner.interrupt.event):
+                            chapterTwoRosaInterrupts.insert(play.runner.interrupt.event)
+                            play.interrupt()
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        case .questions(let topics):
+                            if let topic = topics.first(where: { [Int16(0), 1].contains($0.keyword) }) {
+                                chapterTwoRosaQuestions.append(topic.keyword)
+                                play.ask(topic.keyword)
+                            } else { play.leaveConversation() }
+                        case .choice(let choices):
+                            guard let choice = choices.first(where: { [UInt16(1), 3, 4, 7].contains($0.id) }) else {
+                                return XCTFail("Expected Rosa's Chapter 2 guide answer")
+                            }
+                            chapterTwoRosaAnswers.append(choice.id)
+                            play.choose(choice.id)
+                        case .exploration: break
+                        default: return XCTFail("Rosa's Chapter 2 route stopped: \(play.runner.phase)")
+                        }
+                        if case .exploration = play.runner.phase { break }
+                    }
+                    XCTAssertEqual(chapterTwoRosaQuestions, [0, 1])
+                    XCTAssertEqual(chapterTwoRosaAnswers, [1, 3, 4, 7])
+                    XCTAssertEqual(chapterTwoRosaInterrupts, [4, 7, 10])
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+                    XCTAssertNil(play.runner.game.personMarker(3))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_rosa_departure")
+                    play.resume()
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<125 {
+                        if case .exploration = play.runner.phase { play.advanceFrame() }
+                    }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.runner.eventIndex, 27)
+                    for _ in 0..<200 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    play.holdLobbyTouch(x: 170, y: 128)
+                    for _ in 0..<365 { play.advanceFrame() }
+                    play.holdLobbyTouch(x: 96, y: 210)
+                    for _ in 0..<12 { play.advanceFrame() }
+                    play.releaseLobbyTouch()
+                    XCTAssertEqual(play.nearbyDoor, 37)
+                    play.inspectNearbyDoor()
+                    for _ in 0..<200 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    play.selectDoorComponent(x: 158, y: 180)
+                    play.confirmDoorComponent()
+                    for _ in 0..<200 {
+                        switch play.runner.phase {
+                        case .dialogue: play.advanceDialogue()
+                        case .waiting: play.advanceFrame()
+                        default: break
+                        }
+                    }
+                    XCTAssertEqual(play.runner.program.name, "EP2_R211")
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 37))
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_linens_entry")
+                    play.resume()
+                    try OriginalLinensRouteChecks.run(play)
+                    XCTAssertEqual(play.runner.phase, .exploration(mapID: 37))
+                    XCTAssertEqual(play.closeup?.view.id, 313)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_linens_complete")
+                    play.resume()
+                    try OriginalHelenRouteChecks.run(play)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_helen_complete")
+                    play.resume()
+                    try OriginalHangerRouteChecks.inspect(play)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_hanger_closeup")
+                    play.resume()
+                    try OriginalHangerRouteChecks.cut(play)
+                    play.pause()
+                    _ = try capture(pages(), size: size, name: "play_chapter_two_hanger_complete")
+                    play.resume()
+                    try OriginalThickWireRouteChecks.run(play)
+                    return
+                }
+                play.leaveLobbyCounter()
+                play.holdLobbyTouch(x: 96, y: 45)
+                for _ in 0..<48 { play.advanceFrame() }
+                play.holdLobbyTouch(x: 20, y: 128)
+                for _ in 0..<98 { play.advanceFrame() }
+                play.releaseLobbyTouch()
+                XCTAssertEqual(play.lobby?.position, .init(-16687, 12288, 5898))
+                play.inspectLobbyCounter()
+                XCTAssertEqual(play.lobby?.searchAreaID, 1)
+                play.selectLobbyObject(x: 133, y: 179)
+                play.selectLobbyObject(x: 133, y: 179)
+                for _ in 0..<300 {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertEqual(play.closeup?.view.id, 262)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_brochure")
+                play.resume()
+                play.selectCloseupComponent(x: 110, y: 70)
+                play.selectCloseupComponent(x: 110, y: 70)
+                XCTAssertEqual(play.runner.program.name, "System")
+                XCTAssertEqual(play.runner.eventIndex, 929)
+                for _ in 0..<300 {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertEqual(play.runner.program.name, "EP1_R205")
+                XCTAssertTrue(try play.runner.game.inventory.items.contains(8))
+                XCTAssertEqual(play.closeupImage?.hit(pageX: 110, pageY: 70), 0)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_paperclip_collected")
+                play.resume()
+                play.useItemInCloseup(8)
+                XCTAssertEqual(play.runner.phase, .process(id: 28))
+                for _ in 0..<65 { play.advanceFrame() }
+                XCTAssertEqual(play.paperclip?.stage, 0)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_paperclip_puzzle")
+                play.resume()
+                let handle = OriginalPaperclipProjection.page(try XCTUnwrap(play.paperclip?.points.first))
+                play.holdPaperclipTouch(x: handle.x, y: handle.y)
+                play.advanceFrame()
+                XCTAssertEqual(play.paperclip?.holding, true)
+                let pausedPuzzle = play.paperclip
+                play.pause()
+                play.advanceFrame()
+                XCTAssertEqual(play.paperclip, pausedPuzzle)
+                play.resume()
+                play.advanceFrame()
+                XCTAssertEqual(play.paperclip?.holding, false, "Resume must clear the held puzzle touch")
+                play.quitPaperclip()
+                for _ in 0..<70 { play.advanceFrame() }
+                for _ in 0..<20 { play.advanceDialogue() }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertNotNil(play.closeup)
+                XCTAssertTrue(try play.runner.game.inventory.items.contains(8))
+                XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 4)), false)
+                play.useItemInCloseup(8)
+                for _ in 0..<65 { play.advanceFrame() }
+                let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+                let commands = try String(contentsOf: root.appendingPathComponent("tools/reference/room215-paperclip-straighten.txt"), encoding: .utf8)
+                for line in commands.split(separator: "\n") {
+                    let fields = line.split(separator: " ")
+                    if fields.first == "touch", let x = Float(fields[1]), let y = Float(fields[2]) {
+                        play.holdPaperclipTouch(x: y, y: 255 - x)
+                    } else if fields.first == "release" { play.releasePaperclipTouch() }
+                    else if fields.first == "frames", let count = Int(fields[1]) {
+                        for _ in 0..<count { play.advanceFrame() }
+                    } else if fields.first == "capture", fields.count > 1 {
+                        if fields[1] == "stage0" { XCTAssertEqual(play.paperclip?.stage, 2) }
+                        if fields[1] == "stage2" { XCTAssertEqual(play.paperclip?.stage, 4) }
+                        if fields[1] == "stage4" { XCTAssertEqual(play.paperclip?.stage, 9) }
+                        play.pause()
+                        _ = try capture(pages(), size: size, name: "play_room215_paperclip_\(fields[1])")
+                        play.resume()
+                    }
+                }
+                XCTAssertNil(play.paperclip)
+                for _ in 0..<30 { play.advanceDialogue() }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertEqual(play.runner.program.name, "EP1_R205")
+                XCTAssertTrue(try play.runner.game.inventory.items.contains(9))
+                XCTAssertFalse(try play.runner.game.inventory.items.contains(8))
+                XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 4)), true)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_wire_collected")
+                play.resume()
+                play.leaveSearchCloseup()
+                XCTAssertNil(play.closeup)
+                XCTAssertEqual(play.lobby?.mode, .counter)
+                play.leaveLobbyCounter()
+                play.holdLobbyTouch(x: 170, y: 128)
+                for _ in 0..<98 { play.advanceFrame() }
+                play.holdLobbyTouch(x: 96, y: 210)
+                for _ in 0..<55 { play.advanceFrame() }
+                play.releaseLobbyTouch()
+                play.inspectLobbyCounter()
+                XCTAssertEqual(play.lobby?.searchAreaID, 3)
+                play.useItemInSearchView(9)
+                play.selectLobbyObject(x: 130, y: 155)
+                play.selectLobbyObject(x: 130, y: 155)
+                for _ in 0..<100 {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .process(id: 29))
+                XCTAssertNotNil(play.thinWire)
+                play.advanceFrame()
+                play.quitThinWire()
+                for _ in 0..<180 { play.advanceFrame() }
+                for _ in 0..<30 { play.advanceDialogue() }
+                XCTAssertNil(play.thinWire)
+                XCTAssertEqual(play.runner.program.name, "EP1_R205")
+                XCTAssertEqual(play.lobby?.mode, .counter)
+                XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 5)), false)
+                play.useItemInSearchView(9)
+                play.selectLobbyObject(x: 130, y: 155)
+                play.selectLobbyObject(x: 130, y: 155)
+                for _ in 0..<30 { play.advanceDialogue() }
+                XCTAssertNotNil(play.thinWire)
+                play.advanceFrame()
+                play.advanceFrame()
+                play.holdThinWireTouch(x: 110, y: 240)
+                for _ in 0..<3 { play.advanceFrame() }
+                XCTAssertEqual(play.thinWire?.holding, true)
+                let pausedWire = play.thinWire
+                play.pause()
+                play.advanceFrame()
+                XCTAssertEqual(play.thinWire, pausedWire)
+                play.resume()
+                play.advanceFrame()
+                XCTAssertEqual(play.thinWire?.holding, false)
+                play.pause()
+                _ = try capture(pages(), size: size, name: "play_room215_thin_wire_start")
+                play.resume()
+                for script in ["insert", "pins"] {
+                    let input = try String(contentsOf: root.appendingPathComponent("tools/reference/room215-thin-wire-\(script).txt"), encoding: .utf8)
+                    for line in input.split(separator: "\n") {
+                        let fields = line.split(separator: " ")
+                        if fields.first == "touch", let x = Float(fields[1]), let y = Float(fields[2]) {
+                            play.holdThinWireTouch(x: y, y: 255 - x)
+                        } else if fields.first == "release" { play.releaseThinWireTouch() }
+                        else if fields.first == "frames", let count = Int(fields[1]) {
+                            for _ in 0..<count { play.advanceFrame() }
+                        } else if fields.first == "capture" {
+                            play.pause()
+                            _ = try capture(pages(), size: size, name: "play_room215_thin_wire_\(fields[1])")
+                            play.resume()
+                        }
+                    }
+                    if script == "insert" {
+                        // The native host honours the original fade durations before accepting pin input.
+                        for _ in 0..<120 { play.advanceFrame() }
+                        XCTAssertEqual(play.thinWire?.phase, 3)
+                        XCTAssertEqual(play.thinWire?.stage, 1)
+                    }
+                }
+                for _ in 0..<300 { play.advanceFrame() }
+                XCTAssertNil(play.thinWire)
+                for _ in 0..<100 {
+                    switch play.runner.phase {
+                    case .dialogue, .itemNotice: play.advanceDialogue()
+                    case .waiting: play.advanceFrame()
+                    default: break
+                    }
+                }
+                XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+                XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 5)), true)
+                XCTAssertTrue(try play.runner.game.inventory.items.contains(9))
+                play.pause()
+                return
+            default: return XCTFail("Unexpected post-bell phase: \(play.runner.phase)")
+            }
+        }
+        XCTFail("Registration did not return to the lobby")
+    }
+
+    func testRenderSuitcaseKeyStages() throws {
+        let renderer = try OriginalSuitcaseRenderer()
+        var puzzle = OriginalSuitcaseKeyProcess()
+        func draw(_ name: String) throws {
+            let image = try renderer.render(puzzle)
+            _ = try capture(Image(decorative: image, scale: 1), size: CGSize(width: 192, height: 256), name: name)
+        }
+        try draw("suitcase_key_start")
+        puzzle.update()
+        puzzle.update()
+        for _ in 0..<3 { puzzle.update(pageTouch: .init(110, 240)) }
+        for y in stride(from: 225, through: 95, by: -10) {
+            for _ in 0..<8 { puzzle.update(pageTouch: .init(100, Float(y))) }
+        }
+        for _ in 0..<180 { puzzle.update(pageTouch: .init(100, 95)) }
+        puzzle.update()
+        XCTAssertEqual(puzzle.stage, 5)
+        try draw("suitcase_key_inserted")
+        for _ in 0..<21 {
+            for _ in 0..<3 { puzzle.update(pageTouch: .init(86, 130)) }
+            for _ in 0..<8 { puzzle.update() }
+        }
+        XCTAssertTrue(puzzle.isBroken)
+        try draw("suitcase_key_broken")
+    }
+
     func testRenderInnerDisplayLayouts() throws {
         let cases: [(String, CGSize, Double, Handedness, DynamicTypeSize)] = [
             ("book_landscape", CGSize(width: 951, height: 669), 180, .rightHanded, .large),

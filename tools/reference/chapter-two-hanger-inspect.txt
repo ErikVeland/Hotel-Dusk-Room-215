@@ -1,0 +1,65 @@
+load extracted/reference/chapter-two-hanger-approach/search.mln
+touch 150 80
+frames 3
+release
+frames 30
+touch 150 80
+frames 3
+release
+frames 180
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture hanger
+save hanger
+touch 15 45
+frames 3
+release
+frames 180
+capture items
+save items

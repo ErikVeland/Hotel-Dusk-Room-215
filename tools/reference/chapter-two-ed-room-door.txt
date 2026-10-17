@@ -1,0 +1,17 @@
+load extracted/reference/chapter-two-ed-return-upstairs/upstairs.mln
+touch 127 20
+frames 270
+release
+frames 5
+touch 45 96
+frames 20
+release
+frames 5
+capture approached
+touch 15 15
+frames 3
+release
+frames 180
+capture door
+save door
+quit

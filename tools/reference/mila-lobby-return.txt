@@ -1,0 +1,13 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/mila-lobby-return
+load extracted/reference/melissa-r103-return/returned.mln
+touch 127 170
+frames 42
+release
+frames 5
+touch 45 96
+until32 02110190 00030002 150
+release
+frames 180
+capture entered
+save entered
+quit

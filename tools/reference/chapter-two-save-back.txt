@@ -1,0 +1,8 @@
+load extracted/reference/chapter-two-save-menu/slots.mln
+touch 15 173
+frames 3
+release
+frames 300
+capture back
+save back
+quit

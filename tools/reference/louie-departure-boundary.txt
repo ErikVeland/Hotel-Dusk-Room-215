@@ -1,0 +1,13 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/louie-departure-boundary
+# Stop on event 64 completion before the map process saves its live position.
+load extracted/reference/louie-career-answer/page47.mln
+keys ffe
+frames 2
+keys fff
+until32 2111288 164 600
+capture completed
+save completed
+frames 180
+capture returned
+save returned
+quit

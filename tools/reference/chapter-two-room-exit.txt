@@ -1,0 +1,24 @@
+# Exploratory capture. This input does not reach its intended route checkpoint.
+# Chapter 2 continuation of the existing component lineage, with no memory writes.
+load extracted/reference/chapter-two-room/page4.mln
+touch 210 96
+frames 110
+release
+frames 10
+touch 127 170
+frames 45
+release
+frames 10
+touch 210 96
+frames 18
+release
+frames 90
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 180
+capture exit
+save exit
+quit

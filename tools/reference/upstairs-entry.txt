@@ -1,0 +1,9 @@
+# Starts after the dropped-piece pickup and the following dialogue.
+load extracted/reference/dropped-piece-combined/upstairs.mln
+touch 127 20
+frames 40
+release
+frames 120
+capture jeff-entry
+save jeff-entry
+quit

@@ -1,0 +1,59 @@
+# Ordinary route from the stored client list to Dunning's office door.
+load extracted/reference/chapter-two-suitcase-store/returned.mln
+touch 15 78
+frames 3
+release
+frames 90
+touch 210 96
+frames 125
+release
+frames 5
+touch 127 20
+frames 28
+release
+frames 5
+touch 210 96
+frames 30
+release
+frames 5
+touch 15 15
+frames 3
+release
+frames 180
+capture corridor
+touch 127 170
+frames 270
+release
+frames 5
+touch 210 96
+until32 02110190 00270011 160
+release
+frames 120
+capture downstairs
+touch 45 96
+frames 68
+release
+frames 5
+touch 127 170
+until32 02110190 00110003 120
+release
+frames 120
+touch 127 170
+frames 135
+release
+frames 5
+touch 45 96
+frames 68
+release
+frames 5
+touch 127 170
+frames 25
+release
+frames 5
+touch 15 15
+frames 3
+release
+frames 180
+capture door
+save door
+quit

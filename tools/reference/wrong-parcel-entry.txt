@@ -1,0 +1,28 @@
+# Component continuation of the modified delivery fixture. Output: extracted/reference/wrong-parcel-entry
+# A-only progression distinguishes entry dialogue from background touches.
+load extracted/reference/wrong-parcel-open/opened.mln
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 180
+capture page4
+save page4
+quit

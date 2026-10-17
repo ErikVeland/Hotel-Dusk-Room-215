@@ -1,0 +1,24 @@
+# Component continuation of the delivery fixture. Continue after declining the chapter-boundary save.
+load extracted/reference/chapter-two-no-save/next.mln
+frames 900
+capture waited
+save waited
+keys ffe
+frames 2
+keys fff
+frames 300
+capture advanced
+save advanced
+touch 30 96
+frames 3
+release
+frames 120
+capture page1
+save page1
+touch 30 96
+frames 3
+release
+frames 120
+capture page2
+save page2
+quit

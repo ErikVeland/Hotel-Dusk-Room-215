@@ -206,7 +206,7 @@ Opcode 10 kind 5 (`0x0203C3E8`) pushes the frame (block, mode, event, operation 
 
 ### Item opcodes
 
-Opcode 6 (`0x0203FBFC`) adds the item in u16 2 with `0x02097914`, then opens a text window at the line in u16 8 for the number of pages in u16 10. Opcode 8 (`0x0203FD30`) stores a picture ID and selects picture state 0x13 or 0x14; it writes no game state.
+Opcode 6 (`0x0203FBFC`) adds the item in u16 2 with `0x02097914`, then opens a text window at the line in u16 8 for the number of pages in u16 10. Opcode 8 (`0x0203FD30`) stores a picture ID and selects picture state 0x13 or 0x14. It writes no game state, but waits for a child process. The native runner now blocks here. See [Touch pictures](touch-pictures.md).
 
 ### Mode setup and completion
 

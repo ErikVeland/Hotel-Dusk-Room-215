@@ -1,0 +1,65 @@
+# Original reference checkpoints for the Room 215 door close-up.
+load extracted/reference/jeff-complete/complete.mln
+touch 127 20
+frames 235
+release
+frames 10
+touch 45 96
+frames 8
+release
+frames 120
+capture door-near
+save door-near
+load extracted/reference/room215-near/door-near.mln
+touch 15 15
+frames 3
+release
+frames 180
+capture door
+save door
+load extracted/reference/room215-door/door.mln
+frames 180
+capture ready
+save ready
+touch 80 160
+frames 3
+release
+frames 150
+capture knob
+save knob
+load extracted/reference/room215-inspect/knob.mln
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+keys ffe
+frames 2
+keys fff
+frames 150
+capture ready
+save ready
+quit

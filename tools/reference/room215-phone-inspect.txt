@@ -1,0 +1,9 @@
+# Original reference. Output directory: extracted/reference/room215-phone-inspect
+load extracted/reference/room215-phone-dresser/dresser.mln
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

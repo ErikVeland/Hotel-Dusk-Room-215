@@ -1,0 +1,18 @@
+# Component continuation of the delivery fixture. Decline the chapter-boundary save prompt.
+load extracted/reference/chapter-one-review-final/page32.mln
+touch 78 137
+frames 3
+release
+frames 120
+capture selected
+save selected
+touch 78 137
+frames 3
+release
+frames 180
+capture dismissed
+save dismissed
+frames 600
+capture next
+save next
+quit

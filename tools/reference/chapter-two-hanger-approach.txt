@@ -1,0 +1,16 @@
+load extracted/reference/chapter-two-room215-enter/room.mln
+touch 45 96
+frames 7
+release
+touch 127 170
+frames 21
+release
+frames 120
+capture near
+save near
+touch 15 78
+frames 3
+release
+frames 180
+capture search
+save search

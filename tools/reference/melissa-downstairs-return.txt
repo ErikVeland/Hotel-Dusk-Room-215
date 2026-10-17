@@ -1,0 +1,9 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-downstairs-return
+load extracted/reference/melissa-stair-entry/aligned.mln
+touch 210 96
+until32 02110190 00270011 120
+release
+frames 120
+capture downstairs
+save downstairs
+quit

@@ -1,0 +1,52 @@
+load extracted/reference/chapter-two-suitcase-store-items/items.mln
+touch 104 70
+frames 3
+release
+frames 100
+capture selected
+touch 29 55
+frames 3
+release
+frames 100
+touch 100 130
+frames 3
+release
+frames 100
+touch 100 130
+frames 3
+release
+frames 120
+capture used
+save used
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page0
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page1
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page2
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page3
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page4
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page5
+save returned
+quit

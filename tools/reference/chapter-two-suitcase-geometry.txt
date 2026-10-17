@@ -1,0 +1,17 @@
+load extracted/reference/chapter-two-suitcase-open/overview.mln
+frames 2
+capture overview
+capture-geometry overview
+load extracted/reference/chapter-two-suitcase-open/lower.mln
+frames 1
+capture lower
+capture-geometry lower
+load extracted/reference/chapter-two-suitcase-upper/upper.mln
+frames 1
+capture upper
+capture-geometry upper
+load extracted/reference/chapter-two-suitcase-cash/cash_notice.mln
+frames 2
+capture item
+capture-geometry item
+quit

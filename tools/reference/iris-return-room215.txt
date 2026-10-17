@@ -1,0 +1,19 @@
+# Component continuation of the delivery fixture. Return to Room 215 after Iris and Louie.
+load extracted/reference/iris-salesman-departure/page55.mln
+touch 128 20
+frames 45
+release
+frames 30
+touch 45 96
+frames 9
+release
+frames 30
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 180
+capture room
+save room
+quit

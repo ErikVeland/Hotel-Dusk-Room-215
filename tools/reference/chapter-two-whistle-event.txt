@@ -1,0 +1,83 @@
+# Exploratory capture. Use chapter-two-whistle.txt for the checked whistle route.
+load extracted/reference/chapter-two-linens-door/door.mln
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page1
+save page1
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page2
+save page2
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page4
+save page4
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page5
+save page5
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page6
+save page6
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page7
+save page7
+keys ffe
+frames 2
+keys fff
+frames 120
+touch 30 96
+frames 3
+release
+frames 120
+capture page8
+save page8
+quit

@@ -1,0 +1,49 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/notebook-angled-strokes
+load extracted/reference/melissa-notebook-open/opened.mln
+touch 225 20
+frames 3
+touch 212 70
+frames 3
+touch 145 30
+frames 3
+touch 195 90
+frames 3
+touch 75 150
+frames 3
+touch 195 90
+frames 3
+release
+frames 30
+capture drawn
+save drawn
+touch 15 141
+frames 3
+release
+frames 30
+capture stored
+save stored
+touch 15 95
+frames 3
+release
+frames 30
+touch 15 43
+frames 3
+release
+frames 30
+touch 225 20
+frames 3
+touch 212 70
+frames 3
+touch 145 30
+frames 3
+release
+frames 30
+capture erased
+save erased
+touch 15 141
+frames 3
+release
+frames 30
+capture erasureStored
+save erasureStored
+quit

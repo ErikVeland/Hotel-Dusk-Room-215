@@ -33,13 +33,91 @@ struct OriginalPlayPage: View {
     let screen: UInt8
 
     var body: some View {
+        if play.chapterTransition != nil {
+            OriginalChapterTransitionView(play: play, screen: screen)
+        } else if play.notebook != nil {
+            if screen == 0 { OriginalNotebookView(play: play) }
+            else { Color.clear }
+        } else { content }
+    }
+
+    @ViewBuilder private var content: some View {
         switch play.runner.phase {
         case .dialogue(let packet):
-            textPage(packet.pages.first(where: { $0.page == screen }))
+            if screen == 0, play.suitcaseContents != nil {
+                ZStack {
+                    OriginalSuitcaseContentsView(play: play, interactive: false)
+                    if let page = packet.pages.first(where: { $0.page == screen }), !OriginalDialogueLines(page: page).isEmpty {
+                        textPage(page).background(NovelStyle.paper.opacity(0.85))
+                    }
+                }
+            } else if screen == 0, play.closeup != nil {
+                ZStack {
+                    OriginalSearchCloseupView(play: play, interactive: false)
+                    if let page = packet.pages.first(where: { $0.page == screen }), !OriginalDialogueLines(page: page).isEmpty {
+                        textPage(page).background(NovelStyle.paper.opacity(0.85))
+                    }
+                }
+            } else if screen == 0, play.door != nil {
+                ZStack {
+                    OriginalDoorView(play: play, interactive: false)
+                    if let page = packet.pages.first(where: { $0.page == screen }), !OriginalDialogueLines(page: page).isEmpty {
+                        textPage(page).background(NovelStyle.paper.opacity(0.85))
+                    }
+                }
+            } else { textPage(packet.pages.first(where: { $0.page == screen })) }
         case .itemNotice(_, let page):
-            textPage(page.page == screen ? page : nil)
+            if screen == 0, play.acquiredItemImage != nil { OriginalTouchPictureView(play: play) }
+            else { textPage(page.page == screen ? page : nil) }
+        case .picture:
+            if screen == 0 { OriginalTouchPictureView(play: play) }
+            else { Color.clear }
+        case .exploration where play.closeup != nil:
+            if screen == 0 { OriginalSearchCloseupView(play: play) }
+            else { Color.clear }
+        case .exploration where play.door != nil:
+            if screen == 0 { OriginalDoorView(play: play) }
+            else { Color.clear }
+        case .exploration where play.lobby != nil:
+            if screen == 0 || play.lobby?.mode == .walking {
+                OriginalMapView(play: play, screen: screen)
+            } else {
+                Color.clear
+            }
         case .process:
-            if play.sign != nil {
+            if play.clock != nil {
+                if screen == 0 { OriginalClockView(play: play) }
+                else { Color.clear }
+            } else if play.cabinetDial != nil {
+                if screen == 0 { OriginalCabinetDialView(play: play) }
+                else { Color.clear }
+            } else if play.crowbar != nil {
+                if screen == 0 { OriginalCrowbarView(play: play) }
+                else { Color.clear }
+            } else if play.memoDrawing != nil {
+                if screen == 0 { OriginalMemoDrawingView(play: play) }
+                else { Color.clear }
+            } else if play.memoPull != nil {
+                if screen == 0 { OriginalMemoPullView(play: play) }
+                else { Color.clear }
+            } else if play.paperclip != nil {
+                if screen == 0 { OriginalPaperclipView(play: play) }
+                else { Color.clear }
+            } else if play.thinWire != nil {
+                if screen == 0 { OriginalThinWireView(play: play) }
+                else { Color.clear }
+            } else if play.hanger != nil {
+                if screen == 0 { OriginalHangerView(play: play) }
+                else { Color.clear }
+            } else if play.suitcaseContents != nil {
+                if screen == 0 { OriginalSuitcaseContentsView(play: play) }
+                else { Color.clear }
+            } else if play.suitcaseKey != nil {
+                if screen == 0 { OriginalSuitcaseKeyView(play: play) }
+                else { Color.clear }
+            } else if play.jigsaw != nil {
+                OriginalJigsawPageView(play: play, upper: screen == 1)
+            } else if play.sign != nil {
                 OriginalSignPageView(play: play, upper: screen == 1)
             } else if play.bell != nil {
                 OriginalBellPageView(play: play, upper: screen == 1)

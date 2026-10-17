@@ -1,0 +1,15 @@
+# Component continuation of the delivery fixture. Output: extracted/reference/melissa-talk-facing
+load extracted/reference/melissa-talk-near/near.mln
+touch 210 96
+frames 18
+release
+frames 120
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 180
+capture talking
+save talking
+quit

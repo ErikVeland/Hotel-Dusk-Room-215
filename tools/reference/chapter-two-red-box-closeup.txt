@@ -1,0 +1,42 @@
+load extracted/reference/chapter-two-cabinet-drawer/page9.mln
+touch 170 65
+frames 3
+release
+frames 120
+capture selected
+save selected
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture ready
+save ready
+quit

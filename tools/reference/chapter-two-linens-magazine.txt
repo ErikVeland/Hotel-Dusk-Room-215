@@ -1,0 +1,188 @@
+load extracted/reference/chapter-two-linens-tools/screwdriver.mln
+touch 15 78
+frames 3
+release
+frames 150
+capture locker
+save locker
+touch 15 78
+frames 3
+release
+frames 150
+capture search
+save search
+touch 15 78
+frames 3
+release
+frames 150
+capture walking
+save walking
+touch 127 20
+frames 21
+release
+frames 60
+touch 45 96
+frames 91
+release
+frames 60
+touch 127 170
+frames 21
+release
+frames 60
+capture near
+save near
+touch 15 78
+frames 3
+release
+frames 150
+capture inspect
+save inspect
+touch 102 95
+frames 3
+release
+frames 20
+touch 102 95
+frames 3
+release
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture magazine
+save magazine
+touch 127 96
+frames 3
+release
+frames 20
+touch 127 96
+frames 3
+release
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture collected
+save collected
+quit

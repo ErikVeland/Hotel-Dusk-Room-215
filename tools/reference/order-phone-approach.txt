@@ -1,0 +1,29 @@
+# Exploratory approach: this capture does not reach telephone inspection.
+# Component continuation of the delivery fixture. Leave the parcel and approach the telephone.
+load extracted/reference/order-sheet/page15.mln
+touch 15 78
+frames 3
+release
+frames 180
+touch 15 180
+frames 3
+release
+frames 180
+capture room
+save room
+touch 210 96
+frames 7
+release
+touch 127 20
+frames 60
+release
+frames 90
+capture near
+save near
+touch 15 87
+frames 3
+release
+frames 180
+capture inspect
+save inspect
+quit

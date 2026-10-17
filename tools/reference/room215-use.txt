@@ -1,0 +1,21 @@
+# Original reference. Output directory: extracted/reference/room215-use
+load extracted/reference/room215-key/used.mln
+touch 29 55
+frames 3
+release
+frames 180
+capture using
+save using
+touch 80 160
+frames 3
+release
+frames 180
+capture selected
+save selected
+touch 80 160
+frames 3
+release
+frames 180
+capture unlocked
+save unlocked
+quit

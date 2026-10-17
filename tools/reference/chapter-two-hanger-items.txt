@@ -1,0 +1,8 @@
+# Exploratory input. This attempt did not scroll the inventory.
+load extracted/reference/chapter-two-hanger-inspect/items.mln
+touch 58 170
+frames 90
+release
+frames 120
+capture scrolled
+save scrolled

@@ -1,0 +1,67 @@
+load extracted/reference/chapter-two-linens-magazine/collected.mln
+touch 15 78
+frames 3
+release
+frames 150
+touch 15 78
+frames 3
+release
+frames 150
+touch 127 20
+frames 21
+release
+touch 210 96
+frames 91
+release
+frames 90
+capture near
+save near
+touch 15 15
+frames 3
+release
+frames 500
+capture exit
+save exit
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture corridor
+save corridor
+quit

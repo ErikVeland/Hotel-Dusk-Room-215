@@ -31,8 +31,10 @@ public final class OriginalModelMetalPreview {
 
     /// Texture lookup uses an exact, case-insensitive name within the model's
     /// archive directory. Missing or unsupported referenced textures throw.
+    /// The caller can preserve materials whose original runtime texture slot was unbound.
     public init(modelPath: String, models: OriginalModelLibrary, textures: OriginalTextureLibrary,
-                device: MTLDevice) throws {
+                device: MTLDevice, textureLoader: ((String) throws -> OriginalTexture)? = nil,
+                untexturedMaterials: Set<Int> = []) throws {
         self.device = device
         model = try models.load(path: modelPath)
         guard let queue = device.makeCommandQueue() else { throw OriginalDataError.invalid("Metal command queue") }
@@ -69,14 +71,18 @@ public final class OriginalModelMetalPreview {
             var dimensions = SIMD4<UInt32>(repeating: 0)
             var sampling = SIMD4<UInt32>(repeating: 0)
             var gpuTexture: MTLTexture?
-            if !material.texture.isEmpty {
+            if !material.texture.isEmpty, !untexturedMaterials.contains(group.material) {
                 if materialTextures[group.material] == nil {
                     let requested = directory + "/" + material.texture + ".dtx"
-                    let matches = textures.manifest.textures.filter { $0.source.lowercased() == requested.lowercased() }
-                    guard matches.count == 1, let record = matches.first else { throw OriginalDataError.missing(requested) }
-                    let texture = try textures.load(path: record.source)
+                    let texture: OriginalTexture
+                    if let textureLoader { texture = try textureLoader(material.texture) }
+                    else {
+                        let matches = textures.manifest.textures.filter { $0.source.lowercased() == requested.lowercased() }
+                        guard matches.count == 1, let record = matches.first else { throw OriginalDataError.missing(requested) }
+                        texture = try textures.load(path: record.source)
+                        resolvedPaths[group.material] = record.source
+                    }
                     materialTextures[group.material] = (texture, try texture.makeMetalTexture(device: device))
-                    resolvedPaths[group.material] = record.source
                 }
                 let (texture, uploaded) = materialTextures[group.material]!
                 gpuTexture = uploaded
@@ -99,7 +105,7 @@ public final class OriginalModelMetalPreview {
     /// The caller supplies camera and visibility. This renderer never moves
     /// the player, creates hotspots, or decides which objects the story reveals.
     public func encode(encoder: MTLRenderCommandEncoder, viewProjection: simd_float4x4,
-                       visibleNodes: Set<Int>) {
+                       visibleNodes: Set<Int>, modelTransform: simd_float4x4 = matrix_identity_float4x4) {
         encoder.setDepthStencilState(depthState)
         encoder.setCullMode(.none)
         for draw in draws where visibleNodes.contains(draw.node) {
@@ -110,7 +116,7 @@ public final class OriginalModelMetalPreview {
                 SIMD4(values[4], values[5], values[6], values[7]),
                 SIMD4(values[8], values[9], values[10], values[11]),
                 SIMD4(values[12], values[13], values[14], values[15])))
-            var uniforms = Uniforms(viewProjection: viewProjection, world: world,
+            var uniforms = Uniforms(viewProjection: viewProjection, world: modelTransform * world,
                                     dimensions: draw.dimensions, sampling: draw.sampling)
             encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
             encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
@@ -121,6 +127,16 @@ public final class OriginalModelMetalPreview {
 
     public func render(width: Int, height: Int, viewProjection: simd_float4x4,
                        visibleNodes: Set<Int>) throws -> CGImage {
+        try Self.render(width: width, height: height, device: device, queue: queue) { encoder in
+            encode(encoder: encoder, viewProjection: viewProjection, visibleNodes: visibleNodes)
+        }
+    }
+
+    /**
+     * Shares one colour and depth target between the caller's original model draws.
+     */
+    static func render(width: Int, height: Int, device: MTLDevice, queue: MTLCommandQueue,
+                       encode: (MTLRenderCommandEncoder) -> Void) throws -> CGImage {
         guard width > 0, height > 0, width <= 4096, height <= 4096 else { throw OriginalDataError.invalid("Preview dimensions") }
         let colourDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm,
                                                                         width: width, height: height, mipmapped: false)
@@ -144,7 +160,7 @@ public final class OriginalModelMetalPreview {
         pass.depthAttachment.storeAction = .dontCare
         pass.depthAttachment.clearDepth = 1
         guard let encoder = command.makeRenderCommandEncoder(descriptor: pass) else { throw OriginalDataError.invalid("Preview encoder") }
-        encode(encoder: encoder, viewProjection: viewProjection, visibleNodes: visibleNodes)
+        encode(encoder)
         encoder.endEncoding()
         command.commit()
         command.waitUntilCompleted()

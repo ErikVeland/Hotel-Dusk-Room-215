@@ -1,0 +1,12 @@
+# Original reference. Output directory: extracted/reference/dunning-central-arrival
+load extracted/reference/dunning-hallway-entry/central.mln
+frames 300
+capture arrived
+save arrived
+touch 210 96
+frames 140
+release
+frames 240
+capture stairs
+save stairs
+quit

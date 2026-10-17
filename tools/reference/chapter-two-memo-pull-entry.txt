@@ -1,0 +1,55 @@
+load extracted/reference/chapter-two-memo-inspect/closeup.mln
+touch 35 100
+frames 3
+release
+frames 5
+touch 35 100
+frames 3
+release
+frames 180
+capture selected
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page3
+save page3
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+keys ffe
+frames 2
+keys fff
+frames 120
+capture page9
+save page9
+quit

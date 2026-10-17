@@ -35,6 +35,8 @@ int main(int argc,char**argv) { try {
     nds.RTC.SetDateTime(2007,1,22,12,0,0);nds.Start();
     std::ofstream audio(output+"/audio.s16le",std::ios::binary),inputs(output+"/inputs.txt"),cues(output+"/audio-cues.csv");u64 frames=0,audioFrames=0;
     std::ofstream cinematic(output+"/cinematic-frames.csv");u32 cinematicBase=0;
+    std::ofstream clockTrace(output+"/clock-frames.csv");u32 clockBase=0;
+    clockTrace<<"frame,vtable,phase,animation,counter,hold,stage,visible,alpha,hour,minute,second,timeSlot,tick,tickSeen\n";
     cinematic<<"frame,object,handler,phase,counter\n";
     cues<<"frame,audioFrame,activeBGM,lastBGM,pauseCounter,musicMute,effectsMute\n";
     std::string lastCue;
@@ -50,6 +52,16 @@ int main(int argc,char**argv) { try {
             const u32 handler=read32(read32(object)+8);
             cinematic<<frames<<','<<std::hex<<object<<','<<handler<<std::dec<<','
                      <<(object?read16(object+4):0)<<','<<(object?read16(object+6):0)<<'\n';
+        }
+        if(clockBase) {
+            u32 vtable;memcpy(&vtable,nds.MainRAM+(clockBase&nds.MainRAMMask),4);
+            u32 tick;memcpy(&tick,nds.MainRAM+((clockBase+0x38c)&nds.MainRAMMask),4);
+            clockTrace<<frames<<','<<std::hex<<vtable<<std::dec<<','<<read16(clockBase+0xc)<<','
+                      <<read16(clockBase+0xe)<<','<<read16(clockBase+0x10)<<','<<read16(clockBase+0x12)<<','
+                      <<read16(clockBase+0x39c)<<','<<int(nds.MainRAM[(clockBase+0x398)&nds.MainRAMMask])<<','
+                      <<read16(clockBase+0x39a)<<','<<read16(clockBase+0x384)<<','<<read16(clockBase+0x386)<<','
+                      <<read16(clockBase+0x388)<<','<<read16(0x0211018e)<<','<<tick<<','
+                      <<int(nds.MainRAM[(clockBase+0x39e)&nds.MainRAMMask])<<'\n';
         }
     };
     std::string line;
@@ -69,6 +81,11 @@ int main(int argc,char**argv) { try {
             if(!command||(cinematicBase&&(cinematicBase<0x02000000||cinematicBase>0x023ffd50)))
                 throw std::runtime_error("Cinematic controller must be in main RAM");
         }
+        else if(op=="trace-clock") {
+            command>>std::hex>>clockBase;
+            if(!command||(clockBase&&(clockBase<0x02000000||clockBase>0x023ffc5c)))
+                throw std::runtime_error("Clock process must be in main RAM");
+        }
         else if(op=="write8"||op=="write16"||op=="write32") {
             u32 address,value;command>>std::hex>>address>>value;
             const unsigned width=op=="write8"?1:op=="write16"?2:4;
@@ -79,6 +96,31 @@ int main(int argc,char**argv) { try {
         else if(op=="save") {std::string name;command>>name;Savestate state;nds.DoSavestate(&state);state.Finish();if(state.Error)throw std::runtime_error("State save failed");writeFile(output+"/"+name+".mln",state.Buffer(),state.Length());}
         else if(op=="load") {std::string path;std::getline(command>>std::ws,path);auto bytes=readFile(path);Savestate state(bytes.data(),bytes.size(),false);if(!nds.DoSavestate(&state)||state.Error)throw std::runtime_error("State load failed");}
         else if(op=="capture") {std::string name;command>>name;if(name.find('/')!=std::string::npos)throw std::runtime_error("Capture name must be a basename");void *top,*bottom;if(!nds.GPU.GetFramebuffers(&top,&bottom))throw std::runtime_error("Software framebuffers required");image(output+"/"+name+"-top.ppm",top);image(output+"/"+name+"-bottom.ppm",bottom);writeFile(output+"/"+name+"-ram.bin",nds.MainRAM,nds.MainRAMMask+1);std::cout<<"captured "<<name<<" frame "<<frames<<std::endl;}
+        else if(op=="capture-geometry") {
+            std::string name;command>>name;
+            if(name.empty()||name.find('/')!=std::string::npos)throw std::runtime_error("Capture name must be a basename");
+            const auto& gpu=nds.GPU.GPU3D;
+            std::ofstream file(output+"/"+name+"-geometry.txt");
+            file<<std::hex<<"display "<<gpu.RenderDispCnt<<" clear "<<gpu.RenderClearAttr1<<" fog "<<gpu.RenderFogColor<<'\n';
+            file<<"display-a "<<nds.GPU.GPU2D_A.DispCnt<<" display-b "<<nds.GPU.GPU2D_B.DispCnt
+                <<" capture "<<nds.GPU.CaptureCnt<<'\n';
+            for(u32 i=0;i<gpu.RenderNumPolygons;i++) {
+                const auto& polygon=*gpu.RenderPolygonRAM[i];
+                file<<"polygon "<<i<<" attributes "<<polygon.Attr<<" texture "<<polygon.TexParam<<" palette "<<polygon.TexPalette<<'\n';
+                for(u32 j=0;j<polygon.NumVertices;j++) {
+                    const auto& vertex=*polygon.Vertices[j];
+                    file<<std::dec<<"vertex "<<vertex.FinalPosition[0]<<' '<<vertex.FinalPosition[1]
+                        <<" uv "<<vertex.TexCoords[0]<<' '<<vertex.TexCoords[1]
+                        <<" colour "<<vertex.FinalColor[0]<<' '<<vertex.FinalColor[1]<<' '<<vertex.FinalColor[2]<<'\n'<<std::hex;
+                }
+            }
+            if(!file)throw std::runtime_error("Cannot write geometry capture");
+            std::vector<u8> texture(0x80000),palette(0x18000);
+            for(u32 i=0;i<texture.size();i++)texture[i]=nds.GPU.ReadVRAMFlat_Texture<u8>(i);
+            for(u32 i=0;i<palette.size();i++)palette[i]=nds.GPU.ReadVRAMFlat_TexPal<u8>(i);
+            writeFile(output+"/"+name+"-texture.bin",texture.data(),texture.size());
+            writeFile(output+"/"+name+"-palette.bin",palette.data(),palette.size());
+        }
         else if(op=="quit")break;
         else throw std::runtime_error("Unknown command: "+op);
     }
