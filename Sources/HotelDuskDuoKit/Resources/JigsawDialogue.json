@@ -1,0 +1,200 @@
+{
+  "source": {
+    "file": "extracted/unpacked_wpf/local/us/textdata_usa/EP3_R209.txt",
+    "sha256": "9cc74718c3b77f805483ffd040812a2771f99e5e5a44a177a560fbbdfae1b259",
+    "chapter": 3,
+    "room": "Room 219",
+    "encoding": "Latin-1; Cing control tokens removed; three original display lines joined with spaces",
+    "note": "Original dialogue reference. Do not show pre-reveal lines during assembly or use them as added puzzle instructions."
+  },
+  "invitation": [
+    {
+      "source_string_indices": [
+        6,
+        7,
+        8
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "I know! Let's do a puzzle!"
+    },
+    {
+      "source_string_indices": [
+        21,
+        22,
+        23
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "The puzzle's on the table."
+    },
+    {
+      "source_string_indices": [
+        24,
+        25,
+        26
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "Let's play over there!"
+    }
+  ],
+  "assembled": [
+    {
+      "source_string_indices": [
+        48,
+        49,
+        50
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "Got it."
+    },
+    {
+      "source_string_indices": [
+        54,
+        55,
+        56
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "Wow! Oh my gosh, you're so great!"
+    },
+    {
+      "source_string_indices": [
+        57,
+        58,
+        59
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "That was too easy for you, wasn't it, mister?"
+    },
+    {
+      "source_string_indices": [
+        60,
+        61,
+        62
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "A little."
+    }
+  ],
+  "context": [
+    {
+      "source_string_indices": [
+        63,
+        64,
+        65
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "Hey, squirt, you know the name of the rabbit on this puzzle?"
+    },
+    {
+      "source_string_indices": [
+        66,
+        67,
+        68
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "Um... Mister Rabbit?"
+    },
+    {
+      "source_string_indices": [
+        78,
+        79,
+        80
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "Well, if you care, the rabbit's real name is Pinkie Rabbit."
+    },
+    {
+      "source_string_indices": [
+        108,
+        109,
+        110
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "My mom gave this to me for my birthday."
+    },
+    {
+      "source_string_indices": [
+        111,
+        112,
+        113
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "Yeah? When's your birthday?"
+    },
+    {
+      "source_string_indices": [
+        114,
+        115,
+        116
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "June 29th."
+    },
+    {
+      "source_string_indices": [
+        126,
+        127,
+        128
+      ],
+      "speaker": "Melissa Woodward",
+      "text": "That's the day my mom left, so..."
+    }
+  ],
+  "before_reveal": [
+    {
+      "source_string_indices": [
+        147,
+        148,
+        149
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "Wait a minute... On the back of that puzzle piece..."
+    },
+    {
+      "source_string_indices": [
+        180,
+        181,
+        182
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "Maybe..."
+    }
+  ],
+  "after_reveal": [
+    {
+      "source_string_indices": [
+        195,
+        196,
+        197
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "There's something written on the back of the puzzle..."
+    },
+    {
+      "source_string_indices": [
+        201,
+        202,
+        203
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "There's a message written on the back of the puzzle!"
+    },
+    {
+      "source_string_indices": [
+        207,
+        208,
+        209
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "\"Good-bye, Melissa.\""
+    },
+    {
+      "source_string_indices": [
+        210,
+        211,
+        212
+      ],
+      "speaker": "Kyle Hyde",
+      "text": "If she wrote this, she wasn't planning on coming home."
+    }
+  ]
+}

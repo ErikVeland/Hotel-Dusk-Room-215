@@ -1,0 +1,5035 @@
+{
+  "schemaVersion": 1,
+  "sourceSDAT_SHA256": "e409838b723198acf3e3b292ce17501ce711ea4c632effbd5547ddf355812891",
+  "ticksPerBeat": 48,
+  "wavePoolSHA256": "6701a7b99d51165dd1ad3e4f926345346bca5cfb3f1004b726f6efc24498a93b",
+  "sequences": [
+    {
+      "id": 0,
+      "symbol": "SEQ_BGM_01",
+      "bankSymbol": "BANK_BGM_01",
+      "volume": 100,
+      "midiSHA256": "489b76d363b6ddb424a389946a9d81182295f083a33452acb59b1e0d3815c668",
+      "suppliedMIDI_SHA256": "489b76d363b6ddb424a389946a9d81182295f083a33452acb59b1e0d3815c668",
+      "originalSequenceSHA256": "e76ffcaa51402ea4cdaab7cd4d2ce9b30362bc03d6fabe9eaddd7ced397c7064",
+      "suppliedDLS_SHA256": "bbe25fe27f60d1036476e5237c59badbfb900a2d292c812ec055cfea1e8b4dc1",
+      "repairedDLS_SHA256": "eacfc8139913c21e01d9ce051c07664ef478615639bc97e4fec0fd479a0ae377",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 59,
+            "jumpOffset": 285
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 335,
+            "jumpOffset": 791
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 814,
+            "jumpOffset": 1271
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 1294,
+            "jumpOffset": 1557
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 1603,
+            "jumpOffset": 1830
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 1853,
+            "jumpOffset": 2220
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 2243,
+            "jumpOffset": 2825
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 2846,
+            "jumpOffset": 4360
+          }
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "symbol": "SEQ_BGM_02",
+      "bankSymbol": "BANK_BGM_02",
+      "volume": 110,
+      "midiSHA256": "63508a6ab0be61da060b071a60fe8d2c4c4ba6d4aa48b8ad1c609aaabb29c31b",
+      "suppliedMIDI_SHA256": "63508a6ab0be61da060b071a60fe8d2c4c4ba6d4aa48b8ad1c609aaabb29c31b",
+      "originalSequenceSHA256": "5fb93d877b48ee6ebd2873cb9f6df1fcf1ed910112934a22c0ca5b72e13abf0a",
+      "suppliedDLS_SHA256": "27760d83f2ea54783a7143a6a18a50255fcf6110a009bb9e94130a1326409fc4",
+      "repairedDLS_SHA256": "bbddd0245243fa03d1a6f3867339897a98753dc636ef967136644d9be843e790",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 1968,
+          "loop": null
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 1968,
+          "loop": null
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 1968,
+          "loop": null
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 1968,
+          "loop": null
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 1967,
+          "loop": null
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 1969,
+          "loop": null
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 1969,
+          "loop": null
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 736,
+          "loop": null
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 752,
+          "loop": null
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 1968,
+          "loop": null
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 1968,
+          "loop": null
+        },
+        {
+          "trackID": 14,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 1968,
+          "loop": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "symbol": "SEQ_BGM_03",
+      "bankSymbol": "BANK_BGM_03",
+      "volume": 100,
+      "midiSHA256": "ed9e066203c3a0262589435f747fc966bfe247b9653335b3faf4be0c20364587",
+      "suppliedMIDI_SHA256": "ed9e066203c3a0262589435f747fc966bfe247b9653335b3faf4be0c20364587",
+      "originalSequenceSHA256": "e3cff2f332957fbcfb031ad2ffc317331eec93b58866d9269f72fb525c3d9718",
+      "suppliedDLS_SHA256": "73b4884794b60f7bf501af75eb3a6b13d23d53c7102bc0de2ea19695a743bc25",
+      "repairedDLS_SHA256": "6147d9eec8368f24d97a0c865136eceefe30b310836a2f4e968596591ca2234c",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 62,
+            "jumpOffset": 493
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 514,
+            "jumpOffset": 669
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 751,
+            "jumpOffset": 1049
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 1070,
+            "jumpOffset": 1373
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 1478,
+            "jumpOffset": 1718
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 1739,
+            "jumpOffset": 1960
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 2002,
+            "jumpOffset": 2242
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 2263,
+            "jumpOffset": 2488
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 7680,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7680,
+            "targetOffset": 2534,
+            "jumpOffset": 3023
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "symbol": "SEQ_BGM_04",
+      "bankSymbol": "BANK_BGM_04",
+      "volume": 85,
+      "midiSHA256": "b2837cf53ffe13676a491197a3bc3e7f6c9135046c134895df99a6e9e3e1e2f9",
+      "suppliedMIDI_SHA256": "b2837cf53ffe13676a491197a3bc3e7f6c9135046c134895df99a6e9e3e1e2f9",
+      "originalSequenceSHA256": "a43b7b28a3eaff7a13532a7f81aab31dc2587fb85a2b1eef27077efc83ae1fb2",
+      "suppliedDLS_SHA256": "d5705a2d22e25c9236210d2e3c89a491e19d16adb168af6dad9bc146ed7faf23",
+      "repairedDLS_SHA256": "c5aace83bde6ce10d6e3f4cfdc6abfa9f395d8b439fc3c27d8c7d62f10c15102",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3408,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3408,
+            "targetOffset": 54,
+            "jumpOffset": 270
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3408,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3408,
+            "targetOffset": 293,
+            "jumpOffset": 420
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3408,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3408,
+            "targetOffset": 443,
+            "jumpOffset": 570
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3408,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3408,
+            "targetOffset": 593,
+            "jumpOffset": 697
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 3408,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3408,
+            "targetOffset": 720,
+            "jumpOffset": 3385
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 3408,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3408,
+            "targetOffset": 3408,
+            "jumpOffset": 6073
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": false,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 3408,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3408,
+            "targetOffset": 6094,
+            "jumpOffset": 6097
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "symbol": "SEQ_BGM_05",
+      "bankSymbol": "BANK_BGM_05",
+      "volume": 105,
+      "midiSHA256": "1a1bd9a2753c0454295ba1584032b868618ec79b43086d1355172ffd941beb89",
+      "suppliedMIDI_SHA256": "16b6d4c050637415339e0a08b3a7a9df469b3daef1a902a83bbda99eb52785e0",
+      "originalSequenceSHA256": "e3a91dda4147043e6088db45790c4a1b61ecba497227e985a5100679d7bf3945",
+      "suppliedDLS_SHA256": "f83d905f7095743bf206c82a893d9b9d780143a3352df0ce32463ed261e43219",
+      "repairedDLS_SHA256": "d2694eeca9a61eb3262dc07d24f4b8b12997d29d236f718ab10c3070741a16be",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": false,
+          "hasMIDIEvents": false,
+          "program": 0,
+          "endTick": 960,
+          "loop": null
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 1535,
+          "loop": null
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 1534,
+          "loop": null
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 1149,
+          "loop": null
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 1161,
+          "loop": null
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 1535,
+          "loop": null
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 1535,
+          "loop": null
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 1535,
+          "loop": null
+        },
+        {
+          "trackID": 14,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 1342,
+          "loop": null
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 1056,
+          "loop": null
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "symbol": "SEQ_BGM_06",
+      "bankSymbol": "BANK_BGM_06",
+      "volume": 127,
+      "midiSHA256": "181ba44b7eae8472a15dca22f682c55e0e468bacda3a50fb5b5edfd5e62589e7",
+      "suppliedMIDI_SHA256": "181ba44b7eae8472a15dca22f682c55e0e468bacda3a50fb5b5edfd5e62589e7",
+      "originalSequenceSHA256": "790c10fcff36e224b865825c7c146fa4d60568074f97ddcc4b50981b657c5db1",
+      "suppliedDLS_SHA256": "80feaf2ac93e26135252efc118b9aa165847513f6048414f7886561075c91a35",
+      "repairedDLS_SHA256": "4ec7e2892b0595a10e46cc0765f4a8179334b19b4158a5e4fcd9c8116a0eba0e",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 95,
+            "jumpOffset": 173
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 403,
+            "jumpOffset": 598
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 22,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 856,
+            "jumpOffset": 925
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 23,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 965,
+            "jumpOffset": 1070
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 1096,
+            "jumpOffset": 1165
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 21,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 1193,
+            "jumpOffset": 2174
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 21,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 2202,
+            "jumpOffset": 3189
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 3229,
+            "jumpOffset": 3581
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 3622,
+            "jumpOffset": 3944
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 4001,
+            "jumpOffset": 4234
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 4544,
+            "jumpOffset": 4562
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 24,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 4588,
+            "jumpOffset": 4646
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 24,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 4672,
+            "jumpOffset": 4730
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 7320,
+          "loop": {
+            "startTick": 408,
+            "endTick": 7320,
+            "targetOffset": 4754,
+            "jumpOffset": 4792
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "symbol": "SEQ_BGM_07",
+      "bankSymbol": "BANK_BGM_07",
+      "volume": 95,
+      "midiSHA256": "7db9f6f5f29f7eda215fba9974123a095ceba50a418261215170ca0b832f75b8",
+      "suppliedMIDI_SHA256": "7db9f6f5f29f7eda215fba9974123a095ceba50a418261215170ca0b832f75b8",
+      "originalSequenceSHA256": "4cb3c5f4b9ee6583bac5d3a2940457abbe63264e66bf38c9164f5be608edf94e",
+      "suppliedDLS_SHA256": "27738bd879467fdd7b5d316e2769e5dbc6063559d41f6a63b3da54fc3366c81b",
+      "repairedDLS_SHA256": "1feeb29353a1ca184225607dbb4d14e2e96257c70fb297023e55a9ccbbcf487f",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 133,
+            "jumpOffset": 814
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 1004,
+            "jumpOffset": 1434
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 1697,
+            "jumpOffset": 2057
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 2292,
+            "jumpOffset": 2624
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 2787,
+            "jumpOffset": 3111
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 3299,
+            "jumpOffset": 3332
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 3382,
+            "jumpOffset": 3415
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 3465,
+            "jumpOffset": 4080
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 4322,
+            "jumpOffset": 5243
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 6317,
+            "jumpOffset": 7791
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 7837,
+            "jumpOffset": 9939
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 6148,
+          "loop": {
+            "startTick": 772,
+            "endTick": 6148,
+            "targetOffset": 9963,
+            "jumpOffset": 10010
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "symbol": "SEQ_BGM_08",
+      "bankSymbol": "BANK_BGM_08",
+      "volume": 95,
+      "midiSHA256": "4d073c002adf8504b5571bab37be2b7ffc215eff49b5b3bb4b19eaeec5ebd30a",
+      "suppliedMIDI_SHA256": "4d073c002adf8504b5571bab37be2b7ffc215eff49b5b3bb4b19eaeec5ebd30a",
+      "originalSequenceSHA256": "7a369925f5702b78e1da1a681360feead7a8ca974b6e91935ef4e0afc8c7413a",
+      "suppliedDLS_SHA256": "e0eadb4a86b44c90a65e3c78be232a07ca18f163a0bd28f7e781f7b788026a4b",
+      "repairedDLS_SHA256": "1dc50ce830f1c087e2592c9142e322bc0ae3994056cea5e6aba0f6c63bfbb92d",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 74,
+            "jumpOffset": 617
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 755,
+            "jumpOffset": 1117
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 1289,
+            "jumpOffset": 1645
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 1791,
+            "jumpOffset": 2149
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 2301,
+            "jumpOffset": 2704
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 20,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 2727,
+            "jumpOffset": 2933
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 20,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 2956,
+            "jumpOffset": 3162
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 3185,
+            "jumpOffset": 3363
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 3384,
+            "jumpOffset": 3805
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 4429,
+            "jumpOffset": 4647
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7296,
+          "loop": {
+            "startTick": 0,
+            "endTick": 7296,
+            "targetOffset": 4670,
+            "jumpOffset": 4686
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "symbol": "SEQ_BGM_09",
+      "bankSymbol": "BANK_BGM_09",
+      "volume": 127,
+      "midiSHA256": "3d3c74399e423c0faca8faff173035f24b2ae1caef04326b3e57832b2996d6a3",
+      "suppliedMIDI_SHA256": "3d3c74399e423c0faca8faff173035f24b2ae1caef04326b3e57832b2996d6a3",
+      "originalSequenceSHA256": "18bf8ac8fa650c75163bd359215bc32a77c5393cc604bef939e24344398de575",
+      "suppliedDLS_SHA256": "6b893b5ed5e9d9774b5f70fde682ced987abcab39ae23e716c3c950ccd72f6d8",
+      "repairedDLS_SHA256": "ad6e95d4c655924f0c57c5b05827afc2afc34227a1090598e41730741527c110",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 105,
+            "jumpOffset": 346
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 405,
+            "jumpOffset": 810
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 952,
+            "jumpOffset": 1357
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 1553,
+            "jumpOffset": 1692
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 23,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 1749,
+            "jumpOffset": 1870
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 1896,
+            "jumpOffset": 2029
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 2147,
+            "jumpOffset": 2284
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 22,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 2460,
+            "jumpOffset": 2711
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 22,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 2791,
+            "jumpOffset": 3044
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 3070,
+            "jumpOffset": 3241
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 3435,
+            "jumpOffset": 3719
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 3861,
+            "jumpOffset": 4149
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 4326,
+            "jumpOffset": 4616
+          }
+        },
+        {
+          "trackID": 13,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 4977,
+            "jumpOffset": 5271
+          }
+        },
+        {
+          "trackID": 14,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 5586,
+            "jumpOffset": 5642
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8736,
+          "loop": {
+            "startTick": 2832,
+            "endTick": 8736,
+            "targetOffset": 5847,
+            "jumpOffset": 5905
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "symbol": "SEQ_BGM_10",
+      "bankSymbol": "BANK_BGM_10",
+      "volume": 70,
+      "midiSHA256": "65904a2c76aff5cac2c452b5bbe36715c2942b6972587b2b4c0bd7dfcb9634d2",
+      "suppliedMIDI_SHA256": "65904a2c76aff5cac2c452b5bbe36715c2942b6972587b2b4c0bd7dfcb9634d2",
+      "originalSequenceSHA256": "0edd664d7db6706aa70ef8fbd8e1857485b66d78c5580bf854f99cebf0ebf530",
+      "suppliedDLS_SHA256": "4a855fcdaf5af4e5fb59a30e1b6a5ce1d8b5154b4d537130a48ef09824082629",
+      "repairedDLS_SHA256": "c862a7d73a2cb03bdc3b81711ccf9af41e35310594f90fcf70cdb0a5a7d79c3f",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 6192,
+          "loop": {
+            "startTick": 48,
+            "endTick": 6192,
+            "targetOffset": 72,
+            "jumpOffset": 326
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 6192,
+          "loop": {
+            "startTick": 48,
+            "endTick": 6192,
+            "targetOffset": 408,
+            "jumpOffset": 810
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 6192,
+          "loop": {
+            "startTick": 48,
+            "endTick": 6192,
+            "targetOffset": 871,
+            "jumpOffset": 1395
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 6192,
+          "loop": {
+            "startTick": 48,
+            "endTick": 6192,
+            "targetOffset": 1534,
+            "jumpOffset": 1763
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 15,
+          "endTick": 6192,
+          "loop": {
+            "startTick": 48,
+            "endTick": 6192,
+            "targetOffset": 1788,
+            "jumpOffset": 2069
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 15,
+          "endTick": 6192,
+          "loop": {
+            "startTick": 48,
+            "endTick": 6192,
+            "targetOffset": 2622,
+            "jumpOffset": 3009
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 6192,
+          "loop": {
+            "startTick": 48,
+            "endTick": 6192,
+            "targetOffset": 3518,
+            "jumpOffset": 3808
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "symbol": "SEQ_BGM_11",
+      "bankSymbol": "BANK_BGM_11",
+      "volume": 98,
+      "midiSHA256": "ee9ab6a13c6272ad9a7331067bc33d65c2281f0ab68d3a26c825c40c887c4b9c",
+      "suppliedMIDI_SHA256": "ee9ab6a13c6272ad9a7331067bc33d65c2281f0ab68d3a26c825c40c887c4b9c",
+      "originalSequenceSHA256": "61d4695a97420d1e4aebaeab2e9eb99defd04653713908613fb3b1a865743114",
+      "suppliedDLS_SHA256": "af42d98688c8275b20ba3e6ad3eca3af53e674320291afd0b7f9bfc6ff871ddb",
+      "repairedDLS_SHA256": "43ee2a17134840e3aeb2f447c98f5010ff05b57363a014323827633f71638b4f",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 64,
+            "jumpOffset": 458
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 669,
+            "jumpOffset": 1323
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 1506,
+            "jumpOffset": 2207
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 17,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 2347,
+            "jumpOffset": 2759
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 3100,
+            "jumpOffset": 3627
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 3650,
+            "jumpOffset": 4094
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 18,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 4154,
+            "jumpOffset": 4353
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 4413,
+            "jumpOffset": 4664
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 8064,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8064,
+            "targetOffset": 4685,
+            "jumpOffset": 5176
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "symbol": "SEQ_BGM_12",
+      "bankSymbol": "BANK_BGM_12",
+      "volume": 95,
+      "midiSHA256": "de0ef0990b527f0bab2df12e6b034aa2736689a786d56ac9a6fa5d00c09ca701",
+      "suppliedMIDI_SHA256": "de0ef0990b527f0bab2df12e6b034aa2736689a786d56ac9a6fa5d00c09ca701",
+      "originalSequenceSHA256": "d3196c84f7637246275d2ed968d87db7abd6fe784b5c02bc42059d587f2b86cc",
+      "suppliedDLS_SHA256": "6a134272fac8a911e4036a371fff4a2ca14a85aad55b3275702e392065e20c36",
+      "repairedDLS_SHA256": "74b97194ccb13b0de424834e4ceb82b72fdba0a6474452e14d8b8a272e39b855",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 3888,
+          "loop": {
+            "startTick": 816,
+            "endTick": 3888,
+            "targetOffset": 75,
+            "jumpOffset": 160
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 3888,
+          "loop": {
+            "startTick": 816,
+            "endTick": 3888,
+            "targetOffset": 243,
+            "jumpOffset": 398
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 3888,
+          "loop": {
+            "startTick": 816,
+            "endTick": 3888,
+            "targetOffset": 508,
+            "jumpOffset": 814
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 16,
+          "endTick": 3888,
+          "loop": {
+            "startTick": 816,
+            "endTick": 3888,
+            "targetOffset": 840,
+            "jumpOffset": 1163
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 3888,
+          "loop": {
+            "startTick": 816,
+            "endTick": 3888,
+            "targetOffset": 1608,
+            "jumpOffset": 1914
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 16,
+          "endTick": 3888,
+          "loop": {
+            "startTick": 816,
+            "endTick": 3888,
+            "targetOffset": 1940,
+            "jumpOffset": 2235
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 3888,
+          "loop": {
+            "startTick": 816,
+            "endTick": 3888,
+            "targetOffset": 2793,
+            "jumpOffset": 2915
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "symbol": "SEQ_BGM_13",
+      "bankSymbol": "BANK_BGM_13",
+      "volume": 105,
+      "midiSHA256": "2cbe787944feac773afee142426d52fe2a182980c8052c61f76d007c9bf3c406",
+      "suppliedMIDI_SHA256": "2cbe787944feac773afee142426d52fe2a182980c8052c61f76d007c9bf3c406",
+      "originalSequenceSHA256": "d9bd6205be08e49289f79a215e7c4466d00b2b4f1c928463d00c6d71f4df60dd",
+      "suppliedDLS_SHA256": "6755bad1a74a52b84bf5ed0350a52a9e9c7d61cd734484518444333ecbbca4bd",
+      "repairedDLS_SHA256": "4adbd16fc27f796cc8d3f6d1d01e62b8721eed7b9cfd37bbed0a4ecd243f93bf",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 59,
+            "jumpOffset": 209
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 232,
+            "jumpOffset": 639
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 832,
+            "jumpOffset": 1245
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 1444,
+            "jumpOffset": 1738
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 1792,
+            "jumpOffset": 2090
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 6,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 2146,
+            "jumpOffset": 2396
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 2419,
+            "jumpOffset": 2669
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 3264,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3264,
+            "targetOffset": 2690,
+            "jumpOffset": 2848
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "symbol": "SEQ_BGM_14",
+      "bankSymbol": "BANK_BGM_14",
+      "volume": 105,
+      "midiSHA256": "5e0717d3a9841aefc7d9f47d505a5c3dd845f889de6fddeaa4af214b5bf9f79b",
+      "suppliedMIDI_SHA256": "5e0717d3a9841aefc7d9f47d505a5c3dd845f889de6fddeaa4af214b5bf9f79b",
+      "originalSequenceSHA256": "678baa547e30596515d52178492e33c99a7f97deb800961f9625dd85c28b4699",
+      "suppliedDLS_SHA256": "e5bcb74550ea4dada5e29388495e61ccef37d46f58b3d7f7674ce1cb981dd30c",
+      "repairedDLS_SHA256": "9b2bd983ab04bb689a80b1df2b2a881c2e2a434092eb8e84dd404631c9c7eb7d",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 69,
+            "jumpOffset": 333
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 356,
+            "jumpOffset": 517
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 677,
+            "jumpOffset": 845
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 1201,
+            "jumpOffset": 1634
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 1657,
+            "jumpOffset": 2090
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 17,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 2113,
+            "jumpOffset": 2255
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 2278,
+            "jumpOffset": 2341
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 2434,
+            "jumpOffset": 2497
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 18,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 2594,
+            "jumpOffset": 2818
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 6144,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6144,
+            "targetOffset": 2839,
+            "jumpOffset": 2999
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "symbol": "SEQ_BGM_15",
+      "bankSymbol": "BANK_BGM_15",
+      "volume": 90,
+      "midiSHA256": "18dd23541593f4d348bddf23c4ab3c416ee304d9e2700143e2f823c8bc4c5f19",
+      "suppliedMIDI_SHA256": "18dd23541593f4d348bddf23c4ab3c416ee304d9e2700143e2f823c8bc4c5f19",
+      "originalSequenceSHA256": "2e128b9e56f15de58bd862973aa9b86e30a40e1a22ae91677cc11817a18223fa",
+      "suppliedDLS_SHA256": "a7a65ef6f90529803098cfe6d14a0592f6d434c24464c34b189bb4a50931f60c",
+      "repairedDLS_SHA256": "40a403ba0baabc2688e000e24e0b8fb1bfd717486402ddd86345df256207d152",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 150,
+            "jumpOffset": 518
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 36,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 614,
+            "jumpOffset": 2714
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 37,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 9224,
+            "jumpOffset": 9259
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 39,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 9289,
+            "jumpOffset": 10011
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 39,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 10274,
+            "jumpOffset": 10904
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 11163,
+            "jumpOffset": 11294
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 11347,
+            "jumpOffset": 11482
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 11564,
+            "jumpOffset": 11863
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 12767,
+            "jumpOffset": 13070
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 13156,
+            "jumpOffset": 13459
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 10752,
+          "loop": {
+            "startTick": 1536,
+            "endTick": 10752,
+            "targetOffset": 13547,
+            "jumpOffset": 13550
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "symbol": "SEQ_BGM_16",
+      "bankSymbol": "BANK_BGM_16",
+      "volume": 90,
+      "midiSHA256": "2148567e0eb4a64e2e05bb23b597f29127e93b336c31d32f5678ce0fb1eb6182",
+      "suppliedMIDI_SHA256": "2148567e0eb4a64e2e05bb23b597f29127e93b336c31d32f5678ce0fb1eb6182",
+      "originalSequenceSHA256": "d5fd1c32562d98433532d5bdc291a2fc2800f74b920a33b24290a1e6d4e07d59",
+      "suppliedDLS_SHA256": "1482373c37490bf61a00dd85eee715f384a9510b7a0a5e8d8a46e1d87f1eefd4",
+      "repairedDLS_SHA256": "1c4f0170129ec9574622881d7c74f9886be964f28fed587f7676c1dc9fa6df05",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 182,
+            "jumpOffset": 444
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 24,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 3121,
+            "jumpOffset": 25072
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 35280,
+            "jumpOffset": 35483
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 22,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 36039,
+            "jumpOffset": 36130
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 22,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 36332,
+            "jumpOffset": 36395
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 22,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 36433,
+            "jumpOffset": 36496
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 36716,
+            "jumpOffset": 36907
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 37257,
+            "jumpOffset": 37260
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 37825,
+            "jumpOffset": 38111
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 38405,
+            "jumpOffset": 39493
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 20,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 39768,
+            "jumpOffset": 39995
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 40065,
+            "jumpOffset": 40511
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": false,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 40581,
+            "jumpOffset": 40584
+          }
+        },
+        {
+          "trackID": 13,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 25,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 40610,
+            "jumpOffset": 40832
+          }
+        },
+        {
+          "trackID": 14,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 25,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 40858,
+            "jumpOffset": 41080
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 11520,
+          "loop": {
+            "startTick": 3072,
+            "endTick": 11520,
+            "targetOffset": 41111,
+            "jumpOffset": 41166
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "symbol": "SEQ_BGM_17",
+      "bankSymbol": "BANK_BGM_17",
+      "volume": 90,
+      "midiSHA256": "b6c4ca1d5c1cf6230c2918d5b9a372a059e0a4f8607f55cdccd832f3fadb1dff",
+      "suppliedMIDI_SHA256": "b6c4ca1d5c1cf6230c2918d5b9a372a059e0a4f8607f55cdccd832f3fadb1dff",
+      "originalSequenceSHA256": "f978c7ffa8b7c52a8678c0e922973af1e8f01fb10b54080470616fe56850921f",
+      "suppliedDLS_SHA256": "b52f10533f8203a0e38e1c3b03cf04a400d6594b39b6890bf927a37ef4bf6229",
+      "repairedDLS_SHA256": "dc0a3bf06069df9ea3f3aadbbb1843609a9b3cac96755286954813beb114c4ee",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 105,
+            "jumpOffset": 319
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 863,
+            "jumpOffset": 1429
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 1676,
+            "jumpOffset": 1679
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 33,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 1713,
+            "jumpOffset": 2121
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 2968,
+            "jumpOffset": 2971
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 3110,
+            "jumpOffset": 3113
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 3230,
+            "jumpOffset": 3233
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 3403,
+            "jumpOffset": 3866
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 4011,
+            "jumpOffset": 4643
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 5086,
+            "jumpOffset": 5782
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7561,
+          "loop": {
+            "startTick": 1033,
+            "endTick": 7561,
+            "targetOffset": 5972,
+            "jumpOffset": 6688
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "symbol": "SEQ_BGM_18",
+      "bankSymbol": "BANK_BGM_18",
+      "volume": 80,
+      "midiSHA256": "33e33df6cdcac6514e13db03391ed0a49eeae9333940a59f86fb4c203e518caf",
+      "suppliedMIDI_SHA256": "33e33df6cdcac6514e13db03391ed0a49eeae9333940a59f86fb4c203e518caf",
+      "originalSequenceSHA256": "8ae5429d7821127f0c1c7a187915166e9b5d9dde981b5a25e6cd05b9ac4e387e",
+      "suppliedDLS_SHA256": "be84e5797a77624e3aa3e36b49845cc38687cca45d542d951ef68b5196390db6",
+      "repairedDLS_SHA256": "b4aaf43f328f5ec8c2e0516bdc5fcdff752bf90f2203dc724cc573daa852f7b3",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 64,
+            "jumpOffset": 307
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 561,
+            "jumpOffset": 894
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 1241,
+            "jumpOffset": 1591
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 1639,
+            "jumpOffset": 1906
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 2017,
+            "jumpOffset": 2077
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 2128,
+            "jumpOffset": 2464
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 2536,
+            "jumpOffset": 3302
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 3346,
+            "jumpOffset": 4397
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 6528,
+          "loop": {
+            "startTick": 0,
+            "endTick": 6528,
+            "targetOffset": 4439,
+            "jumpOffset": 4841
+          }
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "symbol": "SEQ_BGM_19",
+      "bankSymbol": "BANK_BGM_19",
+      "volume": 70,
+      "midiSHA256": "00a3f83461a505b68b4ce5a35134d785020459edb2153108e31d21b25c25f839",
+      "suppliedMIDI_SHA256": "00a3f83461a505b68b4ce5a35134d785020459edb2153108e31d21b25c25f839",
+      "originalSequenceSHA256": "c64aedc65e0917eb93b120245ea78c8ea7e313215f5b1b1a5d9a3428a39ffaac",
+      "suppliedDLS_SHA256": "2862f9ec514295df5ed3d5f8498b1ac19cb76349aca29b37a1343ff33e052f09",
+      "repairedDLS_SHA256": "2c66bca539ad0f269320ef32f4e2fba97210fc10cc8084f81b7289ad75920d16",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 64,
+            "jumpOffset": 444
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 598,
+            "jumpOffset": 1102
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 1189,
+            "jumpOffset": 1473
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 1521,
+            "jumpOffset": 1881
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 1999,
+            "jumpOffset": 2473
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 2569,
+            "jumpOffset": 3309
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 3605,
+            "jumpOffset": 3928
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 4592,
+          "loop": {
+            "startTick": 32,
+            "endTick": 4592,
+            "targetOffset": 3984,
+            "jumpOffset": 4921
+          }
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "symbol": "SEQ_BGM_20",
+      "bankSymbol": "BANK_BGM_20",
+      "volume": 90,
+      "midiSHA256": "d7df369f2337033477210570d51f824accf4a5c4e4280d0b5118ab5e40cbe3be",
+      "suppliedMIDI_SHA256": "d7df369f2337033477210570d51f824accf4a5c4e4280d0b5118ab5e40cbe3be",
+      "originalSequenceSHA256": "4f954ab232a39c5c7b671c84267880dec9ab74a6d1ccb756c9fcc98711544751",
+      "suppliedDLS_SHA256": "2f0d9282df99b1a02cb74ce77580b1a72285b6173b7beb6eb035587a68c50ff7",
+      "repairedDLS_SHA256": "d370b0045b840c7bbe08084a953222966ade5c1acab66809a9581bc8df3da9b2",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 5808,
+          "loop": {
+            "startTick": 48,
+            "endTick": 5808,
+            "targetOffset": 54,
+            "jumpOffset": 424
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 5808,
+          "loop": {
+            "startTick": 48,
+            "endTick": 5808,
+            "targetOffset": 611,
+            "jumpOffset": 1467
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 5808,
+          "loop": {
+            "startTick": 48,
+            "endTick": 5808,
+            "targetOffset": 1689,
+            "jumpOffset": 2090
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 5808,
+          "loop": {
+            "startTick": 48,
+            "endTick": 5808,
+            "targetOffset": 2386,
+            "jumpOffset": 2946
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 6,
+          "endTick": 5808,
+          "loop": {
+            "startTick": 48,
+            "endTick": 5808,
+            "targetOffset": 2994,
+            "jumpOffset": 3554
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 5808,
+          "loop": {
+            "startTick": 48,
+            "endTick": 5808,
+            "targetOffset": 3613,
+            "jumpOffset": 3919
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "symbol": "SEQ_BGM_21",
+      "bankSymbol": "BANK_BGM_21",
+      "volume": 95,
+      "midiSHA256": "62eead6d65126879917363cdb224bd360970cfe840ac08311c49d9e5a6f6f6e4",
+      "suppliedMIDI_SHA256": "62eead6d65126879917363cdb224bd360970cfe840ac08311c49d9e5a6f6f6e4",
+      "originalSequenceSHA256": "a4408a3d2ab19b35981fa702b8f7571593e7c86dc029b8a7518a733dc1ac4d55",
+      "suppliedDLS_SHA256": "62595ffe4a33ec356016d4f92e5037ade1fdf2890e0f06be485f782fdf2c39ab",
+      "repairedDLS_SHA256": "2719cfbdf63ef489f9a56b9e1aee5a1344f13626d3479a49b64c8320623a5408",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 64,
+            "jumpOffset": 405
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 459,
+            "jumpOffset": 796
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 973,
+            "jumpOffset": 1307
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 1330,
+            "jumpOffset": 1428
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 1476,
+            "jumpOffset": 1636
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 1728,
+            "jumpOffset": 2041
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 2064,
+            "jumpOffset": 2407
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 2594,
+            "jumpOffset": 2692
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 3744,
+          "loop": {
+            "startTick": 0,
+            "endTick": 3744,
+            "targetOffset": 2736,
+            "jumpOffset": 2877
+          }
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "symbol": "SEQ_BGM_22",
+      "bankSymbol": "BANK_BGM_22",
+      "volume": 83,
+      "midiSHA256": "8b18eb567aaf0b24f6a89c125835974ffaad515b9118af0800560707be62bc8c",
+      "suppliedMIDI_SHA256": "8b18eb567aaf0b24f6a89c125835974ffaad515b9118af0800560707be62bc8c",
+      "originalSequenceSHA256": "f6463b9ec3dafae32a93456ae44851dadd8bdaab0a57d57b701e81dd6f8af68c",
+      "suppliedDLS_SHA256": "4f65803d83f75c9a7d4ea6571c2ed38c2d8d907ca16bf78901051652244d9049",
+      "repairedDLS_SHA256": "1867cad4e8d7df72a95c07ec8d091fa027ba00a61eb3d454dacba55eb54cff69",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 84,
+            "jumpOffset": 559
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 582,
+            "jumpOffset": 1134
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 1157,
+            "jumpOffset": 1558
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 1581,
+            "jumpOffset": 1810
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 1949,
+            "jumpOffset": 2127
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 2181,
+            "jumpOffset": 2510
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 2533,
+            "jumpOffset": 2941
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 2964,
+            "jumpOffset": 3507
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 3530,
+            "jumpOffset": 3884
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 3905,
+            "jumpOffset": 4405
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 7,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 4765,
+            "jumpOffset": 5094
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 5117,
+            "jumpOffset": 5472
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8448,
+            "targetOffset": 5495,
+            "jumpOffset": 5536
+          }
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "symbol": "SEQ_BGM_23",
+      "bankSymbol": "BANK_BGM_23",
+      "volume": 67,
+      "midiSHA256": "c923f7bf58d4c4b89a509ad1919c8118ef87b444bff85eb8e4411c513bd691de",
+      "suppliedMIDI_SHA256": "c923f7bf58d4c4b89a509ad1919c8118ef87b444bff85eb8e4411c513bd691de",
+      "originalSequenceSHA256": "9e0a6f7fd4f756146504fc73d7fdfb865a12d88561c41eec9d6b008e276b9615",
+      "suppliedDLS_SHA256": "6706fed567a97b45d05cd4502cf4155f1adf87a69c00554a49aa0f5d6cabcf9d",
+      "repairedDLS_SHA256": "1e5ec6904132357249052ba4bb0832b63d99d192272c4ebf7a6f5afa72c1f0bb",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 90,
+            "jumpOffset": 334
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 425,
+            "jumpOffset": 1004
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 29,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 1030,
+            "jumpOffset": 1177
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 29,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 1203,
+            "jumpOffset": 1350
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 32,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 1389,
+            "jumpOffset": 1510
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 32,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 1663,
+            "jumpOffset": 1784
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 25,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 1989,
+            "jumpOffset": 2203
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 2229,
+            "jumpOffset": 2544
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 2570,
+            "jumpOffset": 3215
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 3239,
+            "jumpOffset": 3439
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 3541,
+            "jumpOffset": 4096
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 4175,
+            "jumpOffset": 4305
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 11522,
+          "loop": {
+            "startTick": 1154,
+            "endTick": 11522,
+            "targetOffset": 4473,
+            "jumpOffset": 4508
+          }
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "symbol": "SEQ_BGM_24",
+      "bankSymbol": "BANK_BGM_24",
+      "volume": 90,
+      "midiSHA256": "3a1b4ac7f034954bab987d1ad10b15de0143d4f469cd017e250ca132dd404639",
+      "suppliedMIDI_SHA256": "3a1b4ac7f034954bab987d1ad10b15de0143d4f469cd017e250ca132dd404639",
+      "originalSequenceSHA256": "c386991ff30d30b0bba2c631af709a6f9bebe0126fce05cd50ee3abe85bc7d40",
+      "suppliedDLS_SHA256": "6ecf3f5db3d9f6e20ed4af4723e0067592ff0fb66dbecd214364fb6cddbd089c",
+      "repairedDLS_SHA256": "1864e4bece1452bbd6e2531d3e5bfd9394b1d9f783d58a4864deffb561ca0d6e",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 89,
+            "jumpOffset": 548
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 594,
+            "jumpOffset": 988
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 1013,
+            "jumpOffset": 1407
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 1432,
+            "jumpOffset": 1504
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 1529,
+            "jumpOffset": 1603
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 1628,
+            "jumpOffset": 2050
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 2075,
+            "jumpOffset": 2224
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 2249,
+            "jumpOffset": 2486
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 2513,
+            "jumpOffset": 2872
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 2933,
+            "jumpOffset": 3279
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 3488,
+            "jumpOffset": 3847
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 3874,
+            "jumpOffset": 4347
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 7032,
+          "loop": {
+            "startTick": 120,
+            "endTick": 7032,
+            "targetOffset": 4370,
+            "jumpOffset": 4398
+          }
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "symbol": "SEQ_BGM_25",
+      "bankSymbol": "BANK_BGM_25",
+      "volume": 92,
+      "midiSHA256": "18be3532b9e2e034a4e26e5ec4b79f53ae915348a871333958103d95c22a4690",
+      "suppliedMIDI_SHA256": "18be3532b9e2e034a4e26e5ec4b79f53ae915348a871333958103d95c22a4690",
+      "originalSequenceSHA256": "249e9d41350803ac67849a8ff8f343621d3bb4aebccec232247dca5a976f309a",
+      "suppliedDLS_SHA256": "2adb51a6e397c3542ce3c3faeef0343eb5a0abf459c0ce37fe6055c8b0d57754",
+      "repairedDLS_SHA256": "290bcc000dc2be5350696823abac056ab1bd77ec1eb316c524b45753f842afdd",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 24,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 70,
+            "jumpOffset": 171
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 25,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 197,
+            "jumpOffset": 1139
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 23,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 1171,
+            "jumpOffset": 1343
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 22,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 1410,
+            "jumpOffset": 1452
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 26,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 1478,
+            "jumpOffset": 1495
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 1570,
+            "jumpOffset": 2111
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 2202,
+            "jumpOffset": 3193
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 3286,
+            "jumpOffset": 3676
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": false,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 7206,
+          "loop": {
+            "startTick": 486,
+            "endTick": 7206,
+            "targetOffset": 3753,
+            "jumpOffset": 3862
+          }
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "symbol": "SEQ_BGM_26",
+      "bankSymbol": "BANK_BGM_26",
+      "volume": 87,
+      "midiSHA256": "0fa9f321a9efd08ec93a69cc28de33ba7a1e5749e2014855c73b3572d40513a4",
+      "suppliedMIDI_SHA256": "0fa9f321a9efd08ec93a69cc28de33ba7a1e5749e2014855c73b3572d40513a4",
+      "originalSequenceSHA256": "150575d43ee49d4680db30b9c280dae0315285953a94256c384f3d4734c02f80",
+      "suppliedDLS_SHA256": "1265c964dc58bc5bb3852a9cf8fb3c5ae72aa3fda64f8fc948c9c32d4d43e163",
+      "repairedDLS_SHA256": "ecdf0a0300ba983eaf3c9adc084bf3d6b686c0712b49f529c9d5ab8ae2da1dde",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 59,
+            "jumpOffset": 466
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 511,
+            "jumpOffset": 1266
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 1867,
+            "jumpOffset": 2628
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 3245,
+            "jumpOffset": 3674
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 3755,
+            "jumpOffset": 3929
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 3982,
+            "jumpOffset": 4887
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 5002,
+            "jumpOffset": 5915
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 8352,
+          "loop": {
+            "startTick": 0,
+            "endTick": 8352,
+            "targetOffset": 6030,
+            "jumpOffset": 6454
+          }
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "symbol": "SEQ_BGM_27",
+      "bankSymbol": "BANK_BGM_27",
+      "volume": 117,
+      "midiSHA256": "d7e22a1198d3f821462e4ff50212a1367c53b9478b9f7a47c7598e18700d45b2",
+      "suppliedMIDI_SHA256": "112cf17cd1649bf8b17807394a25480491eed2b4f2c2ce368a302388f7ccf109",
+      "originalSequenceSHA256": "4cb77d71c1c1157852c4d407b54890d369be4f1dec056bd035186f0695b9ba37",
+      "suppliedDLS_SHA256": "d400d30c1a3fc80ec51340fd12a0e7464c02bf1f9cb6caf36420b3373cefb6e5",
+      "repairedDLS_SHA256": "38429df7014630dc3e24c40337346cf13b1089ba73975ea443d723bdfad89e94",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 10383,
+          "loop": null
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 10384,
+          "loop": null
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 10390,
+          "loop": null
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 10384,
+          "loop": null
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 10396,
+          "loop": null
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 25,
+          "endTick": 10492,
+          "loop": null
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 10392,
+          "loop": null
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 10400,
+          "loop": null
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 10384,
+          "loop": null
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 10208,
+          "loop": null
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 10392,
+          "loop": null
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 9919,
+          "loop": null
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 9931,
+          "loop": null
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 10208,
+          "loop": null
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "symbol": "SEQ_BGM_28",
+      "bankSymbol": "BANK_BGM_28",
+      "volume": 75,
+      "midiSHA256": "5364404dd35371ca684194b7ca6dadf43f1ceb1541490e721385b07b1610f018",
+      "suppliedMIDI_SHA256": "5364404dd35371ca684194b7ca6dadf43f1ceb1541490e721385b07b1610f018",
+      "originalSequenceSHA256": "7983c85c8e33bfa803d274decb5fd3994c13659e0cc0dc9ba72a139cff7b6d04",
+      "suppliedDLS_SHA256": "ae5f84ab115d401ed54d3fcf4f08409b40fb148b07ca42dad5b5468648bebd7c",
+      "repairedDLS_SHA256": "33171f7ef70208ba87bccb87f2e3be1032e4c30d2207fa97654c836f6d38b021",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 64,
+            "jumpOffset": 322
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 557,
+            "jumpOffset": 901
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 1130,
+            "jumpOffset": 1447
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 15,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 1652,
+            "jumpOffset": 1924
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 15,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 2120,
+            "jumpOffset": 2400
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 2606,
+            "jumpOffset": 2878
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 3074,
+            "jumpOffset": 3354
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 3324,
+          "loop": {
+            "startTick": 60,
+            "endTick": 3324,
+            "targetOffset": 3586,
+            "jumpOffset": 4037
+          }
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "symbol": "SEQ_BGM_29",
+      "bankSymbol": "BANK_BGM_29",
+      "volume": 75,
+      "midiSHA256": "60e8edc538ca36e554622097e3e88d19cfb72533f058612a071d6f82989bf3a6",
+      "suppliedMIDI_SHA256": "60e8edc538ca36e554622097e3e88d19cfb72533f058612a071d6f82989bf3a6",
+      "originalSequenceSHA256": "ab3769d474b284b53f2e11ddbe9ec7ff12ab1efc535515cb6166ff173113ca81",
+      "suppliedDLS_SHA256": "c9aaccb17c17d6e9ede5267e7f08e068257de3488e687b1ffeb9449d92dc50a6",
+      "repairedDLS_SHA256": "4bfb775a325e65dd757a5597d76b21a8d271474581670d7f68edd037c4031bcd",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 106,
+            "jumpOffset": 292
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 34,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 442,
+            "jumpOffset": 2148
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 27,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 10113,
+            "jumpOffset": 10151
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 10522,
+            "jumpOffset": 11002
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 11145,
+            "jumpOffset": 11148
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 35,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 11174,
+            "jumpOffset": 11275
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 35,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 11445,
+            "jumpOffset": 11548
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 11755,
+            "jumpOffset": 12016
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 12211,
+            "jumpOffset": 12524
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 16132,
+          "loop": {
+            "startTick": 2692,
+            "endTick": 16132,
+            "targetOffset": 12668,
+            "jumpOffset": 12989
+          }
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "symbol": "SEQ_BGM_30",
+      "bankSymbol": "BANK_BGM_30",
+      "volume": 77,
+      "midiSHA256": "6c1c73e2e834bf8648c12b8efb5940bdb7d65aba328563d238a4fbbac102850e",
+      "suppliedMIDI_SHA256": "6c1c73e2e834bf8648c12b8efb5940bdb7d65aba328563d238a4fbbac102850e",
+      "originalSequenceSHA256": "f28f19ce6ea54a156879c8a4116648f4be7ff128144ff92bd9828115e40c36f8",
+      "suppliedDLS_SHA256": "cb930fead752537046787455f97f75dce127cae02c34244fa47f3dc9efb82f40",
+      "repairedDLS_SHA256": "076a83978076d068ec990a60d29b86c1a47530da7a069f0b58d645e62db6a8d5",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 29,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 79,
+            "jumpOffset": 281
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 29,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 304,
+            "jumpOffset": 505
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 528,
+            "jumpOffset": 661
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 684,
+            "jumpOffset": 819
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 27,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 842,
+            "jumpOffset": 1237
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 27,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 1506,
+            "jumpOffset": 1749
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 1772,
+            "jumpOffset": 2080
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 2131,
+            "jumpOffset": 2439
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 28,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 2490,
+            "jumpOffset": 2625
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 13,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 2648,
+            "jumpOffset": 2998
+          }
+        },
+        {
+          "trackID": 13,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 31,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 3021,
+            "jumpOffset": 3301
+          }
+        },
+        {
+          "trackID": 14,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 27,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 3324,
+            "jumpOffset": 3681
+          }
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "symbol": "SEQ_BGM_31",
+      "bankSymbol": "BANK_BGM_31",
+      "volume": 115,
+      "midiSHA256": "bf29653f8cf585620388072b703ebf25d4bdc4fee3f018c9672263595a07a117",
+      "suppliedMIDI_SHA256": "bf29653f8cf585620388072b703ebf25d4bdc4fee3f018c9672263595a07a117",
+      "originalSequenceSHA256": "0aab17cb0d6cc5e99b1ea893054a4c66657aed91ab331c61d299a8d4653c2e0b",
+      "suppliedDLS_SHA256": "e5f806928d6fc5a3062e4d92124dcaa7be72c2af454e393df9a1a5daf55a6abd",
+      "repairedDLS_SHA256": "5da3f94edd636f0c7cb430c50e2c5938237d1778267449c07e9556cada099616",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 54,
+            "jumpOffset": 364
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 622,
+            "jumpOffset": 1209
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 1232,
+            "jumpOffset": 1609
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 1634,
+            "jumpOffset": 1947
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 2217,
+            "jumpOffset": 2594
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 2619,
+            "jumpOffset": 2769
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 4608,
+          "loop": {
+            "startTick": 0,
+            "endTick": 4608,
+            "targetOffset": 2792,
+            "jumpOffset": 2986
+          }
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "symbol": "SEQ_BGM_32",
+      "bankSymbol": "BANK_BGM_32",
+      "volume": 75,
+      "midiSHA256": "e4218b9c4056ddbf6f6e14105976f0cb4454cc44e50dbd25898b45d2829ae9ac",
+      "suppliedMIDI_SHA256": "e4218b9c4056ddbf6f6e14105976f0cb4454cc44e50dbd25898b45d2829ae9ac",
+      "originalSequenceSHA256": "ebf450f26d765d1311dabff086ef31d73b3b8c94046d9fff89bfed6ace7a445e",
+      "suppliedDLS_SHA256": "2640ee37f1b55e1703e87da6a3c6d356a2f5b8305d8c96ddb2b5c0e87b064f54",
+      "repairedDLS_SHA256": "6404778470dc4585d0ba7f87699c33723ae6485482dec5c85f041d263bbe2d69",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 72,
+            "jumpOffset": 353
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 11,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 557,
+            "jumpOffset": 792
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 967,
+            "jumpOffset": 1202
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 1385,
+            "jumpOffset": 1657
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 3,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 1690,
+            "jumpOffset": 1850
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 2013,
+            "jumpOffset": 2284
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 2448,
+            "jumpOffset": 2650
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 3096,
+          "loop": {
+            "startTick": 24,
+            "endTick": 3096,
+            "targetOffset": 2888,
+            "jumpOffset": 3794
+          }
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "symbol": "SEQ_BGM_33",
+      "bankSymbol": "BANK_BGM_33",
+      "volume": 65,
+      "midiSHA256": "c7b40dad3964793d8355f6a96bd20e27c85e443f031585162a8355f7f2339ec2",
+      "suppliedMIDI_SHA256": "c7b40dad3964793d8355f6a96bd20e27c85e443f031585162a8355f7f2339ec2",
+      "originalSequenceSHA256": "34432de3f28b2e4d697abba857afd62ee3916e91c793b6d1ca720ccc07b64e08",
+      "suppliedDLS_SHA256": "164cc216aa009bfffce6a338d7d5d18626e7c20cfd04a30dbb4400da02989b49",
+      "repairedDLS_SHA256": "d47cacf8cc61512b6cdcb331e6fd95d49fa570037d4728734c5474ee60105c7e",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 8642,
+          "loop": {
+            "startTick": 3458,
+            "endTick": 8642,
+            "targetOffset": 321,
+            "jumpOffset": 689
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8642,
+          "loop": {
+            "startTick": 3458,
+            "endTick": 8642,
+            "targetOffset": 939,
+            "jumpOffset": 1338
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 8642,
+          "loop": {
+            "startTick": 3458,
+            "endTick": 8642,
+            "targetOffset": 1535,
+            "jumpOffset": 1952
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 8642,
+          "loop": {
+            "startTick": 3458,
+            "endTick": 8642,
+            "targetOffset": 2515,
+            "jumpOffset": 2846
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 8642,
+          "loop": {
+            "startTick": 3458,
+            "endTick": 8642,
+            "targetOffset": 3118,
+            "jumpOffset": 3264
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 8642,
+          "loop": {
+            "startTick": 3458,
+            "endTick": 8642,
+            "targetOffset": 3540,
+            "jumpOffset": 3961
+          }
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "symbol": "SEQ_BGM_34",
+      "bankSymbol": "BANK_BGM_34",
+      "volume": 75,
+      "midiSHA256": "9fa0bd5bfbe0ea3fe6e8256de7c4f78f7fa3d6faffb3495b74735795265d12f2",
+      "suppliedMIDI_SHA256": "9fa0bd5bfbe0ea3fe6e8256de7c4f78f7fa3d6faffb3495b74735795265d12f2",
+      "originalSequenceSHA256": "bce63aaa44ed268d73bd81d1735afed3fdba6d8195d221e2b0c30f0c79d041c9",
+      "suppliedDLS_SHA256": "e9a65e6c73d2a2f534f97cd23534243f5194a186132f0f8626316e7afe11f3fa",
+      "repairedDLS_SHA256": "0da85249e22b310b8b3a187e0636edeb2f04f38a3b33da184527ed2bcd94e1b3",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 64,
+            "jumpOffset": 440
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 465,
+            "jumpOffset": 504
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 529,
+            "jumpOffset": 933
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 6,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 958,
+            "jumpOffset": 1211
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 6,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 1236,
+            "jumpOffset": 1489
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 1514,
+            "jumpOffset": 2142
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 2167,
+            "jumpOffset": 2587
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 4080,
+          "loop": {
+            "startTick": 48,
+            "endTick": 4080,
+            "targetOffset": 2646,
+            "jumpOffset": 2831
+          }
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "symbol": "SEQ_BGM_35",
+      "bankSymbol": "BANK_BGM_35",
+      "volume": 80,
+      "midiSHA256": "a1bbfc05eb831bd6316d0f28f3f511608b8daead8ae73e3bd01d0018b7ffc497",
+      "suppliedMIDI_SHA256": "a1bbfc05eb831bd6316d0f28f3f511608b8daead8ae73e3bd01d0018b7ffc497",
+      "originalSequenceSHA256": "e790de598d69809cad25238bb32186ad59906fc6b8015bcef28bb6a9039783ba",
+      "suppliedDLS_SHA256": "810423b879224fc9e692080cf857bd603751b6d9d2731217aff8b7dbaaa14bbe",
+      "repairedDLS_SHA256": "6d50e84eb4f337c5cb5f4b6dfc1ebce14120b61e07c07f7aa20d0ea7939a1464",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 119,
+            "jumpOffset": 480
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 794,
+            "jumpOffset": 1189
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 12,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 1452,
+            "jumpOffset": 1853
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 2044,
+            "jumpOffset": 2321
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 21,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 2510,
+            "jumpOffset": 2749
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 21,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 2968,
+            "jumpOffset": 3209
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 3482,
+            "jumpOffset": 3968
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 4258,
+            "jumpOffset": 4965
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 1,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 5087,
+            "jumpOffset": 5277
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 5647,
+            "jumpOffset": 5939
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 6472,
+            "jumpOffset": 6626
+          }
+        },
+        {
+          "trackID": 12,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 6652,
+            "jumpOffset": 6806
+          }
+        },
+        {
+          "trackID": 15,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 8448,
+          "loop": {
+            "startTick": 2304,
+            "endTick": 8448,
+            "targetOffset": 6837,
+            "jumpOffset": 6905
+          }
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "symbol": "SEQ_BGM_36",
+      "bankSymbol": "BANK_BGM_36",
+      "volume": 105,
+      "midiSHA256": "3dac886bd9352540f17fba6b276a14636fb624e5e1bcda564d9dbf51a01be8af",
+      "suppliedMIDI_SHA256": "3dac886bd9352540f17fba6b276a14636fb624e5e1bcda564d9dbf51a01be8af",
+      "originalSequenceSHA256": "90b89279a0afa26e01cafa920da845020c4570ba25869c80d72d351b4d2b0507",
+      "suppliedDLS_SHA256": "6c3eb61afcdcd400bf0142d644c2726649529039e85f59eba1632fbf4c55bf98",
+      "repairedDLS_SHA256": "67a878895026338758a42b1e7bd655e4de31a2d7aa2b6e736e4a6f9c0c4bfff1",
+      "tracks": [
+        {
+          "trackID": 0,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 0,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 106,
+            "jumpOffset": 369
+          }
+        },
+        {
+          "trackID": 1,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 24,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 400,
+            "jumpOffset": 1556
+          }
+        },
+        {
+          "trackID": 2,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 3739,
+            "jumpOffset": 3854
+          }
+        },
+        {
+          "trackID": 3,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 8,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 4077,
+            "jumpOffset": 4194
+          }
+        },
+        {
+          "trackID": 4,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 2,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 4459,
+            "jumpOffset": 4821
+          }
+        },
+        {
+          "trackID": 5,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 5,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 4868,
+            "jumpOffset": 5134
+          }
+        },
+        {
+          "trackID": 6,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 19,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 5160,
+            "jumpOffset": 5480
+          }
+        },
+        {
+          "trackID": 7,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 5506,
+            "jumpOffset": 5700
+          }
+        },
+        {
+          "trackID": 8,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 4,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 5749,
+            "jumpOffset": 5935
+          }
+        },
+        {
+          "trackID": 9,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 10,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 5995,
+            "jumpOffset": 6127
+          }
+        },
+        {
+          "trackID": 10,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 6194,
+            "jumpOffset": 6487
+          }
+        },
+        {
+          "trackID": 11,
+          "hasNotes": true,
+          "hasMIDIEvents": true,
+          "program": 9,
+          "endTick": 4992,
+          "loop": {
+            "startTick": 384,
+            "endTick": 4992,
+            "targetOffset": 6513,
+            "jumpOffset": 6806
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Apple sampler envelopes and mixing are not verified against the DS.",
+    "MIDI control conversion is not fully validated against the original sound driver.",
+    "Sequence IDs have no inferred scene or chapter mapping.",
+    "SSAR sound effect playback is not implemented by this adapter."
+  ],
+  "repairedWaveTails": 3070
+}

@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+  "files": [
+    {
+      "name": "door_flg.bin",
+      "source": "extracted/root/data/map/sdata/door_flg.bin",
+      "bytes": 816,
+      "sha256": "f2c7ba4ccd8a372befcf57153414edbbada08c0fad3c7caaa4ab9ebaa5feef18"
+    },
+    {
+      "name": "onoffobjs.dat",
+      "source": "extracted/root/data/map/sdata/onoffobjs.dat",
+      "bytes": 4036,
+      "sha256": "8ba8e930bdec70e56109b36c368e05631731225222e714a0c6db04494b0350cc"
+    }
+  ]
+}

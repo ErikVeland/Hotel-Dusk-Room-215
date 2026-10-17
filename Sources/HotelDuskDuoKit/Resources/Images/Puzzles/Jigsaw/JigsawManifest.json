@@ -1,0 +1,760 @@
+{
+  "boardWidth": 192,
+  "boardHeight": 256,
+  "pieces": [
+    {
+      "id": "00",
+      "image": "JigsawPiece00",
+      "x": 20.4375,
+      "y": 10.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 13,
+        "width": 50,
+        "height": 51
+      },
+      "row": 0,
+      "column": 0
+    },
+    {
+      "id": "01",
+      "image": "JigsawPiece01",
+      "x": 52.9375,
+      "y": 10.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 13,
+        "width": 39,
+        "height": 39
+      },
+      "row": 0,
+      "column": 1
+    },
+    {
+      "id": "02",
+      "image": "JigsawPiece02",
+      "x": 85.4375,
+      "y": 10.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 2,
+        "y": 13,
+        "width": 61,
+        "height": 39
+      },
+      "row": 0,
+      "column": 2
+    },
+    {
+      "id": "03",
+      "image": "JigsawPiece03",
+      "x": 117.9375,
+      "y": 10.4375,
+      "width": 41.4375,
+      "height": 52.0,
+      "nativeWidth": 51,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 13,
+        "width": 38,
+        "height": 39
+      },
+      "row": 0,
+      "column": 3
+    },
+    {
+      "id": "10",
+      "image": "JigsawPiece10",
+      "x": 20.4375,
+      "y": 42.9375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 13,
+        "width": 50,
+        "height": 39
+      },
+      "row": 1,
+      "column": 0
+    },
+    {
+      "id": "11",
+      "image": "JigsawPiece11",
+      "x": 52.9375,
+      "y": 42.9375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 1,
+        "width": 39,
+        "height": 51
+      },
+      "row": 1,
+      "column": 1
+    },
+    {
+      "id": "12",
+      "image": "JigsawPiece12",
+      "x": 85.4375,
+      "y": 42.9375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 2,
+        "y": 1,
+        "width": 61,
+        "height": 51
+      },
+      "row": 1,
+      "column": 2
+    },
+    {
+      "id": "13",
+      "image": "JigsawPiece13",
+      "x": 117.9375,
+      "y": 42.9375,
+      "width": 41.4375,
+      "height": 52.0,
+      "nativeWidth": 51,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 1,
+        "width": 38,
+        "height": 51
+      },
+      "row": 1,
+      "column": 3
+    },
+    {
+      "id": "20",
+      "image": "JigsawPiece20",
+      "x": 20.4375,
+      "y": 75.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 2,
+        "width": 39,
+        "height": 50
+      },
+      "row": 2,
+      "column": 0
+    },
+    {
+      "id": "21",
+      "image": "JigsawPiece21",
+      "x": 52.9375,
+      "y": 75.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 62,
+        "height": 63
+      },
+      "row": 2,
+      "column": 1
+    },
+    {
+      "id": "22",
+      "image": "JigsawPiece22",
+      "x": 85.4375,
+      "y": 75.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 2,
+        "width": 51,
+        "height": 50
+      },
+      "row": 2,
+      "column": 2
+    },
+    {
+      "id": "23",
+      "image": "JigsawPiece23",
+      "x": 117.9375,
+      "y": 75.4375,
+      "width": 41.4375,
+      "height": 52.0,
+      "nativeWidth": 51,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 2,
+        "width": 38,
+        "height": 50
+      },
+      "row": 2,
+      "column": 3
+    },
+    {
+      "id": "30",
+      "image": "JigsawPiece30",
+      "x": 20.4375,
+      "y": 107.9375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 1,
+        "width": 51,
+        "height": 51
+      },
+      "row": 3,
+      "column": 0
+    },
+    {
+      "id": "31",
+      "image": "JigsawPiece31",
+      "x": 52.9375,
+      "y": 107.9375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 13,
+        "width": 39,
+        "height": 39
+      },
+      "row": 3,
+      "column": 1
+    },
+    {
+      "id": "32",
+      "image": "JigsawPiece32",
+      "x": 85.4375,
+      "y": 107.9375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 63,
+        "height": 63
+      },
+      "row": 3,
+      "column": 2
+    },
+    {
+      "id": "33",
+      "image": "JigsawPiece33",
+      "x": 117.9375,
+      "y": 107.9375,
+      "width": 41.4375,
+      "height": 52.0,
+      "nativeWidth": 51,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 1,
+        "width": 38,
+        "height": 51
+      },
+      "row": 3,
+      "column": 3
+    },
+    {
+      "id": "40",
+      "image": "JigsawPiece40",
+      "x": 20.4375,
+      "y": 140.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 1,
+        "width": 39,
+        "height": 50
+      },
+      "row": 4,
+      "column": 0
+    },
+    {
+      "id": "41",
+      "image": "JigsawPiece41",
+      "x": 52.9375,
+      "y": 140.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 1,
+        "y": 1,
+        "width": 63,
+        "height": 50
+      },
+      "row": 4,
+      "column": 1
+    },
+    {
+      "id": "42",
+      "image": "JigsawPiece42",
+      "x": 85.4375,
+      "y": 140.4375,
+      "width": 52.0,
+      "height": 52.0,
+      "nativeWidth": 64,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 13,
+        "width": 50,
+        "height": 38
+      },
+      "row": 4,
+      "column": 2
+    },
+    {
+      "id": "43",
+      "image": "JigsawPiece43",
+      "x": 117.9375,
+      "y": 140.4375,
+      "width": 41.4375,
+      "height": 52.0,
+      "nativeWidth": 51,
+      "nativeHeight": 64,
+      "alphaBounds": {
+        "x": 13,
+        "y": 1,
+        "width": 38,
+        "height": 50
+      },
+      "row": 4,
+      "column": 3
+    }
+  ],
+  "frontImage": "JigsawFront",
+  "reverseImage": "JigsawReverse",
+  "tableImage": "JigsawTable",
+  "trayImage": "JigsawTray",
+  "foldTrayImage": "JigsawFoldTray",
+  "rotateLeftImage": "JigsawRotateLeft",
+  "rotateRightImage": "JigsawRotateRight",
+  "assemblyPictureBounds": {
+    "x": 30,
+    "y": 20,
+    "width": 131,
+    "height": 164
+  },
+  "sourceNativeCellSize": 40,
+  "sourceNativePadding": 13,
+  "assemblyScale": 0.8125,
+  "provenance": [
+    {
+      "image": "JigsawFront",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_ura_01.bin",
+      "sourceSHA256": "510fcb4d9481ee7c24f544c1b5701b006854b650f6171e9a1bda81c84cd39412",
+      "pngSHA256": "4d9e2a5f0cd8943ab5c65b10331633d90036739fa0782a47cade80ef9ac29c92",
+      "width": 192,
+      "height": 256
+    },
+    {
+      "image": "JigsawFoldTray",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_ura_02.bin",
+      "sourceSHA256": "13bbe49eef1f3a5340ae1f09ea49fb795c4254502f73b05e0dbd232a6561fa4d",
+      "pngSHA256": "612f212340704d2ded2d21b870aeb632c31469a86239a6bf72029ad3233b0ca4",
+      "width": 192,
+      "height": 256
+    },
+    {
+      "image": "JigsawReverse",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_ura_03.bin",
+      "sourceSHA256": "c87e71ac7c4dfd0844ff54a5bb0e5713a0128843f643c7e72cf9291354b6741b",
+      "pngSHA256": "2012fbd9e2259f2699ab7ced72a4280996b0e6d4ed7c9d8645fd4af7a1949053",
+      "width": 192,
+      "height": 256
+    },
+    {
+      "image": "JigsawTray",
+      "source": "extracted/unpacked_wpf/trick/zig/table.bin",
+      "sourceSHA256": "08349c96d9141546c356c0879d99c6ce1952c3c3d7abc92a48c6339cebc6f10f",
+      "pngSHA256": "180cfbf8bcb0d797b6eae46d05d26709bff4149093cd76d4e31aa972a5184ca2",
+      "width": 192,
+      "height": 256
+    },
+    {
+      "image": "JigsawTable",
+      "source": "extracted/unpacked_wpf/trick/zig/table_bk.bin",
+      "sourceSHA256": "36bf41eccdd48152392764eaf75ee8f821730085f627bfc6df8a99708152e3c4",
+      "pngSHA256": "93b738077be2ef8e06e6c9466aa5266b4f004aad02a0c4cd8665ccbd0310eeca",
+      "width": 192,
+      "height": 256
+    },
+    {
+      "image": "JigsawPiece00",
+      "source": "extracted/unpacked_wpf/trick/zig/zig00.bin",
+      "sourceSHA256": "481362dd09730888756816bfa8759eccccf9297367b13324b6c78715628de88c",
+      "pngSHA256": "eba308e603e03378d25552b923ee58a013a3f6ca656db2711a2eb7fed0cd9517",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece00",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_00.bin",
+      "sourceSHA256": "5b845ddd21c9890f68d2a52601ecffc7e025574bbf2ed0e0f051445288ad716d",
+      "pngSHA256": "e06bc491f26a279f9af14b0d0428c8f90ea0405eb0a969ccd7faddea2dbcf009",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece01",
+      "source": "extracted/unpacked_wpf/trick/zig/zig01.bin",
+      "sourceSHA256": "0c89bf1f2b51e60e8d88f5d516aa0d29736f082bb6c5758f299ab355616c6806",
+      "pngSHA256": "f78252ecac8ea7de21701e6cbeb1dfafc99a25159fbbeb6fdd932f6bf0be2004",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece01",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_01.bin",
+      "sourceSHA256": "b131c502e965e0e0848d347106cbe1af964714f01b1faecb36304156db60e5eb",
+      "pngSHA256": "50106210f84bf47eaeb8bb0c371ce52a5a12ed04f1d18a546abddc56ff5b99ae",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece02",
+      "source": "extracted/unpacked_wpf/trick/zig/zig02.bin",
+      "sourceSHA256": "db520d975d7db9b46f43ea11b54cc7785e53b84dddcb78399c3591c5efc47be0",
+      "pngSHA256": "c3a51eb2a95fa612e082f2bd4eae9a820c7ff5a45907e81702c730c2e13dc2f9",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece02",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_02.bin",
+      "sourceSHA256": "700ead091806e17a68dda25568820189c4ae16345d3b2821405a00ce36d17437",
+      "pngSHA256": "ceb61df4578d1f3f82ed3f0ecb6363a555d8fd2aaa9215c0daf27fe058a6ecba",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece03",
+      "source": "extracted/unpacked_wpf/trick/zig/zig03.bin",
+      "sourceSHA256": "ad6461fb262199016f5d864b4b7e8b5c1f480f8e966352ec00af371d7c6c4be2",
+      "pngSHA256": "3267ac66d6fdf0b3b11b262bf172e4427db59d6ccef4a54581d83cba0e925a28",
+      "width": 51,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece03",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_03.bin",
+      "sourceSHA256": "0f8fc0ecef513efcfe7e5ef2279204767275231327f4a17d312be6f77c13d0a8",
+      "pngSHA256": "78d6e00a09c6c29a1ee9db0acec06b6dbc5c6fef8f0796dfb6a8111c0a593339",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece10",
+      "source": "extracted/unpacked_wpf/trick/zig/zig10.bin",
+      "sourceSHA256": "0a0696c19a0dae4383c295401603b7ec72910a6a622c13a879f1f34da37505b6",
+      "pngSHA256": "8f5ecd2e8a1e0ae774729d2922ff56a3da1c0fd690d115472a386b7be1408bc8",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece10",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_10.bin",
+      "sourceSHA256": "b88c2b38ebef23b780bc423baf5fb76efe9b0bf28133d5f981cc9e99f99cc89c",
+      "pngSHA256": "5a607428fd299bca9c399fe068bc0eabb5e0558a41235468eee9020713c3279f",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece11",
+      "source": "extracted/unpacked_wpf/trick/zig/zig11.bin",
+      "sourceSHA256": "27be2fab534d1192bb514dc0ee172a4da771353a76a28162fa875ee4e029f3ae",
+      "pngSHA256": "1a38c0e5194b8f69dd32eaec7bb45ef1e6935cbfd349dfebcde1b19edf5d6d2d",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece11",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_11.bin",
+      "sourceSHA256": "3a7d09b910cb3c855566299aec1b7e5284eafac2bff4eb375dc476f5b6f80ac8",
+      "pngSHA256": "44e1e6f0601fda832cc136ef6b5ee56c76c74df813d1dd7ea5aaf4fd6614c212",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece12",
+      "source": "extracted/unpacked_wpf/trick/zig/zig12.bin",
+      "sourceSHA256": "3bea9d4f5bf067d2c672b1ba83416f46bf2ec34bcb17b6e6d8942f68eb50c576",
+      "pngSHA256": "8fa31f11c635cd01c6fbcaba97631242c43cdcad28bb4e4ea5359af828079a31",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece12",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_12.bin",
+      "sourceSHA256": "cd581369173f374242b0ccb43859d955cb0fc9c1663caad25eb965f4effa738b",
+      "pngSHA256": "b19cb9fba12a403392cd5dd0093c99b84c49f08bacfecbff063df600b9ea1b52",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece13",
+      "source": "extracted/unpacked_wpf/trick/zig/zig13.bin",
+      "sourceSHA256": "fb89ad9aad33846c69a2404e521697d22417b66174a71c81814689d0bbc53207",
+      "pngSHA256": "a22ac2be83b27e23c92d791b6da1f5d56ccdb636511d986db80704438cc3a032",
+      "width": 51,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece13",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_13.bin",
+      "sourceSHA256": "1a18b0c26f1220c3e286ce614e5d88c40f85d188a283e9c46487cb073af45422",
+      "pngSHA256": "10805394289ea0e27ede000324c38e362e15587381ef61bfb2a2b3fd96a70850",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece20",
+      "source": "extracted/unpacked_wpf/trick/zig/zig20.bin",
+      "sourceSHA256": "b349c7de5c31e0e939eac3d3f69767daa545fc3335aacfe8a0a3f680a6175d77",
+      "pngSHA256": "21e99a7d95f301fce13fda46f7f9816d3c251465b7433da51ba0203b20927089",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece20",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_20.bin",
+      "sourceSHA256": "b9da97d97396ecd2e5f4c4734716e7962660f3673223e941ddf1de609e429280",
+      "pngSHA256": "cd375f99703c218834776eb9258a7dd0d3a82fb2d1417459f868be04a6d0b588",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece21",
+      "source": "extracted/unpacked_wpf/trick/zig/zig21.bin",
+      "sourceSHA256": "448efa81961be4b555952095b874a28d5f570017396b5cfc1e6ddd9971856aaa",
+      "pngSHA256": "49e327b620a7db28dcdbc1eed69776a28df5cf6a25463f77240dd4e9608ee2ab",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece21",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_21.bin",
+      "sourceSHA256": "6e2dfbd5bbca9ec595ee404cd9e769f865a5fe5503475e962c04c81a8654b557",
+      "pngSHA256": "ecdcdfc790ae4e4a778ea68454f25e348f02dc6dc083d5044bd5198c8dd06f20",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece22",
+      "source": "extracted/unpacked_wpf/trick/zig/zig22.bin",
+      "sourceSHA256": "ad314d9f2c7304d46afad5b980c99dc4a36000dcfc94db1c60069d87f33f536e",
+      "pngSHA256": "a3f48041ec7de47a324e012bd723ed7d9dff22b1390ffac0b96c15be1edba79b",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece22",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_22.bin",
+      "sourceSHA256": "36cc12e6da95ae74deff2cc37eef97ed6be36f303bbc4383cc51ec82f5dc9156",
+      "pngSHA256": "8b53b5c83bc1acc32eb3a74ef2f1fb91d8ed59baf5e92475c53ac232526213dc",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece23",
+      "source": "extracted/unpacked_wpf/trick/zig/zig23.bin",
+      "sourceSHA256": "a485f5badf2c5734d22c4d17e477815a569b654f26af6a269044aad2a721f9f1",
+      "pngSHA256": "cae6af5ff0eaf15dd60b164dc06d17b153e8e7d5dc08c9aca629ae45706e15ae",
+      "width": 51,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece23",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_23.bin",
+      "sourceSHA256": "33773fd24a425d67577aed6d455ccc9762a9c75e37f0b98fe3d2777ff68d18cf",
+      "pngSHA256": "47bc5976959f9044f8060f76a7952d1430bc78bf5cc96f2266ec518efdcc51de",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece30",
+      "source": "extracted/unpacked_wpf/trick/zig/zig30.bin",
+      "sourceSHA256": "1b7236abc6a293f9732dd2565c172389b5defc2fdde9d0bf6704f11557d5086f",
+      "pngSHA256": "8973c50862de1da4c59765c222878510bd1b9e7eb48e99e0a2b6e9c05144b835",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece30",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_30.bin",
+      "sourceSHA256": "4b67f44f2d71df2a840adb95b8ead7b851897c77bc5317b8d948fa003618ae53",
+      "pngSHA256": "d7efb9847db9b2791e963b5e150d80176625554c6b4dfba5e657accd90969697",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece31",
+      "source": "extracted/unpacked_wpf/trick/zig/zig31.bin",
+      "sourceSHA256": "09d1cc8df763508213a18db1afddd07ed839c5482811f20b7033b1284bd959d1",
+      "pngSHA256": "96ca083e923fc25a6f3a42ba7e9d44329879f5b1e375d96497649523795a16c8",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece31",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_31.bin",
+      "sourceSHA256": "3fc91c3773cb2942e0c48128a36ae0c8a56d58ec223960d6da80ac130a97657b",
+      "pngSHA256": "c159a08658f27384f6994faf60228e4c16e1a3dcd2e2f22417d1a1887afc9ca1",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece32",
+      "source": "extracted/unpacked_wpf/trick/zig/zig32.bin",
+      "sourceSHA256": "4966d05067bfdcd503723040ea681ea6aec755b29e0d61b7a61e6085ac61f1a5",
+      "pngSHA256": "f3fed7ed979c49ff44522f55d2e2e274c3ac42d0736170b0bed3c032253a01b7",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece32",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_32.bin",
+      "sourceSHA256": "cf9bb45b5d45bdc2cdf0db83a90a96f76cf915d6a67fb11b66dc0eed71e65fcb",
+      "pngSHA256": "e297b3048fa0826131cffb39c4d6684dc2ae4e19367ef0bb8c12b567eabb647a",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece33",
+      "source": "extracted/unpacked_wpf/trick/zig/zig33.bin",
+      "sourceSHA256": "b3807f0d05adcdace013980e41b60e0e27437a61933a4bba15e6cbb50c913ed5",
+      "pngSHA256": "a1e25e0552868e2047dfce5e4e40f2a0e0a2caef394393189c6d23181a5611eb",
+      "width": 51,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece33",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_33.bin",
+      "sourceSHA256": "528108526692cfcac7c4cde6ea4288ba5f58a14d846ab2ef19694e89eb2724af",
+      "pngSHA256": "ffa8d436c41913fa3d47da4223c94acd2252aa6fe20cba269129dbed2e60a4c5",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece40",
+      "source": "extracted/unpacked_wpf/trick/zig/zig40.bin",
+      "sourceSHA256": "19e111ebda8222616be251e642953fbf517461d10fd43dc24f45e722a4c34a98",
+      "pngSHA256": "82222c1b3c4ac8ae8ca7f9aaed0ea7c6210a6dd985ffd4f5f8dd61c3b623aad5",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece40",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_40.bin",
+      "sourceSHA256": "e3ddba4fb70daa78ef6a65ce0c26925c8f7260e9eb719dbb67e5681c68dafb04",
+      "pngSHA256": "eaa25128b92a51113cf41fce190ef3d4758298416a103ad6bf280610ef508c48",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece41",
+      "source": "extracted/unpacked_wpf/trick/zig/zig41.bin",
+      "sourceSHA256": "562b2289a1b309c0d66acb50583aed30968f6548b9078c67c598724a179a992a",
+      "pngSHA256": "0bfb996b9929744fba9e5ad3484de31d97c02dca97b9e28cc250148f4359e0ad",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece41",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_41.bin",
+      "sourceSHA256": "92006ef036f478deb7649d8e8735656bfa24033185b416f011ef4859f61d4937",
+      "pngSHA256": "de99155ef9350513b6fc896f01bef6f3899c2e6d59452b8978c9bd3f12a3595e",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece42",
+      "source": "extracted/unpacked_wpf/trick/zig/zig42.bin",
+      "sourceSHA256": "f059866b5c83d8391e9124bde6f43518d1919e9ea8e33a224a3abc013d23907b",
+      "pngSHA256": "3901500ddc716fa78d9a2ddf3f985b3314320cb28c0987fb1338f925c40cfd63",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece42",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_42.bin",
+      "sourceSHA256": "8aff6eb6f73c2a2eb9c02d35ec4c7e1a631e58574be1cb7ae6565c11cf04904b",
+      "pngSHA256": "0ad80d708fe4196e13a726cf31a3380d811b8aa2b8754b6a6a7fa403575f6e9b",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawPiece43",
+      "source": "extracted/unpacked_wpf/trick/zig/zig43.bin",
+      "sourceSHA256": "fb9862801f269b347c523ae7c8fde48b2be28535523dccd81917d5b06f90ee99",
+      "pngSHA256": "42f99ac58af42193c61bff93cc5a411fd7b328a7eea62fee4fc7f4a87c4b506a",
+      "width": 51,
+      "height": 64
+    },
+    {
+      "image": "JigsawBackPiece43",
+      "source": "extracted/unpacked_wpf/trick/zig/zig_43.bin",
+      "sourceSHA256": "9facb4f4095ecfb4044da866a092aa143e75e383f221b0c54386b990ea992e9c",
+      "pngSHA256": "909d145767d643d5cab706c537137dd9f524e996d0ff0f203f48206d88ad939e",
+      "width": 64,
+      "height": 64
+    },
+    {
+      "image": "JigsawRotateLeft",
+      "source": "extracted/unpacked_wpf/local/us/SystemIcon/left1.bin",
+      "sourceSHA256": "39eb8925c63b732e55c8d9587af9e0ac342cd5b17d66fbd139bfc5f67e4b2169",
+      "pngSHA256": "e431cddf04053410657c0467d2405752768e3589795d74300253b3bd0d27774e",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "image": "JigsawRotateRight",
+      "source": "extracted/unpacked_wpf/local/us/SystemIcon/right2.bin",
+      "sourceSHA256": "e1bd5162efada5a36f213f8a0c3c3b7d30dda77629e49a31f8741a5d39d54ef2",
+      "pngSHA256": "6b02ce8873cd10d09ef2356fffc1f3cefa308d7f773bdae0102209b9965c8b73",
+      "width": 32,
+      "height": 32
+    }
+  ]
+}

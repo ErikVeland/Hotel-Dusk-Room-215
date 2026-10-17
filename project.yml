@@ -1,0 +1,31 @@
+name: HotelDuskDuo
+options:
+  bundleIdPrefix: com.veland.hoteldusk
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  HotelDuskDuo:
+    path: .
+targets:
+  HotelDuskDuoiOS:
+    type: application
+    platform: iOS
+    sources:
+      - Sources/HotelDuskDuoApp
+    dependencies:
+      - package: HotelDuskDuo
+        product: HotelDuskDuoKit
+    settings:
+      base:
+        PRODUCT_NAME: Hotel Dusk
+        PRODUCT_BUNDLE_IDENTIFIER: com.veland.hoteldusk.duo
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Hotel Dusk
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIStatusBarHidden: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "5.0"
+        MARKETING_VERSION: "0.1"
+        CURRENT_PROJECT_VERSION: "1"

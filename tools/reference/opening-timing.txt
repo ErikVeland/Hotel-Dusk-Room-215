@@ -1,0 +1,6 @@
+load extracted/reference/opening-queue/queue.mln
+trace-cinematic 022543f4
+frames 16000
+capture complete
+save complete
+quit

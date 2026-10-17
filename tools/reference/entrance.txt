@@ -1,0 +1,8 @@
+load extracted/reference/arrival-touch/after-touch.mln
+touch 80 92
+frames 3
+release
+frames 600
+capture entrance
+save entrance
+quit
