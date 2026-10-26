@@ -9,7 +9,7 @@ struct OriginalCrowbarView: View {
     var body: some View {
         VStack {
             GeometryReader { proxy in
-                let scale = min(proxy.size.width / 192, proxy.size.height / 256)
+                let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
                 let brightness = play.crowbarScreenEffects.brightness[0].coefficient
                 ZStack {
                     Color.black
@@ -27,6 +27,8 @@ struct OriginalCrowbarView: View {
                     }
                     .onEnded { _ in play.releaseCrowbarTouch() })
                 .scaleEffect(scale)
+                .frame(width: 192 * scale, height: 256 * scale)
+                .notebookPhotograph()
                 .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
                 .accessibilityLabel("Cabinet and crowbar")
             }

@@ -1,10 +1,28 @@
 import Foundation
 
 /**
- * Process 26, overlay 2, variant 0: Melissa's Chapter 1 jigsaw.
+ * Overlay 2: the incomplete, full, reverse and restored jigsaw processes.
  * Positions use the original 20.12 world coordinates. Angles use units of π.
  */
 public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
+    public enum Variant: UInt16, Codable, Sendable {
+        case incomplete = 26, full = 39, reverse = 40, restored = 84
+        var maskSlot: Int? {
+            switch self {
+            case .incomplete: return 0
+            case .full: return 1
+            case .reverse: return nil
+            case .restored: return 2
+            }
+        }
+    }
+    public let variant: Variant
+    public var processID: UInt16 { variant.rawValue }
+    public private(set) var reverseVisible = false
+    private var foldedShut = false
+    private var reopened = false
+    private var reverseCompleted = false
+
     public struct Point: Equatable, Codable, Sendable {
         public var x: Int32
         public var y: Int32
@@ -43,9 +61,11 @@ public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
     /**
      * 0x0220183C supplies the five loose pieces. A saved nonzero mask replaces it.
      */
-    public init(seed: UInt32, savedLooseMask: UInt32 = 0) {
+    public init(seed: UInt32, savedLooseMask: UInt32 = 0, variant: Variant = .incomplete) {
         self.seed = seed
-        let mask = savedLooseMask & 0xFFFFF == 0 ? UInt32(0x668) : savedLooseMask & 0xFFFFF
+        self.variant = variant
+        let defaultMask: UInt32 = variant == .full ? 0xFFFFF : variant == .reverse ? 0 : 0x668
+        let mask = savedLooseMask & 0xFFFFF == 0 ? defaultMask : savedLooseMask & 0xFFFFF
         pieces = (0..<20).map { index in
             Piece(position: Self.target(index), depth: Self.fixed(-Float(index) * 0.001),
                   angle: 1.5, movable: mask & (1 << index) != 0)
@@ -66,7 +86,17 @@ public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
     }
 
     public var placedCount: Int { pieces.indices.filter(isPlaced).count }
-    public var acceptsInput: Bool { phase == 1 && stage == 0 && result == nil }
+    public var acceptsInput: Bool { variant != .reverse && phase == 1 && stage == 0 && result == nil }
+
+    /// Only the reverse process accepts a close/open cycle. Opening to any
+    /// angle is sufficient. Earlier folds cannot carry into this process.
+    public mutating func receiveFold(isClosed: Bool) {
+        guard variant == .reverse, phase == 3, stage == 1, result == nil else { return }
+        if isClosed { foldedShut = true }
+        else if foldedShut { reopened = true; foldedShut = false }
+    }
+
+    public mutating func cancelPendingFold() { foldedShut = false; reopened = false }
     public var looseMask: UInt32 {
         pieces.indices.reduce(0) { $0 | (pieces[$1].movable ? UInt32(1) << $1 : 0) }
     }
@@ -136,7 +166,7 @@ public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
     }
 
     public mutating func quit() {
-        guard phase == 1, result == nil else { return }
+        guard phase == 1 || phase == 3, result == nil else { return }
         holding = false
         phase = 4
         stage = 0
@@ -162,7 +192,7 @@ public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
         switch phase {
         case 0:
             if stage == 0 { effects.append(.fadeIn(updates: 60)) }
-            if stage == 3 { phase = 1; stage = 0 }
+            if stage == 3 { phase = variant == .reverse ? 3 : 1; stage = 0 }
             else { stage += 1 }
         case 1:
             if stage == 1, let index = selected {
@@ -188,13 +218,35 @@ public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
                 if timer > 120 { timer = 0; phase = 4; stage = 0; idleSeconds = nil }
             default: break
             }
+        case 3:
+            switch stage {
+            case 0:
+                cancelPendingFold()
+                stage = 1
+            case 1:
+                if reopened { stage = 2; effects.append(.fadeOut(updates: 5)) }
+            case 2:
+                if screen0FadeComplete { reverseVisible = true; stage = 4 }
+            case 4:
+                stage = 5
+                timer = 0
+            case 5:
+                timer += 1
+                if timer == 60 {
+                    reverseCompleted = true
+                    effects += [.completionFade(updates: 60), .sound(archive: 1, entry: 0)]
+                }
+                if timer > 300 { timer = 0; phase = 4; stage = 0 }
+            default: break
+            }
         case 4:
             if stage == 0 {
                 stage = 1
                 effects.append(.fadeOut(updates: 60))
             } else if screen0FadeComplete {
                 let count = placedCount
-                let value: Int16 = count == 20 ? 0 : count == 15 ? 2 : 1
+                let value: Int16 = variant == .reverse ? (reverseCompleted ? 0 : 1)
+                    : count == 20 ? 0 : variant == .incomplete && count == 15 ? 2 : 1
                 result = value
                 effects.append(.completed(value))
             }
@@ -204,7 +256,7 @@ public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
             if stage == 0, timer >= 30 {
                 let pair: Int16 = nextRandom() & 0x80000000 == 0 ? 1 : 2
                 awaitingHint = true
-                effects.append(.hint(pairA: 3, pairB: pair))
+                effects.append(.hint(pairA: variant == .incomplete ? 3 : 16, pairB: pair))
             } else if stage == 1, timer >= 30 { phase = 2; stage = 0; timer = 0 }
         default: break
         }

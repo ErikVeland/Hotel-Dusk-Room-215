@@ -124,6 +124,16 @@ public struct OriginalTouchPicture: Sendable {
 
     public mutating func release() { touching = false }
 
+    /// Native single-tap input keeps the original hit mask and completion stages.
+    public mutating func activate(pageX: Int, pageY: Int) -> [Effect] {
+        guard phase == .selecting, contains(pageX: pageX, pageY: pageY) else { return [] }
+        selected = true
+        touching = false
+        phase = .fading
+        fadeUpdates = 20
+        return [.confirmSound]
+    }
+
     /**
      * Stages 17 and 18 wait for the 20-update fade, then return to the talk controller.
      */

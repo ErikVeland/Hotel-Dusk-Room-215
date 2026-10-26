@@ -27,6 +27,7 @@ let package = Package(
                 .process("Resources/JigsawDialogue.json"),
                 .copy("Resources/Original/Scripts"),
                 .copy("Resources/Original/Audio"),
+                .copy("Resources/RecordedMusic"),
                 .copy("Resources/Original/GameData"),
                 .copy("Resources/OriginalAnimations"),
                 .copy("Resources/OriginalTextures"),

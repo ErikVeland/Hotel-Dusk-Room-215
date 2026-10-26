@@ -2,6 +2,35 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalDoorTests: XCTestCase {
+    func testLockedDoorUsesOriginalSharedResponseAndReturnsToRoomRunner() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
+        game.setMap(39, previous: 17)
+        var runner = try OriginalEventRunner(program: catalog.loadProgram("EP1_R213"), game: game, deferArrival: true)
+        runner.interactWithDoor(area: 7, upView: 343)
+        XCTAssertNil(runner.eventIndex)
+        var response = try XCTUnwrap(runner.searchFallback(catalog: catalog))
+        XCTAssertEqual(response.program.name, "System")
+        var lines = ""
+        for _ in 0..<100 {
+            switch response.phase {
+            case .dialogue(let packet):
+                lines += packet.pages.compactMap { String(data: $0.visibleBytes, encoding: .isoLatin1) }.joined()
+                response.acknowledgeDialogue()
+            case .waiting: response.advanceWait()
+            case .exploration: break
+            default: return XCTFail("Default door response stopped: \(response.phase)")
+            }
+            if case .exploration = response.phase { break }
+        }
+        XCTAssertTrue(lines.lowercased().contains("locked"), lines)
+        XCTAssertEqual(response.phase, .exploration(mapID: 39))
+        runner.resumeSearch(after: response)
+        XCTAssertEqual(runner.program.name, "EP1_R213")
+        XCTAssertEqual(runner.game.value(for: .doorOpen(index: 32)), true)
+        XCTAssertEqual(try runner.game.inventory.items, try game.inventory.items)
+    }
+
     func testRoom215EntryAndKeyMatchOriginalState() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         func state(_ capture: String) throws -> Data {

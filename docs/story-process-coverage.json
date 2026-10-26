@@ -1,0 +1,777 @@
+{
+  "schemaVersion": 1,
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "scope": "Static story process coverage. Does not establish route completion, presentation fidelity, conditions, input fidelity, or optional inventory processes.",
+  "nativeHostProcessIDs": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    47,
+    48,
+    51,
+    53,
+    54,
+    56,
+    60,
+    73,
+    77,
+    78,
+    80,
+    84,
+    126
+  ],
+  "processes": [
+    {
+      "processID": 24,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP1_R102",
+          "event": 4,
+          "sourceOffset": 624
+        },
+        {
+          "program": "EP1_R102",
+          "event": 58,
+          "sourceOffset": 1704
+        }
+      ]
+    },
+    {
+      "processID": 25,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP1_R102",
+          "event": 16,
+          "sourceOffset": 864
+        }
+      ]
+    },
+    {
+      "processID": 26,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP1_R117",
+          "event": 48,
+          "sourceOffset": 1360
+        }
+      ]
+    },
+    {
+      "processID": 27,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP2_R115",
+          "event": 13,
+          "sourceOffset": 388
+        }
+      ]
+    },
+    {
+      "processID": 30,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP2_R115",
+          "event": 20,
+          "sourceOffset": 528
+        }
+      ]
+    },
+    {
+      "processID": 31,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP2_R115",
+          "event": 7,
+          "sourceOffset": 268
+        }
+      ]
+    },
+    {
+      "processID": 34,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP2_R115",
+          "event": 26,
+          "sourceOffset": 648
+        }
+      ]
+    },
+    {
+      "processID": 37,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP1_R205",
+          "event": 22,
+          "sourceOffset": 1304
+        }
+      ]
+    },
+    {
+      "processID": 38,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP5_R205",
+          "event": 15,
+          "sourceOffset": 588
+        }
+      ]
+    },
+    {
+      "processID": 39,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP3_R209",
+          "event": 8,
+          "sourceOffset": 384
+        }
+      ]
+    },
+    {
+      "processID": 40,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP3_R209",
+          "event": 11,
+          "sourceOffset": 444
+        }
+      ]
+    },
+    {
+      "processID": 41,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP3_R109",
+          "event": 2,
+          "sourceOffset": 168
+        }
+      ]
+    },
+    {
+      "processID": 42,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP3_R106",
+          "event": 7,
+          "sourceOffset": 380
+        },
+        {
+          "program": "EP3_R107",
+          "event": 1,
+          "sourceOffset": 84
+        },
+        {
+          "program": "EP3_R117",
+          "event": 54,
+          "sourceOffset": 1496
+        }
+      ]
+    },
+    {
+      "processID": 43,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP7_R122",
+          "event": 7,
+          "sourceOffset": 380
+        }
+      ]
+    },
+    {
+      "processID": 44,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP8_R119",
+          "event": 8,
+          "sourceOffset": 368
+        }
+      ]
+    },
+    {
+      "processID": 45,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP8_R114",
+          "event": 13,
+          "sourceOffset": 452
+        }
+      ]
+    },
+    {
+      "processID": 46,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP6_R106",
+          "event": 7,
+          "sourceOffset": 236
+        }
+      ]
+    },
+    {
+      "processID": 47,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP3_R205",
+          "event": 14,
+          "sourceOffset": 552
+        },
+        {
+          "program": "EP3_R205",
+          "event": 19,
+          "sourceOffset": 652
+        }
+      ]
+    },
+    {
+      "processID": 48,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP4_R205",
+          "event": 11,
+          "sourceOffset": 476
+        }
+      ]
+    },
+    {
+      "processID": 51,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP6_R105",
+          "event": 37,
+          "sourceOffset": 1236
+        }
+      ]
+    },
+    {
+      "processID": 52,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP8_R114",
+          "event": 15,
+          "sourceOffset": 492
+        }
+      ]
+    },
+    {
+      "processID": 53,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP6_R105",
+          "event": 54,
+          "sourceOffset": 1576
+        },
+        {
+          "program": "EP6_R105",
+          "event": 82,
+          "sourceOffset": 2136
+        }
+      ]
+    },
+    {
+      "processID": 54,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP6_R105",
+          "event": 57,
+          "sourceOffset": 1636
+        },
+        {
+          "program": "EP6_R105",
+          "event": 86,
+          "sourceOffset": 2216
+        }
+      ]
+    },
+    {
+      "processID": 55,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP7_R122",
+          "event": 3,
+          "sourceOffset": 300
+        }
+      ]
+    },
+    {
+      "processID": 56,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP1_R102",
+          "event": 1,
+          "sourceOffset": 564
+        }
+      ]
+    },
+    {
+      "processID": 58,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP6_R105",
+          "event": 60,
+          "sourceOffset": 1696
+        },
+        {
+          "program": "EP6_R105",
+          "event": 90,
+          "sourceOffset": 2296
+        }
+      ]
+    },
+    {
+      "processID": 59,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 14,
+          "sourceOffset": 440
+        }
+      ]
+    },
+    {
+      "processID": 60,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP5_R111",
+          "event": 1,
+          "sourceOffset": 148
+        }
+      ]
+    },
+    {
+      "processID": 61,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R302",
+          "event": 8,
+          "sourceOffset": 256
+        }
+      ]
+    },
+    {
+      "processID": 62,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 62,
+          "sourceOffset": 1400
+        }
+      ]
+    },
+    {
+      "processID": 63,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP9_R116",
+          "event": 4,
+          "sourceOffset": 304
+        }
+      ]
+    },
+    {
+      "processID": 64,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP9_R117",
+          "event": 1,
+          "sourceOffset": 84
+        },
+        {
+          "program": "EP9_R125",
+          "event": 2,
+          "sourceOffset": 104
+        },
+        {
+          "program": "EP9_R205",
+          "event": 2,
+          "sourceOffset": 248
+        },
+        {
+          "program": "EP9_R207",
+          "event": 1,
+          "sourceOffset": 84
+        },
+        {
+          "program": "EP9_R213",
+          "event": 1,
+          "sourceOffset": 84
+        }
+      ]
+    },
+    {
+      "processID": 67,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 64,
+          "sourceOffset": 1440
+        }
+      ]
+    },
+    {
+      "processID": 73,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP4_R201",
+          "event": 80,
+          "sourceOffset": 1808
+        }
+      ]
+    },
+    {
+      "processID": 74,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 32,
+          "sourceOffset": 800
+        }
+      ]
+    },
+    {
+      "processID": 75,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R304",
+          "event": 24,
+          "sourceOffset": 672
+        }
+      ]
+    },
+    {
+      "processID": 76,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP8_R114",
+          "event": 9,
+          "sourceOffset": 372
+        }
+      ]
+    },
+    {
+      "processID": 77,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP3_R213",
+          "event": 26,
+          "sourceOffset": 904
+        }
+      ]
+    },
+    {
+      "processID": 79,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R304",
+          "event": 22,
+          "sourceOffset": 632
+        }
+      ]
+    },
+    {
+      "processID": 80,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 2,
+          "sourceOffset": 200
+        },
+        {
+          "program": "EP10_R301",
+          "event": 112,
+          "sourceOffset": 2400
+        }
+      ]
+    },
+    {
+      "processID": 81,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP9_R125",
+          "event": 5,
+          "sourceOffset": 164
+        }
+      ]
+    },
+    {
+      "processID": 84,
+      "hasNativeHandler": true,
+      "references": [
+        {
+          "program": "EP3_R209",
+          "event": 14,
+          "sourceOffset": 504
+        }
+      ]
+    },
+    {
+      "processID": 85,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R305",
+          "event": 53,
+          "sourceOffset": 1268
+        }
+      ]
+    },
+    {
+      "processID": 86,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 33,
+          "sourceOffset": 820
+        }
+      ]
+    },
+    {
+      "processID": 88,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R102",
+          "event": 4,
+          "sourceOffset": 208
+        }
+      ]
+    },
+    {
+      "processID": 90,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 123,
+          "sourceOffset": 2620
+        }
+      ]
+    },
+    {
+      "processID": 91,
+      "hasNativeHandler": false,
+      "references": [
+        {
+          "program": "EP10_R301",
+          "event": 34,
+          "sourceOffset": 840
+        }
+      ]
+    }
+  ],
+  "chapters": [
+    {
+      "chapter": 1,
+      "requiredProcesses": [
+        24,
+        25,
+        26,
+        37,
+        56
+      ],
+      "missingProcesses": []
+    },
+    {
+      "chapter": 2,
+      "requiredProcesses": [
+        27,
+        30,
+        31,
+        34
+      ],
+      "missingProcesses": []
+    },
+    {
+      "chapter": 3,
+      "requiredProcesses": [
+        39,
+        40,
+        41,
+        42,
+        47,
+        77,
+        84
+      ],
+      "missingProcesses": []
+    },
+    {
+      "chapter": 4,
+      "requiredProcesses": [
+        48,
+        73
+      ],
+      "missingProcesses": []
+    },
+    {
+      "chapter": 5,
+      "requiredProcesses": [
+        38,
+        60
+      ],
+      "missingProcesses": []
+    },
+    {
+      "chapter": 6,
+      "requiredProcesses": [
+        46,
+        51,
+        53,
+        54,
+        58
+      ],
+      "missingProcesses": [
+        46,
+        58
+      ]
+    },
+    {
+      "chapter": 7,
+      "requiredProcesses": [
+        43,
+        55
+      ],
+      "missingProcesses": [
+        43,
+        55
+      ]
+    },
+    {
+      "chapter": 8,
+      "requiredProcesses": [
+        44,
+        45,
+        52,
+        76
+      ],
+      "missingProcesses": [
+        44,
+        45,
+        52,
+        76
+      ]
+    },
+    {
+      "chapter": 9,
+      "requiredProcesses": [
+        63,
+        64,
+        81
+      ],
+      "missingProcesses": [
+        63,
+        64,
+        81
+      ]
+    },
+    {
+      "chapter": 10,
+      "requiredProcesses": [
+        59,
+        61,
+        62,
+        67,
+        74,
+        75,
+        79,
+        80,
+        85,
+        86,
+        88,
+        90,
+        91
+      ],
+      "missingProcesses": [
+        59,
+        61,
+        62,
+        67,
+        74,
+        75,
+        79,
+        85,
+        86,
+        88,
+        90,
+        91
+      ]
+    }
+  ],
+  "eventModeCounts": {
+    "0": 167,
+    "1": 233,
+    "3": 896,
+    "4": 73,
+    "5": 330,
+    "6": 94,
+    "7": 73,
+    "8": 73,
+    "10": 193,
+    "11": 73,
+    "12": 4,
+    "13": 19,
+    "14": 79,
+    "15": 59,
+    "16": 126,
+    "17": 135,
+    "24": 45,
+    "25": 120,
+    "27": 70,
+    "29": 49,
+    "32": 1
+  }
+}

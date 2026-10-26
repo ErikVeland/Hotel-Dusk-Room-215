@@ -5,6 +5,116 @@ import CryptoKit
 
 @MainActor
 final class OriginalAudioTests: XCTestCase {
+    func testDialogueAudioUsesOriginalLookupOrderAndStopSemantics() throws {
+        let table = try OriginalDialogueAudio.load()
+        XCTAssertEqual(try table.command(for: .music(mode: 0, name: "BGM_36")), .startMusic(sequenceID: 35))
+        XCTAssertEqual(try table.command(for: .music(mode: 1, name: "BGM_60")), .stopMusic(fadeFrames: 20))
+        XCTAssertNil(try table.command(for: .music(mode: 2, name: "BGM_00")))
+        XCTAssertEqual(try table.command(for: .sound(code: "000101", mode: 0)), .startEffect(archiveID: 8, entryID: 0))
+        XCTAssertEqual(try table.command(for: .sound(code: "000101", mode: 1)),
+                       .stopEffect(archiveID: 8, entryID: 0, fadeFrames: 1))
+        // The source contains duplicate codes. Its linear lookup uses the first.
+        XCTAssertEqual(try table.command(for: .sound(code: "400101", mode: 0)), .startEffect(archiveID: 0, entryID: 0))
+        XCTAssertThrowsError(try table.command(for: .sound(code: "unknown", mode: 0)))
+        let archive = try OriginalSoundArchive.load()
+        for cue in table.sounds { _ = try archive.effect(archiveID: cue.archiveID, entryID: cue.entryID) }
+    }
+
+    func testEveryBundledDialogueAudioControlResolves() throws {
+        let table = try OriginalDialogueAudio.load()
+        let catalog = try OriginalScriptCatalog.bundled()
+        var music = 0, sounds = 0
+        for name in catalog.programNames {
+            let program = try catalog.loadProgram(name)
+            let graph = try program.blocks
+            for event in graph.tables[2] {
+                let records = try graph.operations(forEvent: event.index)
+                var index = 0
+                while index < records.count {
+                    let record = records[index]
+                    if record.raw[0] == 4 {
+                        let following = index + 1 < records.count ? records[index + 1] : nil
+                        let packet = try OriginalDialoguePacket(record: record, following: following, text: program.text)
+                        for token in packet.pages.flatMap(\.tokens) {
+                            guard case .control(let control) = token.kind else { continue }
+                            switch control {
+                            case .music: music += 1
+                            case .sound: sounds += 1
+                            default: continue
+                            }
+                            XCTAssertNotNil(try table.command(for: control), "\(name) text \(token.textIndex)")
+                        }
+                    }
+                    index += record.raw[1] == 2 ? 2 : 1
+                }
+            }
+        }
+        XCTAssertGreaterThan(music, 400)
+        XCTAssertGreaterThan(sounds, 600)
+    }
+
+    func testDialogueFadeCompletesOnLiveTimer() async throws {
+        let audio = AudioController()
+        audio.isMuted = true
+        let play = try OriginalPlaySession.chapterOne(audio: audio)
+        defer { play.stop() }
+        let phase = play.runner.phase
+        try audio.applyOriginalCommand(.stopMusic(fadeFrames: 20))
+        try await Task.sleep(for: .seconds(1))
+        XCTAssertNil(audio.playback)
+        XCTAssertEqual(play.runner.phase, phase)
+    }
+
+    func testWalkingMusicUsesMapTableFlagAndSavedBarSong() throws {
+        let table = try OriginalDialogueAudio.load()
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        XCTAssertEqual(try table.walkingMusic(mapID: 2, game: game), .startMusic(sequenceID: 17))
+        XCTAssertEqual(try table.walkingMusic(mapID: 26, game: game), .startMusic(sequenceID: 33))
+        XCTAssertEqual(try table.walkingMusic(mapID: 5, game: game), .startMusic(sequenceID: 31))
+        var bytes = game.bytes
+        bytes[0x13BC] = 6; bytes[0x13BD] = 0
+        game = try OriginalGameState(snapshot: Data(bytes))
+        XCTAssertEqual(try table.walkingMusic(mapID: 5, game: game), .startMusic(sequenceID: 6))
+        bytes[0x38] |= 0x80 // Original game flag 31, read by 0x020977CC.
+        game = try OriginalGameState(snapshot: Data(bytes))
+        XCTAssertEqual(try table.walkingMusic(mapID: 8, game: game), .startMusic(sequenceID: 5))
+    }
+
+    func testDialogueFadesAdvanceWithoutAdvancingTextAndPauseWithBook() throws {
+        let audio = AudioController()
+        audio.isMuted = true
+        let play = try OriginalPlaySession.chapterOne(audio: audio)
+        defer { play.stop() }
+        let phase = play.runner.phase
+        XCTAssertEqual(audio.currentSequenceID, 35)
+        XCTAssertNil(audio.lastError)
+        try audio.applyOriginalCommand(.stopMusic(fadeFrames: 20))
+        XCTAssertNotNil(audio.playback)
+        play.pause()
+        for _ in 0..<40 { play.advanceFrame() }
+        XCTAssertNotNil(audio.playback, "Closing the book must suspend the fade")
+        play.resume()
+        for _ in 0..<19 { play.advanceFrame() }
+        XCTAssertNotNil(audio.playback)
+        play.advanceFrame()
+        XCTAssertNil(audio.playback)
+        XCTAssertEqual(play.runner.phase, phase, "Audio updates must not advance dialogue or paused puzzles")
+    }
+
+    func testEffectErrorsAreReportedAndEndingGameStopsEffectPlayers() throws {
+        let audio = AudioController()
+        audio.isMuted = true
+        defer { audio.stopAll() }
+        XCTAssertThrowsError(try audio.playOriginalEffect(archiveID: -1, entryID: 0))
+        XCTAssertNotNil(audio.lastError)
+        try audio.playOriginalEffect(archiveID: 8, entryID: 0)
+        XCTAssertNil(audio.lastError)
+        XCTAssertEqual(audio.soundEffectsHistory.last, "SE_SYSTEM_OK")
+        audio.stopAll()
+        XCTAssertFalse(try audio.applyOriginalCommand(.waitForEffectPlayer(2)))
+        XCTAssertNil(audio.currentSequenceID)
+    }
+
     func testSourceLoopsPreserveIntroductionsAndTerminatingMusic() throws {
         let library = try OriginalAudioLibrary.load()
         XCTAssertEqual(library.sequences.count, 36)

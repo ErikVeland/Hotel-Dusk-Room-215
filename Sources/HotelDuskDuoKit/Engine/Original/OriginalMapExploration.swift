@@ -8,46 +8,27 @@ public struct OriginalMapExploration {
     private static let originalPi = Float(bitPattern: 0x40490FDB)
     public enum Mode: Equatable { case walking, counter }
     public let mapID: Int16
-    public static let supportedMaps: [Int16: String] = [2: "R102", 3: "R103", 14: "R114", 15: "R115", 17: "R117", 19: "R119", 39: "R213", 31: "R205", 37: "R211"]
+    public static let supportedMaps = OriginalMapCatalog.maps.mapValues(\.name)
     /**
      * Name order in 0x020FAB2C, used by 0x0209C04C to resolve model markers.
      */
-    private static let mapNames = ["NONE"] + (101...126).map { "R\($0)" }
+    static let mapNames = ["NONE"] + (101...126).map { "R\($0)" }
         + (201...213).map { "R\($0)" } + (301...305).map { "R\($0)" } + ["R401", "R402"]
-    // The stair exit must run its departure conversation before R213 can load.
-    private static let exitMaps: [String: Int16] = ["in_r102": 2, "in_r103": 3, "in_r117": 17, "in_r213": 39]
+    // Walk-through exits still run the original departure event before loading the destination.
+    private static let exitMaps = Dictionary(uniqueKeysWithValues: supportedMaps.map {
+        ("in_" + $0.value.lowercased(), $0.key)
+    })
     public private(set) var searchAreaID: UInt16
     public var mapName: String { Self.supportedMaps[mapID]! }
     /**
      * Map origin table 0x020E02AC, including the eight-pixel vertical marker offset.
      */
-    public var mapOrigin: SIMD2<Float> {
-        switch mapID {
-        case 2: return SIMD2(258, 320)
-        case 3: return SIMD2(257, 330)
-        case 14: return SIMD2(30, -3)
-        case 15: return SIMD2(12, 1)
-        case 19: return SIMD2(231, 514)
-        case 39: return SIMD2(525, 140)
-        case 31: return SIMD2(15, -27)
-        case 37: return SIMD2(0, 5)
-        default: return SIMD2(125, 317)
-        }
-    }
+    public var mapOrigin: SIMD2<Float> { OriginalMapCatalog.maps[mapID]!.origin }
+
     /**
      * Pixels per world unit from the original map scale table at 0x020DFF60.
      */
-    public var mapScale: Float {
-        switch mapID {
-        case 3: return 14.7
-        case 15: return 16.2
-        case 17: return 14.2
-        case 14, 19: return 17.5
-        case 31: return 12.7
-        case 37: return 14
-        default: return 17
-        }
-    }
+    public var mapScale: Float { OriginalMapCatalog.maps[mapID]!.scale }
 
     /**
      * 0x02037020 loads tiles from pixel/8 minus (16,24). The rotated viewport starts at (96,192).
@@ -55,8 +36,8 @@ public struct OriginalMapExploration {
     public var mapBitmapOffset: SIMD2<Float> {
         let point = mapOrigin + SIMD2(position.x, position.z) / 4096 * mapScale
         // 256×256 room maps omit the large-map tile origin offsets (0x02037020).
-        let origin: SIMD2<Float> = [14, 15, 31, 37].contains(mapID) ? SIMD2(-32, 0) : SIMD2(96, 192)
-        let scroll = [14, 15, 31, 37].contains(mapID) ? simd_clamp(point, SIMD2(repeating: -96), SIMD2(repeating: 96)) : point
+        let origin: SIMD2<Float> = OriginalMapCatalog.maps[mapID]!.compact ? SIMD2(-32, 0) : SIMD2(96, 192)
+        let scroll = OriginalMapCatalog.maps[mapID]!.compact ? simd_clamp(point, SIMD2(repeating: -96), SIMD2(repeating: 96)) : point
         return origin - SIMD2(Float(Int(scroll.x)), Float(Int(scroll.y)))
     }
     public private(set) var mode: Mode = .walking
@@ -77,8 +58,8 @@ public struct OriginalMapExploration {
     public let objectVisibility: OriginalObjectVisibility
     private var target: SIMD3<Float>
     private var front: SIMD3<Float>
-    private var camera1: OriginalModelCameraMarkers
-    private var camera2: OriginalModelCameraMarkers
+    private var camera1: OriginalModelCameraMarkers?
+    private var camera2: OriginalModelCameraMarkers?
     private var previousPosition = SIMD3<Float>(-82, 12288, 21217)
 
     public init(collision: OriginalMapCollision, room: OriginalModel, counter: OriginalModel,
@@ -86,28 +67,38 @@ public struct OriginalMapExploration {
                 mapID: Int16 = 2, previousMapID: Int16 = 1, savedGame: OriginalGameState? = nil) throws {
         guard Self.supportedMaps[mapID] != nil else { throw OriginalDataError.unsupported("Map \(mapID)") }
         self.mapID = mapID
-        searchAreaID = mapID == 31 ? 1 : 2
+        searchAreaID = OriginalMapCatalog.maps[mapID]!.searchArea
         self.collision = collision
         self.room = room
         self.counter = counter
         self.restrictions = restrictions
         self.objectVisibility = objectVisibility
-        let marker = mapID == 31 ? "s01" : "s02"
-        guard let node = room.nodes.first(where: { $0.name == marker }),
-              let frontNode = room.nodes.first(where: { $0.name == marker + "f" }) else {
-            throw OriginalDataError.missing("Map \(mapID) search markers")
+        target = position
+        front = position
+        if searchAreaID != 0 {
+            let marker = String(format: "s%02d", searchAreaID)
+            guard let node = room.nodes.first(where: { $0.name == marker }),
+                  let frontNode = room.nodes.first(where: { $0.name == marker + "f" }) else {
+                throw OriginalDataError.missing("Map \(mapID) search markers")
+            }
+            target = SIMD3(Float(node.worldFixed[12]), 12288, Float(node.worldFixed[14]))
+            front = SIMD3(Float(frontNode.worldFixed[12]), 12288, Float(frontNode.worldFixed[14]))
+            camera1 = try counter.cameraMarkers(index: 1)
+            camera2 = try counter.cameraMarkers(index: 2)
         }
-        target = SIMD3(Float(node.worldFixed[12]), 12288, Float(node.worldFixed[14]))
-        front = SIMD3(Float(frontNode.worldFixed[12]), 12288, Float(frontNode.worldFixed[14]))
-        camera1 = try counter.cameraMarkers(index: 1)
-        camera2 = try counter.cameraMarkers(index: 2)
         if let savedGame, savedGame.mapID == mapID {
             position = savedGame.mapPosition
             facing = savedGame.facing
         } else if !(mapID == 2 && previousMapID == 1) {
-            guard let previousName = Self.supportedMaps[previousMapID]?.lowercased(),
-                  let marker = room.nodes.first(where: { $0.name == "out_\(previousName)" }) else {
-                throw OriginalDataError.missing("Map entry marker from \(previousMapID)")
+            guard let previousName = Self.supportedMaps[previousMapID]?.lowercased() else {
+                throw OriginalDataError.missing("Previous map \(previousMapID)")
+            }
+            // 0x0202AF14 starts at the room origin when a scripted move has no entry marker.
+            guard let marker = room.nodes.first(where: { $0.name == "out_\(previousName)" }) else {
+                position = SIMD3(0, 12288, 0)
+                facing = 0
+                previousPosition = position
+                return
             }
             position = SIMD3(Float(marker.worldFixed[12]), 12288, Float(marker.worldFixed[14]))
             // 0x0209D828: fixed-point normalised X axis, then signed acos.
@@ -118,6 +109,10 @@ public struct OriginalMapExploration {
             if z > 0 { facing = -facing }
         }
         previousPosition = position
+    }
+
+    mutating func restoreCheckpointFacing(_ value: Float) {
+        checkpointFacing = value
     }
 
     /**
@@ -151,10 +146,10 @@ public struct OriginalMapExploration {
         let data = try Data(contentsOf: root.appendingPathComponent("\(name).col"))
         guard let record = manifest.files.first(where: { $0.name == "\(name).col" }),
               OriginalScriptCatalog.digest(data) == record.sha256 else { throw OriginalDataError.checksum("\(name).col") }
-        let area = mapID == 31 ? "01" : "02"
-        return try Self(collision: .init(data: data),
-            room: models.load(path: "map/\(name)/\(name)/\(name).mdf"),
-            counter: models.load(path: "map/\(name)/\(name)_s\(area)/\(name)_s\(area).mdf"), restrictions: .bundled(),
+        let area = String(format: "%02d", OriginalMapCatalog.maps[mapID]!.searchArea)
+        let room = try models.load(path: "map/\(name)/\(name)/\(name).mdf")
+        let counter = area == "00" ? room : try models.load(path: "map/\(name)/\(name)_s\(area)/\(name)_s\(area).mdf")
+        return try Self(collision: .init(data: data), room: room, counter: counter, restrictions: .bundled(),
             objectVisibility: .bundled(), mapID: mapID, previousMapID: previousMapID, savedGame: savedGame)
     }
 
@@ -163,9 +158,8 @@ public struct OriginalMapExploration {
      */
     public var nearbySearchArea: UInt16? {
         guard mode == .walking else { return nil }
-        let supported: Set<UInt16> = mapID == 2 ? [2] : [14, 15, 31, 37].contains(mapID) ? [1, 2, 3, 4] : []
         for region in collision.matchingRegions(containing: position, prefix: "search").prefix(2) {
-            guard let area = UInt16(region.dropFirst(6).prefix(2)), supported.contains(area),
+            guard let area = UInt16(region.dropFirst(6).prefix(2)),
                   let marker = room.nodes.first(where: { $0.name == String(format: "s%02d", area) }) else { continue }
             let delta = SIMD3(Float(marker.worldFixed[12]), 12288, Float(marker.worldFixed[14])) - position
             if simd_length_squared(delta) == 0 ||
@@ -285,13 +279,38 @@ public struct OriginalMapExploration {
         let speed = Float(Int(Float(distance > 64 ? 246 : 143) * 1.1 * corridorScale))
         let step = SIMD3<Float>(Float((direction.x * Int64(speed) + 2048) >> 12), 0,
                                 Float((direction.y * Int64(speed) + 2048) >> 12))
+        move(by: step, people: people)
+        facing = Self.turn(from: facing, towards: angle)
+    }
+
+    /// Native controls turn in place without changing the player's position.
+    public mutating func turnView(by radians: Float) {
+        guard mode == .walking, radians.isFinite else { return }
+        facing = atan2(sin(facing + radians), cos(facing + radians))
+        checkpointFacing = facing
+    }
+
+    /// Smooth movement relative to the camera; backwards and strafing retain the view direction.
+    public mutating func update(firstPersonMovement input: SIMD2<Float>, people: [SIMD3<Float>] = []) {
+        checkpointFacing = facing
+        guard mode == .walking, input.x.isFinite, input.y.isFinite else { return }
+        let length = hypot(input.x, input.y)
+        guard length > 0.12 else { return }
+        let direction = input / max(1, length)
+        let speed: Float = Float(Int(246 * 1.1 * ([17, 19, 39].contains(mapID) ? 1.35 : 1)))
+        let forward = SIMD3<Float>(sin(facing), 0, cos(facing))
+        let right = SIMD3<Float>(-cos(facing), 0, sin(facing))
+        previousPosition = position
+        move(by: (forward * direction.y + right * direction.x) * speed, people: people)
+    }
+
+    private mutating func move(by step: SIMD3<Float>, people: [SIMD3<Float>]) {
         let candidate = collision.resolve(Self.resolvePeople(position + step, people: people))
         // Other exits remain blocked until their map behaviour is recovered.
         let exit = collision.firstRegion(containing: candidate, prefix: "in_")
         if exit == nil || exit.flatMap({ Self.exitMaps[$0] }) != nil {
             position = candidate
         }
-        facing = Self.turn(from: facing, towards: angle)
     }
 
     /**
@@ -407,6 +426,7 @@ public struct OriginalMapExploration {
 
     private func vector(_ values: [Int32]) -> SIMD3<Float> { SIMD3(Float(values[0]), Float(values[1]), Float(values[2])) }
     private var cameraArc: Float {
+        guard let camera1, let camera2 else { return 0 }
         let centre = vector(camera1.targetFixed)
         let a = simd_normalize(vector(camera1.positionFixed) - centre)
         let b = simd_normalize(vector(camera2.positionFixed) - centre)
@@ -418,6 +438,10 @@ public struct OriginalMapExploration {
      */
     public var camera: (eye: SIMD3<Float>, target: SIMD3<Float>) {
         if mode == .walking {
+            let eye = position / 4096
+            return (eye, eye + SIMD3(sin(facing), 0, cos(facing)))
+        }
+        guard let camera1, let camera2 else {
             let eye = position / 4096
             return (eye, eye + SIMD3(sin(facing), 0, cos(facing)))
         }
@@ -553,8 +577,8 @@ public struct OriginalMapCollision {
             regionOrder.append(name)
             if inWalls { walls += triangles }
         }
-        guard !walls.isEmpty, regions["search02"]?.isEmpty == false else {
-            throw OriginalDataError.missing("Lobby collision regions")
+        guard !walls.isEmpty else {
+            throw OriginalDataError.missing("Map collision walls")
         }
     }
 

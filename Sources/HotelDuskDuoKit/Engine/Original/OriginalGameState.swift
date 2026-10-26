@@ -112,6 +112,22 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
      */
     public mutating func openNotebook() { bytes[0x87D] = 0 }
 
+    /// 0x020989E0 / 0x020989D4: the bar jukebox's saved sequence, or -1.
+    public var jukeboxSequence: Int16 { Int16(bitPattern: read16(0x13BC)) }
+    public mutating func setJukeboxSequence(_ id: Int16) { write16(0x13BC, UInt16(bitPattern: id)) }
+
+    /// 0x02098910: a script made this Mila memo available (opcode 46, 0x02098894).
+    public func memoAvailable(_ index: Int) -> Bool { bit(base: 0x13CC, index: index) == true }
+
+    /// 0x02098984: the notebook has shown this memo.
+    public func memoRead(_ index: Int) -> Bool { bit(base: 0x13D0, index: index) == true }
+
+    /// 0x02098948 marks a shown memo as read.
+    public mutating func markMemoRead(_ index: Int) {
+        guard (0..<32).contains(index) else { return }
+        setBit(base: 0x13D0, index: index, value: true)
+    }
+
     /**
      * 0x02078DA8 stores the three writable pages in the original game state.
      */
@@ -142,10 +158,15 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
      */
     public mutating func markPuzzleCompleted(processID: UInt16) {
         guard (24..<95).contains(processID) else { return }
-        setBit(base: 0x872, index: Int(processID - 24), value: true)
+        // The launch ID can differ from CTrickBase's recorded ID. Overlay 26
+        // stores 49 for the tank; overlay 2 stores 40 for the restored jigsaw.
+        let recordedID: UInt16 = processID == 48 ? 49 : processID == 84 ? 40 : processID
+        setBit(base: 0x872, index: Int(recordedID - 24), value: true)
     }
 
     public var cabinetDialRetainedValue: UInt16 { read16(0x13D6) }
+    public var cashboxDialRetainedValue: UInt16 { read16(0x13DE) }
+    public mutating func storeCashboxDialValue(_ value: UInt16) { write16(0x13DE, value) }
 
     /**
      * Overlay 10 stores 999 minus the displayed cabinet number when the process exits.
@@ -231,6 +252,17 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
     public var chapterOneJigsawMask: UInt32 {
         get { UInt32(read16(0x14AC)) | UInt32(read16(0x14AE)) << 16 }
         set { write32(0x14AC, newValue & 0xFFFFF) }
+    }
+
+    public func jigsawMask(for variant: OriginalJigsawProcess.Variant) -> UInt32 {
+        guard let slot = variant.maskSlot else { return 0 }
+        let offset = 0x14AC + slot * 4
+        return (UInt32(read16(offset)) | UInt32(read16(offset + 2)) << 16) & 0xFFFFF
+    }
+
+    public mutating func setJigsawMask(_ mask: UInt32, for variant: OriginalJigsawProcess.Variant) {
+        guard let slot = variant.maskSlot else { return }
+        write32(0x14AC + slot * 4, mask & 0xFFFFF)
     }
 
     /**

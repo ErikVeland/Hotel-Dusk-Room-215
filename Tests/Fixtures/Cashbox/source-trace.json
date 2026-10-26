@@ -1,0 +1,427 @@
+{
+  "kind": "modified-checkpoint-component-test",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "commandsSHA256": "1b9fa041c208ffef8e260834586f37cf54543a6c2497833c01b72c39f3ca25df",
+  "initial": {
+    "phase": 1,
+    "stage": 1,
+    "nextPhase": -1,
+    "returnValue": 2,
+    "angles": [
+      1.600000023841858,
+      1.600000023841858,
+      1.600000023841858
+    ],
+    "wheelX": [
+      -4280,
+      123,
+      4526
+    ],
+    "wheelY": [
+      -483,
+      -483,
+      -483
+    ],
+    "holding": false,
+    "selected": 0,
+    "target": [
+      5,
+      1,
+      8
+    ]
+  },
+  "steps": {
+    "drag0_0": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        1.763828158378601,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        3711,
+        -483,
+        -483
+      ],
+      "holding": true,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "wheel0_0": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        1.7938281297683716,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        -483,
+        -483
+      ],
+      "holding": false,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "drag0_1": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        1.9576562643051147,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        4194,
+        -483,
+        -483
+      ],
+      "holding": true,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "wheel0_1": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        1.997656226158142,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        -483,
+        -483
+      ],
+      "holding": false,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "drag0_2": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        2.1614842414855957,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        4194,
+        -483,
+        -483
+      ],
+      "holding": true,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "wheel0_2": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.1914842575788498,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        -483,
+        -483
+      ],
+      "holding": false,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "drag0_3": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.35531237721443176,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        4194,
+        -483,
+        -483
+      ],
+      "holding": true,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "wheel0_3": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.3953123390674591,
+        1.600000023841858,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        -483,
+        -483
+      ],
+      "holding": false,
+      "selected": 0,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "drag1_0": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.3953123390674591,
+        1.4438281059265137,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        -4481,
+        -483
+      ],
+      "holding": true,
+      "selected": 1,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "wheel1_0": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.3953123390674591,
+        1.4038281440734863,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        0,
+        -483
+      ],
+      "holding": false,
+      "selected": 1,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "drag1_1": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.3953123390674591,
+        1.247656226158142,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        -3998,
+        -483
+      ],
+      "holding": true,
+      "selected": 1,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "wheel1_1": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.3953123390674591,
+        1.2076562643051147,
+        1.600000023841858
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        0,
+        -483
+      ],
+      "holding": false,
+      "selected": 1,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "drag2_0": {
+      "phase": 1,
+      "stage": 1,
+      "nextPhase": -1,
+      "returnValue": 1,
+      "angles": [
+        0.3953123390674591,
+        1.2076562643051147,
+        1.763828158378601
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        0,
+        3711
+      ],
+      "holding": true,
+      "selected": 2,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    },
+    "wheel2_0": {
+      "phase": 1,
+      "stage": 4,
+      "nextPhase": -1,
+      "returnValue": 0,
+      "angles": [
+        0.3953123390674591,
+        1.2076562643051147,
+        1.7938281297683716
+      ],
+      "wheelX": [
+        -4280,
+        123,
+        4526
+      ],
+      "wheelY": [
+        0,
+        0,
+        0
+      ],
+      "holding": false,
+      "selected": 2,
+      "target": [
+        5,
+        1,
+        8
+      ]
+    }
+  }
+}

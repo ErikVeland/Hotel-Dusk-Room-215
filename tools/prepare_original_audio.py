@@ -336,7 +336,7 @@ def main():
                 "limitations": ["Apple sampler envelopes and mixing are not verified against the DS.",
                                 "MIDI control conversion is not fully validated against the original sound driver.",
                                 "Sequence IDs have no inferred scene or chapter mapping.",
-                                "SSAR sound effect playback is not implemented by this adapter."],
+                                "Walking footsteps, environmental cues and exact dialogue cue timing remain incomplete."],
                 "repairedWaveTails": repaired_tails}
     (output / "OriginalAudioManifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     shutil.copy2(root / "inventory.json", output / "OriginalSDATInventory.json")

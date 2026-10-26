@@ -37,7 +37,7 @@ Both the full 24,576-byte hit map and the full 98,304-byte colour buffer match t
 
 Event 26 sets door state zero. The key remains in inventory. The existing `.doorOpen` condition name returns the stored nonzero state, so it is false after unlocking. Event 27 must run before map departure even though its dialogue packets contain presentation controls without visible text.
 
-The session applies the original departure selector before changing maps. This preserves the room's telephone reminder gate. Generic locked-door responses and incorrect-item responses are still unsupported.
+The session applies the original departure selector before changing maps. This preserves the room's telephone reminder gate. Door inspection and component selection now use the original System fallback when the room has no matching event. This follows modes 13 and 14 in `0x0203A444`. Door item use also uses the existing mode-16 fallback. An unrecovered response still stops explicitly.
 
 ## Room placement and map
 

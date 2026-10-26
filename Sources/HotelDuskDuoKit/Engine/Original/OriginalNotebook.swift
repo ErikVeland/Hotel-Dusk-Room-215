@@ -16,10 +16,12 @@ public struct OriginalNotebook: Sendable {
     public var canEdit: Bool { page < 3 && !locked[page] }
     public var pageCount: Int { pages.count }
 
+    /// The first available memo that has not been read. The notebook opens at its page.
+    public let unreadMemo: Int?
+
     public init(game: OriginalGameState, load: (String) throws -> Data) throws {
-        guard game.bytes[0x13CC..<0x13D0].allSatisfy({ $0 == 0 }),
-              game.bytes[0x13D8..<0x13DA].allSatisfy({ $0 == 0 }) else {
-            throw OriginalDataError.unsupported("Mila and apple notebook page composition")
+        guard game.bytes[0x13D8..<0x13DA].allSatisfy({ $0 == 0 }) else {
+            throw OriginalDataError.unsupported("Apple notebook page composition")
         }
         pages = (0..<3).map { Array(game.bytes[(0x3558 + $0 * Self.packedSize)..<(0x3558 + ($0 + 1) * Self.packedSize)]) }
         locked = (0..<3).map { game.bytes[0x13C8 + $0] != 0 }
@@ -28,7 +30,40 @@ public struct OriginalNotebook: Sendable {
             guard data.count == Self.packedSize else { throw OriginalDataError.invalid("Notebook drawing length") }
             pages.append(Array(data))
         }
-        pixels = locked[0] ? Array(repeating: 0, count: 0xC000) : Self.unpack(pages[0])
+        /**
+         * 0x020797CC packs available Mila memos top-down onto shared pages. A page breaks
+         * at 256 rows or when a later memo's group differs from the page's second memo onward.
+         */
+        var unread: Int?, startPage = 0, used = 0, group: Int?, pageStarted = false
+        for index in 0..<32 where game.memoAvailable(index) {
+            let data = Array(try load(String(format: "system/note/memo/mila%02d_M.bin", index + 1)))
+            guard data.count == 0x10 + Self.packedSize, data[0..<4] == [0x4D, 0x49, 0x4C, 0x41] else {
+                throw OriginalDataError.invalid("Mila memo \(index + 1)")
+            }
+            let rows = Int(data[4])
+            if group == nil { group = Int(data[5]) }
+            if !pageStarted || used + rows > 0x100 || group != Int(data[5]) {
+                pages.append(Array(repeating: 0, count: Self.packedSize))
+                pageStarted = true
+                used = 0
+                group = nil
+            }
+            // 0x0207A458 copies the bottom `rows` bytes of each 8-pixel column.
+            guard rows % 8 == 0, used % 8 == 0 else { throw OriginalDataError.invalid("Mila memo rows") }
+            for column in 0..<24 {
+                let source = 0x10 + column * 0x100 + 0x100 - rows
+                let target = column * 0x100 + 0x100 - used - rows
+                pages[pages.count - 1].replaceSubrange(target..<(target + rows), with: data[source..<(source + rows)])
+            }
+            used += rows
+            if unread == nil, !game.memoRead(index) {
+                unread = index
+                startPage = pages.count - 1
+            }
+        }
+        unreadMemo = unread
+        page = startPage
+        pixels = page < 3 && locked[page] ? Array(repeating: 0, count: 0xC000) : Self.unpack(pages[page])
         undoPixels = pixels
     }
 

@@ -158,6 +158,22 @@ public struct OriginalScriptCatalog: Sendable {
         manifest.files.filter { $0.name.hasSuffix(".blk") }.map { String($0.name.dropLast(4)) }.sorted()
     }
 
+    /// The original loader permits rooms without a chapter script and uses System responses.
+    /// Only an absent room program is empty. Present but damaged files still fail validation.
+    public func loadMapProgram(chapter: UInt16, mapID: Int16) throws -> OriginalScriptProgram {
+        guard chapter < 10, let map = OriginalMapExploration.supportedMaps[mapID] else {
+            throw OriginalDataError.unsupported("Room program")
+        }
+        let name = "EP\(chapter + 1)_\(map)"
+        if manifest.files.contains(where: { $0.name.hasPrefix(name + ".") }) {
+            return try loadProgram(name)
+        }
+        let emptyTables = Data((0..<4).flatMap { _ in [UInt8(32), 0, 0, 0, 0, 0, 0, 0] })
+        return try OriginalScriptProgram(name: name,
+            text: OriginalTextTable(decoded: Data(repeating: 0, count: 4)),
+            eventLabels: [], choices: [], blockData: emptyTables, conditionData: Data())
+    }
+
     public func loadProgram(_ name: String) throws -> OriginalScriptProgram {
         let debugName = "\(name).dbg"
         let reviewName = name.firstIndex(of: "_").map { String(name[...$0]) + ".spn" }

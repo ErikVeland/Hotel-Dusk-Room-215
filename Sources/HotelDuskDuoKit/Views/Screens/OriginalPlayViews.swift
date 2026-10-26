@@ -2,17 +2,28 @@ import SwiftUI
 import CoreGraphics
 
 /// Visible text from an original dialogue page. Glyph bytes are shown as
-/// Latin-1; control codes other than colour are not drawn.
+/// Latin-1. Colour and participant metadata survive into the notebook.
 struct OriginalDialogueLines {
-    struct Run: Hashable { let text: String; let colour: UInt8 }
+    struct Run: Hashable {
+        let text: String
+        let colour: UInt8
+        let person: Int32?
+
+        init(text: String, colour: UInt8, person: Int32? = nil) {
+            self.text = text
+            self.colour = colour
+            self.person = person
+        }
+    }
     let lines: [[Run]]
 
-    init(page: OriginalDialoguePacket.Page) {
+    init(page: OriginalDialoguePacket.Page, person: Int32? = nil) {
         var lines: [[Run]] = [[]]
+        var person = person
         var colour: UInt8 = 0, bytes: [UInt8] = []
         func flush() {
             guard !bytes.isEmpty else { return }
-            lines[lines.count - 1].append(Run(text: String(bytes: bytes, encoding: .isoLatin1) ?? "", colour: colour))
+            lines[lines.count - 1].append(Run(text: String(bytes: bytes, encoding: .isoLatin1) ?? "", colour: colour, person: person))
             bytes = []
         }
         for token in page.tokens {
@@ -20,6 +31,7 @@ struct OriginalDialogueLines {
             case .glyph(10): flush(); lines.append([])
             case .glyph(let byte): bytes.append(byte)
             case .control(.color(let value)): flush(); colour = value
+            case .control(.portraitMetadata(let value, _)): flush(); person = value
             case .control: break
             }
         }
@@ -29,34 +41,6 @@ struct OriginalDialogueLines {
     }
 
     var isEmpty: Bool { lines.allSatisfy { $0.allSatisfy { $0.text.trimmingCharacters(in: .whitespaces).isEmpty } } }
-}
-
-/// Colour 1 marks emphasised names and colour 2 Kyle's private thoughts in
-/// the source text. These ink tones approximate them; the original palette
-/// entries have not been recovered.
-private func ink(_ colour: UInt8) -> Color {
-    switch colour {
-    case 1: NovelStyle.redInk
-    case 2: Color(red: 0.20, green: 0.27, blue: 0.42)
-    default: NovelStyle.ink
-    }
-}
-
-struct OriginalDialoguePageView: View {
-    let page: OriginalDialoguePacket.Page
-
-    var body: some View {
-        let text = OriginalDialogueLines(page: page)
-        VStack(alignment: .leading, spacing: 6) {
-            ForEach(Array(text.lines.enumerated()), id: \.offset) { _, line in
-                line.reduce(Text("")) { $0 + Text($1.text).foregroundColor(ink($1.colour)) }
-                    .font(NovelStyle.body)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
-    }
 }
 
 /// The original entrance panels, rotated from DS framebuffer orientation to
@@ -121,18 +105,19 @@ struct OriginalEntrancePanelView: View {
                 }
                 .frame(width: size.width, height: size.height)
                 .contentShape(Rectangle())
-                .gesture(SpatialTapGesture().onEnded { tap in
+                .onPageTap { point in
                     guard !upper else { return }
-                    play.touchEntrance(pageX: Int(tap.location.x / size.width * 192),
-                                       pageY: Int(tap.location.y / size.height * 256))
-                })
+                    play.touchEntrance(pageX: Int(point.x / size.width * 192),
+                                       pageY: Int(point.y / size.height * 256))
+                }
+                .notebookPhotograph()
                 .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
             }
         }
     }
 
     private func fittedSize(in space: CGSize) -> CGSize {
-        let scale = min(space.width / 192, space.height / 256)
+        let scale = max(0, min((space.width - 16) / 192, (space.height - 36) / 256))
         return CGSize(width: 192 * scale, height: 256 * scale)
     }
 
@@ -171,33 +156,46 @@ struct OriginalBellPageView: View {
 
     var body: some View {
         if let scene = play.bell, !upper {
-            GeometryReader { proxy in
-                let scale = min(proxy.size.width / 192, proxy.size.height / 256)
-                let size = CGSize(width: 192 * scale, height: 256 * scale)
-                ZStack(alignment: .topLeading) {
-                    ForEach(["bell02", "bell01"], id: \.self) { name in
-                        if let image = Self.image(name) {
-                            Image(decorative: image, scale: 1).resizable().interpolation(.none)
-                                .frame(width: size.width, height: size.height)
+            VStack(spacing: 8) {
+                GeometryReader { proxy in
+                    let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
+                    let size = CGSize(width: 192 * scale, height: 256 * scale)
+                    ZStack(alignment: .topLeading) {
+                        ForEach(["bell02", "bell01"], id: \.self) { name in
+                            if let image = Self.image(name) {
+                                Image(decorative: image, scale: 1).resizable().interpolation(.none)
+                                    .frame(width: size.width, height: size.height)
+                            }
+                        }
+                        if scene.awaitingTouch {
+                            // 0x021FE7F8: x′ 56–96, y′ 72–120 → page x 72–120, y 56–96.
+                            marker(x: 72, y: 56, width: 49, height: 41, scale: scale)
+                                .accessibilityLabel("Bell")
+                        }
+                        if scene.quitEnabled {
+                            // 0x020267F0 slot 5: x′ 228–252, y′ 156–188.
+                            marker(x: 156, y: 228, width: 33, height: 25, scale: scale)
+                                .accessibilityLabel("Quit")
                         }
                     }
-                    if scene.awaitingTouch {
-                        // 0x021FE7F8: x′ 56–96, y′ 72–120 → page x 72–120, y 56–96.
-                        marker(x: 72, y: 56, width: 49, height: 41, scale: scale)
-                            .accessibilityLabel("Bell")
+                    .frame(width: size.width, height: size.height)
+                    .contentShape(Rectangle())
+                    .onPageTap { point in
+                        guard scale > 0 else { return }
+                        play.touchEntrance(pageX: Int(point.x / scale), pageY: Int(point.y / scale))
                     }
-                    if scene.quitEnabled {
-                        // 0x020267F0 slot 5: x′ 228–252, y′ 156–188.
-                        marker(x: 156, y: 228, width: 33, height: 25, scale: scale)
-                            .accessibilityLabel("Quit")
-                    }
+                    .notebookPhotograph()
+                    .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
                 }
-                .frame(width: size.width, height: size.height)
-                .contentShape(Rectangle())
-                .gesture(SpatialTapGesture().onEnded { tap in
-                    play.touchEntrance(pageX: Int(tap.location.x / scale), pageY: Int(tap.location.y / scale))
-                })
-                .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+                HStack {
+                    Button("Back") { play.touchEntrance(pageX: 172, pageY: 240) }
+                        .disabled(!scene.quitEnabled)
+                    Button(scene.awaitingTouch ? "Ring bell" : "Wait…") {
+                        play.touchEntrance(pageX: 96, pageY: 76)
+                    }
+                    .disabled(!scene.awaitingTouch)
+                }
+                .buttonStyle(BookTextButtonStyle())
             }
         }
     }
@@ -234,9 +232,12 @@ struct OriginalPlayStatusView: View {
             default:
                 EmptyView()
             }
-            Button("Start again") { session.startOriginalGame() }
-                .buttonStyle(BookTextButtonStyle())
-            Button("Close") { session.endOriginalGame() }
+            if session.resumeSave != nil {
+                Button("Return to last checkpoint") { session.continueSavedGame() }
+                    .buttonStyle(BookTextButtonStyle())
+            }
+            if let error = session.saveError { Text(error).font(NovelStyle.caption) }
+            Button("Return to title") { session.endOriginalGame() }
                 .buttonStyle(BookTextButtonStyle())
         }
         .multilineTextAlignment(.center)
@@ -282,7 +283,7 @@ struct OriginalSignPageView: View {
     var body: some View {
         if let scene = play.sign, !upper {
             GeometryReader { proxy in
-                let scale = min(proxy.size.width / 192, proxy.size.height / 256)
+                let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
                 let size = CGSize(width: 192 * scale, height: 256 * scale)
                 ZStack(alignment: .topLeading) {
                     if let blank = Self.image("signnote") {
@@ -319,6 +320,7 @@ struct OriginalSignPageView: View {
                 .frame(width: size.width, height: size.height)
                 .contentShape(Rectangle())
                 .gesture(DragGesture(minimumDistance: 0).onChanged { drag in
+                    guard scale > 0 else { return }
                     let x = Int(drag.location.x / scale), y = Int(drag.location.y / scale)
                     if !dragging { dragging = true; play.touchEntrance(pageX: x, pageY: y) }
                     play.holdTouch(pageX: x, pageY: y)
@@ -326,6 +328,7 @@ struct OriginalSignPageView: View {
                     dragging = false
                     play.releaseTouch()
                 })
+                .notebookPhotograph()
                 .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
             }
         }
@@ -353,29 +356,27 @@ struct OriginalQuestionMenuView: View {
     @State private var showsInventory = false
 
     var body: some View {
-        VStack(spacing: 10) {
-            if showsInventory {
-                Text("Show an item").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
-                ForEach((try? play.runner.game.inventory.items) ?? [], id: \.self) { item in
-                    Button(play.itemNames[item] ?? String(item)) {
-                        showsInventory = false
-                        play.showItemInConversation(item)
-                    }.buttonStyle(BookTextButtonStyle())
-                }
-                Button("Cancel") { showsInventory = false }.buttonStyle(BookTextButtonStyle())
-            } else {
-                Text(topics.isEmpty ? "No questions" : "Ask about").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
-                ForEach(topics, id: \.keyword) { topic in
-                    Button(topic.label) { play.ask(topic.keyword) }
+        if showsInventory {
+            OriginalInventoryView(play: play, actionTitle: "Show item", onSelect: { item in
+                showsInventory = false
+                play.showItemInConversation(item)
+            }, onClose: { showsInventory = false })
+        } else {
+            ScrollView {
+                VStack(spacing: 10) {
+                    Text(topics.isEmpty ? "No questions" : "Ask about").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
+                    ForEach(topics, id: \.keyword) { topic in
+                        Button(topic.label) { play.ask(topic.keyword) }
+                            .buttonStyle(BookTextButtonStyle())
+                    }
+                    InkRule().padding(.vertical, 6)
+                    Button("Notebook") { play.openNotebook() }
+                        .buttonStyle(BookTextButtonStyle())
+                    Button("Items") { showsInventory = true }
+                        .buttonStyle(BookTextButtonStyle())
+                    Button("Leave") { play.leaveConversation() }
                         .buttonStyle(BookTextButtonStyle())
                 }
-                InkRule().padding(.vertical, 6)
-                Button("Notebook") { play.openNotebook() }
-                    .buttonStyle(BookTextButtonStyle())
-                Button("Items") { showsInventory = true }
-                    .buttonStyle(BookTextButtonStyle())
-                Button("Leave") { play.leaveConversation() }
-                    .buttonStyle(BookTextButtonStyle())
             }
         }
     }

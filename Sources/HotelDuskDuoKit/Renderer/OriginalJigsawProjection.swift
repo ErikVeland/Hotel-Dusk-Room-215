@@ -17,7 +17,7 @@ public enum OriginalJigsawProjection {
               128 - (Float(piece.position.y) / 4096 + 1) * pixelsPerUnit)
     }
 
-    public static func imageName(_ index: Int) -> String {
-        "JigsawPiece\(4 - index / 4)\(3 - index % 4)"
+    public static func imageName(_ index: Int, reverse: Bool = false) -> String {
+        "Jigsaw\(reverse ? "BackPiece" : "Piece")\(4 - index / 4)\(3 - index % 4)"
     }
 }

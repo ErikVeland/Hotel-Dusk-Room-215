@@ -36,12 +36,18 @@ fragment float4 bookPaperFragment(PaperVertex in [[stage_in]],
     if (u.viewport.w < 0.5) {
         float2 px=uv*u.viewport.xy/max(u.viewport.z,1.0);
         float tooth=hashPaper(floor(px*1.8)+seed)-0.5;
-        float fibres=pulpNoise(px*float2(0.7,3.8)+seed)-0.5;
+        float fibres=pulpNoise(px*float2(0.38,3.8)+seed)-0.5;
         float density=pulpNoise(px/75.0+seed)-0.5;
         float edge=min(min(uv.x,1-uv.x),min(uv.y,1-uv.y));
-        float oxidation=exp(-edge*65.0)*(0.007+0.009*pulpNoise(px/19.0));
-        float3 stock=float3(0.934,0.902,0.820)+tooth*0.026+fibres*0.009+density*0.009;
+        float oxidation=exp(-edge*38.0)*(0.025+0.035*pulpNoise(px/19.0));
+        float3 stock=float3(0.934,0.895,0.793)+tooth*0.038+fibres*0.018+density*0.025;
         stock-=oxidation*float3(0.45,0.65,0.9);
+        // Sparse inclusions in cheap wood-pulp stock, fixed to each sheet.
+        float2 cell=floor(px/11.0);
+        float2 fleck=fract(px/11.0)-float2(hashPaper(cell+seed),hashPaper(cell+seed+37));
+        float foxing=(1-smoothstep(0.015,0.085,length(fleck)))
+            *step(0.93,hashPaper(cell+seed+91))*(0.035+0.09*exp(-edge*14));
+        stock-=foxing*float3(0.45,0.65,0.8);
         return float4(clamp(stock,0.0,1.0),1);
     }
     if (u.viewport.w < 1.5) {
@@ -61,6 +67,28 @@ fragment float4 bookPaperFragment(PaperVertex in [[stage_in]],
         }
         float alpha=min(0.08,(illumination-1)*0.6);
         return float4(float3(1,0.99,0.94)*alpha,alpha);
+    }
+    if (u.viewport.w > 2.5 && u.viewport.w < 3.5) {
+        // Uncoated photographic mounting card, slightly brighter than the page.
+        float2 px=uv*u.viewport.xy;
+        float grain=hashPaper(floor(px)+seed)-0.5;
+        float edge=min(min(uv.x,1-uv.x),min(uv.y,1-uv.y));
+        float wear=exp(-edge*85)*(0.025+0.025*pulpNoise(px/13+seed));
+        float3 card=float3(0.974,0.951,0.879)+grain*0.025-wear*float3(0.5,0.65,0.8);
+        return float4(card,1);
+    }
+    if (u.viewport.w > 3.5) {
+        // Serrated ends and adhesive mottling on translucent archival tape.
+        float2 px=uv*u.viewport.xy;
+        float tearLeft=0.025+0.055*hashPaper(float2(floor(px.y/3),seed));
+        float tearRight=0.025+0.055*hashPaper(float2(floor(px.y/3),seed+51));
+        float edge=min(uv.x-tearLeft,1-uv.x-tearRight);
+        float mask=smoothstep(0.0,0.008,edge)*smoothstep(0.0,0.045,min(uv.y,1-uv.y));
+        float fibres=pulpNoise(px*float2(0.12,2.2)+seed);
+        float glue=pulpNoise(px/10+seed);
+        float alpha=mask*(0.49+glue*0.18+fibres*0.08);
+        float3 tape=float3(0.79,0.67,0.42)+fibres*0.08+glue*0.04;
+        return float4(tape*alpha,alpha);
     }
     // A narrow curved valley at the physical binding, not a flat black divider.
     float x=abs(uv.x-0.5)*2;

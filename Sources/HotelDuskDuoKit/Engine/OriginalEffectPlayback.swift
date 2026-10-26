@@ -13,9 +13,18 @@ private final class OriginalEffectRenderBox: @unchecked Sendable {
     private let lock = NSLock()
     private var players: [Int: Playing] = [:]
     private var shared: OriginalSequenceMachine.SharedState
-    private(set) var error: Error?
+    private var error: Error?
 
     init(driver: OriginalSoundDriver) { shared = .init(driver: driver) }
+
+    func takeError() -> Error? {
+        lock.withLock {
+            defer { error = nil }
+            return error
+        }
+    }
+
+    func clear() { lock.withLock { players.removeAll(); error = nil } }
 
     func play(_ renderer: OriginalEffectRenderer, playerID: Int) {
         lock.withLock {
@@ -138,4 +147,6 @@ final class OriginalEffectPlayback {
     func advanceFrame() { box.advanceFrame() }
     func pause() { engine.pause() }
     func resume() throws { if !engine.isRunning { try engine.start() } }
+    func takeRenderError() -> Error? { box.takeError() }
+    func stopAll() { engine.stop(); box.clear() }
 }

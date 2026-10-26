@@ -5,7 +5,10 @@ import simd
  * Overlay 12 wire-lock controller. Process 29 fails with thin wire. Process 33 opens the suitcase.
  */
 public struct OriginalThinWireProcess: Equatable, Sendable {
-    public enum Variant: Equatable, Sendable { case thin, thick }
+    public enum Variant: UInt16, Equatable, Sendable {
+        case thin = 29, thick = 33, door = 77, orderedDoor = 78
+        var isDoor: Bool { self == .door || self == .orderedDoor }
+    }
 
     public enum Effect: Equatable, Sendable {
         case fadeIn(Int), fadeOut(Int), completionFade(Int)
@@ -46,15 +49,19 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
     private var cameraStart = SIMD3<Int32>.zero
     private var scrapePlaying = false
     private var previousScrapeTouch = SIMD2<Float>.zero
+    private var latchElapsed: Double?
 
-    public init(variant: Variant = .thin) { self.variant = variant }
+    public init(variant: Variant = .thin) {
+        self.variant = variant
+        if variant.isDoor { pins = pinOrigins.map { Pin(position: $0) } }
+    }
 
-    public var processID: UInt16 { variant == .thin ? 29 : 33 }
+    public var processID: UInt16 { variant.rawValue }
     public var contactRadius: Float { variant == .thin ? 0.05 : 0.1 }
     public var showsOpening: Bool { phase == 4 || phase == 8 }
     var frameCounter: Int { timer }
 
-    public var showsLock: Bool { phase == 3 || phase == 7 }
+    public var showsLock: Bool { phase == 3 || phase == 7 || (phase == 0 && variant.isDoor) }
     public var canQuit: Bool { result == nil && (phase == 1 || (phase == 3 && stage == 1)) }
 
     public mutating func quit() {
@@ -69,7 +76,7 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
      * Page coordinates retain the original 192×256 rotation and fixed-point rounding.
      */
     @discardableResult
-    public mutating func update(pageTouch: SIMD2<Float>? = nil, fadeComplete: Bool = false) -> [Effect] {
+    public mutating func update(pageTouch: SIMD2<Float>? = nil, fadeComplete: Bool = false, elapsedSeconds: Double = 1 / 59.8261) -> [Effect] {
         guard result == nil else { return [] }
         let touch = pageTouch.flatMap { point -> SIMD2<Float>? in
             guard point.x.isFinite, point.y.isFinite, (0...191).contains(point.x), (0...255).contains(point.y) else { return nil }
@@ -78,7 +85,7 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
         let pressed = touch != nil && !wasDown
         wasDown = touch != nil
         switch phase {
-        case 0: phase = 1; return [.fadeIn(60), .caption(-1)]
+        case 0: phase = variant.isDoor ? 3 : 1; return [.fadeIn(60), .caption(-1)]
         case 1:
             drawnWire = wire
             if stage == 0 { stage = 1 }
@@ -123,7 +130,16 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
             drawnWire = wire
         case 3:
             if stage == 0 { stage = 1 }
-            else if stage == 1 { return updatePins(touch) }
+            else if stage == 1 {
+                if variant == .door, let elapsed = latchElapsed {
+                    let next = elapsed + (elapsedSeconds.isFinite ? max(0, elapsedSeconds) : 0)
+                    if next >= 4 {
+                        for index in pins.indices { pins[index].reached = false; pins[index].wasPushed = false }
+                        latchElapsed = nil
+                    } else { latchElapsed = next }
+                }
+                return updatePins(touch)
+            }
             else if stage == 2 { stage = 3; timer = 0 }
             else if stage == 3 {
                 timer += 1
@@ -194,6 +210,13 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
         return []
     }
 
+    private func inCursorWindow(_ point: SIMD2<Float>) -> Bool {
+        // Overlay initializer 0x02207E5C supplies different door and suitcase windows.
+        let x: ClosedRange<Float> = variant.isDoor ? 88...104 : 85...106
+        let y: ClosedRange<Float> = variant.isDoor ? 88...168 : 98...158
+        return x.contains(point.x) && y.contains(point.y)
+    }
+
     private func hit(_ point: SIMD2<Float>, radius: Int32) -> SIMD3<Int32>? {
         OriginalSuitcaseProjection.hit(page: point, eye: eye, target: target, centre: drawnWire, radius: radius)
     }
@@ -202,23 +225,23 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
      * 0x02204D50 returns each pin before handling the cursor's next contact.
      */
     private mutating func updatePins(_ touch: SIMD2<Float>?) -> [Effect] {
-        cursorVisible = touch.map { (85...106).contains($0.x) && (98...158).contains($0.y) } ?? false
+        cursorVisible = touch.map(inCursorWindow) ?? false
         var effects: [Effect] = []
         for index in pins.indices {
-            if variant == .thick && pins[index].reached { continue }
+            if variant != .thin && pins[index].reached { continue }
             if pins[index].depth > 0 && !pins[index].wasPushed {
                 pins[index].depth -= 1
                 let step = Self.pinStep(index)
                 let value = SIMD2<Float>(pins[index].position) - step
                 pins[index].position = SIMD2(Int32(value.x), Int32(value.y))
-                let origin = Self.pinOrigins[index]
+                let origin = pinOrigins[index]
                 pins[index].position.x = step.x > 0 ? max(origin.x, pins[index].position.x) : min(origin.x, pins[index].position.x)
                 pins[index].position.y = step.y > 0 ? max(origin.y, pins[index].position.y) : min(origin.y, pins[index].position.y)
             }
             pins[index].wasPushed = false
         }
         if !holding {
-            if let touch, (85...106).contains(touch.x), (98...158).contains(touch.y) {
+            if let touch, inCursorWindow(touch) {
                 holding = true
                 cursor = Self.lockPoint(touch)
                 if contactPins() {
@@ -264,7 +287,7 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
     private mutating func contactPins() -> Bool {
         var hit = false
         for index in pins.indices {
-            let points = Self.pinContours[index].map { $0 &+ pins[index].position }
+            let points = pinContours[index].map { $0 &+ pins[index].position }
             let repeated = points + Array(repeating: points[4], count: 5)
             let contact = (0..<10).contains { side in
                 near(repeated[side]) || nearMidpoint(repeated[side], repeated[(side + 1) % 10])
@@ -288,7 +311,13 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
             pins[index].position = SIMD2(Int32(value.x), Int32(value.y))
         }
         if pins[index].depth >= threshold {
-            if variant == .thick && !pins[index].reached { latchedPins += 1 }
+            if variant != .thin && !pins[index].reached {
+                latchedPins += 1
+                if variant == .door, latchElapsed == nil { latchElapsed = 0 }
+            }
+            if variant == .orderedDoor, pins.indices.contains(where: { $0 > index && pins[$0].reached }) {
+                for other in pins.indices { pins[other].reached = false; pins[other].wasPushed = false }
+            }
             pins[index].reached = true
         }
     }
@@ -319,11 +348,18 @@ public struct OriginalThinWireProcess: Equatable, Sendable {
         SIMD3((0..<3).map { Int32((point[$0] * 4096).rounded(.toNearestOrAwayFromZero)) })
     }
 
-    private static let pinOrigins: [SIMD2<Int32>] = [SIMD2(0, 1106), SIMD2(492, 0), SIMD2(0, -1065)]
+    private var pinOrigins: [SIMD2<Int32>] {
+        switch variant {
+        case .door: return [.init(-410, 1352), .init(410, 410), .init(410, -1352), .init(-410, -410)]
+        case .orderedDoor: return [.init(410, 1352), .init(410, -410), .init(-410, -1352), .init(-410, 410)]
+        default: return [.init(0, 1106), .init(492, 0), .init(0, -1065)]
+        }
+    }
     // 0x02205AF4 derives these five contour points from the original lock dimensions.
-    private static let pinContours: [[SIMD2<Int32>]] = [
+    private var pinContours: [[SIMD2<Int32>]] { [
         [SIMD2(-512, 683), SIMD2(-512, -640), SIMD2(469, -640), SIMD2(469, 683), SIMD2(0, -640)],
         [SIMD2(-384, 299), SIMD2(-384, -256), SIMD2(384, -256), SIMD2(384, 299), SIMD2(-384, 0)],
-        [SIMD2(-427, 512), SIMD2(-427, -469), SIMD2(341, -469), SIMD2(341, 512), SIMD2(0, 512)]
-    ]
+        [SIMD2(-427, 512), SIMD2(-427, -469), SIMD2(341, -469), SIMD2(341, 512), SIMD2(0, 512)],
+        [SIMD2(-384, 299), SIMD2(-384, -256), SIMD2(384, -256), SIMD2(384, 299), SIMD2(384, 0)]
+    ] }
 }

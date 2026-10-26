@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "method": "Whole native introduction and loop RMS; both sources attenuated, shared 3 dB headroom.",
+  "profileSHA256": "c78b413dafbbe7d32eefc43af6a961f3b30e117eb29f1b6a3600461585189b92",
+  "nativeManifestSHA256": "8055b29303cc771a1b7242600a798783b31f46cade575bb66abbbd8bf33d1002",
+  "recordedManifestSHA256": "d9edf635effb2ffbe9438b21c4a7217748ff0cc1616ba8ee6300e906529c7e48",
+  "tracks": [
+    {
+      "id": 0,
+      "nativeGain": 0.14566302343393583,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 1,
+      "nativeGain": 0.09852299992241903,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 2,
+      "nativeGain": 0.15018869702546525,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 3,
+      "nativeGain": 0.055547926937743464,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 4,
+      "nativeGain": 0.14703487342620938,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 5,
+      "nativeGain": 0.15991660167814722,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 6,
+      "nativeGain": 0.17284531271062775,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 7,
+      "nativeGain": 0.14930226991056303,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 8,
+      "nativeGain": 0.10244149190239282,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 9,
+      "nativeGain": 0.16441558354282837,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 10,
+      "nativeGain": 0.1211869601359595,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 11,
+      "nativeGain": 0.2051607766095334,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 12,
+      "nativeGain": 0.09729461450143521,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 13,
+      "nativeGain": 0.10999546118053974,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 14,
+      "nativeGain": 0.12276749074108824,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 15,
+      "nativeGain": 0.1652868518978946,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 16,
+      "nativeGain": 0.14076368860430066,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 17,
+      "nativeGain": 0.17407305701457584,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 18,
+      "nativeGain": 0.12716371009606967,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 19,
+      "nativeGain": 0.13564090858181246,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 20,
+      "nativeGain": 0.13229861350704902,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 21,
+      "nativeGain": 0.10182358512301898,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 22,
+      "nativeGain": 0.09116640653910024,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 23,
+      "nativeGain": 0.1252326379744665,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 24,
+      "nativeGain": 0.10972949089980857,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 25,
+      "nativeGain": 0.12082020956154275,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 26,
+      "nativeGain": 0.13668442151728033,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 27,
+      "nativeGain": 0.14565892460934832,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 28,
+      "nativeGain": 0.11764033651752703,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 29,
+      "nativeGain": 0.05235188936425545,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 30,
+      "nativeGain": 0.09521499787281931,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 31,
+      "nativeGain": 0.1413179044468845,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 32,
+      "nativeGain": 0.06761391912750965,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 33,
+      "nativeGain": 0.16528522600270953,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 34,
+      "nativeGain": 0.1415467590639263,
+      "recordedGain": 0.7079457843841379
+    },
+    {
+      "id": 35,
+      "nativeGain": 0.10828263706411674,
+      "recordedGain": 0.7079457843841379
+    }
+  ]
+}

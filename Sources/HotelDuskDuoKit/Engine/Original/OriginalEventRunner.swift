@@ -215,12 +215,12 @@ public struct OriginalEventRunner: Sendable {
     }
 
     /**
-     * 0x0203A444 tries System after a normal search or close-up selection finds no event.
+     * 0x0203A444 tries System after a search, close-up or door selection finds no event.
      */
     public func searchFallback(catalog: OriginalScriptCatalog) throws -> Self? {
         guard scope == .normal, case .exploration = phase, eventIndex == nil,
               let context = lastSelectionMiss, context == session.selection,
-              ((10...12).contains(context.modeID) || context.modeID == 16) else { return nil }
+              ((10...14).contains(context.modeID) || context.modeID == 16) else { return nil }
         return try Self(program: catalog.loadProgram("System"), game: game,
                         selection: context, scope: .system)
     }
@@ -373,18 +373,17 @@ public struct OriginalEventRunner: Sendable {
     /**
      * The map host consumes the chapter request after the review returns.
      */
-    mutating func prepareChapter(_ chapter: UInt16, position: SIMD3<Float>, facing: Float) throws {
+    mutating func prepareChapter(_ chapter: UInt16, position: SIMD3<Float>, facing: Float, destination: Int16? = nil) throws {
         try game.beginChapter(chapter)
-        game.setMap(game.mapID, previous: game.mapID)
+        game.setMap(destination ?? game.mapID, previous: game.mapID)
         game.setMapPosition(position, facing: facing)
     }
 
     /**
-     * Chapter 2 uses the source label, including its leading space.
+     * The title uses the source clock table, including its leading space.
      */
     mutating func beginChapterTitle() throws {
-        guard game.chapter == 1 else { throw OriginalDataError.unsupported("Chapter title") }
-        try game.beginChapterTitle(label: " 05:30PM")
+        try game.beginChapterTitle(label: OriginalChapter(game.chapter).clockLabel)
     }
 
     /// The player dismissed the current text page.
@@ -450,11 +449,15 @@ public struct OriginalEventRunner: Sendable {
 
     /// The embedded process finished with its process-manager return value.
     public mutating func finishProcess(returnValue: Int16) {
-        guard case .process = phase, inventoryProcess == nil else { return }
+        guard case .process(let id) = phase, inventoryProcess == nil else { return }
         if timeTransition != nil {
             timeTransition = nil
             operationIndex += 1
         }
+        // CTrickBase destructor 0x02026DD4 marks the process bit only when
+        // its return value is zero. Clock and non-puzzle IDs are excluded by
+        // the original puzzle-bit range.
+        if returnValue == 0 { game.markPuzzleCompleted(processID: id) }
         processReturn = returnValue
         run()
     }
@@ -480,7 +483,7 @@ public struct OriginalEventRunner: Sendable {
      * Overlay 12 marks the completed wire attempt before the shared script handles its outcome.
      */
     public mutating func finishThinWire(returnValue: Int16) {
-        guard case .process(let id) = phase, id == 29 || id == 33 else { return }
+        guard case .process(let id) = phase, OriginalThinWireProcess.Variant(rawValue: id) != nil else { return }
         if returnValue == 0 { game.markPuzzleCompleted(processID: id) }
         finishProcess(returnValue: returnValue)
     }
@@ -532,9 +535,9 @@ public struct OriginalEventRunner: Sendable {
      * Overlay 10 retains the wheel number and marks only a successful cabinet unlock.
      */
     public mutating func finishCabinetDial(returnValue: Int16, retainedValue: UInt16) {
-        guard case .process(31) = phase else { return }
-        if returnValue == 0 { game.markPuzzleCompleted(processID: 31) }
-        game.storeCabinetDialValue(retainedValue)
+        guard case .process(let processID) = phase, processID == 31 || processID == 80 else { return }
+        if processID == 31 { game.storeCabinetDialValue(retainedValue) }
+        else { game.storeCashboxDialValue(retainedValue) }
         finishProcess(returnValue: returnValue)
     }
 
@@ -561,6 +564,12 @@ public struct OriginalEventRunner: Sendable {
      * Clears the original notebook notification without advancing the parent event.
      */
     public mutating func openNotebook() { game.openNotebook() }
+
+    /// Process 58 stores the jukebox song while the process runs (0x020989D4).
+    mutating func setJukeboxSequence(_ id: Int16) {
+        guard case .process(58) = phase else { return }
+        game.setJukeboxSequence(id)
+    }
 
     /**
      * Stores writable ink while retaining the parent event selection.
@@ -618,8 +627,8 @@ public struct OriginalEventRunner: Sendable {
      * The jigsaw destructor saves its loose-piece mask before the process returns.
      */
     public mutating func finishJigsaw(returnValue: Int16, looseMask: UInt32) {
-        guard case .process(26) = phase else { return }
-        game.chapterOneJigsawMask = looseMask
+        guard case .process(let id) = phase, let variant = OriginalJigsawProcess.Variant(rawValue: id) else { return }
+        game.setJigsawMask(looseMask, for: variant)
         finishProcess(returnValue: returnValue)
     }
 
@@ -632,6 +641,28 @@ public struct OriginalEventRunner: Sendable {
         context.pairA = pairA
         context.pairB = pairB
         return try Self(program: catalog.loadProgram("System"), game: game, selection: context, scope: .system)
+    }
+
+    /**
+     * 0x02078138: after the notebook shows a new Mila memo in a conversation, 0x02028328
+     * commits mode 31 with the memo index and 0x02098948 marks it read. Mode 31 selects
+     * from System scene 203.
+     */
+    public mutating func readMemo(_ index: Int, catalog: OriginalScriptCatalog) throws -> Self {
+        guard case .questions = phase else { throw OriginalDataError.unsupported("Memo outside a conversation") }
+        game.markMemoRead(index)
+        var context = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID).selection
+        context.modeID = 31
+        context.parameter60 = Int16(index)
+        return try Self(program: catalog.loadProgram("System"), game: game, selection: context, scope: .system)
+    }
+
+    /// The memo response returns its state; the conversation keeps its question menu.
+    public mutating func resumeConversation(after response: Self) {
+        guard case .questions = phase, case .exploration = response.phase, response.scope == .system else { return }
+        game = response.game
+        unrenderedPresentation += response.unrenderedPresentation
+        processRequests += response.processRequests
     }
 
     /**
@@ -852,6 +883,10 @@ public struct OriginalEventRunner: Sendable {
                 case 4:
                     let following = operationIndex + 1 < operations.count ? operations[operationIndex + 1] : nil
                     let packet = try OriginalDialoguePacket(record: record, following: following, text: program.text)
+                    // Game-over pages (`%r`) need the recovered failure screen and retry restore.
+                    if packet.pages.contains(where: { $0.tokens.contains { if case .control(.retry) = $0.kind { return true }; return false } }) {
+                        return halt("The game-over retry sequence is not recovered", sourceOffset: record.sourceOffset)
+                    }
                     if session.restoredFromNonDialogue {
                         let skipped = skipReplayedPage(packet, following: following)
                         if interrupt.window || interrupt.keepShared { disarmInterrupt() }
@@ -937,6 +972,17 @@ public struct OriginalEventRunner: Sendable {
                 case 47:
                     try game.apply(.keywordUnavailable(Int16(bitPattern: OriginalBytes(record.raw).u16(2))))
                     unrenderedPresentation.append("keywordRemoval@\(record.sourceOffset)")
+                case 34:
+                    // Handler 0x0203C51C pushes the request, then 0x02028240 and 0x020282EC
+                    // commit scene 1, mode 29 and block 0 with the value in session +0x3A.
+                    let reader = OriginalBytes(record.raw)
+                    let value = Int16(bitPattern: try reader.u16(4))
+                    processRequests.append(ProcessRequest(kind: Int8(bitPattern: reader.bytes[2]), value: value))
+                    session.selection.sceneID = 1
+                    session.selection.modeID = 29
+                    session.selection.blockID = 0
+                    session.selection.parameter58 = value
+                    session.eventCommitted = true
                 case 52, 53:
                     // Handlers 0x0203CABC and 0x0203CAD0: fixed kinds 10 and 11, value 0.
                     processRequests.append(ProcessRequest(kind: opcode == 52 ? 10 : 11, value: 0))

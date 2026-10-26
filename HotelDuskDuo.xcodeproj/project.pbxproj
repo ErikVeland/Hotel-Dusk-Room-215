@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,7 +12,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		5F8910055F0C701D82DF4E9A /* HotelDuskDuoiOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = HotelDuskDuoiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F8910055F0C701D82DF4E9A /* Hotel Dusk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hotel Dusk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FB88226230A4BD4F5451B68 /* HotelDuskDuoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotelDuskDuoApp.swift; sourceTree = "<group>"; };
 		F57FFDF4C59592BA5783A64B /* Hotel Dusk Room 215 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Hotel Dusk Room 215"; path = .; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -32,7 +32,7 @@
 		084EB1003AC99D708B2F8BF3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5F8910055F0C701D82DF4E9A /* HotelDuskDuoiOS.app */,
+				5F8910055F0C701D82DF4E9A /* Hotel Dusk.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -82,7 +82,7 @@
 				99E6802D5D467857B5D71480 /* HotelDuskDuoKit */,
 			);
 			productName = HotelDuskDuoiOS;
-			productReference = 5F8910055F0C701D82DF4E9A /* HotelDuskDuoiOS.app */;
+			productReference = 5F8910055F0C701D82DF4E9A /* Hotel Dusk.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -107,7 +107,6 @@
 			packageReferences = (
 				338848465B3C6B203281355E /* XCLocalSwiftPackageReference "." */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -134,8 +133,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 54WU29TRTY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Hotel Dusk";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Blow into the microphone to interact with puzzles. Audio is not saved.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -215,8 +216,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 54WU29TRTY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Hotel Dusk";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Blow into the microphone to interact with puzzles. Audio is not saved.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

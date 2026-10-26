@@ -9,6 +9,190 @@ import AppKit
 /// can be checked without unfolding a simulator. Set SNAPSHOT_DIR to write PNGs.
 @MainActor
 final class LayoutSnapshotTests: XCTestCase {
+    func testRenderGraphicalInventoryAndItemInspection() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        game.setMap(2, previous: 1)
+        for item: UInt16 in [1, 2, 3, 5, 6, 8, 10, 15, 18, 24, 49, 65] {
+            try game.apply(.addInventory(id: item))
+        }
+        let runner = try OriginalEventRunner(program: catalog.loadProgram("EP1_R102"), game: game, deferArrival: true)
+        let audio = AudioController()
+        audio.isMuted = true
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
+        defer { play.stop() }
+        let bytes = play.runner.game.bytes
+        for size in [CGSize(width: 400, height: 540), CGSize(width: 270, height: 460)] {
+            try capture(OriginalInventoryView(play: play, onSelect: { _ in
+                XCTFail("Looking at inventory must not select an item")
+            }, onClose: {}).padding(16).background(PaperSurface()), size: size,
+                name: "inventory_grid_\(Int(size.width))", settlingTime: 0.1)
+            try capture(ScrollView { OriginalInventoryInspection(item: 1).padding(16) }
+                .background(PaperSurface()), size: size,
+                name: "inventory_key_inspection_\(Int(size.width))", settlingTime: 0.1)
+        }
+        try capture(OriginalInventoryInspection(item: 18).padding(16).background(PaperSurface()),
+            size: CGSize(width: 400, height: 540), name: "inventory_photo_inspection", settlingTime: 0.1)
+        try capture(OriginalInventoryInspection(item: 51).padding(16).background(PaperSurface()),
+            size: CGSize(width: 400, height: 540), name: "inventory_missing_source_picture", settlingTime: 0.1)
+        XCTAssertEqual(play.runner.game.bytes, bytes)
+    }
+
+    func testRenderConversationParticipantInk() throws {
+        let audio = AudioController()
+        audio.isMuted = true
+        let play = try OriginalPlaySession.chapterOne(audio: audio)
+        defer { play.stop() }
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102")
+        let book = DialogueNotebook()
+        for start in [120] + Array(stride(from: 178, through: 211, by: 3)) {
+            let entries = Array(program.text.entries[start..<(start + 3)])
+            let tokens = try entries.flatMap { entry in
+                try OriginalDialogueControl.tokens(for: entry) + [
+                    OriginalDialogueToken(textIndex: entry.index, byteOffset: entry.bytes.count, kind: .glyph(10))
+                ]
+            }
+            book.record(.itemNotice(itemID: 1, page: .init(page: 0, entries: entries, tokens: tokens)), program: program.name)
+        }
+        let size = CGSize(width: 951, height: 669)
+        let metrics = DialogueSpreadMetrics(size: size)
+        let layout = DialogueNotebookLayout(runs: book.ink, size: metrics.textSize, fontSize: 18)
+        book.configure(layout)
+        book.finishWriting()
+        try capture(HStack(spacing: 0) {
+            NotebookDialogueLeaf(play: play, notebook: book, layout: layout, metrics: metrics, pageIndex: 0)
+            NotebookDialogueLeaf(play: play, notebook: book, layout: layout, metrics: metrics, pageIndex: 1)
+        }, size: size, name: "conversation_participant_ink")
+    }
+
+    func testRenderWrittenDialoguePages() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let session = GameSession(saveStore: OriginalChapterFileStore(directory: root),
+                                  resumeStore: OriginalResumeFileStore(directory: root))
+        session.startOriginalGame()
+        defer { session.endOriginalGame() }
+        let play = try XCTUnwrap(session.play)
+        for _ in 0..<10 where play.dialogueNotebook.ink.isEmpty { play.advanceDialogue() }
+        XCTAssertFalse(play.dialogueNotebook.ink.isEmpty)
+        let openingSize = CGSize(width: 951, height: 669)
+        play.dialogueNotebook.configure(DialogueNotebookLayout(runs: play.dialogueNotebook.ink,
+            size: DialogueSpreadMetrics(size: openingSize).textSize, fontSize: 18))
+        play.dialogueNotebook.finishWriting()
+        _ = try capture(DuoBookContainerView(session: session), size: openingSize,
+                        name: "book_dialogue_opening", settlingTime: 0.15)
+        session.hingeManager.toggleHandedness()
+        _ = try capture(DuoBookContainerView(session: session), size: openingSize,
+                        name: "book_dialogue_swapped", settlingTime: 0.15)
+        // A test hosting window can report an inactive scene to the container.
+        play.resume()
+        for _ in 0..<20 {
+            guard case .dialogue = play.runner.phase else { break }
+            play.advanceDialogue()
+        }
+        play.pause()
+        let book = play.dialogueNotebook
+        for size in [CGSize(width: 951, height: 669), CGSize(width: 640, height: 800)] {
+            let metrics = DialogueSpreadMetrics(size: size)
+            let layout = DialogueNotebookLayout(runs: book.ink, size: metrics.textSize, fontSize: 18)
+            book.configure(layout)
+            book.finishWriting()
+            XCTAssertGreaterThan(layout.pages.count, 1, "Opening text must reach the right leaf")
+            _ = try capture(NotebookDialogueSpread(play: play, notebook: book), size: size,
+                            name: "written_spread_\(Int(size.width))", settlingTime: 0.15)
+        }
+        // A compact spread exercises overflow and the curved front/reverse faces.
+        let size = CGSize(width: 640, height: 480)
+        let metrics = DialogueSpreadMetrics(size: size)
+        let layout = DialogueNotebookLayout(runs: book.ink, size: metrics.textSize, fontSize: 18)
+        book.configure(layout)
+        book.finishWriting()
+        XCTAssertTrue(book.reader.hasNextSpread)
+        let oldIndex = book.reader.leftIndex
+        func leaf(_ index: Int) -> NotebookDialogueLeaf {
+            NotebookDialogueLeaf(play: play, notebook: book, layout: layout, metrics: metrics, pageIndex: index)
+        }
+        func snapshot(_ index: Int) throws -> CGImage {
+            let renderer = ImageRenderer(content: leaf(index))
+            renderer.scale = 2
+            return try XCTUnwrap(renderer.cgImage)
+        }
+        let images = try NotebookCurlImages(left: snapshot(oldIndex), front: snapshot(oldIndex + 1), reverse: snapshot(oldIndex + 2))
+        XCTAssertFalse(book.consumeTap())
+        for progress in [0.25, 0.5, 0.75] {
+            let view = HStack(spacing: 0) { leaf(oldIndex + 2); leaf(oldIndex + 3) }
+                .overlay { DesktopNotebookCurl(images: images, pageSize: metrics.pageSize, progress: progress) }
+            _ = try capture(view, size: size, name: "spread_curl_\(Int(progress * 100))")
+        }
+        _ = try capture(NotebookDialogueSpread(play: play, notebook: book), size: size,
+                        name: "spread_curl_completed", settlingTime: 1.2)
+        XCTAssertFalse(book.isTurning, "The mounted curl must complete and unlock the next spread")
+        book.finishWriting()
+        _ = try capture(NotebookDialogueSpread(play: play, notebook: book), size: size,
+                        name: "written_next_spread", settlingTime: 0.15)
+        let reverseImages = try NotebookCurlImages(left: snapshot(oldIndex + 3),
+            front: snapshot(oldIndex + 2), reverse: snapshot(oldIndex + 1))
+        book.turnBack()
+        XCTAssertTrue(book.turnsBackward)
+        for progress in [0.25, 0.5, 0.75] {
+            let view = HStack(spacing: 0) { leaf(oldIndex); leaf(oldIndex + 1) }
+                .overlay { DesktopNotebookCurl(images: reverseImages, pageSize: metrics.pageSize,
+                                              progress: progress, backward: true) }
+            _ = try capture(view, size: size, name: "spread_back_curl_\(Int(progress * 100))")
+        }
+        _ = try capture(NotebookDialogueSpread(play: play, notebook: book), size: size,
+                        name: "spread_back_completed", settlingTime: 1.2)
+        XCTAssertFalse(book.isTurning)
+        XCTAssertEqual(book.reader.leftIndex, oldIndex)
+    }
+
+    func testRenderNoirNotebookExploration() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let session = GameSession(saveStore: OriginalChapterFileStore(directory: root),
+                                  resumeStore: OriginalResumeFileStore(directory: root))
+        session.startOriginalGame()
+        defer { session.endOriginalGame() }
+        let play = try XCTUnwrap(session.play)
+        for _ in 0..<20 {
+            guard case .dialogue = play.runner.phase else { break }
+            play.advanceDialogue()
+        }
+        for _ in 0..<900 {
+            guard case .process(56) = play.runner.phase else { break }
+            if play.entrance?.awaitingHandle == true { play.touchEntrance(pageX: 92, pageY: 175) }
+            play.advanceFrame()
+        }
+        for _ in 0..<10 {
+            guard case .dialogue = play.runner.phase else { break }
+            play.advanceDialogue()
+        }
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+        play.pause()
+        for size in [CGSize(width: 951, height: 669), CGSize(width: 640, height: 800), CGSize(width: 768, height: 600)] {
+            let view = DuoBookContainerView(session: session).frame(width: size.width, height: size.height)
+            try assertPaperAtOuterEdges(capture(view, size: size, name: "noir_lobby_\(Int(size.width))"))
+        }
+    }
+
+    func testPlayableTitleAndPauseMenuFitDuoPages() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let session = GameSession(saveStore: OriginalChapterFileStore(directory: root),
+                                  resumeStore: OriginalResumeFileStore(directory: root))
+        for size in [CGSize(width: 768, height: 600), CGSize(width: 640, height: 800)] {
+            _ = try capture(DuoBookContainerView(session: session).frame(width: size.width, height: size.height),
+                            size: size, name: "playable_title_\(Int(size.width))")
+        }
+        session.startOriginalGame()
+        defer { session.endOriginalGame() }
+        session.openPauseMenu()
+        for size in [CGSize(width: 768, height: 600), CGSize(width: 640, height: 800)] {
+            _ = try capture(DuoBookContainerView(session: session).frame(width: size.width, height: size.height),
+                            size: size, name: "playable_pause_\(Int(size.width))")
+        }
+    }
+
     func testRenderPlayableLobbyAndRingBellThroughSession() throws {
         try runChapterOneRoute(completeDunningQuestions: false)
     }
@@ -23,6 +207,11 @@ final class LayoutSnapshotTests: XCTestCase {
         let runner = try OriginalEventRunner.chapterOneArrival(catalog: .bundled(), defaults: .bundled())
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: try .bundled(),
                                        jigsawSeed: { 0x3DEAC027 })
+        var walkingSaves: [String: OriginalResumeSave] = [:]
+        play.onWalkingCheckpoint = { checkpoint in
+            guard let game = try? checkpoint.gameState() else { return }
+            walkingSaves["\(game.chapter)-\(game.mapID)"] = checkpoint
+        }
         defer { play.stop() }
         for _ in 0..<20 {
             guard case .dialogue = play.runner.phase else { break }
@@ -75,13 +264,8 @@ final class LayoutSnapshotTests: XCTestCase {
         play.inspectLobbyCounter()
         XCTAssertEqual(play.lobby?.mode, .counter)
         play.panLobbyCounter(0)
-        play.selectLobbyObject(x: 126, y: 195)
-        XCTAssertEqual(play.runner.phase, .exploration(mapID: 2), "First tap selects")
-        XCTAssertEqual(play.lobby?.selectedNode, "obj02")
-        play.pause()
-        _ = try capture(pages(), size: size, name: "play_counter_selected")
-        play.resume()
-        play.confirmLobbyObject()
+        play.selectLobbyObject(x: 126, y: 195, confirmImmediately: true)
+        guard case .dialogue = play.runner.phase else { return XCTFail("One tap must inspect the bell") }
         XCTAssertEqual(play.runner.eventIndex, 3)
         play.advanceDialogue()
         XCTAssertEqual(play.runner.phase, .process(id: 24))
@@ -93,8 +277,7 @@ final class LayoutSnapshotTests: XCTestCase {
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
         XCTAssertEqual(play.lobby?.mode, .counter)
         XCTAssertEqual(play.lobby?.pan, 0)
-        play.selectLobbyObject(x: 126, y: 195)
-        play.selectLobbyObject(x: 126, y: 195)
+        play.selectLobbyObject(x: 126, y: 195, confirmImmediately: true)
         XCTAssertEqual(play.runner.eventIndex, 3)
         play.advanceDialogue()
         for _ in 0..<80 { play.advanceFrame() }
@@ -123,11 +306,8 @@ final class LayoutSnapshotTests: XCTestCase {
             case .waiting: play.advanceFrame()
             case .picture(let id):
                 collectedPictures.append(id)
-                play.touchPicture(pageX: 96, pageY: 215)
-                play.releasePicture()
-                XCTAssertEqual(play.touchPicture?.selected, true)
-                play.touchPicture(pageX: 96, pageY: 215)
-                play.releasePicture()
+                play.activatePicture(pageX: 96, pageY: 215)
+                XCTAssertEqual(play.touchPicture?.phase, .fading)
                 for _ in 0..<22 { play.advanceFrame() }
             case .process(25):
                 for _ in 0..<40 { play.advanceFrame() }
@@ -439,17 +619,14 @@ final class LayoutSnapshotTests: XCTestCase {
                 XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
                 XCTAssertEqual(play.door?.doorID, 32)
                 play.useItemAtDoor(1)
-                play.selectDoorComponent(x: 160, y: 175)
-                XCTAssertEqual(play.door?.selected, 2)
                 XCTAssertEqual(play.runner.game.value(for: .doorOpen(index: 32)), true)
-                play.selectDoorComponent(x: 160, y: 175)
+                play.selectDoorComponent(x: 160, y: 175, confirmImmediately: true)
                 XCTAssertEqual(play.runner.eventIndex, 26)
                 for _ in 0..<20 { if case .dialogue = play.runner.phase { play.advanceDialogue() } }
                 XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
                 XCTAssertEqual(play.runner.game.value(for: .doorOpen(index: 32)), false)
                 XCTAssertTrue(try play.runner.game.inventory.items.contains(1))
-                play.selectDoorComponent(x: 160, y: 175)
-                play.selectDoorComponent(x: 160, y: 175)
+                play.selectDoorComponent(x: 160, y: 175, confirmImmediately: true)
                 XCTAssertEqual(play.runner.eventIndex, 27)
                 for _ in 0..<20 {
                     if play.door != nil, case .dialogue = play.runner.phase { play.advanceDialogue() }
@@ -745,8 +922,7 @@ final class LayoutSnapshotTests: XCTestCase {
                     play.pause()
                     _ = try capture(pages(), size: size, name: "play_wrong_parcel_notebook")
                     play.resume()
-                    play.selectCloseupComponent(x: 95, y: 150)
-                    play.selectCloseupComponent(x: 95, y: 150)
+                    play.selectCloseupComponent(x: 95, y: 150, confirmImmediately: true)
                     XCTAssertEqual(play.runner.eventIndex, 74)
                     for _ in 0..<40 {
                         switch play.runner.phase {
@@ -1554,6 +1730,17 @@ final class LayoutSnapshotTests: XCTestCase {
                     _ = try capture(pages(), size: size, name: "play_chapter_two_hanger_complete")
                     play.resume()
                     try OriginalThickWireRouteChecks.run(play)
+                    XCTAssertGreaterThanOrEqual(walkingSaves.count, 10)
+                    for checkpoint in walkingSaves.values {
+                        let restored = try OriginalPlaySession.restoring(checkpoint, audio: AudioController(),
+                            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory))
+                        XCTAssertEqual(restored.runner.game, try checkpoint.gameState())
+                        XCTAssertEqual(restored.runner.phase, .exploration(mapID: restored.runner.game.mapID))
+                        XCTAssertTrue(restored.runner.eventTrail.isEmpty)
+                        XCTAssertEqual(restored.lobby?.position, restored.runner.game.mapPosition)
+                        XCTAssertTrue(restored.canSaveWalkingCheckpoint)
+                        restored.stop()
+                    }
                     return
                 }
                 play.leaveLobbyCounter()
@@ -1910,8 +2097,8 @@ final class LayoutSnapshotTests: XCTestCase {
     }
 
     @discardableResult
-    private func capture<V: View>(_ view: V, size: CGSize, name: String) throws -> CGImage {
-        let image = try snapshot(view, size: size, name: name)
+    private func capture<V: View>(_ view: V, size: CGSize, name: String, settlingTime: TimeInterval = 0) throws -> CGImage {
+        let image = try snapshot(view, size: size, name: name, settlingTime: settlingTime)
         XCTAssertEqual(image.width, Int(size.width))
         XCTAssertEqual(image.height, Int(size.height))
         if let dir = ProcessInfo.processInfo.environment["SNAPSHOT_DIR"] {
@@ -1945,7 +2132,7 @@ final class LayoutSnapshotTests: XCTestCase {
         }
     }
 
-    private func snapshot<V: View>(_ view: V, size: CGSize, name: String) throws -> CGImage {
+    private func snapshot<V: View>(_ view: V, size: CGSize, name: String, settlingTime: TimeInterval) throws -> CGImage {
         #if os(macOS)
         // ImageRenderer omits AppKit-backed scroll content. Host a real view so
         // previews include the dialogue, inventory and navigation rows.
@@ -1957,6 +2144,10 @@ final class LayoutSnapshotTests: XCTestCase {
         window.contentView = host
         host.frame = CGRect(origin: .zero, size: size)
         host.layoutSubtreeIfNeeded()
+        if settlingTime > 0 {
+            RunLoop.main.run(until: Date().addingTimeInterval(settlingTime))
+            host.layoutSubtreeIfNeeded()
+        }
         host.displayIfNeeded()
         let bitmap = try XCTUnwrap(host.bitmapImageRepForCachingDisplay(in: host.bounds), name)
         host.cacheDisplay(in: host.bounds, to: bitmap)

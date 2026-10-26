@@ -27,8 +27,12 @@ public struct OriginalChapterSave: Codable, Equatable, Sendable {
         return game
     }
 
+    public var chapterNumber: Int { (try? Int(gameState().chapter) + 1) ?? 1 }
+
     private static func validate(_ game: OriginalGameState) throws {
-        guard game.chapter == 1, game.nowTime == 0, game.mapID == 31, game.previousMapID == 31,
+        guard (1..<10).contains(game.chapter), game.nowTime == 0,
+              OriginalMapExploration.supportedMaps[game.mapID] != nil, OriginalMapExploration.supportedMaps[game.previousMapID] != nil,
+              game.facing.isFinite, game.mapPosition.x.isFinite, game.mapPosition.y.isFinite, game.mapPosition.z.isFinite,
               game.bytes[0x137B] == 1 else {
             throw OriginalDataError.unsupported("Chapter save checkpoint")
         }

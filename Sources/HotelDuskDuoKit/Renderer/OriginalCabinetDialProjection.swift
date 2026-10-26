@@ -16,11 +16,11 @@ public enum OriginalCabinetDialProjection {
         let direction = normalise(SIMD3(horizontal, vertical, -4096))
         let end = eye &+ direction &* SIMD3<Int32>(repeating: 1000)
         let hits = (0..<3).map { index in
-            intersect(end: end, centre: SIMD3(OriginalCabinetDialProcess.wheelX[index], process.wheelY[index], 4751),
+            intersect(end: end, centre: SIMD3(process.wheelCentres[index], process.wheelY[index], 4751),
                 halfSize: SIMD2(2007, 2048))
         }
         let plane = intersect(end: end,
-            centre: SIMD3(OriginalCabinetDialProcess.wheelX[process.selected], process.wheelY[process.selected], 4751),
+            centre: SIMD3(process.wheelCentres[process.selected], process.wheelY[process.selected], 4751),
             halfSize: SIMD2(20480, 20480))
         return .init(hits: hits, plane: plane)
     }

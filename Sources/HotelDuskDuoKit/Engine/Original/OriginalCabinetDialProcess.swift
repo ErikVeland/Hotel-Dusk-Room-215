@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Cabinet mode of process 31, recovered from overlay 10.
+ * Cabinet and cashbox modes of overlay 10 (processes 31 and 80).
  */
 public struct OriginalCabinetDialProcess: Equatable, Sendable {
     public struct Touch: Equatable, Sendable {
@@ -25,6 +25,11 @@ public struct OriginalCabinetDialProcess: Equatable, Sendable {
         case completed(Int16)
     }
 
+    public enum Variant: UInt16, Equatable, Sendable {
+        case cabinet = 31, cashbox = 80
+    }
+    public let variant: Variant
+    public var wheelCentres: [Int32] { variant == .cabinet ? Self.wheelX : [-4280, 123, 4526] }
     public let target: [Int]
     public private(set) var phase = 0
     public private(set) var stage = 0
@@ -39,9 +44,10 @@ public struct OriginalCabinetDialProcess: Equatable, Sendable {
     public private(set) var returnValue: Int16 = 2
     public private(set) var result: Int16?
 
-    public init(randomValue: UInt16, retainedValue: UInt16) {
+    public init(randomValue: UInt16, retainedValue: UInt16, variant: Variant = .cabinet) {
+        self.variant = variant
         let code = Int(randomValue % 10) + 127
-        target = [code / 100, code / 10 % 10, code % 10]
+        target = variant == .cabinet ? [code / 100, code / 10 % 10, code % 10] : [5, 1, 8]
         let initial = min(999, Int(UInt16(999) &- retainedValue))
         let digits = [initial / 100, initial / 10 % 10, initial % 10]
         angles = digits.map { Float((6 - $0 + 10) % 10 + 1) * Float(0.2) }
@@ -110,7 +116,7 @@ public struct OriginalCabinetDialProcess: Equatable, Sendable {
                         returnValue = 1
                         holding = true
                         selected = index
-                        grabOffsets[index] = point &- SIMD3(Self.wheelX[index], wheelY[index], 4751)
+                        grabOffsets[index] = point &- SIMD3(wheelCentres[index], wheelY[index], 4751)
                         break
                     }
                 }
@@ -125,7 +131,7 @@ public struct OriginalCabinetDialProcess: Equatable, Sendable {
                 angles[selected] = Self.wrap(angles[selected])
                 stage = 2
                 holding = false
-                return [.sound(archive: 0, entry: 31)]
+                return [.sound(archive: 31, entry: 0)]
             }
         case 2:
             for index in -1...10 {
@@ -143,16 +149,16 @@ public struct OriginalCabinetDialProcess: Equatable, Sendable {
                     if digits == target {
                         returnValue = 0
                         stage = 3
-                        return [.completionFade(60), .sound(archive: 1, entry: 31), .hideCaption, .rumble]
+                        return [.completionFade(60), .sound(archive: 31, entry: 1), .hideCaption, .rumble]
                     }
                 }
             }
         case 3:
             timer += 1
-            if timer > 0 { timer = 0; stage = 4; return [.sound(archive: 0, entry: 6)] }
+            if timer > 0 { timer = 0; stage = 4; return [.sound(archive: 1, entry: 0)] }
         case 4:
             timer += 1
-            if timer > 120 { timer = 0; phase = 3; stage = 0; nextPhase = 2 }
+            if timer > 120 { timer = 0; phase = 3; stage = 0; nextPhase = variant == .cabinet ? 2 : -1 }
         default: break
         }
         return []

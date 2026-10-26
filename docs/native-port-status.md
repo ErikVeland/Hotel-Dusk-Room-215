@@ -2,7 +2,7 @@
 
 The architecture is Swift and SwiftUI, with Metal for the Duo book material. The original ROM is the comparison reference. No emulator integration is planned or included.
 
-The native game remains incomplete. The checked new-game route now reaches the Chapter 2 cabinet, red box and following Louie and Rosa conversations. Later routes and presentation remain unfinished.
+The native game remains incomplete. The checked new-game route now plays through the Chapter 4 review and stops at the Chapter 5 save prompt. Chapters 5–10, game-over retries and original presentation remain unfinished.
 
 ## Playable opening slice
 
@@ -67,7 +67,7 @@ These modules are recovery foundations, not a complete event interpreter. The Ch
 
 Independent Python extraction and Swift decoding are compared using original payload, index-buffer, palette and RGBA hashes. Original command and condition fixtures are selected by exact program name and byte offset. Native handler tests check source behaviors such as preserving item acquisition state and the wait counter's extra update.
 
-Passing these checks proves the covered transformations agree with recovered source evidence. It does not prove a chapter, puzzle sequence, ending or audio mix matches the running ROM. Full game comparisons, general midgame save persistence, original audio cue timing and remaining handlers are outstanding. The Chapter 2 starting checkpoint now has native persistence.
+Passing these checks proves the covered transformations agree with recovered source evidence. It does not prove a chapter, puzzle sequence, ending or audio mix matches the running ROM. Full game comparisons, saving during conversations or puzzles, original audio cue timing and remaining handlers are outstanding. Native walking checkpoints now persist across app restarts, with Continue and checkpoint recovery. The three Chapter 2 starting slots remain separate.
 
 ## Remaining native work
 
@@ -100,3 +100,16 @@ The extended native route now completes Iris’s introduction and Summer’s vis
 ## Chapter 2 payment
 
 The native route now returns downstairs after cash pickup and client-list storage. It knocks on the office door and follows the apology interrupt. Choice 21 and the returned lobby state have complete original game-state comparisons. The close-up decoder now accepts the lobby file’s unused trailing records while checking every declared record. The cash item remains available and the office lock clears, matching the original. R115 exploration is connected. The guest ledger, birthday card, supervisory log and calendar now run through native input. Trapped-memo pulling and torn-paper acquisition are connected. Memo drawing, Clear, Back and inventory reopening are connected. The route now places the crowbar, lifts the cabinet and receives the joined memo. Back returns to cabinet inspection. Process 31 now accepts the memo code, opens drawer 3 and returns to the red-box search. Item 14 acquisition and the office exit are connected. The returned lobby state has an original comparison. Louie’s Nile discussion and Rosa’s follow-up choices now have complete original state comparisons. Diagonal walking uses the original fixed-point lookup. See [Nile and Rosa](chapter-two-louie-office.md). See [Cabinet combination](chapter-two-cabinet-combination.md). See [Crowbar recovery](chapter-two-crowbar-recovery.md). See [Memo drawing](chapter-two-memo-drawing.md). See [Trapped memo](chapter-two-memo-pull.md). See [Office search](chapter-two-office.md). See [Chapter 2 payment](chapter-two-payment.md).
+
+
+## Chapter 2 ending and Chapter 3
+
+The native route completes Louie's confrontation, all required questions and the photo interaction. Scripted request 1 now moves Kyle into the corridor automatically. The Chapter 2 review checks all five answers and a wrong-answer retry. The next save, title artwork, clock and Room 215 arrival use Chapter 3 data. Rachel's phone call and the Kevin, Louie and Iris conversations run through native input. The route collects the rag doll, completes dinner and the Summer/Rosa questions, then talks to Louie to reach 6:20 PM.
+
+Chapter titles and checkpoint validation now use the original tables for all ten chapters. This does not establish that the later chapters are playable. Rooms without a local chapter program retain System interactions. Present but damaged script files still fail validation. Walk-through exits use supported destination markers and retain original departure events.
+
+See [Chapter 3 progress](chapter-three-progress.md) for the current route and remaining work.
+
+## Chapter 4
+
+The native route now plays Chapter 4 from the roof to the review through normal input. Opcode 34 and departure clock requests are recovered. Game-over pages (`%r`) now stop play with an explicit message, because the failure screen and retry restore are not recovered. See [Chapter 4 progress](chapter-four-progress.md).

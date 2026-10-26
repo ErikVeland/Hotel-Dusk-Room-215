@@ -1,0 +1,704 @@
+{
+  "note" : "One complete native introduction and loop, or the terminating cue duration. RMS is a level comparison, not perceptual loudness or fidelity. Preparation includes checksum, decoding and engine setup. PCM bytes exclude engine, sampler and decoder allocations.",
+  "processFootprintAfterSwitchesBytes" : 128451472,
+  "recordedMinusNativeDB" : [
+    -13.733013598324593,
+    -17.129247456366908,
+    -13.467255008977897,
+    -22.10664288794509,
+    -13.651592959409806,
+    -12.922128956101673,
+    -12.246847866719737,
+    -13.518671788950524,
+    -16.790482106559722,
+    -12.681140435929628,
+    -15.330882165385916,
+    -10.758113312753817,
+    -17.23822396689186,
+    -16.17250470136542,
+    -15.218332413232085,
+    -12.635233839073038,
+    -14.030187226690783,
+    -12.18536887350664,
+    -14.912736194141031,
+    -14.352186195816811,
+    -14.568894144124968,
+    -16.843032317701475,
+    -17.80330326465205,
+    -15.045649421716009,
+    -16.193532714905874,
+    -15.357208306522256,
+    -14.285619618610092,
+    -13.733258014773504,
+    -15.588874836734249,
+    -22.62135280284939,
+    -17.425892759119442,
+    -13.996056223767653,
+    -20.399277803649493,
+    -12.63531928093026,
+    -13.982001400829784,
+    -16.30882352340768
+  ],
+  "schemaVersion" : 1,
+  "switchNote" : "First switch includes preparation; subsequent switches reuse the current cue's alternate backend. Timings exclude the asynchronous 150 ms crossfade.",
+  "switchToNativeMS" : [
+    32.670021057128906,
+    32.69505500793457,
+    32.71293640136719
+  ],
+  "switchToRecordingMS" : [
+    93.75298023223877,
+    41.89097881317139,
+    42.00100898742676
+  ],
+  "tracks" : [
+    {
+      "decodedLoopBytes" : 21816840,
+      "id" : 0,
+      "native" : {
+        "peakDBFS" : 8.568566749992216,
+        "rmsDBFS" : -5.84024334212227,
+        "samples" : 5934546
+      },
+      "nativePreparationMS" : 129.34505939483643,
+      "processFootprintBeforeBytes" : 7275216,
+      "processFootprintPreparedBytes" : 43139888,
+      "recorded" : {
+        "peakDBFS" : -4.076010447384856,
+        "rmsDBFS" : -19.573256940446864,
+        "samples" : 5934546
+      },
+      "recordedPreparationMS" : 83.01401138305664
+    },
+    {
+      "decodedLoopBytes" : 0,
+      "id" : 1,
+      "native" : {
+        "peakDBFS" : 13.773025179281134,
+        "rmsDBFS" : 0.5456869165707847,
+        "samples" : 3635076
+      },
+      "nativePreparationMS" : 20.828962326049805,
+      "processFootprintBeforeBytes" : 22463280,
+      "processFootprintPreparedBytes" : 24298288,
+      "recorded" : {
+        "peakDBFS" : -2.4960236620238914,
+        "rmsDBFS" : -16.583560539796125,
+        "samples" : 3635076
+      },
+      "recordedPreparationMS" : 17.575979232788086
+    },
+    {
+      "decodedLoopBytes" : 25096376,
+      "id" : 2,
+      "native" : {
+        "peakDBFS" : 7.77313985267233,
+        "rmsDBFS" : -6.456324467398708,
+        "samples" : 6826674
+      },
+      "nativePreparationMS" : 19.927978515625,
+      "processFootprintBeforeBytes" : 24855344,
+      "processFootprintPreparedBytes" : 56607560,
+      "recorded" : {
+        "peakDBFS" : -4.046524239057167,
+        "rmsDBFS" : -19.923579476376606,
+        "samples" : 6826674
+      },
+      "recordedPreparationMS" : 87.95404434204102
+    },
+    {
+      "decodedLoopBytes" : 21477688,
+      "id" : 3,
+      "native" : {
+        "peakDBFS" : 4.8993531864875,
+        "rmsDBFS" : -9.468106984575918,
+        "samples" : 5842286
+      },
+      "nativePreparationMS" : 21.23403549194336,
+      "processFootprintBeforeBytes" : 32047944,
+      "processFootprintPreparedBytes" : 54281032,
+      "recorded" : {
+        "peakDBFS" : -7.258737348078078,
+        "rmsDBFS" : -31.574749872521007,
+        "samples" : 5842286
+      },
+      "recordedPreparationMS" : 78.25696468353271
+    },
+    {
+      "decodedLoopBytes" : 0,
+      "id" : 4,
+      "native" : {
+        "peakDBFS" : 6.865351719054804,
+        "rmsDBFS" : -6.336093028553757,
+        "samples" : 1560000
+      },
+      "nativePreparationMS" : 19.526004791259766,
+      "processFootprintBeforeBytes" : 33342280,
+      "processFootprintPreparedBytes" : 33653576,
+      "recorded" : {
+        "peakDBFS" : -3.547974385182365,
+        "rmsDBFS" : -19.987685987963562,
+        "samples" : 1560000
+      },
+      "recordedPreparationMS" : 13.357996940612793
+    },
+    {
+      "decodedLoopBytes" : 25410032,
+      "id" : 5,
+      "native" : {
+        "peakDBFS" : 13.661634489616914,
+        "rmsDBFS" : -2.621691578192744,
+        "samples" : 7320000
+      },
+      "nativePreparationMS" : 22.380948066711426,
+      "processFootprintBeforeBytes" : 34194248,
+      "processFootprintPreparedBytes" : 67388232,
+      "recorded" : {
+        "peakDBFS" : 0.06381722489807588,
+        "rmsDBFS" : -15.543820534294417,
+        "samples" : 7320000
+      },
+      "recordedPreparationMS" : 92.10705757141113
+    },
+    {
+      "decodedLoopBytes" : 27259760,
+      "id" : 6,
+      "native" : {
+        "peakDBFS" : 6.593862633812155,
+        "rmsDBFS" : -7.460753206455801,
+        "samples" : 8480010
+      },
+      "nativePreparationMS" : 24.935007095336914,
+      "processFootprintBeforeBytes" : 42664776,
+      "processFootprintPreparedBytes" : 77316936,
+      "recorded" : {
+        "peakDBFS" : -4.949776624135616,
+        "rmsDBFS" : -19.70760107317554,
+        "samples" : 8480010
+      },
+      "recordedPreparationMS" : 101.64296627044678
+    },
+    {
+      "decodedLoopBytes" : 29528328,
+      "id" : 7,
+      "native" : {
+        "peakDBFS" : 6.543156843608671,
+        "rmsDBFS" : -7.151368796147285,
+        "samples" : 8032296
+      },
+      "nativePreparationMS" : 23.594975471496582,
+      "processFootprintBeforeBytes" : 50594632,
+      "processFootprintPreparedBytes" : 87753568,
+      "recorded" : {
+        "peakDBFS" : -4.906275200626134,
+        "rmsDBFS" : -20.67004058509781,
+        "samples" : 8032296
+      },
+      "recordedPreparationMS" : 115.38803577423096
+    },
+    {
+      "decodedLoopBytes" : 32556320,
+      "id" : 8,
+      "native" : {
+        "peakDBFS" : 14.464467733201298,
+        "rmsDBFS" : -1.0618895618653075,
+        "samples" : 13104000
+      },
+      "nativePreparationMS" : 24.6579647064209,
+      "processFootprintBeforeBytes" : 58606432,
+      "processFootprintPreparedBytes" : 101385056,
+      "recorded" : {
+        "peakDBFS" : 0.13496840309988994,
+        "rmsDBFS" : -17.85237166842503,
+        "samples" : 13104000
+      },
+      "recordedPreparationMS" : 121.57201766967773
+    },
+    {
+      "decodedLoopBytes" : 23775544,
+      "id" : 9,
+      "native" : {
+        "peakDBFS" : 0.2779288077858506,
+        "rmsDBFS" : -13.449674405369162,
+        "samples" : 6517896
+      },
+      "nativePreparationMS" : 20.109057426452637,
+      "processFootprintBeforeBytes" : 70124384,
+      "processFootprintPreparedBytes" : 94077816,
+      "recorded" : {
+        "peakDBFS" : -11.460084424979737,
+        "rmsDBFS" : -26.13081484129879,
+        "samples" : 6517896
+      },
+      "recordedPreparationMS" : 90.8360481262207
+    },
+    {
+      "decodedLoopBytes" : 25778304,
+      "id" : 10,
+      "native" : {
+        "peakDBFS" : 9.290981333118612,
+        "rmsDBFS" : -4.814246058229539,
+        "samples" : 7012180
+      },
+      "nativePreparationMS" : 24.38795566558838,
+      "processFootprintBeforeBytes" : 70747000,
+      "processFootprintPreparedBytes" : 96617336,
+      "recorded" : {
+        "peakDBFS" : -4.48856296120041,
+        "rmsDBFS" : -20.145128223615455,
+        "samples" : 7012180
+      },
+      "recordedPreparationMS" : 95.4970121383667
+    },
+    {
+      "decodedLoopBytes" : 13552496,
+      "id" : 11,
+      "native" : {
+        "peakDBFS" : 2.6591972298415385,
+        "rmsDBFS" : -9.804370950503579,
+        "samples" : 4665600
+      },
+      "nativePreparationMS" : 22.113919258117676,
+      "processFootprintBeforeBytes" : 71254904,
+      "processFootprintPreparedBytes" : 84902776,
+      "recorded" : {
+        "peakDBFS" : -6.670992504873738,
+        "rmsDBFS" : -20.562484263257396,
+        "samples" : 4665600
+      },
+      "recordedPreparationMS" : 58.93909931182861
+    },
+    {
+      "decodedLoopBytes" : 21816840,
+      "id" : 12,
+      "native" : {
+        "peakDBFS" : 9.927556512255245,
+        "rmsDBFS" : -3.8619278683850897,
+        "samples" : 5934546
+      },
+      "nativePreparationMS" : 22.626042366027832,
+      "processFootprintBeforeBytes" : 71877496,
+      "processFootprintPreparedBytes" : 94618488,
+      "recorded" : {
+        "peakDBFS" : -3.278355993125718,
+        "rmsDBFS" : -21.100151835276947,
+        "samples" : 5934546
+      },
+      "recordedPreparationMS" : 83.72902870178223
+    },
+    {
+      "decodedLoopBytes" : 27103968,
+      "id" : 13,
+      "native" : {
+        "peakDBFS" : 9.91287435414674,
+        "rmsDBFS" : -5.291010666063103,
+        "samples" : 7372800
+      },
+      "nativePreparationMS" : 23.607969284057617,
+      "processFootprintBeforeBytes" : 73450360,
+      "processFootprintPreparedBytes" : 100762488,
+      "recorded" : {
+        "peakDBFS" : -3.2664733531667784,
+        "rmsDBFS" : -21.46351536742852,
+        "samples" : 7372800
+      },
+      "recordedPreparationMS" : 100.42595863342285
+    },
+    {
+      "decodedLoopBytes" : 33879704,
+      "id" : 14,
+      "native" : {
+        "peakDBFS" : 6.658694490504904,
+        "rmsDBFS" : -9.53656467483462,
+        "samples" : 10752000
+      },
+      "nativePreparationMS" : 24.17302131652832,
+      "processFootprintBeforeBytes" : 74318712,
+      "processFootprintPreparedBytes" : 109052792,
+      "recorded" : {
+        "peakDBFS" : -5.974168838792927,
+        "rmsDBFS" : -24.754897088066706,
+        "samples" : 10752000
+      },
+      "recordedPreparationMS" : 120.09799480438232
+    },
+    {
+      "decodedLoopBytes" : 27005792,
+      "id" : 15,
+      "native" : {
+        "peakDBFS" : 6.7687359024682445,
+        "rmsDBFS" : -7.322661293744684,
+        "samples" : 10215322
+      },
+      "nativePreparationMS" : 26.218056678771973,
+      "processFootprintBeforeBytes" : 75760504,
+      "processFootprintPreparedBytes" : 104465272,
+      "recorded" : {
+        "peakDBFS" : -5.565607106953209,
+        "rmsDBFS" : -19.957895132817722,
+        "samples" : 10215322
+      },
+      "recordedPreparationMS" : 99.21395778656006
+    },
+    {
+      "decodedLoopBytes" : 44996144,
+      "id" : 16,
+      "native" : {
+        "peakDBFS" : 4.996854657153255,
+        "rmsDBFS" : -9.178837546623908,
+        "samples" : 14176874
+      },
+      "nativePreparationMS" : 21.448969841003418,
+      "processFootprintBeforeBytes" : 78152568,
+      "processFootprintPreparedBytes" : 134988688,
+      "recorded" : {
+        "peakDBFS" : -6.533703979247044,
+        "rmsDBFS" : -23.20902477331469,
+        "samples" : 14176874
+      },
+      "recordedPreparationMS" : 162.67704963684082
+    },
+    {
+      "decodedLoopBytes" : 21816864,
+      "id" : 17,
+      "native" : {
+        "peakDBFS" : 2.152988699136045,
+        "rmsDBFS" : -11.708435653559736,
+        "samples" : 5934552
+      },
+      "nativePreparationMS" : 24.07097816467285,
+      "processFootprintBeforeBytes" : 90522488,
+      "processFootprintPreparedBytes" : 112460664,
+      "recorded" : {
+        "peakDBFS" : -9.099435366601384,
+        "rmsDBFS" : -23.893804527066376,
+        "samples" : 5934552
+      },
+      "recordedPreparationMS" : 86.20798587799072
+    },
+    {
+      "decodedLoopBytes" : 16763912,
+      "id" : 18,
+      "native" : {
+        "peakDBFS" : 1.7949575962042523,
+        "rmsDBFS" : -11.684912404373533,
+        "samples" : 4592000
+      },
+      "nativePreparationMS" : 20.019888877868652,
+      "processFootprintBeforeBytes" : 91063160,
+      "processFootprintPreparedBytes" : 108004216,
+      "recorded" : {
+        "peakDBFS" : -11.174316761591596,
+        "rmsDBFS" : -26.597648598514564,
+        "samples" : 4592000
+      },
+      "recordedPreparationMS" : 69.04411315917969
+    },
+    {
+      "decodedLoopBytes" : 27322568,
+      "id" : 19,
+      "native" : {
+        "peakDBFS" : 3.5766069388578146,
+        "rmsDBFS" : -9.543692694947422,
+        "samples" : 7494200
+      },
+      "nativePreparationMS" : 20.38705348968506,
+      "processFootprintBeforeBytes" : 91784056,
+      "processFootprintPreparedBytes" : 119243664,
+      "recorded" : {
+        "peakDBFS" : -6.975965586895615,
+        "rmsDBFS" : -23.895878890764234,
+        "samples" : 7494200
+      },
+      "recordedPreparationMS" : 105.40890693664551
+    },
+    {
+      "decodedLoopBytes" : 19431464,
+      "id" : 20,
+      "native" : {
+        "peakDBFS" : 6.856529295413425,
+        "rmsDBFS" : -6.063338267685516,
+        "samples" : 5285650
+      },
+      "nativePreparationMS" : 20.170927047729492,
+      "processFootprintBeforeBytes" : 92324728,
+      "processFootprintPreparedBytes" : 111805304,
+      "recorded" : {
+        "peakDBFS" : -4.91001380048125,
+        "rmsDBFS" : -20.632232411810485,
+        "samples" : 5285650
+      },
+      "recordedPreparationMS" : 78.60302925109863
+    },
+    {
+      "decodedLoopBytes" : 30054696,
+      "id" : 21,
+      "native" : {
+        "peakDBFS" : 6.253658660129063,
+        "rmsDBFS" : -7.771047914858502,
+        "samples" : 8175484
+      },
+      "nativePreparationMS" : 33.367037773132324,
+      "processFootprintBeforeBytes" : 92799864,
+      "processFootprintPreparedBytes" : 123323280,
+      "recorded" : {
+        "peakDBFS" : -7.530334678058183,
+        "rmsDBFS" : -24.614080232559978,
+        "samples" : 8175484
+      },
+      "recordedPreparationMS" : 111.2060546875
+    },
+    {
+      "decodedLoopBytes" : 40836984,
+      "id" : 22,
+      "native" : {
+        "peakDBFS" : 1.7371864488718658,
+        "rmsDBFS" : -12.842324454015051,
+        "samples" : 12345016
+      },
+      "nativePreparationMS" : 24.837017059326172,
+      "processFootprintBeforeBytes" : 93864824,
+      "processFootprintPreparedBytes" : 135185296,
+      "recorded" : {
+        "peakDBFS" : -13.070534037009027,
+        "rmsDBFS" : -30.6456277186671,
+        "samples" : 12345016
+      },
+      "recordedPreparationMS" : 144.09899711608887
+    },
+    {
+      "decodedLoopBytes" : 26984072,
+      "id" : 23,
+      "native" : {
+        "peakDBFS" : 7.526204976684658,
+        "rmsDBFS" : -6.690716444419957,
+        "samples" : 7467618
+      },
+      "nativePreparationMS" : 23.928046226501465,
+      "processFootprintBeforeBytes" : 94978936,
+      "processFootprintPreparedBytes" : 122274680,
+      "recorded" : {
+        "peakDBFS" : -5.503992409708177,
+        "rmsDBFS" : -21.736365866135966,
+        "samples" : 7467618
+      },
+      "recordedPreparationMS" : 100.63493251800537
+    },
+    {
+      "decodedLoopBytes" : 27966928,
+      "id" : 24,
+      "native" : {
+        "peakDBFS" : 7.861167460125608,
+        "rmsDBFS" : -7.54316314030127,
+        "samples" : 8157738
+      },
+      "nativePreparationMS" : 20.926952362060547,
+      "processFootprintBeforeBytes" : 95863672,
+      "processFootprintPreparedBytes" : 123913104,
+      "recorded" : {
+        "peakDBFS" : -6.794700591174512,
+        "rmsDBFS" : -23.736695855207145,
+        "samples" : 8157738
+      },
+      "recordedPreparationMS" : 101.36902332305908
+    },
+    {
+      "decodedLoopBytes" : 40937784,
+      "id" : 25,
+      "native" : {
+        "peakDBFS" : 5.093840601076077,
+        "rmsDBFS" : -9.054556513713433,
+        "samples" : 11136004
+      },
+      "nativePreparationMS" : 19.946932792663574,
+      "processFootprintBeforeBytes" : 96502648,
+      "processFootprintPreparedBytes" : 137528208,
+      "recorded" : {
+        "peakDBFS" : -7.523455444031453,
+        "rmsDBFS" : -24.41176482023569,
+        "samples" : 11136004
+      },
+      "recordedPreparationMS" : 148.1260061264038
+    },
+    {
+      "decodedLoopBytes" : 0,
+      "id" : 26,
+      "native" : {
+        "peakDBFS" : 11.975338108431258,
+        "rmsDBFS" : -2.357572275985025,
+        "samples" : 13577412
+      },
+      "nativePreparationMS" : 25.6500244140625,
+      "processFootprintBeforeBytes" : 97125240,
+      "processFootprintPreparedBytes" : 97371000,
+      "recorded" : {
+        "peakDBFS" : -1.2995719750178494,
+        "rmsDBFS" : -16.643191894595116,
+        "samples" : 13577412
+      },
+      "recordedPreparationMS" : 20.3169584274292
+    },
+    {
+      "decodedLoopBytes" : 17348552,
+      "id" : 27,
+      "native" : {
+        "peakDBFS" : 0.8234907748693998,
+        "rmsDBFS" : -12.203163890437132,
+        "samples" : 4805786
+      },
+      "nativePreparationMS" : 24.026989936828613,
+      "processFootprintBeforeBytes" : 97944440,
+      "processFootprintPreparedBytes" : 115393400,
+      "recorded" : {
+        "peakDBFS" : -10.856213514047317,
+        "rmsDBFS" : -25.936421905210636,
+        "samples" : 4805786
+      },
+      "recordedPreparationMS" : 74.00298118591309
+    },
+    {
+      "decodedLoopBytes" : 33879784,
+      "id" : 28,
+      "native" : {
+        "peakDBFS" : 3.0487419081910927,
+        "rmsDBFS" : -12.196834917774567,
+        "samples" : 11061970
+      },
+      "nativePreparationMS" : 21.533966064453125,
+      "processFootprintBeforeBytes" : 98599800,
+      "processFootprintPreparedBytes" : 133137296,
+      "recorded" : {
+        "peakDBFS" : -9.213891188482478,
+        "rmsDBFS" : -27.785709754508815,
+        "samples" : 11061970
+      },
+      "recordedPreparationMS" : 124.96399879455566
+    },
+    {
+      "decodedLoopBytes" : 28233280,
+      "id" : 29,
+      "native" : {
+        "peakDBFS" : 3.0245718979282725,
+        "rmsDBFS" : -9.321880973756013,
+        "samples" : 7680006
+      },
+      "nativePreparationMS" : 24.243950843811035,
+      "processFootprintBeforeBytes" : 99795832,
+      "processFootprintPreparedBytes" : 128484240,
+      "recorded" : {
+        "peakDBFS" : -12.428884518854527,
+        "rmsDBFS" : -31.943233776605403,
+        "samples" : 7680006
+      },
+      "recordedPreparationMS" : 108.5749864578247
+    },
+    {
+      "decodedLoopBytes" : 16940360,
+      "id" : 30,
+      "native" : {
+        "peakDBFS" : 10.32254202609337,
+        "rmsDBFS" : -3.840142768729982,
+        "samples" : 4608000
+      },
+      "nativePreparationMS" : 24.438023567199707,
+      "processFootprintBeforeBytes" : 100762488,
+      "processFootprintPreparedBytes" : 117932920,
+      "recorded" : {
+        "peakDBFS" : -2.7044882984152285,
+        "rmsDBFS" : -21.266035527849425,
+        "samples" : 4608000
+      },
+      "recordedPreparationMS" : 76.94995403289795
+    },
+    {
+      "decodedLoopBytes" : 16328104,
+      "id" : 31,
+      "native" : {
+        "peakDBFS" : 4.412309816582438,
+        "rmsDBFS" : -11.254739946240104,
+        "samples" : 4476146
+      },
+      "nativePreparationMS" : 22.709965705871582,
+      "processFootprintBeforeBytes" : 101565304,
+      "processFootprintPreparedBytes" : 118080376,
+      "recorded" : {
+        "peakDBFS" : -9.106057442713979,
+        "rmsDBFS" : -25.250796170007757,
+        "samples" : 4476146
+      },
+      "recordedPreparationMS" : 66.9790506362915
+    },
+    {
+      "decodedLoopBytes" : 18150336,
+      "id" : 32,
+      "native" : {
+        "peakDBFS" : 1.5583964386527924,
+        "rmsDBFS" : -11.14581115509186,
+        "samples" : 8229912
+      },
+      "nativePreparationMS" : 22.436976432800293,
+      "processFootprintBeforeBytes" : 102286200,
+      "processFootprintPreparedBytes" : 120587128,
+      "recorded" : {
+        "peakDBFS" : -13.611171006731873,
+        "rmsDBFS" : -31.545088958741353,
+        "samples" : 8229912
+      },
+      "recordedPreparationMS" : 72.7999210357666
+    },
+    {
+      "decodedLoopBytes" : 18723456,
+      "id" : 33,
+      "native" : {
+        "peakDBFS" : 2.0554519335218076,
+        "rmsDBFS" : -11.240824683434363,
+        "samples" : 5153684
+      },
+      "nativePreparationMS" : 20.487070083618164,
+      "processFootprintBeforeBytes" : 103007096,
+      "processFootprintPreparedBytes" : 121848696,
+      "recorded" : {
+        "peakDBFS" : -9.470012541380708,
+        "rmsDBFS" : -23.876143964364623,
+        "samples" : 5153684
+      },
+      "recordedPreparationMS" : 74.2119550704956
+    },
+    {
+      "decodedLoopBytes" : 21858240,
+      "id" : 34,
+      "native" : {
+        "peakDBFS" : 2.254451046842759,
+        "rmsDBFS" : -12.2164964100356,
+        "samples" : 8175484
+      },
+      "nativePreparationMS" : 24.151086807250977,
+      "processFootprintBeforeBytes" : 103564152,
+      "processFootprintPreparedBytes" : 125961080,
+      "recorded" : {
+        "peakDBFS" : -9.60422064261378,
+        "rmsDBFS" : -26.198497810865383,
+        "samples" : 8175484
+      },
+      "recordedPreparationMS" : 97.58198261260986
+    },
+    {
+      "decodedLoopBytes" : 25410032,
+      "id" : 35,
+      "native" : {
+        "peakDBFS" : 7.926597219214363,
+        "rmsDBFS" : -5.499089101380502,
+        "samples" : 7488000
+      },
+      "nativePreparationMS" : 23.50592613220215,
+      "processFootprintBeforeBytes" : 104661880,
+      "processFootprintPreparedBytes" : 130286456,
+      "recorded" : {
+        "peakDBFS" : -4.203749418878449,
+        "rmsDBFS" : -21.80791262478818,
+        "samples" : 7488000
+      },
+      "recordedPreparationMS" : 95.83902359008789
+    }
+  ]
+}

@@ -26,7 +26,7 @@ struct OriginalChapterTransitionView: View {
                             } label: {
                                 HStack {
                                     Text("\(slot + 1)")
-                                    Text(transition.slots[slot] == nil ? "There is no data." : "Chapter 2")
+                                    Text(transition.slots[slot].map { "Chapter \($0.chapterNumber)" } ?? "There is no data.")
                                     Spacer()
                                     if transition.selectedSlot == slot { Image(systemName: "checkmark") }
                                 }
@@ -48,23 +48,25 @@ struct OriginalChapterTransitionView: View {
         }
     }
 
+    private var chapter: OriginalChapter { try! OriginalChapter(play.runner.game.chapter) }
+
     private var titlePage: some View {
         GeometryReader { proxy in
-            let scale = min(proxy.size.width / 192, proxy.size.height / 256)
+            let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
             ZStack(alignment: .topLeading) {
                 if let images = play.chapterTitleImages {
                     Image(decorative: screen == 1 ? images.left : images.right, scale: 1)
                         .resizable().interpolation(.none).frame(width: 192, height: 256)
                     if screen == 1 {
-                        Text("Chapter 2").font(.system(size: 24, design: .serif)).position(x: 96, y: 76)
+                        Text(chapter.title).font(.system(size: 24, design: .serif)).position(x: 96, y: 76)
                         Image(decorative: images.item, scale: 1).interpolation(.none)
                             .position(x: CGFloat(images.item.width) / 2, y: 128 + CGFloat(images.item.height) / 2)
                     } else {
-                        Text("December 28th 1979").font(.system(size: 12, design: .serif))
+                        Text(chapter.dateLabel).font(.system(size: 12, design: .serif))
                             .position(x: 96, y: 44)
                         Image(decorative: images.clock, scale: 1).interpolation(.none)
                             .position(x: 96, y: 112)
-                        Text("5:30–6:00 P.M.").font(.system(size: 20, design: .serif))
+                        Text(chapter.timeRange).font(.system(size: 20, design: .serif))
                             .position(x: 96, y: 204)
                     }
                 }
@@ -74,10 +76,12 @@ struct OriginalChapterTransitionView: View {
             .contentShape(Rectangle())
             .onTapGesture { play.continueChapterTitle() }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(screen == 1 ? "Chapter 2" : "December 28th 1979. 5:30 to 6:00 PM")
+            .accessibilityLabel(screen == 1 ? chapter.title : "\(chapter.dateLabel). \(chapter.timeRange)")
             .accessibilityHint("Continue")
             .accessibilityAddTraits(.isButton)
             .scaleEffect(scale)
+            .frame(width: 192 * scale, height: 256 * scale)
+            .notebookPhotograph()
             .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
         }
     }

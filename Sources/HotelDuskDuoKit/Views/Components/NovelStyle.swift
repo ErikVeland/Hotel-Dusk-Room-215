@@ -17,6 +17,7 @@ enum NovelStyle {
     static let label = Font.custom("Baskerville", size: 17, relativeTo: .callout)
     static let caption = Font.custom("Baskerville", size: 14, relativeTo: .caption)
     static let document = Font.custom("Courier", size: 15, relativeTo: .callout)
+    static let imprint = Font.custom("Courier", size: 11, relativeTo: .caption2)
 }
 
 struct PaperSurface: View {

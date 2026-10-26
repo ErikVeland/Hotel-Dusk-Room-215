@@ -231,6 +231,8 @@ final class OriginalInterruptTests: XCTestCase {
             if runner.eventIndex == 19 { break }
             switch runner.phase {
             case .dialogue, .itemNotice: runner.acknowledgeDialogue()
+            case .picture: runner.finishPicture()
+            case .waiting: runner.advanceWait()
             case .exploration: runner.lookInSearchView(area: 2, subarea: 2, table: table)
             case .process: runner.finishProcess(returnValue: 0)
             case .choice: runner.choose(2)

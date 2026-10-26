@@ -1,7 +1,6 @@
 import SwiftUI
 
-/// Kyle's page. In paired dialogue, original screen 1 holds Kyle's text; that
-/// screen is the left page in the right-handed book.
+/// Kyle's gameplay page. Dialogue is presented by the shared book spread.
 public struct LeftPageView: View {
     @ObservedObject public var session: GameSession
     public init(session: GameSession) { self.session = session }
@@ -13,12 +12,7 @@ public struct LeftPageView: View {
             } else if let frame = session.animationPreview {
                 OriginalAnimationFrameView(frame: frame)
             } else {
-                VStack(spacing: 20) {
-                    Text("HOTEL DUSK")
-                        .font(NovelStyle.heading).tracking(3)
-                    Text("Room 215")
-                        .font(NovelStyle.title)
-                }
+                NotebookTitleLeaf()
             }
         }
         .foregroundStyle(NovelStyle.ink)
@@ -37,7 +31,7 @@ struct OriginalPlayPage: View {
             OriginalChapterTransitionView(play: play, screen: screen)
         } else if play.notebook != nil {
             if screen == 0 { OriginalNotebookView(play: play) }
-            else { Color.clear }
+            else { retainedNotes }
         } else { content }
     }
 
@@ -48,121 +42,129 @@ struct OriginalPlayPage: View {
                 ZStack {
                     OriginalSuitcaseContentsView(play: play, interactive: false)
                     if let page = packet.pages.first(where: { $0.page == screen }), !OriginalDialogueLines(page: page).isEmpty {
-                        textPage(page).background(NovelStyle.paper.opacity(0.85))
+                        textPage().background(NovelStyle.paper.opacity(0.85))
                     }
                 }
             } else if screen == 0, play.closeup != nil {
                 ZStack {
                     OriginalSearchCloseupView(play: play, interactive: false)
                     if let page = packet.pages.first(where: { $0.page == screen }), !OriginalDialogueLines(page: page).isEmpty {
-                        textPage(page).background(NovelStyle.paper.opacity(0.85))
+                        textPage().background(NovelStyle.paper.opacity(0.85))
                     }
                 }
             } else if screen == 0, play.door != nil {
                 ZStack {
                     OriginalDoorView(play: play, interactive: false)
                     if let page = packet.pages.first(where: { $0.page == screen }), !OriginalDialogueLines(page: page).isEmpty {
-                        textPage(page).background(NovelStyle.paper.opacity(0.85))
+                        textPage().background(NovelStyle.paper.opacity(0.85))
                     }
                 }
-            } else { textPage(packet.pages.first(where: { $0.page == screen })) }
-        case .itemNotice(_, let page):
+            } else { textPage() }
+        case .itemNotice:
             if screen == 0, play.acquiredItemImage != nil { OriginalTouchPictureView(play: play) }
-            else { textPage(page.page == screen ? page : nil) }
+            else { textPage() }
         case .picture:
             if screen == 0 { OriginalTouchPictureView(play: play) }
-            else { Color.clear }
+            else { retainedNotes }
         case .exploration where play.closeup != nil:
             if screen == 0 { OriginalSearchCloseupView(play: play) }
-            else { Color.clear }
+            else { retainedNotes }
         case .exploration where play.door != nil:
             if screen == 0 { OriginalDoorView(play: play) }
-            else { Color.clear }
+            else { retainedNotes }
         case .exploration where play.lobby != nil:
             if screen == 0 || play.lobby?.mode == .walking {
                 OriginalMapView(play: play, screen: screen)
             } else {
-                Color.clear
+                retainedNotes
             }
         case .process:
             if play.clock != nil {
                 if screen == 0 { OriginalClockView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.cabinetDial != nil {
                 if screen == 0 { OriginalCabinetDialView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.crowbar != nil {
                 if screen == 0 { OriginalCrowbarView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.memoDrawing != nil {
                 if screen == 0 { OriginalMemoDrawingView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.memoPull != nil {
                 if screen == 0 { OriginalMemoPullView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.paperclip != nil {
                 if screen == 0 { OriginalPaperclipView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
+            } else if play.fountainPen != nil {
+                if screen == 0 { OriginalFountainPenView(play: play) }
+                else { retainedNotes }
+            } else if play.differences != nil {
+                if screen == 0 { OriginalDifferencesView(play: play) }
+                else { retainedNotes }
+            } else if play.toiletTank != nil {
+                if screen == 0 { OriginalToiletTankView(play: play) }
+                else { retainedNotes }
+            } else if play.linenWagon != nil {
+                if screen == 0 { OriginalLinenWagonView(play: play) }
+                else { retainedNotes }
+            } else if play.matchsticks != nil {
+                if screen == 0 { OriginalMatchstickView(play: play) }
+                else { retainedNotes }
+            } else if play.jukebox != nil {
+                if screen == 0 { OriginalJukeboxView(play: play) }
+                else { retainedNotes }
+            } else if play.coinPuzzle != nil {
+                if screen == 0 { OriginalCoinView(play: play) }
+                else { retainedNotes }
+            } else if play.dollRepair != nil {
+                if screen == 0 { OriginalDollRepairView(play: play) }
+                else { retainedNotes }
+            } else if play.bookmarkBox != nil {
+                if screen == 0 { OriginalBookmarkBoxView(play: play) }
+                else { retainedNotes }
+            } else if play.switchboard != nil {
+                if screen == 0 { OriginalSwitchboardView(play: play) }
+                else { retainedNotes }
             } else if play.thinWire != nil {
                 if screen == 0 { OriginalThinWireView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.hanger != nil {
                 if screen == 0 { OriginalHangerView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.suitcaseContents != nil {
                 if screen == 0 { OriginalSuitcaseContentsView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.suitcaseKey != nil {
                 if screen == 0 { OriginalSuitcaseKeyView(play: play) }
-                else { Color.clear }
+                else { retainedNotes }
             } else if play.jigsaw != nil {
-                OriginalJigsawPageView(play: play, upper: screen == 1)
+                if screen == 0 || play.jigsaw?.variant == .reverse { OriginalJigsawPageView(play: play, upper: screen == 1) }
+                else { retainedNotes }
             } else if play.sign != nil {
-                OriginalSignPageView(play: play, upper: screen == 1)
+                if screen == 0 { OriginalSignPageView(play: play, upper: false) }
+                else { retainedNotes }
             } else if play.bell != nil {
-                OriginalBellPageView(play: play, upper: screen == 1)
+                if screen == 0 { OriginalBellPageView(play: play, upper: false) }
+                else { retainedNotes }
             } else {
                 OriginalEntrancePanelView(play: play, upper: screen == 1)
             }
         default:
-            EmptyView()
+            retainedNotes
         }
     }
 
-    private func textPage(_ shown: OriginalDialoguePacket.Page?) -> some View {
-            VStack(spacing: 0) {
-                Spacer(minLength: 0)
-                // A page without visible text still carries portrait and cue
-                // controls, and the original still waits for a tap there.
-                if let page = shown {
-                    OriginalDialoguePageView(page: page)
-                    HStack {
-                        Spacer()
-                        Text("▾").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
-                    }
-                    .padding(.top, 8)
-                }
-                Spacer(minLength: 0)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .contentShape(Rectangle())
-            .onTapGesture { play.advanceDialogue() }
-            .accessibilityAddTraits(.isButton)
-            .accessibilityHint("Continue")
-            .overlay(alignment: .bottomLeading) {
-                if screen == 0, play.runner.interruptAvailable {
-                    // The original pulses an icon on the touch screen
-                    // (0x02041C34) for as long as an interrupt is armed.
-                    Button { play.interrupt() } label: {
-                        Image(systemName: "exclamationmark.bubble.fill")
-                            .font(.largeTitle)
-                            .foregroundStyle(NovelStyle.redInk)
-                            .symbolEffect(.pulse)
-                            .frame(minWidth: 56, minHeight: 56)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Interrupt")
-                }
-            }
+    @ViewBuilder private var retainedNotes: some View {
+        if !play.dialogueNotebook.ink.isEmpty {
+            NotebookDialogueView(play: play, notebook: play.dialogueNotebook, screen: screen)
+        } else {
+            Color.clear
+        }
+    }
+
+    private func textPage() -> some View {
+        NotebookDialogueView(play: play, notebook: play.dialogueNotebook, screen: screen)
     }
 }

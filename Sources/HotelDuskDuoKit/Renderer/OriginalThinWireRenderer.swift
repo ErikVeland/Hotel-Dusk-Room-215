@@ -12,6 +12,7 @@ final class OriginalThinWireRenderer {
     private let bag: OriginalModelMetalPreview
     private let wire: OriginalModelMetalPreview
     private let layers: [CGImage]
+    private let doorImage: CGImage?
 
     init(variant: OriginalThinWireProcess.Variant = .thin) throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
@@ -29,6 +30,15 @@ final class OriginalThinWireRenderer {
         }
         bag = try load("kaban")
         wire = try variant == .thin ? load("harigane") : load("kitasen", directory: "hanger")
+        if variant.isDoor {
+            let texture = try bitmaps.loadTexture(path: "trick/bag/\(variant == .door ? "d218" : "chika").bin")
+            let rotated = OriginalEntrancePanels.rotated(rgba: texture.rgba, width: texture.storedWidth, height: texture.storedHeight)
+            guard let image = rotated?.cropping(to: CGRect(x: 0, y: texture.storedWidth - texture.logicalWidth,
+                width: texture.logicalHeight, height: texture.logicalWidth)) else {
+                throw OriginalDataError.invalid("Door lock picture")
+            }
+            doorImage = image
+        } else { doorImage = nil }
         layers = try ["hole", "01", "02", "03", "bg"].map { name in
             let bitmap = try bitmaps.loadLinear(path: "trick/bag/\(name).bin")
             guard let image = OriginalEntrancePanels.rotated(rgba: bitmap.rgba(transparentPaletteZero: true),
@@ -68,13 +78,13 @@ final class OriginalThinWireRenderer {
         context.translateBy(x: 96, y: 128)
         context.rotate(by: -CGFloat(puzzle.lockRotation) * .pi)
         context.translateBy(x: -96, y: -128)
-        context.draw(layers[0], in: CGRect(x: 32, y: 64, width: 128, height: 128))
+        if !puzzle.variant.isDoor { context.draw(layers[0], in: CGRect(x: 32, y: 64, width: 128, height: 128)) }
         for (index, pin) in puzzle.pins.enumerated() {
-            context.draw(layers[index + 1], in: CGRect(x: 80 + CGFloat(pin.position.x) * 96 / 4096,
+            context.draw(layers[index == 3 ? 2 : index + 1], in: CGRect(x: 80 + CGFloat(pin.position.x) * 96 / 4096,
                 y: 112 + CGFloat(pin.position.y) * 96 / 4096, width: 32, height: 32))
         }
         context.restoreGState()
-        context.draw(layers[4], in: CGRect(x: 0, y: 0, width: 192, height: 256))
+        context.draw(doorImage ?? layers[4], in: CGRect(x: 0, y: 0, width: 192, height: 256))
         if puzzle.cursorVisible {
             // 0x02202374 draws the ten fixed-point vertices initialised at process offset 0x60C.
             let points: [SIMD2<Int32>] = [.init(205, 0), .init(166, 120), .init(63, 195), .init(-63, 195),

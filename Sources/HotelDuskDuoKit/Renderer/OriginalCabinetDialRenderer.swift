@@ -13,6 +13,7 @@ final class OriginalCabinetDialRenderer {
     private let wall: OriginalModelMetalPreview
     private let dial: MTLTexture
     private let background: MTLTexture
+    private let backgroundV: Float
     private let pipeline: MTLRenderPipelineState
     private let depth: MTLDepthStencilState
     private struct Vertex {
@@ -20,7 +21,7 @@ final class OriginalCabinetDialRenderer {
         var uv: SIMD2<Float>
     }
 
-    init() throws {
+    init(variant: OriginalCabinetDialProcess.Variant = .cabinet) throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -35,8 +36,13 @@ final class OriginalCabinetDialRenderer {
             textures: textures, device: device, textureLoader: texture)
         wall = try OriginalModelMetalPreview(modelPath: "trick/dial/kabe.mdf", models: models,
             textures: textures, device: device, textureLoader: texture)
-        dial = try texture("dial").makeMetalTexture(device: device)
-        background = try texture("dial_cbnt").makeMetalTexture(device: device)
+        func dialTexture(_ name: String) throws -> MTLTexture {
+            let folder = variant == .cabinet ? "dial" : "cashbox"
+            return try bitmaps.loadTexture(path: "trick/\(folder)/\(name).bin").makeMetalTexture(device: device)
+        }
+        dial = try dialTexture("dial")
+        background = try dialTexture("dial_cbnt")
+        backgroundV = variant == .cashbox ? 0.75 : 1
         let library = try device.makeLibrary(source: Self.shader, options: nil)
         let descriptor = MTLRenderPipelineDescriptor()
         descriptor.vertexFunction = library.makeFunction(name: "dial_vertex")
@@ -79,9 +85,9 @@ final class OriginalCabinetDialRenderer {
             let backdrop = Self.translation(SIMD3(0, 0, 4751) / 4096)
                 * Self.rotation(-.pi / 2, axis: SIMD3(0, 0, 1)) * Self.scale(4656 / 4096)
             let points: [SIMD3<Float>] = [SIMD3(-2, -1.5, 0), SIMD3(2, -1.5, 0), SIMD3(-2, 1.5, 0), SIMD3(2, 1.5, 0)]
-            let uv: [SIMD2<Float>] = [SIMD2(1, 0), SIMD2(0, 0), SIMD2(1, 1), SIMD2(0, 1)]
+            let uv: [SIMD2<Float>] = [SIMD2(1, 0), SIMD2(0, 0), SIMD2(1, backgroundV), SIMD2(0, backgroundV)]
             for wheel in 0..<3 {
-                let transform = Self.translation(SIMD3(Float(OriginalCabinetDialProcess.wheelX[wheel]), -483, 0) / 4096)
+                let transform = Self.translation(SIMD3(Float(puzzle.wheelCentres[wheel]), -483, 0) / 4096)
                     * Self.rotation(-puzzle.angles[wheel] * .pi, axis: SIMD3(1, 0, 0))
                 for segment in 0..<10 {
                     func edge(_ index: Int, x: Float) -> SIMD3<Float> {

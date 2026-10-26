@@ -1,0 +1,1579 @@
+{
+  "schemaVersion": 1,
+  "arm9SHA256": "b9b7f7e4ddedcb245f7df0d9a953e3fbf5a15cc88436e03b8b3b65cfe872e809",
+  "textHandler": "0204370c",
+  "music": [
+    {
+      "name": "BGM_01",
+      "sequenceID": 0
+    },
+    {
+      "name": "BGM_02",
+      "sequenceID": 1
+    },
+    {
+      "name": "BGM_03",
+      "sequenceID": 2
+    },
+    {
+      "name": "BGM_04",
+      "sequenceID": 3
+    },
+    {
+      "name": "BGM_05",
+      "sequenceID": 4
+    },
+    {
+      "name": "BGM_06",
+      "sequenceID": 5
+    },
+    {
+      "name": "BGM_07",
+      "sequenceID": 6
+    },
+    {
+      "name": "BGM_08",
+      "sequenceID": 7
+    },
+    {
+      "name": "BGM_09",
+      "sequenceID": 8
+    },
+    {
+      "name": "BGM_10",
+      "sequenceID": 9
+    },
+    {
+      "name": "BGM_11",
+      "sequenceID": 10
+    },
+    {
+      "name": "BGM_12",
+      "sequenceID": 11
+    },
+    {
+      "name": "BGM_13",
+      "sequenceID": 12
+    },
+    {
+      "name": "BGM_14",
+      "sequenceID": 13
+    },
+    {
+      "name": "BGM_15",
+      "sequenceID": 14
+    },
+    {
+      "name": "BGM_16",
+      "sequenceID": 15
+    },
+    {
+      "name": "BGM_17",
+      "sequenceID": 16
+    },
+    {
+      "name": "BGM_18",
+      "sequenceID": 17
+    },
+    {
+      "name": "BGM_19",
+      "sequenceID": 18
+    },
+    {
+      "name": "BGM_20",
+      "sequenceID": 19
+    },
+    {
+      "name": "BGM_21",
+      "sequenceID": 20
+    },
+    {
+      "name": "BGM_22",
+      "sequenceID": 21
+    },
+    {
+      "name": "BGM_23",
+      "sequenceID": 22
+    },
+    {
+      "name": "BGM_24",
+      "sequenceID": 23
+    },
+    {
+      "name": "BGM_25",
+      "sequenceID": 24
+    },
+    {
+      "name": "BGM_26",
+      "sequenceID": 25
+    },
+    {
+      "name": "BGM_27",
+      "sequenceID": 26
+    },
+    {
+      "name": "BGM_28",
+      "sequenceID": 27
+    },
+    {
+      "name": "BGM_29",
+      "sequenceID": 28
+    },
+    {
+      "name": "BGM_30",
+      "sequenceID": 29
+    },
+    {
+      "name": "BGM_31",
+      "sequenceID": 30
+    },
+    {
+      "name": "BGM_32",
+      "sequenceID": 31
+    },
+    {
+      "name": "BGM_33",
+      "sequenceID": 32
+    },
+    {
+      "name": "BGM_34",
+      "sequenceID": 33
+    },
+    {
+      "name": "BGM_35",
+      "sequenceID": 34
+    },
+    {
+      "name": "BGM_36",
+      "sequenceID": 35
+    }
+  ],
+  "sounds": [
+    {
+      "code": "400101",
+      "archiveID": 0,
+      "entryID": 0
+    },
+    {
+      "code": "400201",
+      "archiveID": 1,
+      "entryID": 0
+    },
+    {
+      "code": "400301",
+      "archiveID": 2,
+      "entryID": 0
+    },
+    {
+      "code": "400401",
+      "archiveID": 3,
+      "entryID": 0
+    },
+    {
+      "code": "400501",
+      "archiveID": 4,
+      "entryID": 0
+    },
+    {
+      "code": "400601",
+      "archiveID": 5,
+      "entryID": 0
+    },
+    {
+      "code": "400701",
+      "archiveID": 6,
+      "entryID": 0
+    },
+    {
+      "code": "400801",
+      "archiveID": 7,
+      "entryID": 0
+    },
+    {
+      "code": "000101",
+      "archiveID": 8,
+      "entryID": 0
+    },
+    {
+      "code": "000201",
+      "archiveID": 8,
+      "entryID": 1
+    },
+    {
+      "code": "000301",
+      "archiveID": 8,
+      "entryID": 2
+    },
+    {
+      "code": "000401",
+      "archiveID": 8,
+      "entryID": 3
+    },
+    {
+      "code": "000501",
+      "archiveID": 8,
+      "entryID": 4
+    },
+    {
+      "code": "000601",
+      "archiveID": 8,
+      "entryID": 5
+    },
+    {
+      "code": "000701",
+      "archiveID": 8,
+      "entryID": 6
+    },
+    {
+      "code": "000801",
+      "archiveID": 8,
+      "entryID": 7
+    },
+    {
+      "code": "001001",
+      "archiveID": 8,
+      "entryID": 8
+    },
+    {
+      "code": "001301",
+      "archiveID": 8,
+      "entryID": 9
+    },
+    {
+      "code": "001401",
+      "archiveID": 8,
+      "entryID": 10
+    },
+    {
+      "code": "300101",
+      "archiveID": 9,
+      "entryID": 0
+    },
+    {
+      "code": "300301",
+      "archiveID": 10,
+      "entryID": 0
+    },
+    {
+      "code": "300401",
+      "archiveID": 11,
+      "entryID": 0
+    },
+    {
+      "code": "300501",
+      "archiveID": 12,
+      "entryID": 0
+    },
+    {
+      "code": "300601",
+      "archiveID": 13,
+      "entryID": 0
+    },
+    {
+      "code": "300701",
+      "archiveID": 14,
+      "entryID": 0
+    },
+    {
+      "code": "300801",
+      "archiveID": 15,
+      "entryID": 0
+    },
+    {
+      "code": "100101",
+      "archiveID": 16,
+      "entryID": 0
+    },
+    {
+      "code": "100201",
+      "archiveID": 16,
+      "entryID": 1
+    },
+    {
+      "code": "100301",
+      "archiveID": 16,
+      "entryID": 2
+    },
+    {
+      "code": "100401",
+      "archiveID": 16,
+      "entryID": 3
+    },
+    {
+      "code": "100501",
+      "archiveID": 16,
+      "entryID": 4
+    },
+    {
+      "code": "100601",
+      "archiveID": 16,
+      "entryID": 5
+    },
+    {
+      "code": "100701",
+      "archiveID": 16,
+      "entryID": 8
+    },
+    {
+      "code": "100801",
+      "archiveID": 16,
+      "entryID": 6
+    },
+    {
+      "code": "100901",
+      "archiveID": 17,
+      "entryID": 0
+    },
+    {
+      "code": "101001",
+      "archiveID": 17,
+      "entryID": 1
+    },
+    {
+      "code": "101101",
+      "archiveID": 18,
+      "entryID": 0
+    },
+    {
+      "code": "101201",
+      "archiveID": 18,
+      "entryID": 1
+    },
+    {
+      "code": "101301",
+      "archiveID": 18,
+      "entryID": 2
+    },
+    {
+      "code": "101401",
+      "archiveID": 18,
+      "entryID": 3
+    },
+    {
+      "code": "101501",
+      "archiveID": 18,
+      "entryID": 4
+    },
+    {
+      "code": "101601",
+      "archiveID": 19,
+      "entryID": 0
+    },
+    {
+      "code": "101701",
+      "archiveID": 19,
+      "entryID": 1
+    },
+    {
+      "code": "101801",
+      "archiveID": 19,
+      "entryID": 2
+    },
+    {
+      "code": "101901",
+      "archiveID": 19,
+      "entryID": 3
+    },
+    {
+      "code": "102001",
+      "archiveID": 19,
+      "entryID": 4
+    },
+    {
+      "code": "102101",
+      "archiveID": 20,
+      "entryID": 0
+    },
+    {
+      "code": "102201",
+      "archiveID": 20,
+      "entryID": 1
+    },
+    {
+      "code": "102301",
+      "archiveID": 20,
+      "entryID": 2
+    },
+    {
+      "code": "102401",
+      "archiveID": 21,
+      "entryID": 0
+    },
+    {
+      "code": "102501",
+      "archiveID": 21,
+      "entryID": 1
+    },
+    {
+      "code": "102601",
+      "archiveID": 21,
+      "entryID": 2
+    },
+    {
+      "code": "102701",
+      "archiveID": 21,
+      "entryID": 3
+    },
+    {
+      "code": "102801",
+      "archiveID": 22,
+      "entryID": 0
+    },
+    {
+      "code": "103201",
+      "archiveID": 16,
+      "entryID": 7
+    },
+    {
+      "code": "103301",
+      "archiveID": 18,
+      "entryID": 5
+    },
+    {
+      "code": "103401",
+      "archiveID": 19,
+      "entryID": 5
+    },
+    {
+      "code": "103501",
+      "archiveID": 23,
+      "entryID": 0
+    },
+    {
+      "code": "103601",
+      "archiveID": 16,
+      "entryID": 9
+    },
+    {
+      "code": "103701",
+      "archiveID": 16,
+      "entryID": 10
+    },
+    {
+      "code": "103801",
+      "archiveID": 16,
+      "entryID": 11
+    },
+    {
+      "code": "103901",
+      "archiveID": 16,
+      "entryID": 12
+    },
+    {
+      "code": "104001",
+      "archiveID": 16,
+      "entryID": 13
+    },
+    {
+      "code": "104101",
+      "archiveID": 16,
+      "entryID": 14
+    },
+    {
+      "code": "104201",
+      "archiveID": 16,
+      "entryID": 15
+    },
+    {
+      "code": "104301",
+      "archiveID": 16,
+      "entryID": 16
+    },
+    {
+      "code": "104401",
+      "archiveID": 17,
+      "entryID": 2
+    },
+    {
+      "code": "104501",
+      "archiveID": 17,
+      "entryID": 3
+    },
+    {
+      "code": "104601",
+      "archiveID": 24,
+      "entryID": 0
+    },
+    {
+      "code": "104801",
+      "archiveID": 16,
+      "entryID": 17
+    },
+    {
+      "code": "104901",
+      "archiveID": 16,
+      "entryID": 18
+    },
+    {
+      "code": "105001",
+      "archiveID": 16,
+      "entryID": 19
+    },
+    {
+      "code": "105101",
+      "archiveID": 67,
+      "entryID": 0
+    },
+    {
+      "code": "200101",
+      "archiveID": 25,
+      "entryID": 0
+    },
+    {
+      "code": "200201",
+      "archiveID": 26,
+      "entryID": 0
+    },
+    {
+      "code": "200301",
+      "archiveID": 26,
+      "entryID": 1
+    },
+    {
+      "code": "200401",
+      "archiveID": 27,
+      "entryID": 0
+    },
+    {
+      "code": "200501",
+      "archiveID": 28,
+      "entryID": 0
+    },
+    {
+      "code": "200601",
+      "archiveID": 29,
+      "entryID": 0
+    },
+    {
+      "code": "200701",
+      "archiveID": 29,
+      "entryID": 1
+    },
+    {
+      "code": "200801",
+      "archiveID": 29,
+      "entryID": 2
+    },
+    {
+      "code": "200901",
+      "archiveID": 30,
+      "entryID": 0
+    },
+    {
+      "code": "201001",
+      "archiveID": 30,
+      "entryID": 1
+    },
+    {
+      "code": "201101",
+      "archiveID": 30,
+      "entryID": 2
+    },
+    {
+      "code": "201201",
+      "archiveID": 31,
+      "entryID": 0
+    },
+    {
+      "code": "201301",
+      "archiveID": 31,
+      "entryID": 1
+    },
+    {
+      "code": "201401",
+      "archiveID": 32,
+      "entryID": 0
+    },
+    {
+      "code": "201501",
+      "archiveID": 33,
+      "entryID": 0
+    },
+    {
+      "code": "201601",
+      "archiveID": 34,
+      "entryID": 0
+    },
+    {
+      "code": "201901",
+      "archiveID": 36,
+      "entryID": 0
+    },
+    {
+      "code": "202001",
+      "archiveID": 40,
+      "entryID": 0
+    },
+    {
+      "code": "202101",
+      "archiveID": 40,
+      "entryID": 1
+    },
+    {
+      "code": "202201",
+      "archiveID": 40,
+      "entryID": 2
+    },
+    {
+      "code": "202301",
+      "archiveID": 40,
+      "entryID": 3
+    },
+    {
+      "code": "202401",
+      "archiveID": 40,
+      "entryID": 4
+    },
+    {
+      "code": "202501",
+      "archiveID": 41,
+      "entryID": 0
+    },
+    {
+      "code": "202601",
+      "archiveID": 42,
+      "entryID": 0
+    },
+    {
+      "code": "202701",
+      "archiveID": 42,
+      "entryID": 1
+    },
+    {
+      "code": "202801",
+      "archiveID": 42,
+      "entryID": 2
+    },
+    {
+      "code": "202901",
+      "archiveID": 42,
+      "entryID": 3
+    },
+    {
+      "code": "203001",
+      "archiveID": 42,
+      "entryID": 4
+    },
+    {
+      "code": "203101",
+      "archiveID": 42,
+      "entryID": 5
+    },
+    {
+      "code": "203201",
+      "archiveID": 43,
+      "entryID": 0
+    },
+    {
+      "code": "203301",
+      "archiveID": 44,
+      "entryID": 0
+    },
+    {
+      "code": "203401",
+      "archiveID": 37,
+      "entryID": 0
+    },
+    {
+      "code": "203501",
+      "archiveID": 38,
+      "entryID": 0
+    },
+    {
+      "code": "203601",
+      "archiveID": 39,
+      "entryID": 0
+    },
+    {
+      "code": "203701",
+      "archiveID": 58,
+      "entryID": 0
+    },
+    {
+      "code": "203801",
+      "archiveID": 45,
+      "entryID": 0
+    },
+    {
+      "code": "203901",
+      "archiveID": 46,
+      "entryID": 0
+    },
+    {
+      "code": "204101",
+      "archiveID": 47,
+      "entryID": 0
+    },
+    {
+      "code": "204201",
+      "archiveID": 48,
+      "entryID": 0
+    },
+    {
+      "code": "204301",
+      "archiveID": 48,
+      "entryID": 1
+    },
+    {
+      "code": "204401",
+      "archiveID": 48,
+      "entryID": 2
+    },
+    {
+      "code": "204501",
+      "archiveID": 48,
+      "entryID": 3
+    },
+    {
+      "code": "204601",
+      "archiveID": 48,
+      "entryID": 4
+    },
+    {
+      "code": "204801",
+      "archiveID": 49,
+      "entryID": 0
+    },
+    {
+      "code": "204901",
+      "archiveID": 49,
+      "entryID": 1
+    },
+    {
+      "code": "205001",
+      "archiveID": 33,
+      "entryID": 1
+    },
+    {
+      "code": "205101",
+      "archiveID": 43,
+      "entryID": 1
+    },
+    {
+      "code": "205201",
+      "archiveID": 50,
+      "entryID": 0
+    },
+    {
+      "code": "205301",
+      "archiveID": 50,
+      "entryID": 1
+    },
+    {
+      "code": "205401",
+      "archiveID": 39,
+      "entryID": 1
+    },
+    {
+      "code": "205501",
+      "archiveID": 35,
+      "entryID": 0
+    },
+    {
+      "code": "205601",
+      "archiveID": 44,
+      "entryID": 1
+    },
+    {
+      "code": "205701",
+      "archiveID": 44,
+      "entryID": 2
+    },
+    {
+      "code": "205801",
+      "archiveID": 51,
+      "entryID": 0
+    },
+    {
+      "code": "206001",
+      "archiveID": 52,
+      "entryID": 0
+    },
+    {
+      "code": "206101",
+      "archiveID": 52,
+      "entryID": 1
+    },
+    {
+      "code": "206201",
+      "archiveID": 52,
+      "entryID": 2
+    },
+    {
+      "code": "206301",
+      "archiveID": 52,
+      "entryID": 3
+    },
+    {
+      "code": "206401",
+      "archiveID": 53,
+      "entryID": 0
+    },
+    {
+      "code": "206601",
+      "archiveID": 54,
+      "entryID": 0
+    },
+    {
+      "code": "206701",
+      "archiveID": 55,
+      "entryID": 0
+    },
+    {
+      "code": "206801",
+      "archiveID": 55,
+      "entryID": 1
+    },
+    {
+      "code": "207001",
+      "archiveID": 56,
+      "entryID": 0
+    },
+    {
+      "code": "207101",
+      "archiveID": 57,
+      "entryID": 0
+    },
+    {
+      "code": "207301",
+      "archiveID": 58,
+      "entryID": 1
+    },
+    {
+      "code": "207501",
+      "archiveID": 59,
+      "entryID": 0
+    },
+    {
+      "code": "207601",
+      "archiveID": 59,
+      "entryID": 1
+    },
+    {
+      "code": "207701",
+      "archiveID": 59,
+      "entryID": 2
+    },
+    {
+      "code": "207801",
+      "archiveID": 60,
+      "entryID": 0
+    },
+    {
+      "code": "207901",
+      "archiveID": 61,
+      "entryID": 0
+    },
+    {
+      "code": "208001",
+      "archiveID": 62,
+      "entryID": 0
+    },
+    {
+      "code": "208101",
+      "archiveID": 33,
+      "entryID": 2
+    },
+    {
+      "code": "208201",
+      "archiveID": 63,
+      "entryID": 0
+    },
+    {
+      "code": "208301",
+      "archiveID": 63,
+      "entryID": 1
+    },
+    {
+      "code": "208401",
+      "archiveID": 63,
+      "entryID": 2
+    },
+    {
+      "code": "208501",
+      "archiveID": 63,
+      "entryID": 3
+    },
+    {
+      "code": "208601",
+      "archiveID": 64,
+      "entryID": 0
+    },
+    {
+      "code": "208701",
+      "archiveID": 65,
+      "entryID": 0
+    },
+    {
+      "code": "208801",
+      "archiveID": 66,
+      "entryID": 0
+    },
+    {
+      "code": "208901",
+      "archiveID": 66,
+      "entryID": 1
+    },
+    {
+      "code": "209001",
+      "archiveID": 56,
+      "entryID": 1
+    },
+    {
+      "code": "209101",
+      "archiveID": 56,
+      "entryID": 2
+    },
+    {
+      "code": "209201",
+      "archiveID": 25,
+      "entryID": 1
+    },
+    {
+      "code": "209301",
+      "archiveID": 25,
+      "entryID": 2
+    },
+    {
+      "code": "209401",
+      "archiveID": 47,
+      "entryID": 1
+    },
+    {
+      "code": "209501",
+      "archiveID": 25,
+      "entryID": 3
+    },
+    {
+      "code": "209601",
+      "archiveID": 41,
+      "entryID": 1
+    },
+    {
+      "code": "209701",
+      "archiveID": 68,
+      "entryID": 0
+    },
+    {
+      "code": "209801",
+      "archiveID": 69,
+      "entryID": 0
+    },
+    {
+      "code": "209901",
+      "archiveID": 56,
+      "entryID": 3
+    },
+    {
+      "code": "210001",
+      "archiveID": 70,
+      "entryID": 0
+    },
+    {
+      "code": "210101",
+      "archiveID": 71,
+      "entryID": 0
+    },
+    {
+      "code": "210201",
+      "archiveID": 85,
+      "entryID": 0
+    },
+    {
+      "code": "210301",
+      "archiveID": 85,
+      "entryID": 1
+    },
+    {
+      "code": "210401",
+      "archiveID": 48,
+      "entryID": 5
+    },
+    {
+      "code": "400001",
+      "archiveID": 72,
+      "entryID": 0
+    },
+    {
+      "code": "400101",
+      "archiveID": 73,
+      "entryID": 0
+    },
+    {
+      "code": "400201",
+      "archiveID": 74,
+      "entryID": 0
+    },
+    {
+      "code": "400301",
+      "archiveID": 75,
+      "entryID": 0
+    },
+    {
+      "code": "400401",
+      "archiveID": 76,
+      "entryID": 0
+    },
+    {
+      "code": "400501",
+      "archiveID": 77,
+      "entryID": 0
+    },
+    {
+      "code": "400601",
+      "archiveID": 78,
+      "entryID": 0
+    },
+    {
+      "code": "400701",
+      "archiveID": 79,
+      "entryID": 0
+    },
+    {
+      "code": "400801",
+      "archiveID": 80,
+      "entryID": 0
+    },
+    {
+      "code": "400901",
+      "archiveID": 81,
+      "entryID": 0
+    },
+    {
+      "code": "401001",
+      "archiveID": 82,
+      "entryID": 0
+    },
+    {
+      "code": "500001",
+      "archiveID": 72,
+      "entryID": 0
+    },
+    {
+      "code": "500101",
+      "archiveID": 73,
+      "entryID": 0
+    },
+    {
+      "code": "500201",
+      "archiveID": 74,
+      "entryID": 0
+    },
+    {
+      "code": "500301",
+      "archiveID": 75,
+      "entryID": 0
+    },
+    {
+      "code": "500401",
+      "archiveID": 76,
+      "entryID": 0
+    },
+    {
+      "code": "500501",
+      "archiveID": 77,
+      "entryID": 0
+    },
+    {
+      "code": "500601",
+      "archiveID": 78,
+      "entryID": 0
+    },
+    {
+      "code": "500701",
+      "archiveID": 79,
+      "entryID": 0
+    },
+    {
+      "code": "500801",
+      "archiveID": 80,
+      "entryID": 0
+    },
+    {
+      "code": "500901",
+      "archiveID": 81,
+      "entryID": 0
+    },
+    {
+      "code": "501001",
+      "archiveID": 82,
+      "entryID": 0
+    },
+    {
+      "code": "501101",
+      "archiveID": 87,
+      "entryID": 0
+    },
+    {
+      "code": "501201",
+      "archiveID": 88,
+      "entryID": 0
+    },
+    {
+      "code": "600101",
+      "archiveID": 83,
+      "entryID": 0
+    },
+    {
+      "code": "600201",
+      "archiveID": 83,
+      "entryID": 1
+    },
+    {
+      "code": "600301",
+      "archiveID": 84,
+      "entryID": 0
+    },
+    {
+      "code": "700101",
+      "archiveID": 86,
+      "entryID": 0
+    },
+    {
+      "code": "700201",
+      "archiveID": 86,
+      "entryID": 1
+    }
+  ],
+  "mapSoundSHA256": "50277eb10172d0669e342c401624aa4574f989b153627b17ada0885474cae287",
+  "maps": [
+    {
+      "mapID": 1,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 2,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 3,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 4,
+      "sequenceID": 33,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": {
+        "archiveID": 10,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 5,
+      "sequenceID": 31,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 2
+      },
+      "ambient": {
+        "archiveID": 11,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 6,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": {
+        "archiveID": 12,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 7,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 8,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 0
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 9,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 0
+      },
+      "ambient": {
+        "archiveID": 14,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 10,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 0
+      },
+      "ambient": {
+        "archiveID": 13,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 11,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": {
+        "archiveID": 15,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 12,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 13,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 14,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 15,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 16,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 17,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 18,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 2
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 19,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 20,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 21,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 22,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 2
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 23,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 24,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 25,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 26,
+      "sequenceID": 33,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": {
+        "archiveID": 10,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 27,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 28,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 29,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 30,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 31,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 32,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 33,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 34,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 35,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 36,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 37,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 2
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 38,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 39,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 6
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 40,
+      "sequenceID": 24,
+      "footstep": {
+        "archiveID": 17,
+        "entryID": 0
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 41,
+      "sequenceID": 24,
+      "footstep": {
+        "archiveID": 17,
+        "entryID": 0
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 42,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 43,
+      "sequenceID": 24,
+      "footstep": {
+        "archiveID": 17,
+        "entryID": 0
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 44,
+      "sequenceID": 24,
+      "footstep": {
+        "archiveID": 17,
+        "entryID": 0
+      },
+      "ambient": null
+    },
+    {
+      "mapID": 45,
+      "sequenceID": 23,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 0
+      },
+      "ambient": {
+        "archiveID": 9,
+        "entryID": 0
+      }
+    },
+    {
+      "mapID": 46,
+      "sequenceID": -2,
+      "footstep": {
+        "archiveID": 16,
+        "entryID": 4
+      },
+      "ambient": null
+    }
+  ]
+}

@@ -10,7 +10,7 @@ struct OriginalNotebookView: View {
         if let notebook = play.notebook {
             VStack(spacing: 8) {
                 GeometryReader { proxy in
-                    let scale = min(proxy.size.width / 192, proxy.size.height / 256)
+                    let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
                     ZStack {
                         Color.clear
                         if let image = play.notebookImage {
@@ -25,6 +25,7 @@ struct OriginalNotebookView: View {
                             play.holdNotebookTouch(x: Int(value.location.x / scale), y: Int(value.location.y / scale))
                         }
                         .onEnded { _ in play.releaseNotebook() })
+                    .notebookPhotograph()
                     .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
                     .accessibilityLabel("Notebook page \(notebook.page + 1)")
                 }

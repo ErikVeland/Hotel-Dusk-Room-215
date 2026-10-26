@@ -53,8 +53,8 @@ public struct JigsawPuzzleView: View {
             .frame(height: 44)
 
             GeometryReader { space in
-                let scale = min(space.size.width / puzzleManager.manifest.boardWidth,
-                                space.size.height / puzzleManager.manifest.boardHeight)
+                let scale = max(0, min((space.size.width - 32) / puzzleManager.manifest.boardWidth,
+                                      (space.size.height - 36) / puzzleManager.manifest.boardHeight))
                 let stageSize = CGSize(width: puzzleManager.manifest.boardWidth * scale,
                                        height: puzzleManager.manifest.boardHeight * scale)
                 Group {
@@ -66,6 +66,7 @@ public struct JigsawPuzzleView: View {
                     }
                 }
                 .frame(width: stageSize.width, height: stageSize.height)
+                .notebookPhotograph()
                 .position(x: space.size.width / 2, y: space.size.height / 2)
             }
 

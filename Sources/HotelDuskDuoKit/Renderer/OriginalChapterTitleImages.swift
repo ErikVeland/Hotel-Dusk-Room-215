@@ -1,7 +1,7 @@
 import CoreGraphics
 
 /**
- * Original Chapter 2 still artwork. The native page supplies its text separately.
+ * Original chapter still artwork. The native page supplies its text separately.
  */
 @MainActor
 public struct OriginalChapterTitleImages {
@@ -10,7 +10,7 @@ public struct OriginalChapterTitleImages {
     public let clock: CGImage
     public let item: CGImage
 
-    public init(library: OriginalBitmapLibrary) throws {
+    public init(library: OriginalBitmapLibrary, chapter: UInt16 = 1) throws {
         func image(_ name: String, transparent: Bool = true) throws -> CGImage {
             let bitmap = try library.loadLinear(path: "system/title/\(name).bin")
             guard let result = OriginalEntrancePanels.rotated(rgba: bitmap.rgba(transparentPaletteZero: transparent),
@@ -21,7 +21,8 @@ public struct OriginalChapterTitleImages {
         }
         left = try image("backL", transparent: false)
         right = try image("backR", transparent: false)
-        clock = try image("clock02")
-        item = try image("item02")
+        let suffix = try OriginalChapter(chapter).artworkSuffix
+        clock = try image("clock\(suffix)")
+        item = try image("item\(suffix)")
     }
 }

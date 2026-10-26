@@ -14,6 +14,8 @@ public enum OriginalTextControl: Equatable, Sendable {
     case backgroundMetadata(Data)
     case marker(UInt8)
     case toggleCipher
+    /// `%r` with four digits begins every game-over sequence before its replayed warning.
+    case retry(UInt16)
 }
 
 public struct OriginalDialogueToken: Equatable, Sendable {
@@ -50,7 +52,7 @@ public enum OriginalDialogueControl {
             if bytes[cursor] == 37, cursor + 1 < bytes.count {
                 let code = bytes[cursor + 1]
                 let widths: [UInt8: Int] = [98: 5, 99: 1, 100: 1, 101: 2, 109: 3,
-                    110: 1, 112: 7, 115: 7, 119: 1, 33: 0, 63: 0, 43: 0]
+                    110: 1, 112: 7, 114: 4, 115: 7, 119: 1, 33: 0, 63: 0, 43: 0]
                 if let width = widths[code] {
                     length = width + 2
                     guard length <= bytes.count - cursor else {
@@ -82,6 +84,7 @@ public enum OriginalDialogueControl {
                         control = .portraitMetadata(person: person, field: field)
                     case 98: control = .backgroundMetadata(Data(payload))
                     case 43: control = .toggleCipher
+                    case 114: control = .retry(try decimal(payload))
                     default: control = .marker(code)
                     }
                     kind = .control(control)

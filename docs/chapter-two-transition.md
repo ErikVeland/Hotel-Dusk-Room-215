@@ -1,6 +1,6 @@
 # Chapter 2 transition and native saves
 
-The normal native route now completes the Chapter 1 review, offers a save, shows the Chapter 2 title and enters Room 215. The opening room event finishes and returns control to walking. The remaining Chapter 2 route is unfinished.
+The normal native route now completes the Chapter 1 review, offers a save, shows the Chapter 2 title and enters Room 215. The opening room event finishes and returns control to walking. The checked main route now continues through the Chapter 2 review and into Chapter 3. See [Chapter 3 progress](chapter-three-progress.md).
 
 ## Original behaviour
 

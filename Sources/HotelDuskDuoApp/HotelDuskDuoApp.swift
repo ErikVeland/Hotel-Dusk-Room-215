@@ -6,7 +6,7 @@ import HotelDuskDuoKit
 struct HotelDuskDuoApp: App {
     // A hinge transition can replace the display's window. Keep the game above
     // that window so the cover and inner displays share the same session.
-    @StateObject private var session = GameSession()
+    @StateObject private var session = GameSession(audioController: AudioController(preferences: .standard))
 
     var body: some Scene {
         WindowGroup("Hotel Dusk: Room 215 — iPhone Duo Edition") {

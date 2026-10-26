@@ -1,10 +1,10 @@
 import SwiftUI
 import MetalKit
 
-/// All three passes share one compiled Metal pipeline. Views render only when
+/// All material passes share one compiled Metal pipeline. Views render only when
 /// their parameters change; the settling clock lives in PaperbackPageSurface.
 struct MetalBookMaterial: View {
-    enum Pass: Float { case stock = 0, light = 1, spine = 2 }
+    enum Pass: Float { case stock = 0, light = 1, spine = 2, photoCard = 3, tape = 4 }
     var pass: Pass
     var side: PaperPageSide = .left
     var angle: Double = 180
@@ -176,7 +176,15 @@ private func configure(_ view: MTKView, coordinator: PaperMetalDelegate) {
 enum MetalPaperStock {
     private static let left = render(side: 0, seed: 215)
     private static let right = render(side: 1, seed: 219)
+    static let photoCard = material(.photoCard, width: 384, height: 512, seed: 315)
+    static let tape = material(.tape, width: 240, height: 64, seed: 79)
+    static let secondTape = material(.tape, width: 240, height: 64, seed: 215)
     static func image(for side: PaperPageSide) -> CGImage? { side == .left ? left : right }
+    private static func material(_ pass: MetalBookMaterial.Pass, width: Int, height: Int, seed: Float) -> CGImage? {
+        guard let pipeline = try? MetalPaperPipeline.shared.get() else { return nil }
+        return try? pipeline.snapshot(width: width, height: height,
+                                      parameters: MetalPaperParameters(pass: pass.rawValue, seed: seed))
+    }
     private static func render(side: Float, seed: Float) -> CGImage? {
         guard let pipeline = try? MetalPaperPipeline.shared.get() else { return nil }
         return try? pipeline.snapshot(width: 768, height: 1024,

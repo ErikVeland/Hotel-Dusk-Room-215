@@ -6,6 +6,25 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalModelMetalTests: XCTestCase {
+    @MainActor func testLouieRoomLoadsAndRendersAtItsDoorEntry() throws {
+        let map = try OriginalMapExploration.bundled(mapID: 14, previousMapID: 19)
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
+        game.setMap(14, previous: 19)
+        let renderer = try OriginalMapRenderer(mapName: "R114")
+        let image = try renderer.render(map, game: game)
+        XCTAssertEqual(image.width, 192)
+        XCTAssertEqual(image.height, 256)
+        let pixels = try XCTUnwrap(image.dataProvider?.data) as Data
+        XCTAssertGreaterThan(Set(pixels).count, 32)
+        if let output = ProcessInfo.processInfo.environment["HOTEL_DUSK_MODEL_PREVIEW"] {
+            let url = URL(fileURLWithPath: output)
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            let destination = try XCTUnwrap(CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil))
+            CGImageDestinationAddImage(destination, image, nil)
+            XCTAssertTrue(CGImageDestinationFinalize(destination))
+        }
+    }
+
     func testNativeMetalDrawsOriginalRoomGeometryAndTextures() throws {
         guard let device = MTLCreateSystemDefaultDevice() else { throw XCTSkip("Metal unavailable on this host") }
         let preview = try OriginalModelMetalPreview(modelPath: "map/R212/R212/R212.mdf",

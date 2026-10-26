@@ -2,12 +2,17 @@ import Foundation
 import Combine
 
 /// Owns native game data and book state above the display lifecycle.
-/// The recovered route currently reaches the start of Chapter 2.
+/// Owns saves, pause reasons and the supported Chapter 1–2 route.
 @MainActor
 public final class GameSession: ObservableObject {
     @Published public private(set) var chapterSaves: [OriginalChapterSave?] = Array(repeating: nil, count: 3)
     @Published public private(set) var saveError: String?
     private let saveStore: any OriginalChapterSaveStore
+    private let resumeStore: any OriginalResumeSaveStore
+    @Published public private(set) var resumeSave: OriginalResumeSave?
+    @Published public private(set) var isPauseMenuOpen = false
+    @Published public private(set) var isReviewingConversations = false
+    private var isAppActive = true
     @Published public private(set) var originalProgram: OriginalScriptProgram?
     @Published public private(set) var sourceError: String?
     @Published public var memoNotes: [String] = []
@@ -38,8 +43,10 @@ public final class GameSession: ObservableObject {
     public init(hingeManager: DuoHingeManager? = nil,
                 audioController: AudioController = AudioController(),
                 jigsawPuzzleManager: JigsawPuzzleManager? = nil,
-                saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application) {
+                saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
+                resumeStore: any OriginalResumeSaveStore = OriginalResumeFileStore.application) {
         self.saveStore = saveStore
+        self.resumeStore = resumeStore
         self.hingeManager = hingeManager ?? DuoHingeManager()
         self.audioController = audioController
         self.jigsawPuzzleManager = jigsawPuzzleManager ?? JigsawPuzzleManager()
@@ -49,6 +56,8 @@ public final class GameSession: ObservableObject {
             sourceError = String(describing: error)
         }
         refreshChapterSaves()
+        do { resumeSave = try resumeStore.load() }
+        catch { saveError = "The resume checkpoint could not be read: \(error)" }
         observeFoldEvents()
     }
 
@@ -88,23 +97,23 @@ public final class GameSession: ObservableObject {
         play?.stop()
         do {
             let next = try OriginalPlaySession.chapterOne(audio: audioController, saveStore: saveStore)
-            playCancellable = next.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
-            play = next
-            if isBookClosed { next.pause() }
+            attachPlay(next)
         } catch {
             sourceError = String(describing: error)
         }
     }
 
     public func endOriginalGame() {
+        saveWalkingProgress()
         play?.stop()
         playCancellable = nil
         play = nil
+        isPauseMenuOpen = false
+        isReviewingConversations = false
         refreshChapterSaves()
     }
 
     private func refreshChapterSaves() {
-        saveError = nil
         for slot in 0..<3 {
             do { chapterSaves[slot] = try saveStore.load(slot: slot) }
             catch {
@@ -117,16 +126,87 @@ public final class GameSession: ObservableObject {
     public func loadChapterSave(slot: Int) {
         do {
             guard let checkpoint = try saveStore.load(slot: slot) else { return }
-            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore)
             play?.stop()
-            playCancellable = next.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
-            play = next
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore)
             saveError = nil
-            if isBookClosed { next.pause() }
+            attachPlay(next)
         } catch { saveError = "The saved game could not be loaded: \(error)" }
     }
 
+    private func attachPlay(_ next: OriginalPlaySession) {
+        isPauseMenuOpen = false
+        isReviewingConversations = false
+        playCancellable = next.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+        next.onWalkingCheckpoint = { [weak self] checkpoint in self?.persist(checkpoint) }
+        play = next
+        saveWalkingProgress()
+        updatePlayActivity()
+    }
+
+    private func persist(_ checkpoint: OriginalResumeSave) {
+        guard checkpoint.state != resumeSave?.state || checkpoint.checkpointFacing != resumeSave?.checkpointFacing else { return }
+        do {
+            try resumeStore.save(checkpoint)
+            resumeSave = checkpoint
+            saveError = nil
+        } catch { saveError = "Progress could not be saved: \(error)" }
+    }
+
+    public func saveWalkingProgress() {
+        guard let checkpoint = try? play?.walkingCheckpoint() else { return }
+        persist(checkpoint)
+    }
+
+    public func continueSavedGame() {
+        do {
+            guard let checkpoint = try resumeStore.load() else { return }
+            play?.stop()
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore)
+            saveError = nil
+            attachPlay(next)
+            if let sequence = checkpoint.musicSequenceID { try? audioController.playOriginalSequence(id: sequence) }
+            updatePlayActivity()
+        } catch { saveError = "The resume checkpoint could not be loaded: \(error)" }
+    }
+
+    public func reviewConversations() {
+        guard let play, play.canReviewConversations, !isPauseMenuOpen else { return }
+        play.dialogueNotebook.beginReview()
+        isReviewingConversations = true
+        updatePlayActivity()
+    }
+
+    public func closeConversationHistory() {
+        play?.dialogueNotebook.endReview()
+        isReviewingConversations = false
+        updatePlayActivity()
+    }
+
+    public func openPauseMenu() {
+        guard play != nil else { return }
+        isPauseMenuOpen = true
+        updatePlayActivity()
+    }
+
+    public func closePauseMenu() {
+        isPauseMenuOpen = false
+        updatePlayActivity()
+    }
+
+    public func setApplicationActive(_ active: Bool) {
+        isAppActive = active
+        updatePlayActivity()
+    }
+
+    private func updatePlayActivity(bookClosed: Bool? = nil) {
+        if (bookClosed ?? isBookClosed) || !isAppActive || isPauseMenuOpen || isReviewingConversations { play?.pause() }
+        else { play?.resume() }
+    }
+
     private func observeFoldEvents() {
+        audioController.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
         hingeManager.objectWillChange
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
@@ -136,8 +216,14 @@ public final class GameSession: ObservableObject {
         hingeManager.$foldState.removeDuplicates().dropFirst()
             .sink { [weak self] state in
                 guard let self else { return }
+                if state == .closed {
+                    if self.isAppActive && !self.isPauseMenuOpen { self.play?.receiveJigsawFold(isClosed: true) }
+                    else { self.play?.cancelPendingJigsawFold() }
+                } else if !self.isPauseMenuOpen {
+                    self.play?.receiveJigsawFold(isClosed: false)
+                } else { self.play?.cancelPendingJigsawFold() }
                 // A closed book pauses the original update loop and audio.
-                if state == .closed { self.play?.pause() } else { self.play?.resume() }
+                self.updatePlayActivity(bookClosed: state == .closed)
                 guard self.isJigsawPuzzleOpen else { return }
                 if state == .closed { self.jigsawPuzzleManager.onDeviceFoldedShut() }
                 else { self.jigsawPuzzleManager.onDeviceReopened() }

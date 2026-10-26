@@ -45,10 +45,14 @@ class Texture:
                     "DTX pixel length matches neither logical nor allocated dimensions")
             self.width, self.height = self.allocated_width, self.allocated_height
         if self.mode == 7:
+            encoded_width, encoded_height = self.width, self.height
+            # 0x02083CD0 sets the GPU block-row width from the allocation.
+            if self.width % 4:
+                self.width = self.allocated_width
             require(self.width % 4 == 0 and len(self.pixel_data) % 6 == 0 and
                     (self.height % 4 == 0 or self.width == self.allocated_width),
                     "DTX compressed block layout")
-            require(len(self.pixel_data) == self.width * self.height * 3 // 8,
+            require(len(self.pixel_data) == encoded_width * encoded_height * 3 // 8,
                     "Invalid compressed DTX data length")
             blocks_per_row = self.width // 4
             self.height = ((len(self.pixel_data) // 6 + blocks_per_row - 1) // blocks_per_row) * 4

@@ -29,12 +29,13 @@ public final class OriginalModelMetalPreview {
         var sampling: SIMD4<UInt32>
     }
 
-    /// Texture lookup uses an exact, case-insensitive name within the model's
-    /// archive directory. Missing or unsupported referenced textures throw.
+    /// Texture lookup uses an exact, case-insensitive name in the model directory.
+    /// Gameplay maps can share an unambiguous texture within their room archive.
+    /// Missing or unsupported referenced textures throw.
     /// The caller can preserve materials whose original runtime texture slot was unbound.
     public init(modelPath: String, models: OriginalModelLibrary, textures: OriginalTextureLibrary,
                 device: MTLDevice, textureLoader: ((String) throws -> OriginalTexture)? = nil,
-                untexturedMaterials: Set<Int> = []) throws {
+                untexturedMaterials: Set<Int> = [], gameplayOnly: Bool = false) throws {
         self.device = device
         model = try models.load(path: modelPath)
         guard let queue = device.makeCommandQueue() else { throw OriginalDataError.invalid("Metal command queue") }
@@ -61,26 +62,34 @@ public final class OriginalModelMetalPreview {
             throw OriginalDataError.invalid("Metal depth state")
         }
         self.depthState = depthState
+        let unboundNames = gameplayOnly ? OriginalTextureLibrary.unboundMapTextures(modelPath: modelPath) : []
         var materialTextures = [Int: (OriginalTexture, MTLTexture)]()
         var resolvedPaths = [Int: String]()
         var prepared = [Draw]()
         let directory = (modelPath as NSString).deletingLastPathComponent
         for group in model.groups {
+            if gameplayOnly && !model.gameplayRenderNodes.contains(group.node) { continue }
             guard let geometry = group.render else { continue }
             let material = model.materials[group.material]
             var dimensions = SIMD4<UInt32>(repeating: 0)
             var sampling = SIMD4<UInt32>(repeating: 0)
             var gpuTexture: MTLTexture?
-            if !material.texture.isEmpty, !untexturedMaterials.contains(group.material) {
+            if !material.texture.isEmpty, !untexturedMaterials.contains(group.material), !unboundNames.contains(material.texture) {
                 if materialTextures[group.material] == nil {
                     let requested = directory + "/" + material.texture + ".dtx"
                     let texture: OriginalTexture
                     if let textureLoader { texture = try textureLoader(material.texture) }
                     else {
-                        let matches = textures.manifest.textures.filter { $0.source.lowercased() == requested.lowercased() }
-                        guard matches.count == 1, let record = matches.first else { throw OriginalDataError.missing(requested) }
-                        texture = try textures.load(path: record.source)
-                        resolvedPaths[group.material] = record.source
+                        let path: String
+                        if gameplayOnly && modelPath.hasPrefix("map/") {
+                            path = try textures.mapTexturePath(modelPath: modelPath, textureName: material.texture)
+                        } else {
+                            let matches = textures.manifest.textures.filter { $0.source.lowercased() == requested.lowercased() }
+                            guard matches.count == 1, let record = matches.first else { throw OriginalDataError.missing(requested) }
+                            path = record.source
+                        }
+                        texture = try textures.load(path: path)
+                        resolvedPaths[group.material] = path
                     }
                     materialTextures[group.material] = (texture, try texture.makeMetalTexture(device: device))
                 }
@@ -105,7 +114,8 @@ public final class OriginalModelMetalPreview {
     /// The caller supplies camera and visibility. This renderer never moves
     /// the player, creates hotspots, or decides which objects the story reveals.
     public func encode(encoder: MTLRenderCommandEncoder, viewProjection: simd_float4x4,
-                       visibleNodes: Set<Int>, modelTransform: simd_float4x4 = matrix_identity_float4x4) {
+                       visibleNodes: Set<Int>, modelTransform: simd_float4x4 = matrix_identity_float4x4,
+                       nodeTransforms: [Int: simd_float4x4] = [:]) {
         encoder.setDepthStencilState(depthState)
         encoder.setCullMode(.none)
         for draw in draws where visibleNodes.contains(draw.node) {
@@ -116,7 +126,7 @@ public final class OriginalModelMetalPreview {
                 SIMD4(values[4], values[5], values[6], values[7]),
                 SIMD4(values[8], values[9], values[10], values[11]),
                 SIMD4(values[12], values[13], values[14], values[15])))
-            var uniforms = Uniforms(viewProjection: viewProjection, world: modelTransform * world,
+            var uniforms = Uniforms(viewProjection: viewProjection, world: modelTransform * (nodeTransforms[draw.node] ?? matrix_identity_float4x4) * world,
                                     dimensions: draw.dimensions, sampling: draw.sampling)
             encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
             encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)

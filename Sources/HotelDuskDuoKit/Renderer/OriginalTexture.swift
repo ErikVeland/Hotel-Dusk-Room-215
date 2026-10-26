@@ -53,6 +53,10 @@ public struct OriginalTexture: Sendable {
         }
         let blockCount = pixels.count / 6
         if format == 7 {
+            // The descriptor at 0x02083CD0 uses allocated width for 4x4 block rows.
+            // Cropped payloads can stop before that allocation is full. Keep only
+            // their supplied blocks; the unprovided tail stays transparent.
+            if width % 4 != 0 { width = aw }
             guard width % 4 == 0, pixels.count % 6 == 0,
                   height % 4 == 0 || width == aw else {
                 throw OriginalDataError.unsupported("DTX compressed block layout")
@@ -180,6 +184,39 @@ public struct OriginalTextureLibrary: Sendable {
             throw OriginalDataError.missing("OriginalTextures")
         }
         return try .init(resourceRoot: root)
+    }
+
+    /// Room search models share named textures with other members of the same map archive.
+    /// Accept a shared name only when every candidate has the same decoded image.
+    func mapTexturePath(modelPath: String, textureName: String) throws -> String {
+        let directory = (modelPath as NSString).deletingLastPathComponent
+        let requested = directory + "/" + textureName + ".dtx"
+        let exact = manifest.textures.filter { $0.source.lowercased() == requested.lowercased() }
+        if exact.count == 1 { return exact[0].source }
+        let components = modelPath.split(separator: "/")
+        guard components.count >= 3, components[0] == "map" else { throw OriginalDataError.missing(requested) }
+        let archive = "map/" + components[1] + "/"
+        let candidates = manifest.textures.filter {
+            $0.source.hasPrefix(archive) && ($0.source as NSString).lastPathComponent.lowercased() == textureName.lowercased() + ".dtx"
+                && $0.status == "decoded"
+        }
+        guard let first = candidates.first, first.rgbaSHA256 != nil,
+              candidates.allSatisfy({ $0.rgbaSHA256 == first.rgbaSHA256 }) else {
+            throw OriginalDataError.missing(requested)
+        }
+        return first.source
+    }
+
+    /// These names have no FILE entry in their original scene .def. The original
+    /// lookup 02083A6C returns -1 and draw 0208B6F0 selects the default colour slot.
+    static func unboundMapTextures(modelPath: String) -> Set<String> {
+        switch modelPath {
+        case "map/R123/R123/R123.mdf": return ["r123_lamp02"]
+        case "map/R301/R301_s01/R301_s01.mdf": return ["denjou"]
+        case "map/R302/R302/R302.mdf": return ["noicon"]
+        case "map/R304/R304_s02/R304_s02.mdf": return ["yuka01"]
+        default: return []
+        }
     }
 
     public func load(path: String) throws -> OriginalTexture {

@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Main Dual-Screen Book Container for the iPhone Duo
 public struct DuoBookContainerView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject public var session: GameSession
 
     public init(session: GameSession? = nil) {
@@ -19,6 +20,8 @@ public struct DuoBookContainerView: View {
             .ignoresSafeArea()
         }
         .background(PaperSurface())
+        .onChange(of: scenePhase) { _, phase in session.setApplicationActive(phase == .active) }
+        .onAppear { session.setApplicationActive(scenePhase == .active) }
         #if canImport(UIKit)
         .background(HingeObserverView(manager: session.hingeManager))
         .statusBarHidden(true)
@@ -52,10 +55,31 @@ public struct DuoBookContainerView: View {
                 }
             }
             .environment(\.layoutDirection, .leftToRight)
-            .opacity(session.isJigsawPuzzleOpen || session.isBookClosed ? 0 : 1)
-            .disabled(session.isJigsawPuzzleOpen || session.isBookClosed)
-            .allowsHitTesting(!session.isJigsawPuzzleOpen && !session.isBookClosed)
-            .accessibilityHidden(session.isJigsawPuzzleOpen || session.isBookClosed)
+            .opacity(session.isJigsawPuzzleOpen || session.isBookClosed || isReadingDialogue ? 0 : 1)
+            .disabled(session.isJigsawPuzzleOpen || session.isBookClosed || isReadingDialogue)
+            .allowsHitTesting(!session.isJigsawPuzzleOpen && !session.isBookClosed && !isReadingDialogue)
+            .accessibilityHidden(session.isJigsawPuzzleOpen || session.isBookClosed || isReadingDialogue)
+
+            if isReadingDialogue, let play = session.play {
+                let metrics = DialogueSpreadMetrics(size: size, safeArea: safeArea)
+                NotebookDialogueSpread(play: play, notebook: play.dialogueNotebook, safeArea: safeArea,
+                                       isVisible: !session.isBookClosed && !session.isJigsawPuzzleOpen)
+                    .overlay(alignment: .topTrailing) {
+                        HStack {
+                            if session.isReviewingConversations {
+                                Button("Return to game") { session.closeConversationHistory() }
+                                    .font(NovelStyle.caption).buttonStyle(.plain)
+                                    .frame(minHeight: 44)
+                            }
+                            BookSettingsMenu(session: session)
+                        }
+                        .padding(.top, metrics.top - 12)
+                        .padding(.trailing, metrics.margin - 8)
+                    }
+                    .opacity(session.isBookClosed || session.isJigsawPuzzleOpen ? 0 : 1)
+                    .allowsHitTesting(!session.isBookClosed && !session.isJigsawPuzzleOpen)
+                    .accessibilityHidden(session.isBookClosed || session.isJigsawPuzzleOpen)
+            }
 
             if session.isJigsawPuzzleOpen {
                 JigsawPuzzleView(session: session, puzzleManager: session.jigsawPuzzleManager,
@@ -73,6 +97,17 @@ public struct DuoBookContainerView: View {
             }
         }
     }
+
+    private var isReadingDialogue: Bool {
+        if session.isReviewingConversations { return true }
+        guard let play = session.play, !session.isPauseMenuOpen,
+              play.chapterTransition == nil, play.notebook == nil else { return false }
+        switch play.runner.phase {
+        case .dialogue, .itemNotice: return true
+        case .waiting: return !play.dialogueNotebook.ink.isEmpty
+        default: return false
+        }
+    }
 }
 
 /// Settings belong to the touch page so no controls sit over the physical crease.
@@ -82,6 +117,16 @@ struct BookSettingsMenu: View {
 
     var body: some View {
         Menu {
+            if session.isReviewingConversations {
+                Button("Return to game") { session.closeConversationHistory() }
+            } else if let play = session.play {
+                Button("Previous conversations") { session.reviewConversations() }
+                    .disabled(!play.canReviewConversations)
+            }
+            if session.play != nil {
+                Button("Pause game") { session.openPauseMenu() }
+            }
+            MusicSourcePicker(audio: session.audioController)
             Button {
                 session.hingeManager.toggleHandedness()
             } label: {

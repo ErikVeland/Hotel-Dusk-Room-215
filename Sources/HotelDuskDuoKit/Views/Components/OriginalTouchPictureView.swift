@@ -5,13 +5,11 @@ import SwiftUI
  */
 struct OriginalTouchPictureView: View {
     @ObservedObject var play: OriginalPlaySession
-    @State private var pressStarted = false
-    @State private var noticePress = false
 
     var body: some View {
         if let images = play.touchPictureImages {
             GeometryReader { proxy in
-                let scale = min(proxy.size.width / 192, proxy.size.height / 256)
+                let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
                 ZStack(alignment: .topLeading) {
                     Color.clear
                     if let background = images.background { layer(background, x: 0, y: 0, scale: scale) }
@@ -24,21 +22,12 @@ struct OriginalTouchPictureView: View {
                 }
                 .frame(width: 192 * scale, height: 256 * scale)
                 .contentShape(Rectangle())
-                .gesture(DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        guard scale > 0 else { return }
-                        if !pressStarted {
-                            pressStarted = true
-                            noticePress = play.acquiredItemImage != nil
-                        }
-                        play.touchPicture(pageX: Int(value.location.x / scale), pageY: Int(value.location.y / scale))
-                    }
-                    .onEnded { _ in
-                        play.releasePicture()
-                        if noticePress { play.advanceDialogue() }
-                        pressStarted = false
-                        noticePress = false
-                    })
+                .onPageTap { point in
+                    guard scale > 0 else { return }
+                    if play.acquiredItemImage != nil { play.advanceWrittenDialogue() }
+                    else { play.activatePicture(pageX: Int(point.x / scale), pageY: Int(point.y / scale)) }
+                }
+                .notebookPhotograph()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }

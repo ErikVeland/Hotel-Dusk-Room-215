@@ -102,7 +102,10 @@ final class OriginalChapterSaveTests: XCTestCase {
         XCTAssertEqual(try checkpoint.gameState(), try state())
         let audio = AudioController()
         audio.isMuted = true
-        let fresh = GameSession(audioController: audio, saveStore: store)
+        let resumeDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: resumeDirectory) }
+        let fresh = GameSession(audioController: audio, saveStore: store,
+            resumeStore: OriginalResumeFileStore(directory: resumeDirectory))
         XCTAssertEqual(fresh.chapterSaves[1], checkpoint)
         fresh.loadChapterSave(slot: 1)
         let restored = try XCTUnwrap(fresh.play)

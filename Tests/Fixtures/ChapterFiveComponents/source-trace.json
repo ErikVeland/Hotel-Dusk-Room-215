@@ -1,0 +1,1230 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint-component-test",
+  "note": "Original process factory and touch input. Does not establish normal Chapter 5 route completion.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "walkingCheckpointSHA256": "d93e9226d62ca739f148da56198aff5d1bcaa56adfa41606b73e58484f17545b",
+  "commandsSHA256": {
+    "component-linenwagon": "dafa857fa59dd8d7f5d693f259d2d2dc82a570438fcdee5279b93af81f0fc8fe",
+    "component-linenwagon-drag": "8c4e5a4cbe5474e22cd3ba33fe34edb5b461ab57b763e49914ceef1b42591dcf",
+    "component-linenwagon-reveal": "741bab33ed142acd7b72614c236b4da47c152311c1eb1bc1ad1ad26473eccb13",
+    "component-doll": "d3228a9ffecd69eeaab5309a1e31a1ed074be9c7cb45b2c8a249d1d6a43c41e6",
+    "component-doll-solve": "5a1ef5e9fc4f60380c5524bc1e715033cb8cd1be46b0393e1c9a54b055b4cbc4"
+  },
+  "linen": {
+    "processID": 60,
+    "overlaySHA256": "41d5775a6bb2533eb5ac71bba0565451e6827153f5f586a6c0c3c60c5b922657",
+    "seed": 254472630,
+    "initial": {
+      "stage": 1,
+      "phase": 1,
+      "subphase": 0,
+      "held": false,
+      "returnValue": 2,
+      "gunAlpha": 0,
+      "coverAlpha": 0,
+      "pieces": [
+        {
+          "x": -683,
+          "y": 1195,
+          "z": 4096,
+          "rotation": 1.5,
+          "direction": 0
+        },
+        {
+          "x": 1370,
+          "y": 1128,
+          "z": 4506,
+          "rotation": 1.5,
+          "direction": 0
+        },
+        {
+          "x": -607,
+          "y": -455,
+          "z": 4915,
+          "rotation": 0.0,
+          "direction": 0
+        },
+        {
+          "x": 1209,
+          "y": -426,
+          "z": 5325,
+          "rotation": 1.0,
+          "direction": 0
+        },
+        {
+          "x": -531,
+          "y": -1725,
+          "z": 5734,
+          "rotation": 0.0,
+          "direction": 0
+        },
+        {
+          "x": 1047,
+          "y": -1602,
+          "z": 6144,
+          "rotation": 1.0,
+          "direction": 0
+        }
+      ]
+    },
+    "throws": [
+      {
+        "pageTouch": [
+          80,
+          100
+        ],
+        "held": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": true,
+          "returnValue": 2,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -4096,
+              "y": 1195,
+              "z": 3686,
+              "rotation": 1.5,
+              "direction": 0
+            },
+            {
+              "x": 1370,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 0
+            },
+            {
+              "x": -607,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "released": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -4267,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 4
+            },
+            {
+              "x": 1370,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 0
+            },
+            {
+              "x": -607,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "removed": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": 1370,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 0
+            },
+            {
+              "x": -607,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        }
+      },
+      {
+        "pageTouch": [
+          128,
+          102
+        ],
+        "held": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": true,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -4091,
+              "y": 1128,
+              "z": 3686,
+              "rotation": 1.5,
+              "direction": 0
+            },
+            {
+              "x": -607,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "released": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -4091,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 4
+            },
+            {
+              "x": -607,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "removed": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -607,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        }
+      },
+      {
+        "pageTouch": [
+          82,
+          139
+        ],
+        "held": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": true,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -4106,
+              "y": -455,
+              "z": 3686,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "released": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -4277,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 4
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "removed": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": 1209,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        }
+      },
+      {
+        "pageTouch": [
+          124,
+          138
+        ],
+        "held": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": true,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -4082,
+              "y": -426,
+              "z": 3686,
+              "rotation": 1.0,
+              "direction": 0
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "released": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -4082,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 4
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "removed": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8357,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 10
+            },
+            {
+              "x": -531,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        }
+      },
+      {
+        "pageTouch": [
+          84,
+          168
+        ],
+        "held": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": true,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8357,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 10
+            },
+            {
+              "x": -4115,
+              "y": -1725,
+              "z": 3686,
+              "rotation": 0.0,
+              "direction": 0
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "released": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8357,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 10
+            },
+            {
+              "x": -4286,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 4
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "removed": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8357,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 10
+            },
+            {
+              "x": -8219,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": 1047,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        }
+      },
+      {
+        "pageTouch": [
+          121,
+          166
+        ],
+        "held": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": true,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8357,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 10
+            },
+            {
+              "x": -8219,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -4116,
+              "y": -1602,
+              "z": 3686,
+              "rotation": 1.0,
+              "direction": 0
+            }
+          ]
+        },
+        "released": {
+          "stage": 1,
+          "phase": 1,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8357,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 10
+            },
+            {
+              "x": -8219,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -4116,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 4
+            }
+          ]
+        },
+        "removed": {
+          "stage": 1,
+          "phase": 2,
+          "subphase": 0,
+          "held": false,
+          "returnValue": 1,
+          "gunAlpha": 0,
+          "coverAlpha": 0,
+          "pieces": [
+            {
+              "x": -8200,
+              "y": 1195,
+              "z": 4096,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8195,
+              "y": 1128,
+              "z": 4506,
+              "rotation": 1.5,
+              "direction": 10
+            },
+            {
+              "x": -8210,
+              "y": -455,
+              "z": 4915,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8357,
+              "y": -426,
+              "z": 5325,
+              "rotation": 1.0,
+              "direction": 10
+            },
+            {
+              "x": -8219,
+              "y": -1725,
+              "z": 5734,
+              "rotation": 0.0,
+              "direction": 10
+            },
+            {
+              "x": -8220,
+              "y": -1602,
+              "z": 6144,
+              "rotation": 1.0,
+              "direction": 10
+            }
+          ]
+        }
+      }
+    ],
+    "cover": {
+      "stage": 1,
+      "phase": 2,
+      "subphase": 0,
+      "held": false,
+      "returnValue": 1,
+      "gunAlpha": 0,
+      "coverAlpha": 31,
+      "pieces": [
+        {
+          "x": -8200,
+          "y": 1195,
+          "z": 4096,
+          "rotation": 1.5,
+          "direction": 10
+        },
+        {
+          "x": -8195,
+          "y": 1128,
+          "z": 4506,
+          "rotation": 1.5,
+          "direction": 10
+        },
+        {
+          "x": -8210,
+          "y": -455,
+          "z": 4915,
+          "rotation": 0.0,
+          "direction": 10
+        },
+        {
+          "x": -8357,
+          "y": -426,
+          "z": 5325,
+          "rotation": 1.0,
+          "direction": 10
+        },
+        {
+          "x": -8219,
+          "y": -1725,
+          "z": 5734,
+          "rotation": 0.0,
+          "direction": 10
+        },
+        {
+          "x": -8220,
+          "y": -1602,
+          "z": 6144,
+          "rotation": 1.0,
+          "direction": 10
+        }
+      ]
+    },
+    "revealed": {
+      "stage": 1,
+      "phase": 3,
+      "subphase": 4,
+      "held": false,
+      "returnValue": 1,
+      "gunAlpha": 31,
+      "coverAlpha": 31,
+      "pieces": [
+        {
+          "x": -8200,
+          "y": 1195,
+          "z": 4096,
+          "rotation": 1.5,
+          "direction": 10
+        },
+        {
+          "x": -8195,
+          "y": 1128,
+          "z": 4506,
+          "rotation": 1.5,
+          "direction": 10
+        },
+        {
+          "x": -8210,
+          "y": -455,
+          "z": 4915,
+          "rotation": 0.0,
+          "direction": 10
+        },
+        {
+          "x": -8357,
+          "y": -426,
+          "z": 5325,
+          "rotation": 1.0,
+          "direction": 10
+        },
+        {
+          "x": -8219,
+          "y": -1725,
+          "z": 5734,
+          "rotation": 0.0,
+          "direction": 10
+        },
+        {
+          "x": -8220,
+          "y": -1602,
+          "z": 6144,
+          "rotation": 1.0,
+          "direction": 10
+        }
+      ]
+    },
+    "taken": {
+      "stage": 1,
+      "phase": 4,
+      "subphase": 0,
+      "held": false,
+      "returnValue": 0,
+      "gunAlpha": 31,
+      "coverAlpha": 31,
+      "pieces": [
+        {
+          "x": -8200,
+          "y": 1195,
+          "z": 4096,
+          "rotation": 1.5,
+          "direction": 10
+        },
+        {
+          "x": -8195,
+          "y": 1128,
+          "z": 4506,
+          "rotation": 1.5,
+          "direction": 10
+        },
+        {
+          "x": -8210,
+          "y": -455,
+          "z": 4915,
+          "rotation": 0.0,
+          "direction": 10
+        },
+        {
+          "x": -8357,
+          "y": -426,
+          "z": 5325,
+          "rotation": 1.0,
+          "direction": 10
+        },
+        {
+          "x": -8219,
+          "y": -1725,
+          "z": 5734,
+          "rotation": 0.0,
+          "direction": 10
+        },
+        {
+          "x": -8220,
+          "y": -1602,
+          "z": 6144,
+          "rotation": 1.0,
+          "direction": 10
+        }
+      ]
+    }
+  },
+  "doll": {
+    "processID": 38,
+    "overlaySHA256": "55fd6e3a12b275b07362bda7b8cebbf0cae4f72bf3695bb8ae97dca9558f53d9",
+    "stitches": 10,
+    "seamMask": 63,
+    "successStage": 3
+  }
+}

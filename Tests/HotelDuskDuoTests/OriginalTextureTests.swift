@@ -11,8 +11,8 @@ final class OriginalTextureTests: XCTestCase {
     func testEveryRecoveredTextureMatchesIndependentPythonDecoder() throws {
         let library = try OriginalTextureLibrary.bundled()
         XCTAssertEqual(library.manifest.coverage.textures, 2957)
-        XCTAssertEqual(library.manifest.coverage.decoded, 2921)
-        XCTAssertEqual(library.manifest.coverage.unsupported, 36)
+        XCTAssertEqual(library.manifest.coverage.decoded, 2952)
+        XCTAssertEqual(library.manifest.coverage.unsupported, 5)
         var checked = 0
         for record in library.manifest.textures where record.status == "decoded" {
             let texture = try library.load(path: record.source)
@@ -25,7 +25,7 @@ final class OriginalTextureTests: XCTestCase {
             XCTAssertEqual(sha(texture.rgba), record.rgbaSHA256, record.source)
             checked += 1
         }
-        XCTAssertEqual(checked, 2921)
+        XCTAssertEqual(checked, 2952)
     }
 
     func testPaddedStorageRetainsOriginalDimensions() throws {
@@ -55,6 +55,24 @@ final class OriginalTextureTests: XCTestCase {
         for y in 160..<164 {
             for x in 64..<128 {
                 XCTAssertEqual(texture.rgba[(y * 128 + x) * 4 + 3], 0)
+            }
+        }
+    }
+
+    func testLouieRoomCropsRetainSourceBlocksAndTransparentTail() throws {
+        let library = try OriginalTextureLibrary.bundled()
+        for (asset, width, height, blocks) in [("kanbeer02", 32, 32, 62),
+                                               ("r114_kabe01_crop0", 128, 72, 553),
+                                               ("radicase", 64, 40, 152)] {
+            let texture = try library.load(path: "map/R114/R114/\(asset).dtx")
+            XCTAssertEqual(texture.storedWidth, width)
+            XCTAssertEqual(texture.storedHeight, height)
+            XCTAssertEqual(texture.originalPixelData.count / 6, blocks)
+            for block in blocks..<(width * height / 16) {
+                let x = (block % (width / 4)) * 4, y = (block / (width / 4)) * 4
+                for dy in 0..<4 {
+                    for dx in 0..<4 { XCTAssertEqual(texture.rgba[((y + dy) * width + x + dx) * 4 + 3], 0) }
+                }
             }
         }
     }
