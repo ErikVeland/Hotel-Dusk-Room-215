@@ -2,6 +2,33 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalStoryContinuationTests: XCTestCase {
+    @MainActor func testChapterSixReachesBarFromChapterFiveSave() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let save = try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter6")).load(slot: 0) else {
+            throw XCTSkip("Generate the Chapter 6 save through the Chapter 5 route first")
+        }
+        let audio = AudioController(); audio.isMuted = true
+        let play = try OriginalPlaySession.restoring(save, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)))
+        defer { play.stop() }
+
+        play.continueChapterTitle()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+
+        XCTAssertEqual(play.runner.game.chapter, 5)
+        XCTAssertEqual(play.runner.program.name, "EP6_R205")
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+
+        for destination: Int16 in [39, 17, 26, 4] {
+            try OriginalChapterThreeRouteChecks.exit(play, to: destination, interrupt: true)
+            XCTAssertEqual(play.runner.game.mapID, destination)
+        }
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter6-bar")).save(play.walkingCheckpoint())
+    }
+
     @MainActor func testChapterThreeFromPlayedCheckpoint() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let save = try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)).load(slot: 0) else {

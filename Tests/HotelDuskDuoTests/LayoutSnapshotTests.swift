@@ -9,6 +9,118 @@ import AppKit
 /// can be checked without unfolding a simulator. Set SNAPSHOT_DIR to write PNGs.
 @MainActor
 final class LayoutSnapshotTests: XCTestCase {
+    private final class SimulatedMusicOutput: OriginalMusicOutput {
+        var outputVolume: Float = 1
+        private var storedPosition: TimeInterval = 0
+        private var resumedAt: TimeInterval?
+        private(set) var isActive = false
+
+        var position: TimeInterval {
+            storedPosition + (resumedAt.map { ProcessInfo.processInfo.systemUptime - $0 } ?? 0)
+        }
+
+        func seek(to seconds: TimeInterval) throws {
+            storedPosition = seconds
+            if isActive { resumedAt = ProcessInfo.processInfo.systemUptime }
+        }
+
+        func resume() throws {
+            guard !isActive else { return }
+            resumedAt = ProcessInfo.processInfo.systemUptime
+            isActive = true
+        }
+
+        func pause() {
+            guard isActive else { return }
+            storedPosition = position
+            resumedAt = nil
+            isActive = false
+        }
+
+        func stop() {
+            pause()
+            storedPosition = 0
+        }
+    }
+
+    private final class BitmapMapRenderer: OriginalMapRendering {
+        let map: CGImage
+
+        init(mapName: String) throws {
+            guard let image = try OriginalBitmapLibrary.bundled()
+                .loadMap(path: "map/fmapscr/\(mapName).bin").makeCGImage() else {
+                throw OriginalDataError.invalid("Route map image")
+            }
+            map = image
+        }
+
+        func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage { map }
+    }
+
+    private final class BitmapSuitcaseRenderer: OriginalSuitcaseRendering {
+        private let image: CGImage
+
+        init(image: CGImage) { self.image = image }
+
+        func render(_ puzzle: OriginalSuitcaseKeyProcess) throws -> CGImage { image }
+    }
+
+    private final class BitmapHangerRenderer: OriginalHangerRendering {
+        private let image: CGImage
+
+        init(image: CGImage) { self.image = image }
+
+        func render(_ puzzle: OriginalHangerProcess) throws -> CGImage { image }
+    }
+
+    private final class BitmapThinWireRenderer: OriginalThinWireRendering {
+        private let image: CGImage
+
+        init(image: CGImage) { self.image = image }
+
+        func render(_ puzzle: OriginalThinWireProcess) throws -> CGImage { image }
+    }
+
+    private final class BitmapSuitcaseContentsRenderer: OriginalSuitcaseContentsRendering {
+        let initialContents: OriginalSuitcaseContents
+        private let image: CGImage
+
+        init(image: CGImage) throws {
+            self.image = image
+            let bitmaps = try OriginalBitmapLibrary.bundled()
+            let masks = try OriginalSuitcaseContents.lowerObjects.map { object in
+                try bitmaps.loadTexture(path: "trick/searchbag/\(object.texture).bin").originalPixelData
+            }
+            initialContents = try OriginalSuitcaseContents(lowerHitMasks: masks)
+        }
+
+        func render(_ process: OriginalSuitcaseContentsProcess, game: OriginalGameState) throws -> CGImage { image }
+    }
+
+    private final class BitmapMemoPullRenderer: OriginalMemoPullRendering {
+        private let image: CGImage
+
+        init(image: CGImage) { self.image = image }
+
+        func render(_ puzzle: OriginalMemoPullProcess) throws -> CGImage { image }
+    }
+
+    private final class BitmapCrowbarRenderer: OriginalCrowbarRendering {
+        private let image: CGImage
+
+        init(image: CGImage) { self.image = image }
+
+        func render(_ puzzle: OriginalCrowbarProcess) throws -> CGImage { image }
+    }
+
+    private final class BitmapCabinetDialRenderer: OriginalCabinetDialRendering {
+        private let image: CGImage
+
+        init(image: CGImage) { self.image = image }
+
+        func render(_ puzzle: OriginalCabinetDialProcess) throws -> CGImage { image }
+    }
+
     func testRenderGraphicalInventoryAndItemInspection() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
@@ -202,11 +314,21 @@ final class LayoutSnapshotTests: XCTestCase {
     }
 
     private func runChapterOneRoute(completeDunningQuestions: Bool) throws {
-        let audio = AudioController()
+        let audio = AudioController(musicOutputFactory: { _, _, _ in SimulatedMusicOutput() })
         audio.isMuted = true
+        _ = try audio.applyOriginalCommand(.disableNewEffects(true))
         let runner = try OriginalEventRunner.chapterOneArrival(catalog: .bundled(), defaults: .bundled())
+        let routeImage = try BitmapMapRenderer(mapName: "R102").map
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: try .bundled(),
-                                       jigsawSeed: { 0x3DEAC027 })
+                                       jigsawSeed: { 0x3DEAC027 }, mapRendererFactory: { mapName, _ in
+                                           try BitmapMapRenderer(mapName: mapName)
+                                       }, suitcaseRendererFactory: { BitmapSuitcaseRenderer(image: routeImage) },
+                                       hangerRendererFactory: { BitmapHangerRenderer(image: routeImage) },
+                                       thinWireRendererFactory: { _ in BitmapThinWireRenderer(image: routeImage) },
+                                       suitcaseContentsRendererFactory: { try BitmapSuitcaseContentsRenderer(image: routeImage) },
+                                       memoPullRendererFactory: { BitmapMemoPullRenderer(image: routeImage) },
+                                       crowbarRendererFactory: { _ in BitmapCrowbarRenderer(image: routeImage) },
+                                       cabinetDialRendererFactory: { _ in BitmapCabinetDialRenderer(image: routeImage) })
         var walkingSaves: [String: OriginalResumeSave] = [:]
         play.onWalkingCheckpoint = { checkpoint in
             guard let game = try? checkpoint.gameState() else { return }
@@ -1732,8 +1854,18 @@ final class LayoutSnapshotTests: XCTestCase {
                     try OriginalThickWireRouteChecks.run(play)
                     XCTAssertGreaterThanOrEqual(walkingSaves.count, 10)
                     for checkpoint in walkingSaves.values {
-                        let restored = try OriginalPlaySession.restoring(checkpoint, audio: AudioController(),
-                            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory))
+                        let audio = AudioController(musicOutputFactory: { _, _, _ in SimulatedMusicOutput() })
+                        audio.isMuted = true
+                        let restored = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+                            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory),
+                            mapRendererFactory: { mapName, _ in try BitmapMapRenderer(mapName: mapName) },
+                            suitcaseRendererFactory: { BitmapSuitcaseRenderer(image: routeImage) },
+                            hangerRendererFactory: { BitmapHangerRenderer(image: routeImage) },
+                            thinWireRendererFactory: { _ in BitmapThinWireRenderer(image: routeImage) },
+                            suitcaseContentsRendererFactory: { try BitmapSuitcaseContentsRenderer(image: routeImage) },
+                            memoPullRendererFactory: { BitmapMemoPullRenderer(image: routeImage) },
+                            crowbarRendererFactory: { _ in BitmapCrowbarRenderer(image: routeImage) },
+                            cabinetDialRendererFactory: { _ in BitmapCabinetDialRenderer(image: routeImage) })
                         XCTAssertEqual(restored.runner.game, try checkpoint.gameState())
                         XCTAssertEqual(restored.runner.phase, .exploration(mapID: restored.runner.game.mapID))
                         XCTAssertTrue(restored.runner.eventTrail.isEmpty)

@@ -1,0 +1,78 @@
+load extracted/reference/component-walking-base/ready.mln
+write32 0227d2f0 2d
+write32 0227d2f4 2d
+frames 300
+capture ready
+touch 141 130
+frames 1
+touch 135 130
+frames 1
+touch 135 190
+frames 1
+frames 30
+capture swipe-1-held
+release
+frames 1
+frames 10
+capture swipe-1-released
+touch 141 130
+frames 1
+touch 135 130
+frames 1
+touch 135 190
+frames 1
+frames 30
+capture swipe-2-held
+release
+frames 1
+frames 10
+capture swipe-2-released
+touch 141 130
+frames 1
+touch 135 130
+frames 1
+touch 135 190
+frames 1
+frames 30
+capture swipe-3-held
+release
+frames 1
+frames 10
+capture swipe-3-released
+touch 141 130
+frames 1
+touch 135 130
+frames 1
+touch 135 190
+frames 1
+frames 30
+capture swipe-4-held
+release
+frames 1
+frames 10
+capture swipe-4-released
+touch 141 130
+frames 1
+touch 135 130
+frames 1
+touch 135 190
+frames 1
+frames 30
+capture swipe-5-held
+release
+frames 1
+frames 10
+capture swipe-5-released
+touch 141 130
+frames 1
+touch 135 130
+frames 1
+touch 135 190
+frames 1
+frames 30
+capture swipe-6-held
+release
+frames 1
+frames 10
+capture swipe-6-released
+quit

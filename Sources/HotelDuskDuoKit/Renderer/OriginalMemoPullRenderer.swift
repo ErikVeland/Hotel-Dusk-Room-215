@@ -2,11 +2,18 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalMemoPullRendering: AnyObject {
+    func render(_ puzzle: OriginalMemoPullProcess) throws -> CGImage
+}
+
+public typealias OriginalMemoPullRendererFactory = @MainActor () throws -> any OriginalMemoPullRendering
+
 /**
  * Overlay 6 cabinet, wall and paper from the original placedmemo archive.
  */
 @MainActor
-final class OriginalMemoPullRenderer {
+public final class OriginalMemoPullRenderer: OriginalMemoPullRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let cabinet: OriginalModelMetalPreview
@@ -19,7 +26,7 @@ final class OriginalMemoPullRenderer {
         var uv: SIMD2<Float>
     }
 
-    init() throws {
+    public init() throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -53,7 +60,7 @@ final class OriginalMemoPullRenderer {
         self.depth = depth
     }
 
-    func render(_ puzzle: OriginalMemoPullProcess) throws -> CGImage {
+    public func render(_ puzzle: OriginalMemoPullProcess) throws -> CGImage {
         let projection = Self.viewProjection
         let scene = Self.translation(SIMD3(-5612, -2007, 0) / 4096)
             * simd_float4x4(simd_quatf(angle: .pi, axis: SIMD3(0, 1, 0)))

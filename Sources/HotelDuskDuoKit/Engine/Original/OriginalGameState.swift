@@ -165,6 +165,9 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
     }
 
     public var cabinetDialRetainedValue: UInt16 { read16(0x13D6) }
+    /// Overlay 13 stores the Christmas tree decoration order at state offset 0x13DA.
+    public var christmasTreeDecorationOrder: UInt16 { read16(0x13DA) }
+    public mutating func storeChristmasTreeDecorationOrder(_ value: UInt16) { write16(0x13DA, value) }
     public var cashboxDialRetainedValue: UInt16 { read16(0x13DE) }
     public mutating func storeCashboxDialValue(_ value: UInt16) { write16(0x13DE, value) }
 

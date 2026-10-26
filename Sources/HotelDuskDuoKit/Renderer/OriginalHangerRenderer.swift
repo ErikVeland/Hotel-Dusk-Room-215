@@ -2,11 +2,18 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalHangerRendering: AnyObject {
+    func render(_ puzzle: OriginalHangerProcess) throws -> CGImage
+}
+
+public typealias OriginalHangerRendererFactory = @MainActor () throws -> any OriginalHangerRendering
+
 /**
  * Overlay 4 hanger, hinged pliers, hook layers and textured cut covers.
  */
 @MainActor
-final class OriginalHangerRenderer {
+public final class OriginalHangerRenderer: OriginalHangerRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let hanger: OriginalModelMetalPreview
@@ -22,7 +29,7 @@ final class OriginalHangerRenderer {
         var uv: SIMD2<Float>
     }
 
-    init() throws {
+    public init() throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -62,7 +69,7 @@ final class OriginalHangerRenderer {
         self.depth = depth
     }
 
-    func render(_ puzzle: OriginalHangerProcess) throws -> CGImage {
+    public func render(_ puzzle: OriginalHangerProcess) throws -> CGImage {
         let projection = Self.projection(puzzle.cameraBounds)
         return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
             if puzzle.phase == 3, puzzle.stage == 3 {

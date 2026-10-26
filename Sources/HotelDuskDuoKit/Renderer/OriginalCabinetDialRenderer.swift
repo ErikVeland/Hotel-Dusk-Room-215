@@ -2,11 +2,18 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalCabinetDialRendering: AnyObject {
+    func render(_ puzzle: OriginalCabinetDialProcess) throws -> CGImage
+}
+
+public typealias OriginalCabinetDialRendererFactory = @MainActor (OriginalCabinetDialProcess.Variant) throws -> any OriginalCabinetDialRendering
+
 /**
  * Original dial cylinder strips, cabinet bitmap and drawer models from overlay 10.
  */
 @MainActor
-final class OriginalCabinetDialRenderer {
+public final class OriginalCabinetDialRenderer: OriginalCabinetDialRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let cabinet: OriginalModelMetalPreview
@@ -21,7 +28,7 @@ final class OriginalCabinetDialRenderer {
         var uv: SIMD2<Float>
     }
 
-    init(variant: OriginalCabinetDialProcess.Variant = .cabinet) throws {
+    public init(variant: OriginalCabinetDialProcess.Variant = .cabinet) throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -64,7 +71,7 @@ final class OriginalCabinetDialRenderer {
         self.depth = depth
     }
 
-    func render(_ puzzle: OriginalCabinetDialProcess) throws -> CGImage {
+    public func render(_ puzzle: OriginalCabinetDialProcess) throws -> CGImage {
         let projection = Self.viewProjection(drawer: puzzle.showsDrawer)
         return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
             if puzzle.showsDrawer {

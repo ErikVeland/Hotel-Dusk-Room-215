@@ -10,7 +10,7 @@ The native route now plays Chapter 4 from the roof to the chapter review. Chapte
 2. `testChapterFourRoom217AndTankCash`: Rachel's call, Louie's Room 217 key, the photo behind the painting, Bradley's lighter, Dunning's confrontation, Jeff, the wet floor, the toilet tank and Rachel's second call. Saves `chapter4-cash`.
 3. `testChapterFourTheftReportAndNewspaper`: Jeff in the lobby, Rosa's novel, the theft report, Dunning's questions, Summer and the three newspaper articles. Saves `chapter4-lobby`.
 4. `testChapterFourSummerPenAndNotebook`: Rosa's back-stairs clue, Dunning at the utility closet, the knock on Room 211, the fountain pen, the autograph and Summer's notebook. Saves `chapter4-summer`.
-5. `testChapterFourConfrontationAndReview`: Kyle stores the cash, memo, red box and Room 217 key in his suitcase. He returns the pliers, crowbar and screwdriver to the Linens Closet toolbox. Dunning's search then finds nothing. Rosa gets her autograph. The confrontation uses the signature comparison (process 73), and the review accepts all five answers. The test writes the Chapter 5 save to slot 2.
+5. `testChapterFourConfrontationAndReview`: Kyle stores the cash, memo, red box and Room 217 key in his suitcase. He returns the pliers, crowbar and screwdriver to the Linens Closet toolbox. Dunning's search then finds nothing. Rosa gets her autograph. The confrontation uses the signature comparison (process 73), and the review accepts all five answers. The test writes the Chapter 5 save to slot 1.
 
 Run the chain with `HOTEL_DUSK_ROUTE_CHECKPOINTS` set, in the order above, after the Chapter 3 continuation tests.
 

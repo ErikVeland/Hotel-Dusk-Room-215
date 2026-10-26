@@ -2,18 +2,25 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalSuitcaseRendering: AnyObject {
+    func render(_ puzzle: OriginalSuitcaseKeyProcess) throws -> CGImage
+}
+
+public typealias OriginalSuitcaseRendererFactory = @MainActor () throws -> any OriginalSuitcaseRendering
+
 /**
  * Original suitcase and key models, including their BIN textures and process transforms.
  */
 @MainActor
-final class OriginalSuitcaseRenderer {
+public final class OriginalSuitcaseRenderer: OriginalSuitcaseRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let bag: OriginalModelMetalPreview
     private let key: OriginalModelMetalPreview
     private let brokenKey: OriginalModelMetalPreview
 
-    init() throws {
+    public init() throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -33,7 +40,7 @@ final class OriginalSuitcaseRenderer {
         brokenKey = try load("KEY_02")
     }
 
-    func render(_ puzzle: OriginalSuitcaseKeyProcess) throws -> CGImage {
+    public func render(_ puzzle: OriginalSuitcaseKeyProcess) throws -> CGImage {
         let projection = OriginalSuitcaseProjection.viewProjection(eye: puzzle.eye, target: puzzle.target)
         let currentKey = puzzle.isBroken ? brokenKey : key
         return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in

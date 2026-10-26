@@ -2,7 +2,7 @@
 
 The architecture is Swift and SwiftUI, with Metal for the Duo book material. The original ROM is the comparison reference. No emulator integration is planned or included.
 
-The native game remains incomplete. The checked new-game route now plays through the Chapter 4 review and stops at the Chapter 5 save prompt. Chapters 5–10, game-over retries and original presentation remain unfinished.
+The native game remains incomplete. The checked new-game route plays through the Chapter 4 review and stops at the Chapter 5 save prompt. Chapter 5 normal-input route tests exist, but this checkout has no generated Chapter 4 save for them. Chapters 6–10, game-over retries and original presentation remain unfinished.
 
 ## Playable opening slice
 
@@ -34,13 +34,13 @@ These parts of the slice are approximations:
 
 - Jigsaw projection and piece seams do not yet match DS rasterisation. The original portrait page, selected-piece glow and fades are absent. The following dropped-piece picture now requires selection and confirmation. Its original images and item acquisition are connected. See [Touch pictures](touch-pictures.md) for remaining presentation limits.
 
-- The lobby supports search area 2 and walking after registration. R102/R103 return travel, the R103/R117 exit and R213 entry are connected. R205 dresser area 1, bed area 2 and suitcase area 3 are connected. Other search areas and room transitions remain unavailable. Camera smoothing uses native floating-point maths. Region 3 starts event 55 at the compared original position. R103 reminder events 0–2 and R117 event 15 also have original execution comparisons. See [Lobby to bell](lobby-to-bell.md) for the covered comparisons.
-- The map marker, inspection controls, cursor and counter slider use native controls. The other counter page remains blank until Kyle's portrait compositor is recovered. Metal rendering does not reproduce every DS rasterisation detail.
+- The lobby supports search area 2 and walking after registration. R102/R103 return travel, the R103/R117 exit and R213 entry are connected. R205 dresser area 1, bed area 2 and suitcase area 3 are connected. Other search areas and room transitions remain unavailable. Camera smoothing uses native floating-point maths. Region 3 starts event 55 at the compared original position. R103 reminder events 0–2 and R117 event 15 also have original execution comparisons. The floor plan now shows the map artwork without native position, person or cursor overlays. Search close-ups use the visible object alpha masks with a two-pixel margin in transparent areas; the source masks and rendered artwork remain available for ROM comparisons. See [Lobby to bell](lobby-to-bell.md) for the covered comparisons.
+- Inspection controls and the counter slider use native controls. The other counter page remains blank until Kyle's portrait compositor is recovered. Metal rendering does not reproduce every DS rasterisation detail.
 - The opening cinematic does not run. Play starts at the arrival event that the reference runner reaches after the opening.
-- The entrance shows the original `u01`–`u03` and `d01`–`d03` panels, not the 3D R101 scene. An outline marks the original handle rectangle. Fades are counted for timing but not drawn.
+- The entrance shows the original `u01`–`u03` and `d01`–`d03` panels, not the 3D R101 scene. The handle target is invisible. Fades are counted for timing but not drawn.
 - Text control `%m0NN` starts `SEQ_BGM_NN`. The meaning of the other mode values is not known.
 - Text colours 1 and 2 use approximate ink tones. Portraits, talk backgrounds and character animation are not drawn.
-- The bell page shows `bell02` with `bell01` on top. The bell swing angle, the trick-button sprites and the talk background `R102_03` on the other screen are not drawn. Outlines mark the original bell rectangle and quit button.
+- The bell page shows `bell02` with `bell01` on top. The bell target uses the sprite pixel mask with a two-pixel margin, excluded from the quit target. The bell swing angle, trick-button sprites and the talk background `R102_03` on the other screen are not drawn. Touch targets have no visible overlays.
 - The registration card shows `signnote` and reveals `signnote02` per field as the strokes grow. The pen sprite and fades are not drawn.
 - The choice prompt, the question menu and the interrupt icon use book typography, not the original menu graphics. The question menu now lists owned items. Melissa’s puzzle-piece return is checked. Shared responses for unrelated items remain unsupported and halt explicitly.
 - The menu's `+0x6C = -1` branch (a mode-26 answer from the partner's scene) is not recovered. Topic answers use the mode-1 branch.

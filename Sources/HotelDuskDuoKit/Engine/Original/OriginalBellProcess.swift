@@ -71,11 +71,10 @@ public struct OriginalBellProcess: Equatable, Codable, Sendable {
 
     /// The trick base adds icon 0x27 to button slot 5 (0x02026330).
     public static let quitButtonSlot = 5
-    /// Inclusive rectangle at 0x021FE7F8, written by the static initializer
-    /// 0x021FE5AC, in handedness-adjusted coordinates (0x0200985C).
-    public static let bellRect = (left: 56, top: 72, right: 96, bottom: 120)
     /// Slot 5 of 0x020267F0.
     public static let quitRect = (left: 228, top: 156, right: 252, bottom: 188)
+    /// A small finger target expansion around the bell's source pixel mask.
+    public static let bellMaskPadding = 2
     /// 0x021FD75C and 0x021FD764: radians per ring-timer step.
     static let swingScale = Float(bitPattern: 0x3CAC0831)
     static let settleScale = Float(bitPattern: 0x3BE56042)
@@ -93,14 +92,20 @@ public struct OriginalBellProcess: Equatable, Codable, Sendable {
         return (leftHanded ? touch.x : 255 - touch.x, leftHanded ? 191 - touch.y : touch.y)
     }
 
-    /// 0x021FE3AC without its state guards: the rectangle, else the nonzero
-    /// `bell01.bin` pixel at row y and column 255 - x (handedness-adjusted).
+    /// Uses the bell sprite mask and adds a small margin that cannot overlap the quit target.
     public static func hitsBell(_ touch: Touch, leftHanded: Bool, mask: [UInt8]) -> Bool {
         guard let point = adjusted(touch, leftHanded: leftHanded) else { return false }
-        if (bellRect.left...bellRect.right).contains(point.x),
-           (bellRect.top...bellRect.bottom).contains(point.y) { return true }
-        let index = point.y * 256 + 255 - point.x
-        return mask.indices.contains(index) && mask[index] != 0
+        guard !hitsQuit(touch, leftHanded: leftHanded) else { return false }
+        let sourceX = 255 - point.x
+        for dy in -bellMaskPadding...bellMaskPadding {
+            for dx in -bellMaskPadding...bellMaskPadding {
+                let x = sourceX + dx, y = point.y + dy
+                guard (0..<256).contains(x), (0..<192).contains(y) else { continue }
+                let index = y * 256 + x
+                if mask.indices.contains(index), mask[index] != 0 { return true }
+            }
+        }
+        return false
     }
 
     public static func hitsQuit(_ touch: Touch, leftHanded: Bool) -> Bool {

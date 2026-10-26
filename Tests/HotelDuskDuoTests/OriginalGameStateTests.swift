@@ -38,6 +38,19 @@ final class OriginalGameStateTests: XCTestCase {
         XCTAssertEqual(state.bytes[0x45], 255)
     }
 
+    func testChristmasTreeOrderUsesOverlayStatePointerOffset() throws {
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        XCTAssertEqual(game.christmasTreeDecorationOrder, 0)
+
+        game.storeChristmasTreeDecorationOrder(0x7207)
+        XCTAssertEqual(game.christmasTreeDecorationOrder, 0x7207)
+        XCTAssertEqual(Array(game.bytes[0x13DA..<0x13DC]), [0x07, 0x72])
+
+        let restored = try OriginalGameState(snapshot: game.snapshot)
+        XCTAssertEqual(restored.christmasTreeDecorationOrder, 0x7207)
+        XCTAssertEqual(restored.bytes[0xDA..<0xDC], [0, 0])
+    }
+
     func testCommitAndCloseupRestorationUseOriginalSessionFields() throws {
         let conditions = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102").conditions
         let game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)

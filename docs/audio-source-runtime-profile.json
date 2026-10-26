@@ -1,704 +1,1064 @@
 {
-  "note" : "One complete native introduction and loop, or the terminating cue duration. RMS is a level comparison, not perceptual loudness or fidelity. Preparation includes checksum, decoding and engine setup. PCM bytes exclude engine, sampler and decoder allocations.",
-  "processFootprintAfterSwitchesBytes" : 128451472,
+  "note" : "One complete native introduction and loop, or the terminating cue duration. unbalancedNative and unbalancedRecorded include sequence and default app volume before per-source calibration; native and recorded include calibration. RMS compares level, not perceived loudness or fidelity. Preparation includes checksum, decoding and engine setup. PCM bytes exclude engine, sampler and decoder allocations.",
+  "processFootprintAfterSwitchesBytes" : 124617592,
   "recordedMinusNativeDB" : [
-    -13.733013598324593,
-    -17.129247456366908,
-    -13.467255008977897,
-    -22.10664288794509,
-    -13.651592959409806,
-    -12.922128956101673,
-    -12.246847866719737,
-    -13.518671788950524,
-    -16.790482106559722,
-    -12.681140435929628,
-    -15.330882165385916,
-    -10.758113312753817,
-    -17.23822396689186,
-    -16.17250470136542,
-    -15.218332413232085,
-    -12.635233839073038,
-    -14.030187226690783,
-    -12.18536887350664,
-    -14.912736194141031,
-    -14.352186195816811,
-    -14.568894144124968,
-    -16.843032317701475,
-    -17.80330326465205,
-    -15.045649421716009,
-    -16.193532714905874,
-    -15.357208306522256,
-    -14.285619618610092,
-    -13.733258014773504,
-    -15.588874836734249,
-    -22.62135280284939,
-    -17.425892759119442,
-    -13.996056223767653,
-    -20.399277803649493,
-    -12.63531928093026,
-    -13.982001400829784,
-    -16.30882352340768
+    -13.733013630991824,
+    -17.129247473760167,
+    -13.467255006716668,
+    -22.106642874491484,
+    -13.651592974442618,
+    -12.922128941647477,
+    -12.246847857667312,
+    -13.518671779889996,
+    -16.790482111107725,
+    -12.68114044454726,
+    -15.330882155384119,
+    -10.758113311468737,
+    -17.238223991607384,
+    -16.172504692829143,
+    -15.218332399953873,
+    -12.635233835262257,
+    -14.030187237636452,
+    -12.18536886915739,
+    -14.912736167990193,
+    -14.352186201302946,
+    -14.568894177896984,
+    -16.843032299808687,
+    -17.803303261562746,
+    -15.045649436101861,
+    -16.193532725689096,
+    -15.357208310279052,
+    -14.28561960325744,
+    -13.73325803573666,
+    -15.588874823541584,
+    -22.621352808122488,
+    -17.4258927522249,
+    -13.996056217104243,
+    -20.399277833474137,
+    -12.6353192644932,
+    -13.982001404120403,
+    -16.30882353954702
   ],
   "schemaVersion" : 1,
   "switchNote" : "First switch includes preparation; subsequent switches reuse the current cue's alternate backend. Timings exclude the asynchronous 150 ms crossfade.",
   "switchToNativeMS" : [
-    32.670021057128906,
-    32.69505500793457,
-    32.71293640136719
+    11.536002159118652,
+    11.46399974822998,
+    11.488080024719238
   ],
   "switchToRecordingMS" : [
-    93.75298023223877,
-    41.89097881317139,
-    42.00100898742676
+    106.16898536682129,
+    20.42102813720703,
+    20.56598663330078
   ],
   "tracks" : [
     {
       "decodedLoopBytes" : 21816840,
       "id" : 0,
       "native" : {
-        "peakDBFS" : 8.568566749992216,
-        "rmsDBFS" : -5.84024334212227,
+        "peakDBFS" : -10.102647134667551,
+        "rmsDBFS" : -24.511457109549927,
         "samples" : 5934546
       },
-      "nativePreparationMS" : 129.34505939483643,
-      "processFootprintBeforeBytes" : 7275216,
-      "processFootprintPreparedBytes" : 43139888,
+      "nativePreparationMS" : 92.7809476852417,
+      "processFootprintBeforeBytes" : 6603424,
+      "processFootprintPreparedBytes" : 42189544,
       "recorded" : {
-        "peakDBFS" : -4.076010447384856,
-        "rmsDBFS" : -19.573256940446864,
+        "peakDBFS" : -9.014210749911564,
+        "rmsDBFS" : -24.51145736534416,
         "samples" : 5934546
       },
-      "recordedPreparationMS" : 83.01401138305664
+      "recordedPreparationMS" : 96.08900547027588,
+      "unbalancedNative" : {
+        "peakDBFS" : 6.630366489831088,
+        "rmsDBFS" : -7.778443485051288,
+        "samples" : 5934546
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -6.014210500610515,
+        "rmsDBFS" : -21.51145711604311,
+        "samples" : 5934546
+      }
     },
     {
       "decodedLoopBytes" : 0,
       "id" : 1,
       "native" : {
-        "peakDBFS" : 13.773025179281134,
-        "rmsDBFS" : 0.5456869165707847,
+        "peakDBFS" : -8.29442224798488,
+        "rmsDBFS" : -21.521760599101135,
         "samples" : 3635076
       },
-      "nativePreparationMS" : 20.828962326049805,
-      "processFootprintBeforeBytes" : 22463280,
-      "processFootprintPreparedBytes" : 24298288,
+      "nativePreparationMS" : 10.919928550720215,
+      "processFootprintBeforeBytes" : 22201064,
+      "processFootprintPreparedBytes" : 24117992,
       "recorded" : {
-        "peakDBFS" : -2.4960236620238914,
-        "rmsDBFS" : -16.583560539796125,
+        "peakDBFS" : -7.4342245165230185,
+        "rmsDBFS" : -21.521760730923422,
         "samples" : 3635076
       },
-      "recordedPreparationMS" : 17.575979232788086
+      "recordedPreparationMS" : 5.879044532775879,
+      "unbalancedNative" : {
+        "peakDBFS" : 11.83482534325405,
+        "rmsDBFS" : -1.392513007862206,
+        "samples" : 3635076
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -4.43422426722197,
+        "rmsDBFS" : -18.521760481622373,
+        "samples" : 3635076
+      }
     },
     {
       "decodedLoopBytes" : 25096376,
       "id" : 2,
       "native" : {
-        "peakDBFS" : 7.77313985267233,
-        "rmsDBFS" : -6.456324467398708,
+        "peakDBFS" : -10.632314540716955,
+        "rmsDBFS" : -24.861779494722263,
         "samples" : 6826674
       },
-      "nativePreparationMS" : 19.927978515625,
-      "processFootprintBeforeBytes" : 24855344,
-      "processFootprintPreparedBytes" : 56607560,
+      "nativePreparationMS" : 13.172030448913574,
+      "processFootprintBeforeBytes" : 25068264,
+      "processFootprintPreparedBytes" : 56673024,
       "recorded" : {
-        "peakDBFS" : -4.046524239057167,
-        "rmsDBFS" : -19.923579476376606,
+        "peakDBFS" : -8.984723923582687,
+        "rmsDBFS" : -24.861779877045272,
         "samples" : 6826674
       },
-      "recordedPreparationMS" : 87.95404434204102
+      "recordedPreparationMS" : 107.99098014831543,
+      "unbalancedNative" : {
+        "peakDBFS" : 5.834940332977751,
+        "rmsDBFS" : -8.394524621027555,
+        "samples" : 6826674
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -5.984723674281637,
+        "rmsDBFS" : -21.861779627744223,
+        "samples" : 6826674
+      }
     },
     {
       "decodedLoopBytes" : 21477688,
       "id" : 3,
       "native" : {
-        "peakDBFS" : 4.8993531864875,
-        "rmsDBFS" : -9.468106984575918,
+        "peakDBFS" : -22.145491638253294,
+        "rmsDBFS" : -36.51295032948951,
         "samples" : 5842286
       },
-      "nativePreparationMS" : 21.23403549194336,
-      "processFootprintBeforeBytes" : 32047944,
-      "processFootprintPreparedBytes" : 54281032,
+      "nativePreparationMS" : 12.778043746948242,
+      "processFootprintBeforeBytes" : 32129792,
+      "processFootprintPreparedBytes" : 53822208,
       "recorded" : {
-        "peakDBFS" : -7.258737348078078,
-        "rmsDBFS" : -31.574749872521007,
+        "peakDBFS" : -12.196937708280995,
+        "rmsDBFS" : -36.51295050860714,
         "samples" : 5842286
       },
-      "recordedPreparationMS" : 78.25696468353271
+      "recordedPreparationMS" : 92.57400035858154,
+      "unbalancedNative" : {
+        "peakDBFS" : 2.9611513064216104,
+        "rmsDBFS" : -11.40630738481461,
+        "samples" : 5842286
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -9.196937458979946,
+        "rmsDBFS" : -33.512950259306095,
+        "samples" : 5842286
+      }
     },
     {
       "decodedLoopBytes" : 0,
       "id" : 4,
       "native" : {
-        "peakDBFS" : 6.865351719054804,
-        "rmsDBFS" : -6.336093028553757,
+        "peakDBFS" : -11.724442842650419,
+        "rmsDBFS" : -24.925885975183157,
         "samples" : 1560000
       },
-      "nativePreparationMS" : 19.526004791259766,
-      "processFootprintBeforeBytes" : 33342280,
-      "processFootprintPreparedBytes" : 33653576,
+      "nativePreparationMS" : 9.474039077758789,
+      "processFootprintBeforeBytes" : 32768768,
+      "processFootprintPreparedBytes" : 32998144,
       "recorded" : {
-        "peakDBFS" : -3.547974385182365,
-        "rmsDBFS" : -19.987685987963562,
+        "peakDBFS" : -8.486174115724085,
+        "rmsDBFS" : -24.925885954296035,
         "samples" : 1560000
       },
-      "recordedPreparationMS" : 13.357996940612793
+      "recordedPreparationMS" : 5.054950714111328,
+      "unbalancedNative" : {
+        "peakDBFS" : 4.927150401980371,
+        "rmsDBFS" : -8.274292730552368,
+        "samples" : 1560000
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -5.4861738664230355,
+        "rmsDBFS" : -21.925885704994986,
+        "samples" : 1560000
+      }
     },
     {
       "decodedLoopBytes" : 25410032,
       "id" : 5,
       "native" : {
-        "peakDBFS" : 13.661634489616914,
-        "rmsDBFS" : -2.621691578192744,
+        "peakDBFS" : -4.198695109764552,
+        "rmsDBFS" : -20.482021040046398,
         "samples" : 7320000
       },
-      "nativePreparationMS" : 22.380948066711426,
-      "processFootprintBeforeBytes" : 34194248,
-      "processFootprintPreparedBytes" : 67388232,
+      "nativePreparationMS" : 11.538982391357422,
+      "processFootprintBeforeBytes" : 33653504,
+      "processFootprintPreparedBytes" : 65831680,
       "recorded" : {
-        "peakDBFS" : 0.06381722489807588,
-        "rmsDBFS" : -15.543820534294417,
+        "peakDBFS" : -4.874382513669881,
+        "rmsDBFS" : -20.482020891774585,
         "samples" : 7320000
       },
-      "recordedPreparationMS" : 92.10705757141113
+      "recordedPreparationMS" : 108.88898372650146,
+      "unbalancedNative" : {
+        "peakDBFS" : 11.723434229455785,
+        "rmsDBFS" : -4.559891700826059,
+        "samples" : 7320000
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -1.8743822643688322,
+        "rmsDBFS" : -17.482020642473536,
+        "samples" : 7320000
+      }
     },
     {
       "decodedLoopBytes" : 27259760,
       "id" : 6,
       "native" : {
-        "peakDBFS" : 6.593862633812155,
-        "rmsDBFS" : -7.460753206455801,
+        "peakDBFS" : -10.591184817871543,
+        "rmsDBFS" : -24.645801147903377,
         "samples" : 8480010
       },
-      "nativePreparationMS" : 24.935007095336914,
-      "processFootprintBeforeBytes" : 42664776,
-      "processFootprintPreparedBytes" : 77316936,
+      "nativePreparationMS" : 13.908028602600098,
+      "processFootprintBeforeBytes" : 41353984,
+      "processFootprintPreparedBytes" : 76022528,
       "recorded" : {
-        "peakDBFS" : -4.949776624135616,
-        "rmsDBFS" : -19.70760107317554,
+        "peakDBFS" : -9.887977248015504,
+        "rmsDBFS" : -24.645801699859117,
         "samples" : 8480010
       },
-      "recordedPreparationMS" : 101.64296627044678
+      "recordedPreparationMS" : 117.01107025146484,
+      "unbalancedNative" : {
+        "peakDBFS" : 4.655662737141079,
+        "rmsDBFS" : -9.398953592890756,
+        "samples" : 8480010
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -6.887976998714455,
+        "rmsDBFS" : -21.645801450558068,
+        "samples" : 8480010
+      }
     },
     {
       "decodedLoopBytes" : 29528328,
       "id" : 7,
       "native" : {
-        "peakDBFS" : 6.543156843608671,
-        "rmsDBFS" : -7.151368796147285,
+        "peakDBFS" : -11.913714358886024,
+        "rmsDBFS" : -25.60824073035861,
         "samples" : 8032296
       },
-      "nativePreparationMS" : 23.594975471496582,
-      "processFootprintBeforeBytes" : 50594632,
-      "processFootprintPreparedBytes" : 87753568,
+      "nativePreparationMS" : 10.92994213104248,
+      "processFootprintBeforeBytes" : 49300224,
+      "processFootprintPreparedBytes" : 86344448,
       "recorded" : {
-        "peakDBFS" : -4.906275200626134,
-        "rmsDBFS" : -20.67004058509781,
+        "peakDBFS" : -9.844476620857215,
+        "rmsDBFS" : -25.608241207852412,
         "samples" : 8032296
       },
-      "recordedPreparationMS" : 115.38803577423096
+      "recordedPreparationMS" : 125.2070665359497,
+      "unbalancedNative" : {
+        "peakDBFS" : 4.604957192811218,
+        "rmsDBFS" : -9.089569178661367,
+        "samples" : 8032296
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -6.844476371556166,
+        "rmsDBFS" : -22.608240958551363,
+        "samples" : 8032296
+      }
     },
     {
       "decodedLoopBytes" : 32556320,
       "id" : 8,
       "native" : {
-        "peakDBFS" : 14.464467733201298,
-        "rmsDBFS" : -1.0618895618653075,
+        "peakDBFS" : -7.264214428874647,
+        "rmsDBFS" : -22.79057196883231,
         "samples" : 13104000
       },
-      "nativePreparationMS" : 24.6579647064209,
-      "processFootprintBeforeBytes" : 58606432,
-      "processFootprintPreparedBytes" : 101385056,
+      "nativePreparationMS" : 16.605019569396973,
+      "processFootprintBeforeBytes" : 57213696,
+      "processFootprintPreparedBytes" : 100025112,
       "recorded" : {
-        "peakDBFS" : 0.13496840309988994,
-        "rmsDBFS" : -17.85237166842503,
+        "peakDBFS" : -4.803232106362287,
+        "rmsDBFS" : -22.79057203564662,
         "samples" : 13104000
       },
-      "recordedPreparationMS" : 121.57201766967773
+      "recordedPreparationMS" : 139.6859884262085,
+      "unbalancedNative" : {
+        "peakDBFS" : 12.526267864719818,
+        "rmsDBFS" : -3.000089675237845,
+        "samples" : 13104000
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -1.8032318570612382,
+        "rmsDBFS" : -19.79057178634557,
+        "samples" : 13104000
+      }
     },
     {
       "decodedLoopBytes" : 23775544,
       "id" : 9,
       "native" : {
-        "peakDBFS" : 0.2779288077858506,
-        "rmsDBFS" : -13.449674405369162,
+        "peakDBFS" : -17.341411289446857,
+        "rmsDBFS" : -31.06901480665162,
         "samples" : 6517896
       },
-      "nativePreparationMS" : 20.109057426452637,
-      "processFootprintBeforeBytes" : 70124384,
-      "processFootprintPreparedBytes" : 94077816,
+      "nativePreparationMS" : 15.473008155822754,
+      "processFootprintBeforeBytes" : 68518680,
+      "processFootprintPreparedBytes" : 92422936,
       "recorded" : {
-        "peakDBFS" : -11.460084424979737,
-        "rmsDBFS" : -26.13081484129879,
+        "peakDBFS" : -16.39828396601107,
+        "rmsDBFS" : -31.069015036658687,
         "samples" : 6517896
       },
-      "recordedPreparationMS" : 90.8360481262207
+      "recordedPreparationMS" : 102.32293605804443,
+      "unbalancedNative" : {
+        "peakDBFS" : -1.660270825605614,
+        "rmsDBFS" : -15.387874342810377,
+        "samples" : 6517896
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -13.398283716710022,
+        "rmsDBFS" : -28.069014787357638,
+        "samples" : 6517896
+      }
     },
     {
       "decodedLoopBytes" : 25778304,
       "id" : 10,
       "native" : {
-        "peakDBFS" : 9.290981333118612,
-        "rmsDBFS" : -4.814246058229539,
+        "peakDBFS" : -10.9781018670866,
+        "rmsDBFS" : -25.083328838852715,
         "samples" : 7012180
       },
-      "nativePreparationMS" : 24.38795566558838,
-      "processFootprintBeforeBytes" : 70747000,
-      "processFootprintPreparedBytes" : 96617336,
+      "nativePreparationMS" : 13.937950134277344,
+      "processFootprintBeforeBytes" : 69092144,
+      "processFootprintPreparedBytes" : 94978864,
       "recorded" : {
-        "peakDBFS" : -4.48856296120041,
-        "rmsDBFS" : -20.145128223615455,
+        "peakDBFS" : -9.426764013166144,
+        "rmsDBFS" : -25.083328836419433,
         "samples" : 7012180
       },
-      "recordedPreparationMS" : 95.4970121383667
+      "recordedPreparationMS" : 112.27905750274658,
+      "unbalancedNative" : {
+        "peakDBFS" : 7.352780540031848,
+        "rmsDBFS" : -6.752446431734265,
+        "samples" : 7012180
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -6.426763763865095,
+        "rmsDBFS" : -22.083328587118384,
+        "samples" : 7012180
+      }
     },
     {
       "decodedLoopBytes" : 13552496,
       "id" : 11,
       "native" : {
-        "peakDBFS" : 2.6591972298415385,
-        "rmsDBFS" : -9.804370950503579,
+        "peakDBFS" : -13.03711784114426,
+        "rmsDBFS" : -25.500684432419376,
         "samples" : 4665600
       },
-      "nativePreparationMS" : 22.113919258117676,
-      "processFootprintBeforeBytes" : 71254904,
-      "processFootprintPreparedBytes" : 84902776,
+      "nativePreparationMS" : 9.591937065124512,
+      "processFootprintBeforeBytes" : 69534512,
+      "processFootprintPreparedBytes" : 83149616,
       "recorded" : {
-        "peakDBFS" : -6.670992504873738,
-        "rmsDBFS" : -20.562484263257396,
+        "peakDBFS" : -11.60919329332297,
+        "rmsDBFS" : -25.500684897692214,
         "samples" : 4665600
       },
-      "recordedPreparationMS" : 58.93909931182861
+      "recordedPreparationMS" : 60.31203269958496,
+      "unbalancedNative" : {
+        "peakDBFS" : 0.7209952543526893,
+        "rmsDBFS" : -11.742571336922428,
+        "samples" : 4665600
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -8.609193044021922,
+        "rmsDBFS" : -22.500684648391164,
+        "samples" : 4665600
+      }
     },
     {
       "decodedLoopBytes" : 21816840,
       "id" : 12,
       "native" : {
-        "peakDBFS" : 9.927556512255245,
-        "rmsDBFS" : -3.8619278683850897,
+        "peakDBFS" : -12.248866794119746,
+        "rmsDBFS" : -26.038351560851424,
         "samples" : 5934546
       },
-      "nativePreparationMS" : 22.626042366027832,
-      "processFootprintBeforeBytes" : 71877496,
-      "processFootprintPreparedBytes" : 94618488,
+      "nativePreparationMS" : 9.590983390808105,
+      "processFootprintBeforeBytes" : 70124336,
+      "processFootprintPreparedBytes" : 92013360,
       "recorded" : {
-        "peakDBFS" : -3.278355993125718,
-        "rmsDBFS" : -21.100151835276947,
+        "peakDBFS" : -8.216555369917781,
+        "rmsDBFS" : -26.038351765015594,
         "samples" : 5934546
       },
-      "recordedPreparationMS" : 83.72902870178223
+      "recordedPreparationMS" : 91.59600734710693,
+      "unbalancedNative" : {
+        "peakDBFS" : 7.989357242624521,
+        "rmsDBFS" : -5.800127524107159,
+        "samples" : 5934546
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -5.216555120616732,
+        "rmsDBFS" : -23.038351515714545,
+        "samples" : 5934546
+      }
     },
     {
       "decodedLoopBytes" : 27103968,
       "id" : 13,
       "native" : {
-        "peakDBFS" : 9.91287435414674,
-        "rmsDBFS" : -5.291010666063103,
+        "peakDBFS" : -11.197829550435019,
+        "rmsDBFS" : -26.40171500192477,
         "samples" : 7372800
       },
-      "nativePreparationMS" : 23.607969284057617,
-      "processFootprintBeforeBytes" : 73450360,
-      "processFootprintPreparedBytes" : 100762488,
+      "nativePreparationMS" : 13.415098190307617,
+      "processFootprintBeforeBytes" : 70812464,
+      "processFootprintPreparedBytes" : 98075440,
       "recorded" : {
-        "peakDBFS" : -3.2664733531667784,
-        "rmsDBFS" : -21.46351536742852,
+        "peakDBFS" : -8.204673297068119,
+        "rmsDBFS" : -26.401715307428173,
         "samples" : 7372800
       },
-      "recordedPreparationMS" : 100.42595863342285
+      "recordedPreparationMS" : 115.41295051574707,
+      "unbalancedNative" : {
+        "peakDBFS" : 7.9746750861917715,
+        "rmsDBFS" : -7.229210365297982,
+        "samples" : 7372800
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -5.204673047767071,
+        "rmsDBFS" : -23.401715058127124,
+        "samples" : 7372800
+      }
     },
     {
       "decodedLoopBytes" : 33879704,
       "id" : 14,
       "native" : {
-        "peakDBFS" : 6.658694490504904,
-        "rmsDBFS" : -9.53656467483462,
+        "peakDBFS" : -13.497838855794118,
+        "rmsDBFS" : -29.69309691535817,
         "samples" : 10752000
       },
-      "nativePreparationMS" : 24.17302131652832,
-      "processFootprintBeforeBytes" : 74318712,
-      "processFootprintPreparedBytes" : 109052792,
+      "nativePreparationMS" : 11.106014251708984,
+      "processFootprintBeforeBytes" : 71516976,
+      "processFootprintPreparedBytes" : 105595696,
       "recorded" : {
-        "peakDBFS" : -5.974168838792927,
-        "rmsDBFS" : -24.754897088066706,
+        "peakDBFS" : -10.912369348255105,
+        "rmsDBFS" : -29.693097320311697,
         "samples" : 10752000
       },
-      "recordedPreparationMS" : 120.09799480438232
+      "recordedPreparationMS" : 142.68600940704346,
+      "unbalancedNative" : {
+        "peakDBFS" : 4.7204933885072755,
+        "rmsDBFS" : -11.474764671056775,
+        "samples" : 10752000
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -7.912369098954056,
+        "rmsDBFS" : -26.693097071010648,
+        "samples" : 10752000
+      }
     },
     {
       "decodedLoopBytes" : 27005792,
       "id" : 15,
       "native" : {
-        "peakDBFS" : 6.7687359024682445,
-        "rmsDBFS" : -7.322661293744684,
+        "peakDBFS" : -10.804697378565525,
+        "rmsDBFS" : -24.8960950336427,
         "samples" : 10215322
       },
-      "nativePreparationMS" : 26.218056678771973,
-      "processFootprintBeforeBytes" : 75760504,
-      "processFootprintPreparedBytes" : 104465272,
+      "nativePreparationMS" : 13.198018074035645,
+      "processFootprintBeforeBytes" : 72303408,
+      "processFootprintPreparedBytes" : 100500272,
       "recorded" : {
-        "peakDBFS" : -5.565607106953209,
-        "rmsDBFS" : -19.957895132817722,
+        "peakDBFS" : -10.503807370766516,
+        "rmsDBFS" : -24.896095384843232,
         "samples" : 10215322
       },
-      "recordedPreparationMS" : 99.21395778656006
+      "recordedPreparationMS" : 114.67397212982178,
+      "unbalancedNative" : {
+        "peakDBFS" : 4.830536354797247,
+        "rmsDBFS" : -9.260861300279926,
+        "samples" : 10215322
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -7.503807121465468,
+        "rmsDBFS" : -21.896095135542183,
+        "samples" : 10215322
+      }
     },
     {
       "decodedLoopBytes" : 44996144,
       "id" : 16,
       "native" : {
-        "peakDBFS" : 4.996854657153255,
-        "rmsDBFS" : -9.178837546623908,
+        "peakDBFS" : -13.971533336727422,
+        "rmsDBFS" : -28.14722499110728,
         "samples" : 14176874
       },
-      "nativePreparationMS" : 21.448969841003418,
-      "processFootprintBeforeBytes" : 78152568,
-      "processFootprintPreparedBytes" : 134988688,
+      "nativePreparationMS" : 13.79704475402832,
+      "processFootprintBeforeBytes" : 74433328,
+      "processFootprintPreparedBytes" : 131334984,
       "recorded" : {
-        "peakDBFS" : -6.533703979247044,
-        "rmsDBFS" : -23.20902477331469,
+        "peakDBFS" : -11.471903664873057,
+        "rmsDBFS" : -28.14722503556568,
         "samples" : 14176874
       },
-      "recordedPreparationMS" : 162.67704963684082
+      "recordedPreparationMS" : 188.72594833374023,
+      "unbalancedNative" : {
+        "peakDBFS" : 3.0586541057516827,
+        "rmsDBFS" : -11.117037548628177,
+        "samples" : 14176874
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -8.471903415572008,
+        "rmsDBFS" : -25.14722478626463,
+        "samples" : 14176874
+      }
     },
     {
       "decodedLoopBytes" : 21816864,
       "id" : 17,
       "native" : {
-        "peakDBFS" : 2.152988699136045,
-        "rmsDBFS" : -11.708435653559736,
+        "peakDBFS" : -14.970582738092983,
+        "rmsDBFS" : -28.832004879245368,
         "samples" : 5934552
       },
-      "nativePreparationMS" : 24.07097816467285,
-      "processFootprintBeforeBytes" : 90522488,
-      "processFootprintPreparedBytes" : 112460664,
+      "nativePreparationMS" : 10.340094566345215,
+      "processFootprintBeforeBytes" : 86868784,
+      "processFootprintPreparedBytes" : 108806960,
       "recorded" : {
-        "peakDBFS" : -9.099435366601384,
-        "rmsDBFS" : -23.893804527066376,
+        "peakDBFS" : -14.037635876063561,
+        "rmsDBFS" : -28.832005042961672,
         "samples" : 5934552
       },
-      "recordedPreparationMS" : 86.20798587799072
+      "recordedPreparationMS" : 93.13297271728516,
+      "unbalancedNative" : {
+        "peakDBFS" : 0.21478621664915296,
+        "rmsDBFS" : -13.646635924503233,
+        "samples" : 5934552
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -11.037635626762512,
+        "rmsDBFS" : -25.832004793660623,
+        "samples" : 5934552
+      }
     },
     {
       "decodedLoopBytes" : 16763912,
       "id" : 18,
       "native" : {
-        "peakDBFS" : 1.7949575962042523,
-        "rmsDBFS" : -11.684912404373533,
+        "peakDBFS" : -18.055978355332392,
+        "rmsDBFS" : -31.53584868965154,
         "samples" : 4592000
       },
-      "nativePreparationMS" : 20.019888877868652,
-      "processFootprintBeforeBytes" : 91063160,
-      "processFootprintPreparedBytes" : 108004216,
+      "nativePreparationMS" : 12.985944747924805,
+      "processFootprintBeforeBytes" : 87524144,
+      "processFootprintPreparedBytes" : 104399664,
       "recorded" : {
-        "peakDBFS" : -11.174316761591596,
-        "rmsDBFS" : -26.597648598514564,
+        "peakDBFS" : -16.112517271053772,
+        "rmsDBFS" : -31.535848783973588,
         "samples" : 4592000
       },
-      "recordedPreparationMS" : 69.04411315917969
+      "recordedPreparationMS" : 73.17698001861572,
+      "unbalancedNative" : {
+        "peakDBFS" : -0.14324203236319738,
+        "rmsDBFS" : -13.623112366682346,
+        "samples" : 4592000
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -13.112517021752723,
+        "rmsDBFS" : -28.53584853467254,
+        "samples" : 4592000
+      }
     },
     {
       "decodedLoopBytes" : 27322568,
       "id" : 19,
       "native" : {
-        "peakDBFS" : 3.5766069388578146,
-        "rmsDBFS" : -9.543692694947422,
+        "peakDBFS" : -15.713780991255259,
+        "rmsDBFS" : -28.834079159686688,
         "samples" : 7494200
       },
-      "nativePreparationMS" : 20.38705348968506,
-      "processFootprintBeforeBytes" : 91784056,
-      "processFootprintPreparedBytes" : 119243664,
+      "nativePreparationMS" : 9.796977043151855,
+      "processFootprintBeforeBytes" : 88146736,
+      "processFootprintPreparedBytes" : 115557168,
       "recorded" : {
-        "peakDBFS" : -6.975965586895615,
-        "rmsDBFS" : -23.895878890764234,
+        "peakDBFS" : -11.914166818749457,
+        "rmsDBFS" : -28.83407914075574,
         "samples" : 7494200
       },
-      "recordedPreparationMS" : 105.40890693664551
+      "recordedPreparationMS" : 115.52202701568604,
+      "unbalancedNative" : {
+        "peakDBFS" : 1.6384054782796829,
+        "rmsDBFS" : -11.481892690151746,
+        "samples" : 7494200
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -8.914166569448408,
+        "rmsDBFS" : -25.83407889145469,
+        "samples" : 7494200
+      }
     },
     {
       "decodedLoopBytes" : 19431464,
       "id" : 20,
       "native" : {
-        "peakDBFS" : 6.856529295413425,
-        "rmsDBFS" : -6.063338267685516,
+        "peakDBFS" : -12.65056548277654,
+        "rmsDBFS" : -25.57043244527113,
         "samples" : 5285650
       },
-      "nativePreparationMS" : 20.170927047729492,
-      "processFootprintBeforeBytes" : 92324728,
-      "processFootprintPreparedBytes" : 111805304,
+      "nativePreparationMS" : 13.67199420928955,
+      "processFootprintBeforeBytes" : 88802096,
+      "processFootprintPreparedBytes" : 108397360,
       "recorded" : {
-        "peakDBFS" : -4.91001380048125,
-        "rmsDBFS" : -20.632232411810485,
+        "peakDBFS" : -9.848216132265527,
+        "rmsDBFS" : -25.57043305976523,
         "samples" : 5285650
       },
-      "recordedPreparationMS" : 78.60302925109863
+      "recordedPreparationMS" : 84.20491218566895,
+      "unbalancedNative" : {
+        "peakDBFS" : 4.918328329927393,
+        "rmsDBFS" : -8.001538632567195,
+        "samples" : 5285650
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -6.848215882964479,
+        "rmsDBFS" : -22.57043281046418,
+        "samples" : 5285650
+      }
     },
     {
       "decodedLoopBytes" : 30054696,
       "id" : 21,
       "native" : {
-        "peakDBFS" : 6.253658660129063,
-        "rmsDBFS" : -7.771047914858502,
+        "peakDBFS" : -15.527573573898447,
+        "rmsDBFS" : -29.552280199425162,
         "samples" : 8175484
       },
-      "nativePreparationMS" : 33.367037773132324,
-      "processFootprintBeforeBytes" : 92799864,
-      "processFootprintPreparedBytes" : 123323280,
+      "nativePreparationMS" : 14.44399356842041,
+      "processFootprintBeforeBytes" : 89506608,
+      "processFootprintPreparedBytes" : 119784240,
       "recorded" : {
-        "peakDBFS" : -7.530334678058183,
-        "rmsDBFS" : -24.614080232559978,
+        "peakDBFS" : -12.468535033520208,
+        "rmsDBFS" : -29.55228027065584,
         "samples" : 8175484
       },
-      "recordedPreparationMS" : 111.2060546875
+      "recordedPreparationMS" : 126.3430118560791,
+      "unbalancedNative" : {
+        "peakDBFS" : 4.3154589039806135,
+        "rmsDBFS" : -9.709247721546102,
+        "samples" : 8175484
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -9.468534784219159,
+        "rmsDBFS" : -26.55228002135479,
+        "samples" : 8175484
+      }
     },
     {
       "decodedLoopBytes" : 40836984,
       "id" : 22,
       "native" : {
-        "peakDBFS" : 1.7371864488718658,
-        "rmsDBFS" : -12.842324454015051,
+        "peakDBFS" : -21.004317786202087,
+        "rmsDBFS" : -35.583827716077785,
         "samples" : 12345016
       },
-      "nativePreparationMS" : 24.837017059326172,
-      "processFootprintBeforeBytes" : 93864824,
-      "processFootprintPreparedBytes" : 135185296,
+      "nativePreparationMS" : 14.74308967590332,
+      "processFootprintBeforeBytes" : 90178352,
+      "processFootprintPreparedBytes" : 131253064,
       "recorded" : {
-        "peakDBFS" : -13.070534037009027,
-        "rmsDBFS" : -30.6456277186671,
+        "peakDBFS" : -18.008735857896852,
+        "rmsDBFS" : -35.5838279938054,
         "samples" : 12345016
       },
-      "recordedPreparationMS" : 144.09899711608887
+      "recordedPreparationMS" : 170.51100730895996,
+      "unbalancedNative" : {
+        "peakDBFS" : -0.20101455306590815,
+        "rmsDBFS" : -14.780524482941606,
+        "samples" : 12345016
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -15.008735608595803,
+        "rmsDBFS" : -32.583827744504354,
+        "samples" : 12345016
+      }
     },
     {
       "decodedLoopBytes" : 26984072,
       "id" : 23,
       "native" : {
-        "peakDBFS" : 7.526204976684658,
-        "rmsDBFS" : -6.690716444419957,
+        "peakDBFS" : -12.457644777734615,
+        "rmsDBFS" : -26.674565937961916,
         "samples" : 7467618
       },
-      "nativePreparationMS" : 23.928046226501465,
-      "processFootprintBeforeBytes" : 94978936,
-      "processFootprintPreparedBytes" : 122274680,
+      "nativePreparationMS" : 14.994978904724121,
+      "processFootprintBeforeBytes" : 90964784,
+      "processFootprintPreparedBytes" : 118162224,
       "recorded" : {
-        "peakDBFS" : -5.503992409708177,
-        "rmsDBFS" : -21.736365866135966,
+        "peakDBFS" : -10.442192919170354,
+        "rmsDBFS" : -26.674566129106683,
         "samples" : 7467618
       },
-      "recordedPreparationMS" : 100.63493251800537
+      "recordedPreparationMS" : 114.11702632904053,
+      "unbalancedNative" : {
+        "peakDBFS" : 5.588004716523529,
+        "rmsDBFS" : -8.628916443703773,
+        "samples" : 7467618
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -7.442192669869305,
+        "rmsDBFS" : -23.674565879805634,
+        "samples" : 7467618
+      }
     },
     {
       "decodedLoopBytes" : 27966928,
       "id" : 24,
       "native" : {
-        "peakDBFS" : 7.861167460125608,
-        "rmsDBFS" : -7.54316314030127,
+        "peakDBFS" : -13.270565807362585,
+        "rmsDBFS" : -28.674895965009817,
         "samples" : 8157738
       },
-      "nativePreparationMS" : 20.926952362060547,
-      "processFootprintBeforeBytes" : 95863672,
-      "processFootprintPreparedBytes" : 123913104,
+      "nativePreparationMS" : 11.56604290008545,
+      "processFootprintBeforeBytes" : 91702064,
+      "processFootprintPreparedBytes" : 119767856,
       "recorded" : {
-        "peakDBFS" : -6.794700591174512,
-        "rmsDBFS" : -23.736695855207145,
+        "peakDBFS" : -11.732901808109046,
+        "rmsDBFS" : -28.674896246815837,
         "samples" : 8157738
       },
-      "recordedPreparationMS" : 101.36902332305908
+      "recordedPreparationMS" : 117.47598648071289,
+      "unbalancedNative" : {
+        "peakDBFS" : 5.922966885821539,
+        "rmsDBFS" : -9.481363271825693,
+        "samples" : 8157738
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -8.732901558807997,
+        "rmsDBFS" : -25.67489599751479,
+        "samples" : 8157738
+      }
     },
     {
       "decodedLoopBytes" : 40937784,
       "id" : 25,
       "native" : {
-        "peakDBFS" : 5.093840601076077,
-        "rmsDBFS" : -9.054556513713433,
+        "peakDBFS" : -15.201568554386728,
+        "rmsDBFS" : -29.34996480826349,
         "samples" : 11136004
       },
-      "nativePreparationMS" : 19.946932792663574,
-      "processFootprintBeforeBytes" : 96502648,
-      "processFootprintPreparedBytes" : 137528208,
+      "nativePreparationMS" : 9.968996047973633,
+      "processFootprintBeforeBytes" : 92193584,
+      "processFootprintPreparedBytes" : 133251912,
       "recorded" : {
-        "peakDBFS" : -7.523455444031453,
-        "rmsDBFS" : -24.41176482023569,
+        "peakDBFS" : -12.461656261250106,
+        "rmsDBFS" : -29.349965048555053,
         "samples" : 11136004
       },
-      "recordedPreparationMS" : 148.1260061264038
+      "recordedPreparationMS" : 169.77500915527344,
+      "unbalancedNative" : {
+        "peakDBFS" : 3.1556397649018093,
+        "rmsDBFS" : -10.992756488974951,
+        "samples" : 11136004
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -9.461656011949056,
+        "rmsDBFS" : -26.349964799254003,
+        "samples" : 11136004
+      }
     },
     {
       "decodedLoopBytes" : 0,
       "id" : 26,
       "native" : {
-        "peakDBFS" : 11.975338108431258,
-        "rmsDBFS" : -2.357572275985025,
+        "peakDBFS" : -7.248481750522984,
+        "rmsDBFS" : -21.581392102080272,
         "samples" : 13577412
       },
-      "nativePreparationMS" : 25.6500244140625,
-      "processFootprintBeforeBytes" : 97125240,
-      "processFootprintPreparedBytes" : 97371000,
+      "nativePreparationMS" : 14.291048049926758,
+      "processFootprintBeforeBytes" : 92816176,
+      "processFootprintPreparedBytes" : 93111088,
       "recorded" : {
-        "peakDBFS" : -1.2995719750178494,
-        "rmsDBFS" : -16.643191894595116,
+        "peakDBFS" : -6.2377709812931315,
+        "rmsDBFS" : -21.581392095015676,
         "samples" : 13577412
       },
-      "recordedPreparationMS" : 20.3169584274292
+      "recordedPreparationMS" : 7.967948913574219,
+      "unbalancedNative" : {
+        "peakDBFS" : 10.037138109100102,
+        "rmsDBFS" : -4.295772242457188,
+        "samples" : 13577412
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -3.2377707319920828,
+        "rmsDBFS" : -18.581391845714627,
+        "samples" : 13577412
+      }
     },
     {
       "decodedLoopBytes" : 17348552,
       "id" : 27,
       "native" : {
-        "peakDBFS" : 0.8234907748693998,
-        "rmsDBFS" : -12.203163890437132,
+        "peakDBFS" : -17.84796628906868,
+        "rmsDBFS" : -30.874622116599042,
         "samples" : 4805786
       },
-      "nativePreparationMS" : 24.026989936828613,
-      "processFootprintBeforeBytes" : 97944440,
-      "processFootprintPreparedBytes" : 115393400,
+      "nativePreparationMS" : 10.980963706970215,
+      "processFootprintBeforeBytes" : 93799216,
+      "processFootprintPreparedBytes" : 111231792,
       "recorded" : {
-        "peakDBFS" : -10.856213514047317,
-        "rmsDBFS" : -25.936421905210636,
+        "peakDBFS" : -15.794413007196242,
+        "rmsDBFS" : -30.87462242063378,
         "samples" : 4805786
       },
-      "recordedPreparationMS" : 74.00298118591309
+      "recordedPreparationMS" : 76.56300067901611,
+      "unbalancedNative" : {
+        "peakDBFS" : -1.1147083080657114,
+        "rmsDBFS" : -14.141364135596072,
+        "samples" : 4805786
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -12.794412757895193,
+        "rmsDBFS" : -27.87462217133273,
+        "samples" : 4805786
+      }
     },
     {
       "decodedLoopBytes" : 33879784,
       "id" : 28,
       "native" : {
-        "peakDBFS" : 3.0487419081910927,
-        "rmsDBFS" : -12.196834917774567,
+        "peakDBFS" : -17.478332288433954,
+        "rmsDBFS" : -32.72390984783409,
         "samples" : 11061970
       },
-      "nativePreparationMS" : 21.533966064453125,
-      "processFootprintBeforeBytes" : 98599800,
-      "processFootprintPreparedBytes" : 133137296,
+      "nativePreparationMS" : 13.342022895812988,
+      "processFootprintBeforeBytes" : 94257968,
+      "processFootprintPreparedBytes" : 128353096,
       "recorded" : {
-        "peakDBFS" : -9.213891188482478,
-        "rmsDBFS" : -27.785709754508815,
+        "peakDBFS" : -14.152091511006057,
+        "rmsDBFS" : -32.72391025528034,
         "samples" : 11061970
       },
-      "recordedPreparationMS" : 124.96399879455566
+      "recordedPreparationMS" : 143.1800127029419,
+      "unbalancedNative" : {
+        "peakDBFS" : 1.1105423769624292,
+        "rmsDBFS" : -14.135035182437708,
+        "samples" : 11061970
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -11.152091261705008,
+        "rmsDBFS" : -29.723910005979292,
+        "samples" : 11061970
+      }
     },
     {
       "decodedLoopBytes" : 28233280,
       "id" : 29,
       "native" : {
-        "peakDBFS" : 3.0245718979282725,
-        "rmsDBFS" : -9.321880973756013,
+        "peakDBFS" : -24.534982808696675,
+        "rmsDBFS" : -36.88143438893347,
         "samples" : 7680006
       },
-      "nativePreparationMS" : 24.243950843811035,
-      "processFootprintBeforeBytes" : 99795832,
-      "processFootprintPreparedBytes" : 128484240,
+      "nativePreparationMS" : 15.429019927978516,
+      "processFootprintBeforeBytes" : 95011632,
+      "processFootprintPreparedBytes" : 123700016,
       "recorded" : {
-        "peakDBFS" : -12.428884518854527,
-        "rmsDBFS" : -31.943233776605403,
+        "peakDBFS" : -17.367086381693383,
+        "rmsDBFS" : -36.88143446182072,
         "samples" : 7680006
       },
-      "recordedPreparationMS" : 108.5749864578247
+      "recordedPreparationMS" : 120.77701091766357,
+      "unbalancedNative" : {
+        "peakDBFS" : 1.086370175839616,
+        "rmsDBFS" : -11.260081404397184,
+        "samples" : 7680006
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -14.367086132392334,
+        "rmsDBFS" : -33.88143421251967,
+        "samples" : 7680006
+      }
     },
     {
       "decodedLoopBytes" : 16940360,
       "id" : 30,
       "native" : {
-        "peakDBFS" : 10.32254202609337,
-        "rmsDBFS" : -3.840142768729982,
+        "peakDBFS" : -12.041550464281803,
+        "rmsDBFS" : -26.204235093265254,
         "samples" : 4608000
       },
-      "nativePreparationMS" : 24.438023567199707,
-      "processFootprintBeforeBytes" : 100762488,
-      "processFootprintPreparedBytes" : 117932920,
+      "nativePreparationMS" : 13.545989990234375,
+      "processFootprintBeforeBytes" : 95994672,
+      "processFootprintPreparedBytes" : 113165104,
       "recorded" : {
-        "peakDBFS" : -2.7044882984152285,
-        "rmsDBFS" : -21.266035527849425,
+        "peakDBFS" : -7.6426881010411645,
+        "rmsDBFS" : -26.20423554907866,
         "samples" : 4608000
       },
-      "recordedPreparationMS" : 76.94995403289795
+      "recordedPreparationMS" : 73.51493835449219,
+      "unbalancedNative" : {
+        "peakDBFS" : 8.38434208143074,
+        "rmsDBFS" : -5.778342547552712,
+        "samples" : 4608000
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -4.642687851740116,
+        "rmsDBFS" : -23.20423529977761,
+        "samples" : 4608000
+      }
     },
     {
       "decodedLoopBytes" : 16328104,
       "id" : 31,
       "native" : {
-        "peakDBFS" : 4.412309816582438,
-        "rmsDBFS" : -11.254739946240104,
+        "peakDBFS" : -14.521945449029364,
+        "rmsDBFS" : -30.188996472444302,
         "samples" : 4476146
       },
-      "nativePreparationMS" : 22.709965705871582,
-      "processFootprintBeforeBytes" : 101565304,
-      "processFootprintPreparedBytes" : 118080376,
+      "nativePreparationMS" : 9.728074073791504,
+      "processFootprintBeforeBytes" : 96748336,
+      "processFootprintPreparedBytes" : 113197872,
       "recorded" : {
-        "peakDBFS" : -9.106057442713979,
-        "rmsDBFS" : -25.250796170007757,
+        "peakDBFS" : -14.044257952176157,
+        "rmsDBFS" : -30.188996687339134,
         "samples" : 4476146
       },
-      "recordedPreparationMS" : 66.9790506362915
+      "recordedPreparationMS" : 71.35093212127686,
+      "unbalancedNative" : {
+        "peakDBFS" : 2.474110802481096,
+        "rmsDBFS" : -13.192940220933842,
+        "samples" : 4476146
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -11.044257702875107,
+        "rmsDBFS" : -27.188996438038085,
+        "samples" : 4476146
+      }
     },
     {
       "decodedLoopBytes" : 18150336,
       "id" : 32,
       "native" : {
-        "peakDBFS" : 1.5583964386527924,
-        "rmsDBFS" : -11.14581115509186,
+        "peakDBFS" : -23.77908146484469,
+        "rmsDBFS" : -36.48328884135962,
         "samples" : 8229912
       },
-      "nativePreparationMS" : 22.436976432800293,
-      "processFootprintBeforeBytes" : 102286200,
-      "processFootprintPreparedBytes" : 120587128,
+      "nativePreparationMS" : 13.527989387512207,
+      "processFootprintBeforeBytes" : 97502024,
+      "processFootprintPreparedBytes" : 116458360,
       "recorded" : {
-        "peakDBFS" : -13.611171006731873,
-        "rmsDBFS" : -31.545088958741353,
+        "peakDBFS" : -18.549370275619307,
+        "rmsDBFS" : -36.483289497142316,
         "samples" : 8229912
       },
-      "recordedPreparationMS" : 72.7999210357666
+      "recordedPreparationMS" : 81.87305927276611,
+      "unbalancedNative" : {
+        "peakDBFS" : -0.3798040378522082,
+        "rmsDBFS" : -13.084011414367133,
+        "samples" : 8229912
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -15.54937002631826,
+        "rmsDBFS" : -33.48328924784127,
+        "samples" : 8229912
+      }
     },
     {
       "decodedLoopBytes" : 18723456,
       "id" : 33,
       "native" : {
-        "peakDBFS" : 2.0554519335218076,
-        "rmsDBFS" : -11.240824683434363,
+        "peakDBFS" : -15.51806577968293,
+        "rmsDBFS" : -28.81434404998525,
         "samples" : 5153684
       },
-      "nativePreparationMS" : 20.487070083618164,
-      "processFootprintBeforeBytes" : 103007096,
-      "processFootprintPreparedBytes" : 121848696,
+      "nativePreparationMS" : 12.874960899353027,
+      "processFootprintBeforeBytes" : 98878328,
+      "processFootprintPreparedBytes" : 117801848,
       "recorded" : {
-        "peakDBFS" : -9.470012541380708,
-        "rmsDBFS" : -23.876143964364623,
+        "peakDBFS" : -14.408213820974694,
+        "rmsDBFS" : -28.814344476247783,
         "samples" : 5153684
       },
-      "recordedPreparationMS" : 74.2119550704956
+      "recordedPreparationMS" : 81.71498775482178,
+      "unbalancedNative" : {
+        "peakDBFS" : 0.1172533078487862,
+        "rmsDBFS" : -13.179024962453534,
+        "samples" : 5153684
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -11.408213571673645,
+        "rmsDBFS" : -25.814344226946734,
+        "samples" : 5153684
+      }
     },
     {
       "decodedLoopBytes" : 21858240,
       "id" : 34,
       "native" : {
-        "peakDBFS" : 2.254451046842759,
-        "rmsDBFS" : -12.2164964100356,
+        "peakDBFS" : -16.665751000059117,
+        "rmsDBFS" : -31.136698261144662,
         "samples" : 8175484
       },
-      "nativePreparationMS" : 24.151086807250977,
-      "processFootprintBeforeBytes" : 103564152,
-      "processFootprintPreparedBytes" : 125961080,
+      "nativePreparationMS" : 12.081027030944824,
+      "processFootprintBeforeBytes" : 99615608,
+      "processFootprintPreparedBytes" : 122176376,
       "recorded" : {
-        "peakDBFS" : -9.60422064261378,
-        "rmsDBFS" : -26.198497810865383,
+        "peakDBFS" : -14.542422325261592,
+        "rmsDBFS" : -31.13669832750872,
         "samples" : 8175484
       },
-      "recordedPreparationMS" : 97.58198261260986
+      "recordedPreparationMS" : 94.56896781921387,
+      "unbalancedNative" : {
+        "peakDBFS" : 0.31625058699827424,
+        "rmsDBFS" : -14.154696674087269,
+        "samples" : 8175484
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -11.542422075960543,
+        "rmsDBFS" : -28.136698078207672,
+        "samples" : 8175484
+      }
     },
     {
       "decodedLoopBytes" : 25410032,
       "id" : 35,
       "native" : {
-        "peakDBFS" : 7.926597219214363,
-        "rmsDBFS" : -5.499089101380502,
+        "peakDBFS" : -13.320425555120421,
+        "rmsDBFS" : -26.746112025794922,
         "samples" : 7488000
       },
-      "nativePreparationMS" : 23.50592613220215,
-      "processFootprintBeforeBytes" : 104661880,
-      "processFootprintPreparedBytes" : 130286456,
+      "nativePreparationMS" : 12.619972229003906,
+      "processFootprintBeforeBytes" : 100926328,
+      "processFootprintPreparedBytes" : 126681976,
       "recorded" : {
-        "peakDBFS" : -4.203749418878449,
-        "rmsDBFS" : -21.80791262478818,
+        "peakDBFS" : -9.141949298336883,
+        "rmsDBFS" : -26.74611257297004,
         "samples" : 7488000
       },
-      "recordedPreparationMS" : 95.83902359008789
+      "recordedPreparationMS" : 108.25896263122559,
+      "unbalancedNative" : {
+        "peakDBFS" : 5.9883976865525295,
+        "rmsDBFS" : -7.437288784121972,
+        "samples" : 7488000
+      },
+      "unbalancedRecorded" : {
+        "peakDBFS" : -6.141949049035834,
+        "rmsDBFS" : -23.746112323668992,
+        "samples" : 7488000
+      }
     }
   ]
 }

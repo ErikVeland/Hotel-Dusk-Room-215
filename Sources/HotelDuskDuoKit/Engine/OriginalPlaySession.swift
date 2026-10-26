@@ -2,9 +2,8 @@ import Foundation
 import Combine
 import CoreGraphics
 
-/// Hosts the supported Chapter 1–2 route: the original event
-/// runner, the entrance process at the DS update rate, and original audio.
-/// Systems that are not recovered stop play with their source location.
+/// Runs the recovered event flow and native interactions at the DS update
+/// rate. Unrecovered story requests stop with their source location.
 @MainActor
 public final class OriginalPlaySession: ObservableObject {
     let dialogueNotebook = DialogueNotebook()
@@ -53,7 +52,7 @@ public final class OriginalPlaySession: ObservableObject {
     private var resumesWalkingAfterClock = false
     @Published public private(set) var suitcaseKey: OriginalSuitcaseKeyProcess?
     @Published public private(set) var suitcaseImage: CGImage?
-    private var suitcaseRenderer: OriginalSuitcaseRenderer?
+    private var suitcaseRenderer: (any OriginalSuitcaseRendering)?
     private var suitcaseTouch: SIMD2<Float>?
     @Published public private(set) var fountainPen: OriginalFountainPenProcess?
     @Published public private(set) var fountainPenImage: CGImage?
@@ -104,36 +103,51 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var switchboardScreenEffects = OriginalScreenEffects()
     private var switchboardRenderer: OriginalSwitchboardRenderer?
     private var switchboardTouch: SIMD2<Int>?
+    @Published public private(set) var labelPeel: OriginalLabelPeelProcess?
+    @Published public private(set) var labelPeelImage: CGImage?
+    @Published public private(set) var labelPeelScreenEffects = OriginalScreenEffects()
+    private var labelPeelRenderer: OriginalLabelPeelRenderer?
+    private var labelPeelTouch: SIMD2<Int>?
+    @Published public private(set) var christmasTree: OriginalChristmasTreeProcess?
+    @Published public private(set) var christmasTreeImage: CGImage?
+    @Published public private(set) var christmasTreeScreenEffects = OriginalScreenEffects()
+    private var christmasTreeRenderer: OriginalChristmasTreeRenderer?
+    private var christmasTreeDraggedDecoration: Int?
+    @Published public private(set) var searchShed: OriginalSearchShedProcess?
+    @Published public private(set) var searchShedImage: CGImage?
+    @Published public private(set) var searchShedScreenEffects = OriginalScreenEffects()
+    private var searchShedRenderer: OriginalSearchShedRenderer?
+    private var searchShedTouch: SIMD2<Float>?
     private var switchboardParent: OriginalEventRunner?
     @Published public private(set) var thinWire: OriginalThinWireProcess?
     @Published public private(set) var thinWireImage: CGImage?
-    private var thinWireRenderer: OriginalThinWireRenderer?
+    private var thinWireRenderer: (any OriginalThinWireRendering)?
     private var thinWireTouch: SIMD2<Float>?
     @Published public private(set) var hanger: OriginalHangerProcess?
     @Published public private(set) var hangerImage: CGImage?
     @Published public private(set) var hangerScreenEffects = OriginalScreenEffects()
-    private var hangerRenderer: OriginalHangerRenderer?
+    private var hangerRenderer: (any OriginalHangerRendering)?
     private var hangerTouch: SIMD2<Float>?
     @Published public private(set) var suitcaseContents: OriginalSuitcaseContentsProcess?
     @Published public private(set) var suitcaseContentsImage: CGImage?
     @Published public private(set) var suitcaseContentsScreenEffects = OriginalScreenEffects()
-    private var suitcaseContentsRenderer: OriginalSuitcaseContentsRenderer?
+    private var suitcaseContentsRenderer: (any OriginalSuitcaseContentsRendering)?
     private var suitcaseContentsTouch: SIMD2<Float>?
     private var suitcaseContentsParent: OriginalEventRunner?
     @Published public private(set) var memoPull: OriginalMemoPullProcess?
     @Published public private(set) var memoPullImage: CGImage?
     @Published public private(set) var memoPullScreenEffects = OriginalScreenEffects()
-    private var memoPullRenderer: OriginalMemoPullRenderer?
+    private var memoPullRenderer: (any OriginalMemoPullRendering)?
     private var memoPullTouch: SIMD2<Float>?
     @Published public private(set) var cabinetDial: OriginalCabinetDialProcess?
     @Published public private(set) var cabinetDialImage: CGImage?
     @Published public private(set) var cabinetDialScreenEffects = OriginalScreenEffects()
-    private var cabinetDialRenderer: OriginalCabinetDialRenderer?
+    private var cabinetDialRenderer: (any OriginalCabinetDialRendering)?
     private var cabinetDialTouch: SIMD2<Float>?
     @Published public private(set) var crowbar: OriginalCrowbarProcess?
     @Published public private(set) var crowbarImage: CGImage?
     @Published public private(set) var crowbarScreenEffects = OriginalScreenEffects()
-    private var crowbarRenderer: OriginalCrowbarRenderer?
+    private var crowbarRenderer: (any OriginalCrowbarRendering)?
     private var crowbarTouch: SIMD2<Float>?
     @Published public private(set) var memoDrawing: OriginalMemoDrawingProcess?
     @Published public private(set) var memoDrawingImage: CGImage?
@@ -169,7 +183,15 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var lobby: OriginalMapExploration?
     @Published public private(set) var lobbyImage: CGImage?
     public private(set) var lobbyMap: CGImage?
-    private var lobbyRenderer: OriginalMapRenderer?
+    private var lobbyRenderer: (any OriginalMapRendering)?
+    private let mapRendererFactory: OriginalMapRendererFactory
+    private let suitcaseRendererFactory: OriginalSuitcaseRendererFactory
+    private let hangerRendererFactory: OriginalHangerRendererFactory
+    private let thinWireRendererFactory: OriginalThinWireRendererFactory
+    private let suitcaseContentsRendererFactory: OriginalSuitcaseContentsRendererFactory
+    private let memoPullRendererFactory: OriginalMemoPullRendererFactory
+    private let crowbarRendererFactory: OriginalCrowbarRendererFactory
+    private let cabinetDialRendererFactory: OriginalCabinetDialRendererFactory
     private var lobbyTouch: SIMD2<Float>?
     private var firstPersonMovement: SIMD2<Float>?
     private var hasReturnedFromDunningIntroduction = false
@@ -207,7 +229,7 @@ public final class OriginalPlaySession: ObservableObject {
               process == nil, bellProcess == nil, signProcess == nil, jigsaw == nil,
               clock == nil, suitcaseKey == nil, thinWire == nil, hanger == nil, switchboard == nil, fountainPen == nil, bookmarkBox == nil, dollRepair == nil, coinPuzzle == nil, matchsticks == nil, jukebox == nil, linenWagon == nil, differences == nil, toiletTank == nil,
               suitcaseContents == nil, memoPull == nil, cabinetDial == nil,
-              crowbar == nil, memoDrawing == nil, paperclip == nil,
+              crowbar == nil, memoDrawing == nil, paperclip == nil, labelPeel == nil, christmasTree == nil, searchShed == nil,
               touchPicture == nil else { return false }
         switch runner.phase {
         case .dialogue, .itemNotice, .choice, .questions: return true
@@ -237,7 +259,15 @@ public final class OriginalPlaySession: ObservableObject {
                 saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
                 saveDate: @escaping () -> Date = Date.init,
                 chapterTransition: OriginalChapterTransition? = nil,
-                restoredExploration: OriginalMapExploration? = nil) {
+                restoredExploration: OriginalMapExploration? = nil,
+                mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
+                suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
+                hangerRendererFactory: @escaping OriginalHangerRendererFactory = { try OriginalHangerRenderer() },
+                thinWireRendererFactory: @escaping OriginalThinWireRendererFactory = { try OriginalThinWireRenderer(variant: $0) },
+                suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
+                memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
+                crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
+                cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) {
         self.runner = runner
         self.audio = audio
         self.catalog = catalog
@@ -247,6 +277,14 @@ public final class OriginalPlaySession: ObservableObject {
         self.saveStore = saveStore
         self.saveDate = saveDate
         self.chapterTransition = chapterTransition
+        self.mapRendererFactory = mapRendererFactory
+        self.suitcaseRendererFactory = suitcaseRendererFactory
+        self.hangerRendererFactory = hangerRendererFactory
+        self.thinWireRendererFactory = thinWireRendererFactory
+        self.suitcaseContentsRendererFactory = suitcaseContentsRendererFactory
+        self.memoPullRendererFactory = memoPullRendererFactory
+        self.crowbarRendererFactory = crowbarRendererFactory
+        self.cabinetDialRendererFactory = cabinetDialRendererFactory
         lobby = restoredExploration
         if chapterTransition?.stage == .title {
             do { chapterTitleImages = try OriginalChapterTitleImages(library: .bundled(), chapter: runner.game.chapter) }
@@ -258,7 +296,15 @@ public final class OriginalPlaySession: ObservableObject {
         settle()
     }
 
-    public static func chapterOne(audio: AudioController, saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application) throws -> OriginalPlaySession {
+    public static func chapterOne(audio: AudioController, saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
+                                  mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
+                                  suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
+                                  hangerRendererFactory: @escaping OriginalHangerRendererFactory = { try OriginalHangerRenderer() },
+                                  thinWireRendererFactory: @escaping OriginalThinWireRendererFactory = { try OriginalThinWireRenderer(variant: $0) },
+                                  suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
+                                  memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
+                                  crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
+                                  cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) throws -> OriginalPlaySession {
         let catalog = try OriginalScriptCatalog.bundled()
         var runner = try OriginalEventRunner.chapterOneArrival(catalog: catalog, defaults: .bundled(),
             timestamp: Int64(Date().timeIntervalSince1970))
@@ -273,7 +319,14 @@ public final class OriginalPlaySession: ObservableObject {
             fixture = nil
         }
         #endif
-        return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, fixture: fixture, saveStore: saveStore)
+        return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, fixture: fixture, saveStore: saveStore,
+                                   mapRendererFactory: mapRendererFactory, suitcaseRendererFactory: suitcaseRendererFactory,
+                                   hangerRendererFactory: hangerRendererFactory,
+                                   thinWireRendererFactory: thinWireRendererFactory,
+                                   suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
+                                   memoPullRendererFactory: memoPullRendererFactory,
+                                   crowbarRendererFactory: crowbarRendererFactory,
+                                   cabinetDialRendererFactory: cabinetDialRendererFactory)
     }
 
     #if DEBUG
@@ -698,6 +751,102 @@ public final class OriginalPlaySession: ObservableObject {
         switchboard?.quit()
     }
 
+    public func holdLabelPeelTouch(x: Float, y: Float) {
+        guard !isPaused, case .process(46) = runner.phase, x.isFinite, y.isFinite,
+              x >= 32, x < 160, y >= 48, y < 208 else { return }
+        labelPeelTouch = SIMD2(Int(x), Int(y))
+    }
+
+    public func releaseLabelPeelTouch() { labelPeelTouch = nil }
+
+    public func openChristmasTreeMenu() {
+        guard !isPaused, case .process(43) = runner.phase,
+              christmasTreeDraggedDecoration == nil else { return }
+        christmasTree?.openMenu()
+    }
+
+    public func holdChristmasTreeTouch(x: Float, y: Float) {
+        guard !isPaused, case .process(43) = runner.phase, let process = christmasTree,
+              let renderer = christmasTreeRenderer, x.isFinite, y.isFinite,
+              x >= 0, x < 192, y >= 0, y < 256, process.canPlaceDecoration else { return }
+        let point = SIMD2(x, y)
+        if christmasTreeDraggedDecoration == nil {
+            christmasTreeDraggedDecoration = renderer.decoration(at: point, process: process)
+        }
+        guard christmasTreeDraggedDecoration != nil else { return }
+        do {
+            christmasTreeImage = try renderer.render(process, draggedDecoration: christmasTreeDraggedDecoration,
+                                                     at: point)
+        } catch {
+            runner.halt("The Christmas tree decoration could not be rendered: \(error)")
+            cancelChristmasTreeTouch()
+            settle()
+        }
+    }
+
+    public func releaseChristmasTreeTouch(x: Float, y: Float) {
+        guard !isPaused, case .process(43) = runner.phase, var process = christmasTree,
+              let renderer = christmasTreeRenderer, let decoration = christmasTreeDraggedDecoration,
+              x.isFinite, y.isFinite else { return cancelChristmasTreeTouch() }
+        let point = SIMD2(x, y)
+        if let target = renderer.target(at: point) {
+            _ = process.dropDecoration(decoration, at: OriginalChristmasTreeLayout.modelDecorationTargets[target])
+        }
+        christmasTreeDraggedDecoration = nil
+        christmasTree = process
+        do { christmasTreeImage = try renderer.render(process) }
+        catch {
+            runner.halt("The Christmas tree decoration could not be rendered: \(error)")
+            settle()
+        }
+    }
+
+    public func cancelChristmasTreeTouch() {
+        christmasTreeDraggedDecoration = nil
+        guard let christmasTree, let christmasTreeRenderer else { return }
+        do { christmasTreeImage = try christmasTreeRenderer.render(christmasTree) }
+        catch { runner.halt("The Christmas tree decoration could not be rendered: \(error)"); settle() }
+    }
+
+    public func holdSearchShedTouch(x: Float, y: Float) {
+        guard !isPaused, case .process(55) = runner.phase, var process = searchShed,
+              x.isFinite, y.isFinite, x >= 0, x < 192, y >= 0, y < 256,
+              let renderer = searchShedRenderer else { return }
+        let point = SIMD2(x, y)
+        if searchShedTouch == nil, let object = renderer.object(at: point, process: process) {
+            if object == 9 {
+                _ = process.select(object: object, targetIsUnobstructed: true)
+            } else if let position = renderer.planePoint(at: point, height: process.objects[object].position.y) {
+                process.beginDrag(object: object, at: position)
+            }
+        }
+        if process.draggedObject != nil, let object = process.draggedObject,
+           let position = renderer.planePoint(at: point, height: process.objects[object].position.y) {
+            process.drag(to: position)
+        }
+        searchShedTouch = point
+        searchShed = process
+        do { searchShedImage = try renderer.render(process) }
+        catch { runner.halt("The search shed could not be rendered: \(error)"); settle() }
+    }
+
+    public func releaseSearchShedTouch() {
+        searchShedTouch = nil
+        searchShed?.endDrag()
+    }
+
+    public func openSearchShedMenu() {
+        guard !isPaused, case .process(55) = runner.phase else { return }
+        searchShed?.openMenu()
+    }
+
+    public func openSearchShedTreeBox() {
+        guard !isPaused, case .process(55) = runner.phase, var process = searchShed else { return }
+        let effects = process.openFoundBox()
+        searchShed = process
+        applySearchShed(effects)
+    }
+
     public func releaseThinWireTouch() { thinWireTouch = nil }
 
     public func quitThinWire() {
@@ -1109,10 +1258,55 @@ public final class OriginalPlaySession: ObservableObject {
                 }
             }
             startTimer()
+        case .process(46):
+            if labelPeel == nil {
+                do {
+                    let renderer = try OriginalLabelPeelRenderer(library: .bundled())
+                    let puzzle = OriginalLabelPeelProcess(mask: renderer.initialMask)
+                    labelPeelRenderer = renderer
+                    labelPeelImage = try renderer.render(puzzle)
+                    labelPeelScreenEffects = OriginalScreenEffects()
+                    labelPeel = puzzle
+                } catch {
+                    runner.halt("The wine label could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(43):
+            if christmasTree == nil {
+                do {
+                    let renderer = try OriginalChristmasTreeRenderer(library: .bundled())
+                    let process = OriginalChristmasTreeProcess(savedOrder: runner.game.christmasTreeDecorationOrder)
+                    christmasTreeRenderer = renderer
+                    christmasTreeImage = try renderer.render(process)
+                    christmasTreeScreenEffects = OriginalScreenEffects()
+                    christmasTree = process
+                } catch {
+                    runner.halt("The Christmas tree image could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(55):
+            if searchShed == nil {
+                do {
+                    let process = OriginalSearchShedProcess()
+                    let renderer = try OriginalSearchShedRenderer()
+                    searchShedRenderer = renderer
+                    searchShedImage = try renderer.render(process)
+                    searchShedScreenEffects = OriginalScreenEffects()
+                    searchShed = process
+                } catch {
+                    runner.halt("The search shed could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
         case .process(27):
             if memoPull == nil {
                 do {
-                    memoPullRenderer = try OriginalMemoPullRenderer()
+                    memoPullRenderer = try memoPullRendererFactory()
                     let puzzle = OriginalMemoPullProcess()
                     memoPullImage = try memoPullRenderer?.render(puzzle)
                     memoPullScreenEffects = OriginalScreenEffects()
@@ -1141,7 +1335,7 @@ public final class OriginalPlaySession: ObservableObject {
             if thinWire == nil {
                 do {
                     let variant = OriginalThinWireProcess.Variant(rawValue: id)!
-                    thinWireRenderer = try OriginalThinWireRenderer(variant: variant)
+                    thinWireRenderer = try thinWireRendererFactory(variant)
                     let puzzle = OriginalThinWireProcess(variant: variant)
                     thinWireImage = try thinWireRenderer?.render(puzzle)
                     thinWire = puzzle
@@ -1155,7 +1349,7 @@ public final class OriginalPlaySession: ObservableObject {
             if crowbar == nil {
                 do {
                     let items = try runner.game.inventory.items
-                    let renderer = try OriginalCrowbarRenderer(tornPaper: items.contains(7) || items.contains(12))
+                    let renderer = try crowbarRendererFactory(items.contains(7) || items.contains(12))
                     let puzzle = OriginalCrowbarProcess()
                     crowbarRenderer = renderer
                     crowbarImage = try renderer.render(puzzle)
@@ -1171,7 +1365,7 @@ public final class OriginalPlaySession: ObservableObject {
             if cabinetDial == nil {
                 do {
                     let variant: OriginalCabinetDialProcess.Variant = runner.phase == .process(id: 80) ? .cashbox : .cabinet
-                    let renderer = try OriginalCabinetDialRenderer(variant: variant)
+                    let renderer = try cabinetDialRendererFactory(variant)
                     let puzzle = OriginalCabinetDialProcess(randomValue: variant == .cabinet ? runner.memoRandomInfo(seed: puzzleSeed()) : 0,
                         retainedValue: variant == .cabinet ? runner.game.cabinetDialRetainedValue : runner.game.cashboxDialRetainedValue,
                         variant: variant)
@@ -1188,7 +1382,7 @@ public final class OriginalPlaySession: ObservableObject {
         case .process(32):
             if hanger == nil {
                 do {
-                    hangerRenderer = try OriginalHangerRenderer()
+                    hangerRenderer = try hangerRendererFactory()
                     let puzzle = OriginalHangerProcess()
                     hangerImage = try hangerRenderer?.render(puzzle)
                     hangerScreenEffects = OriginalScreenEffects()
@@ -1220,7 +1414,7 @@ public final class OriginalPlaySession: ObservableObject {
         case .process(35):
             if suitcaseContents == nil {
                 do {
-                    let renderer = try OriginalSuitcaseContentsRenderer()
+                    let renderer = try suitcaseContentsRendererFactory()
                     let process = OriginalSuitcaseContentsProcess(contents: renderer.initialContents)
                     suitcaseContentsRenderer = renderer
                     suitcaseContents = process
@@ -1235,7 +1429,7 @@ public final class OriginalPlaySession: ObservableObject {
         case .process(37):
             if suitcaseKey == nil {
                 do {
-                    suitcaseRenderer = try OriginalSuitcaseRenderer()
+                    suitcaseRenderer = try suitcaseRendererFactory()
                     let puzzle = OriginalSuitcaseKeyProcess()
                     suitcaseImage = try suitcaseRenderer?.render(puzzle)
                     suitcaseKey = puzzle
@@ -1440,7 +1634,7 @@ public final class OriginalPlaySession: ObservableObject {
                 if lobby?.mapID != map {
                     lobby = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.previousMapID,
                         savedGame: runner.game.previousMapID == map ? runner.game : nil)
-                    lobbyRenderer = try OriginalMapRenderer(mapName: mapName)
+                    lobbyRenderer = try mapRendererFactory(mapName, nil)
                     lobbyMap = lobbyRenderer?.map
                 }
                 var scriptedDestination: Int16?
@@ -1582,6 +1776,9 @@ public final class OriginalPlaySession: ObservableObject {
         if linenWagon != nil { return updateLinenWagon() }
         if dollRepair != nil { return updateDollRepair() }
         if bookmarkBox != nil { return updateBookmarkBox() }
+        if labelPeel != nil { return updateLabelPeel() }
+        if christmasTree != nil { return updateChristmasTree() }
+        if searchShed != nil { return updateSearchShed() }
         if toiletTank != nil { return updateToiletTank() }
         if switchboard != nil { return updateSwitchboard() }
         if fountainPen != nil { return updateFountainPen() }
@@ -2328,6 +2525,109 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
 
+    private func updateLabelPeel() {
+        guard var puzzle = labelPeel else { return }
+        let complete = !labelPeelScreenEffects.brightness[0].active
+        labelPeelScreenEffects.advanceOriginalFrame()
+        let previous = puzzle
+        let effects = puzzle.update(pageTouch: labelPeelTouch, fadeComplete: complete)
+        labelPeel = puzzle
+        do {
+            for effect in effects {
+                switch effect {
+                case .fadeIn(let updates):
+                    try labelPeelScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 3, from: -16, frames: UInt16(updates))
+                case .fadeOut(let updates):
+                    try labelPeelScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
+                case .dragging(true): try? audio.ensureOriginalEffect(archiveID: 0, entryID: 44)
+                case .dragging(false):
+                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 44, fadeFrames: 5))
+                case .completed(let result):
+                    labelPeel = nil
+                    labelPeelImage = nil
+                    labelPeelRenderer = nil
+                    labelPeelTouch = nil
+                    labelPeelScreenEffects = OriginalScreenEffects()
+                    stopTimer()
+                    runner.finishProcess(returnValue: result)
+                    return settle()
+                }
+            }
+            if previous != puzzle { labelPeelImage = try labelPeelRenderer?.render(puzzle) }
+        } catch {
+            runner.halt("The wine label could not be updated: \(error)")
+            settle()
+        }
+    }
+
+    private func updateChristmasTree() {
+        guard var process = christmasTree else { return }
+        let fadeComplete = !christmasTreeScreenEffects.brightness[0].active
+        christmasTreeScreenEffects.advanceOriginalFrame()
+        let effects = process.update(fadeComplete: fadeComplete)
+        christmasTree = process
+        do {
+            for effect in effects {
+                switch effect {
+                case .fadeIn(let updates):
+                    try christmasTreeScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 3, from: -16, frames: UInt16(updates))
+                case .fadeOut(let updates):
+                    try christmasTreeScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
+                case .completed(let result):
+                    christmasTree = nil
+                    christmasTreeImage = nil
+                    christmasTreeRenderer = nil
+                    christmasTreeDraggedDecoration = nil
+                    christmasTreeScreenEffects = OriginalScreenEffects()
+                    stopTimer()
+                    runner.finishChristmasTree(returnValue: result)
+                    return settle()
+                }
+            }
+        } catch {
+            runner.halt("The Christmas tree process could not be updated: \(error)")
+            settle()
+        }
+    }
+
+    private func updateSearchShed() {
+        guard var process = searchShed else { return }
+        let fadeComplete = !searchShedScreenEffects.brightness[0].active
+        searchShedScreenEffects.advanceOriginalFrame()
+        let effects = process.update(fadeComplete: fadeComplete)
+        searchShed = process
+        applySearchShed(effects)
+    }
+
+    private func applySearchShed(_ effects: [OriginalSearchShedProcess.Effect]) {
+        do {
+            for effect in effects {
+                switch effect {
+                case .fadeIn(let updates):
+                    try searchShedScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 3,
+                                                                 from: -16, frames: UInt16(updates))
+                case .fadeOut(let updates):
+                    try searchShedScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2,
+                                                                 from: 0, frames: UInt16(updates))
+                case .foundTreeBox:
+                    break
+                case .completed(let result):
+                    searchShed = nil
+                    searchShedImage = nil
+                    searchShedRenderer = nil
+                    searchShedTouch = nil
+                    searchShedScreenEffects = OriginalScreenEffects()
+                    stopTimer()
+                    runner.finishProcess(returnValue: result)
+                    return settle()
+                }
+            }
+        } catch {
+            runner.halt("The search shed could not be updated: \(error)")
+            settle()
+        }
+    }
+
     private func updateThinWire() {
         guard var puzzle = thinWire else { return }
         let complete = (fadeRemaining[0] ?? 0) == 0
@@ -2591,7 +2891,7 @@ public final class OriginalPlaySession: ObservableObject {
                 let suffix = String(format: "%02d", area)
                 let model = try OriginalModelLibrary.bundled().load(path: "map/\(lobby.mapName)/\(lobby.mapName)_s\(suffix)/\(lobby.mapName)_s\(suffix).mdf")
                 try lobby.prepareSearch(area: area, model: model)
-                lobbyRenderer = try OriginalMapRenderer(mapName: lobby.mapName, searchArea: area)
+                lobbyRenderer = try mapRendererFactory(lobby.mapName, area)
             }
             guard lobby.inspectCounter() else { return }
             self.lobby = lobby
@@ -2773,7 +3073,7 @@ public final class OriginalPlaySession: ObservableObject {
             }
             let exploration = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.mapID,
                 savedGame: restoresCurrentPosition ? runner.game : nil)
-            let renderer = try OriginalMapRenderer(mapName: name)
+            let renderer = try mapRendererFactory(name, nil)
             audio.stopWalkingAudio()
             runner = try runner.moving(to: map, program: catalog.loadMapProgram(chapter: runner.game.chapter, mapID: map))
             handledMapRequests = 0
@@ -2787,7 +3087,15 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public static func restoring(_ checkpoint: OriginalResumeSave, audio: AudioController,
-                                 saveStore: any OriginalChapterSaveStore) throws -> OriginalPlaySession {
+                                 saveStore: any OriginalChapterSaveStore,
+                                 mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
+                                 suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
+                                 hangerRendererFactory: @escaping OriginalHangerRendererFactory = { try OriginalHangerRenderer() },
+                                 thinWireRendererFactory: @escaping OriginalThinWireRendererFactory = { try OriginalThinWireRenderer(variant: $0) },
+                                 suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
+                                 memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
+                                 crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
+                                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) throws -> OriginalPlaySession {
         let game = try checkpoint.gameState()
         let catalog = try OriginalScriptCatalog.bundled()
         guard let map = OriginalMapExploration.supportedMaps[game.mapID] else {
@@ -2801,10 +3109,18 @@ public final class OriginalPlaySession: ObservableObject {
         var exploration = try OriginalMapExploration.bundled(mapID: game.mapID,
             previousMapID: game.previousMapID, savedGame: game)
         exploration.restoreCheckpointFacing(checkpoint.checkpointFacing)
-        let renderer = try OriginalMapRenderer(mapName: map)
+        let renderer = try mapRendererFactory(map, nil)
         let runner = try OriginalEventRunner(program: program, game: game, keywords: keywords, deferArrival: true)
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
-                                       saveStore: saveStore, restoredExploration: exploration)
+                                       saveStore: saveStore, restoredExploration: exploration,
+                                       mapRendererFactory: mapRendererFactory,
+                                       suitcaseRendererFactory: suitcaseRendererFactory,
+                                       hangerRendererFactory: hangerRendererFactory,
+                                       thinWireRendererFactory: thinWireRendererFactory,
+                                       suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
+                                       memoPullRendererFactory: memoPullRendererFactory,
+                                       crowbarRendererFactory: crowbarRendererFactory,
+                                       cabinetDialRendererFactory: cabinetDialRendererFactory)
         play.lobbyRenderer = renderer
         play.lobbyMap = renderer.map
         try play.renderLobby()
@@ -2817,7 +3133,15 @@ public final class OriginalPlaySession: ObservableObject {
      */
     public static func restoring(_ checkpoint: OriginalChapterSave, audio: AudioController,
                                  saveStore: any OriginalChapterSaveStore,
-                                 puzzleSeed: @escaping () -> UInt32 = { UInt32.random(in: .min ... .max) }) throws -> OriginalPlaySession {
+                                 puzzleSeed: @escaping () -> UInt32 = { UInt32.random(in: .min ... .max) },
+                                 mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
+                                 suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
+                                 hangerRendererFactory: @escaping OriginalHangerRendererFactory = { try OriginalHangerRenderer() },
+                                 thinWireRendererFactory: @escaping OriginalThinWireRendererFactory = { try OriginalThinWireRenderer(variant: $0) },
+                                 suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
+                                 memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
+                                 crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
+                                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) throws -> OriginalPlaySession {
         let game = try checkpoint.gameState()
         let catalog = try OriginalScriptCatalog.bundled()
         guard OriginalMapExploration.supportedMaps[game.mapID] != nil else {
@@ -2829,7 +3153,15 @@ public final class OriginalPlaySession: ObservableObject {
         var transition = OriginalChapterTransition()
         transition.stage = .title
         return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
-                                   puzzleSeed: puzzleSeed, saveStore: saveStore, chapterTransition: transition)
+                                   puzzleSeed: puzzleSeed, saveStore: saveStore, chapterTransition: transition,
+                                   mapRendererFactory: mapRendererFactory,
+                                   suitcaseRendererFactory: suitcaseRendererFactory,
+                                   hangerRendererFactory: hangerRendererFactory,
+                                   thinWireRendererFactory: thinWireRendererFactory,
+                                   suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
+                                   memoPullRendererFactory: memoPullRendererFactory,
+                                   crowbarRendererFactory: crowbarRendererFactory,
+                                   cabinetDialRendererFactory: cabinetDialRendererFactory)
     }
 
     /**

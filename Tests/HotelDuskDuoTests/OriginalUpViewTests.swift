@@ -30,7 +30,7 @@ final class OriginalUpViewTests: XCTestCase {
         let path = root.appendingPathComponent("extracted/reference/room215-ready/ready-ram.bin")
         guard FileManager.default.fileExists(atPath: path.path) else { throw XCTSkip("The original door capture is not available") }
         let ram = try Data(contentsOf: path)
-        XCTAssertNotNil(ram.range(of: Data(image.packedHitMap)))
+        XCTAssertNotNil(ram.range(of: Data(image.sourcePackedHitMap)))
         let rgba = Array(image.rgba)
         var originalColours = Data()
         for pixel in stride(from: 0, to: rgba.count, by: 4) {
@@ -40,6 +40,35 @@ final class OriginalUpViewTests: XCTestCase {
             originalColours.append(UInt8(colour >> 8))
         }
         XCTAssertNotNil(ram.range(of: originalColours))
+    }
+
+    func testHitMarginExpandsOnlyTransparentPixelsAndKeepsNearestObjectBorders() {
+        let width = 9, height = 5
+        var source = [UInt8](repeating: 0, count: (width * height + 1) / 2)
+        func set(_ x: Int, _ y: Int, _ layer: UInt8) {
+            let index = y * width + x
+            let shift = (index & 1) * 4
+            source[index / 2] = (source[index / 2] & ~UInt8(15 << shift))
+                | (layer << ((index & 1) * 4))
+        }
+        func get(_ packed: [UInt8], _ x: Int, _ y: Int) -> UInt8 {
+            let index = y * width + x
+            return (packed[index / 2] >> ((index & 1) * 4)) & 15
+        }
+        set(2, 2, 1)
+        set(3, 2, 1)
+        set(4, 0, 1)
+        set(5, 2, 2)
+        let expanded = OriginalUpViewImage.expandingTransparentHitPixels(
+            in: source, width: width, height: height, radius: 2)
+        XCTAssertEqual(get(expanded, 2, 2), 1)
+        XCTAssertEqual(get(expanded, 3, 2), 1)
+        XCTAssertEqual(get(expanded, 5, 2), 2)
+        XCTAssertEqual(get(expanded, 1, 2), 1)
+        XCTAssertEqual(get(expanded, 7, 2), 2)
+        XCTAssertEqual(get(expanded, 4, 1), 1, "The nearest object wins even if the farther layer is above it")
+        XCTAssertEqual(get(expanded, 4, 2), 2, "Equal-distance pixels go to the higher visible layer")
+        XCTAssertEqual(get(source, 1, 2), 0)
     }
 
     func testLobbyIgnoresUnusedRecordsAndKeepsOfficeHitTargets() throws {

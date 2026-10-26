@@ -1,18 +1,26 @@
 import CoreGraphics
 import Metal
 
+@MainActor
+public protocol OriginalMapRendering: AnyObject {
+    var map: CGImage { get }
+    func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage
+}
+
+public typealias OriginalMapRendererFactory = @MainActor (String, UInt16?) throws -> any OriginalMapRendering
+
 /**
  * Draws the recovered lobby and counter through the existing native model renderer.
  */
 @MainActor
-final class OriginalMapRenderer {
-    let map: CGImage
+public final class OriginalMapRenderer: OriginalMapRendering {
+    public let map: CGImage
     private let room: OriginalModelMetalPreview
     private var counter: OriginalModelMetalPreview?
     private let mapName: String
     private let initialSearchArea: UInt16?
 
-    init(mapName: String = "R102", searchArea: UInt16? = nil) throws {
+    public init(mapName: String = "R102", searchArea: UInt16? = nil) throws {
         self.mapName = mapName
         initialSearchArea = searchArea
         guard let device = MTLCreateSystemDefaultDevice() else { throw OriginalDataError.missing("Metal device") }
@@ -24,7 +32,7 @@ final class OriginalMapRenderer {
         map = image
     }
 
-    func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage {
+    public func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage {
         let scene: OriginalModelMetalPreview
         if state.mode == .walking { scene = room }
         else {

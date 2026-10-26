@@ -2,11 +2,18 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalThinWireRendering: AnyObject {
+    func render(_ puzzle: OriginalThinWireProcess) throws -> CGImage
+}
+
+public typealias OriginalThinWireRendererFactory = @MainActor (OriginalThinWireProcess.Variant) throws -> any OriginalThinWireRendering
+
 /**
  * Original wire and suitcase models, followed by the lock bitmap layers from overlay 12.
  */
 @MainActor
-final class OriginalThinWireRenderer {
+public final class OriginalThinWireRenderer: OriginalThinWireRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let bag: OriginalModelMetalPreview
@@ -14,7 +21,7 @@ final class OriginalThinWireRenderer {
     private let layers: [CGImage]
     private let doorImage: CGImage?
 
-    init(variant: OriginalThinWireProcess.Variant = .thin) throws {
+    public init(variant: OriginalThinWireProcess.Variant = .thin) throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -49,7 +56,7 @@ final class OriginalThinWireRenderer {
         }
     }
 
-    func render(_ puzzle: OriginalThinWireProcess) throws -> CGImage {
+    public func render(_ puzzle: OriginalThinWireProcess) throws -> CGImage {
         if puzzle.showsLock { return try renderLock(puzzle) }
         let projection = OriginalSuitcaseProjection.viewProjection(eye: puzzle.eye, target: puzzle.target)
         return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in

@@ -115,7 +115,8 @@ public final class OriginalModelMetalPreview {
     /// the player, creates hotspots, or decides which objects the story reveals.
     public func encode(encoder: MTLRenderCommandEncoder, viewProjection: simd_float4x4,
                        visibleNodes: Set<Int>, modelTransform: simd_float4x4 = matrix_identity_float4x4,
-                       nodeTransforms: [Int: simd_float4x4] = [:]) {
+                       nodeTransforms: [Int: simd_float4x4] = [:],
+                       nodeInstances: [Int: [simd_float4x4]] = [:]) {
         encoder.setDepthStencilState(depthState)
         encoder.setCullMode(.none)
         for draw in draws where visibleNodes.contains(draw.node) {
@@ -126,19 +127,25 @@ public final class OriginalModelMetalPreview {
                 SIMD4(values[4], values[5], values[6], values[7]),
                 SIMD4(values[8], values[9], values[10], values[11]),
                 SIMD4(values[12], values[13], values[14], values[15])))
-            var uniforms = Uniforms(viewProjection: viewProjection, world: modelTransform * (nodeTransforms[draw.node] ?? matrix_identity_float4x4) * world,
-                                    dimensions: draw.dimensions, sampling: draw.sampling)
-            encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
-            encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
-            encoder.setFragmentTexture(draw.texture, index: 0)
-            draw.buffers.draw(encoder: encoder)
+            let instances = nodeInstances[draw.node] ?? [nodeTransforms[draw.node] ?? matrix_identity_float4x4]
+            for instance in instances {
+                var uniforms = Uniforms(viewProjection: viewProjection, world: modelTransform * instance * world,
+                                        dimensions: draw.dimensions, sampling: draw.sampling)
+                encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
+                encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
+                encoder.setFragmentTexture(draw.texture, index: 0)
+                draw.buffers.draw(encoder: encoder)
+            }
         }
     }
 
     public func render(width: Int, height: Int, viewProjection: simd_float4x4,
-                       visibleNodes: Set<Int>) throws -> CGImage {
+                       visibleNodes: Set<Int>, modelTransform: simd_float4x4 = matrix_identity_float4x4,
+                       nodeTransforms: [Int: simd_float4x4] = [:],
+                       nodeInstances: [Int: [simd_float4x4]] = [:]) throws -> CGImage {
         try Self.render(width: width, height: height, device: device, queue: queue) { encoder in
-            encode(encoder: encoder, viewProjection: viewProjection, visibleNodes: visibleNodes)
+            encode(encoder: encoder, viewProjection: viewProjection, visibleNodes: visibleNodes,
+                   modelTransform: modelTransform, nodeTransforms: nodeTransforms, nodeInstances: nodeInstances)
         }
     }
 

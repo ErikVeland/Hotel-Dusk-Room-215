@@ -60,4 +60,40 @@ final class OriginalEventCompletionTests: XCTestCase {
         game.markEventCompleted(group: 2, event: 256)
         XCTAssertEqual(game, unchanged)
     }
+
+    func testChapterSevenTreeProcessResultTwoSelectsItsScriptTransition() throws {
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP7_R122")
+        let graph = try program.blocks
+        let treeEvents = try graph.tables[2].filter {
+            try OriginalEventCompletion.embeddedProcessID(event: $0) == 43
+        }
+        XCTAssertEqual(treeEvents.count, 1)
+        let event = try XCTUnwrap(treeEvents.first)
+
+        guard case .completed(let completion) = try OriginalEventCompletion.stateOnlyExit(
+            event: event, conditions: program.conditions, processReturn: 2) else {
+            return XCTFail("The tree process result must select its original event transition")
+        }
+        XCTAssertNotNil(completion.transition)
+    }
+
+    func testChapterEightBowlingProcessHasRecoveredReturnTransitions() throws {
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP8_R119")
+        let events = try program.blocks.tables[2].filter {
+            try OriginalEventCompletion.embeddedProcessID(event: $0) == 44
+        }
+        XCTAssertEqual(events.count, 1)
+        let event = try XCTUnwrap(events.first)
+
+        for (result, expectedEvent) in [(Int16(0), UInt16(9)), (1, 10), (2, 11)] {
+            guard case .completed(let completion) = try OriginalEventCompletion.stateOnlyExit(
+                event: event, conditions: program.conditions, processReturn: result) else {
+                return XCTFail("Bowling process result \(result) must select an original transition")
+            }
+            XCTAssertEqual(completion.transition?.sourceOffset, 368 + Int(result) * 16)
+            XCTAssertEqual(completion.transition?.sceneID, 4)
+            XCTAssertEqual(completion.transition?.modeID, 3)
+            XCTAssertEqual(completion.transition?.eventID, expectedEvent)
+        }
+    }
 }

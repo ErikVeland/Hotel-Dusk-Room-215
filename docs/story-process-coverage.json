@@ -21,12 +21,16 @@
     40,
     41,
     42,
+    43,
+    46,
     47,
     48,
     51,
     53,
     54,
+    55,
     56,
+    58,
     60,
     73,
     77,
@@ -196,7 +200,7 @@
     },
     {
       "processID": 43,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
       "references": [
         {
           "program": "EP7_R122",
@@ -229,7 +233,7 @@
     },
     {
       "processID": 46,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
       "references": [
         {
           "program": "EP6_R106",
@@ -321,7 +325,7 @@
     },
     {
       "processID": 55,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
       "references": [
         {
           "program": "EP7_R122",
@@ -343,7 +347,7 @@
     },
     {
       "processID": 58,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
       "references": [
         {
           "program": "EP6_R105",
@@ -674,10 +678,7 @@
         54,
         58
       ],
-      "missingProcesses": [
-        46,
-        58
-      ]
+      "missingProcesses": []
     },
     {
       "chapter": 7,
@@ -685,10 +686,7 @@
         43,
         55
       ],
-      "missingProcesses": [
-        43,
-        55
-      ]
+      "missingProcesses": []
     },
     {
       "chapter": 8,

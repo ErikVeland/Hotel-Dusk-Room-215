@@ -54,6 +54,7 @@ final class OriginalAudioTests: XCTestCase {
     }
 
     func testDialogueFadeCompletesOnLiveTimer() async throws {
+        try AudioTestSupport.requireAppleSampler()
         let audio = AudioController()
         audio.isMuted = true
         let play = try OriginalPlaySession.chapterOne(audio: audio)
@@ -81,6 +82,7 @@ final class OriginalAudioTests: XCTestCase {
     }
 
     func testDialogueFadesAdvanceWithoutAdvancingTextAndPauseWithBook() throws {
+        try AudioTestSupport.requireAppleSampler()
         let audio = AudioController()
         audio.isMuted = true
         let play = try OriginalPlaySession.chapterOne(audio: audio)
@@ -102,6 +104,7 @@ final class OriginalAudioTests: XCTestCase {
     }
 
     func testEffectErrorsAreReportedAndEndingGameStopsEffectPlayers() throws {
+        try AudioTestSupport.requireAppleSampler()
         let audio = AudioController()
         audio.isMuted = true
         defer { audio.stopAll() }
@@ -157,6 +160,7 @@ final class OriginalAudioTests: XCTestCase {
     }
 
     func testNativeSequencerLoadsOriginalProgramsAndLoopRanges() throws {
+        try AudioTestSupport.requireAppleSampler()
         let library = try OriginalAudioLibrary.load()
         for source in library.sequences {
             let playback: OriginalMusicPlayback
@@ -180,6 +184,7 @@ final class OriginalAudioTests: XCTestCase {
     }
 
     func testNativeSequencerRendersOriginalMusicToPCM() throws {
+        try AudioTestSupport.requireAppleSampler()
         let library = try OriginalAudioLibrary.load()
         let playback = try OriginalMusicPlayback(library: library, sequence: library.sequences[0])
         let format = try XCTUnwrap(AVAudioFormat(standardFormatWithSampleRate: 48_000, channels: 2))

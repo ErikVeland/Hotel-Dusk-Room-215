@@ -29,25 +29,8 @@ struct OriginalMapView: View {
                                 Image(decorative: map, scale: 1).interpolation(.none)
                                     .frame(width: 192, height: 256, alignment: .topLeading)
                                     .offset(x: CGFloat(lobby.mapBitmapOffset.x), y: CGFloat(lobby.mapBitmapOffset.y))
-                                Circle().stroke(.red, lineWidth: 1).frame(width: 10, height: 10)
-                                Image(systemName: "arrowtriangle.up.fill")
-                                    .font(.system(size: 10)).foregroundStyle(.red)
-                                    .rotationEffect(.radians(Double(.pi - lobby.facing)))
-                                    .offset(x: CGFloat(sin(lobby.facing) * 13), y: CGFloat(cos(lobby.facing) * 13))
-                                ForEach(lobby.people(in: play.runner.game), id: \.id) { person in
-                                    Circle().fill(.blue).frame(width: 5, height: 5)
-                                        .position(x: CGFloat(96 + (person.position.x - lobby.position.x) / 4096 * lobby.mapScale),
-                                                  y: CGFloat(128 + (person.position.z - lobby.position.z) / 4096 * lobby.mapScale))
-                                        .allowsHitTesting(false)
-                                }
                             } else if let image = play.lobbyImage {
                                 Image(decorative: image, scale: 1).interpolation(.none)
-                            }
-                            if screen == 0, let point = lobby.selectedPoint {
-                                Image(systemName: "hand.point.up.fill")
-                                    .foregroundStyle(.white).shadow(color: .black, radius: 1)
-                                    .position(x: CGFloat(point.x), y: CGFloat(point.y))
-                                    .allowsHitTesting(false)
                             }
                         }
                         .frame(width: 192, height: 256)

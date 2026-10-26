@@ -303,17 +303,17 @@ final class OriginalBellProcessTests: XCTestCase {
         XCTAssertEqual(try mask().filter { $0 != 0 }.count, 5412)
     }
 
-    func testBellTouchUsesTheRectangleAndTheMask() throws {
+    func testBellTouchUsesTheExpandedPixelMaskWithoutOverlappingQuit() throws {
         let mask = try mask()
         typealias Touch = OriginalBellProcess.Touch
-        // Right-handed: x' = 255 - x, so the rectangle is raw x 159-199, y 72-120.
-        XCTAssertTrue(OriginalBellProcess.hitsBell(Touch(x: 159, y: 72), leftHanded: false, mask: mask))
-        XCTAssertTrue(OriginalBellProcess.hitsBell(Touch(x: 199, y: 120), leftHanded: false, mask: mask))
-        // Outside the rectangle, a nonzero bell01 pixel still hits.
+        // A nonzero bell01 pixel hits, with a two-pixel margin around its silhouette.
         XCTAssertNotEqual(mask[96 * 256 + 140], 0)
         XCTAssertTrue(OriginalBellProcess.hitsBell(Touch(x: 140, y: 96), leftHanded: false, mask: mask))
+        XCTAssertTrue(OriginalBellProcess.hitsBell(Touch(x: 142, y: 96), leftHanded: false, mask: mask))
         XCTAssertEqual(mask[10 * 256 + 10], 0)
         XCTAssertFalse(OriginalBellProcess.hitsBell(Touch(x: 10, y: 10), leftHanded: false, mask: mask))
+        XCTAssertFalse(OriginalBellProcess.hitsBell(Touch(x: 27, y: 156), leftHanded: false, mask: mask),
+                       "The bell mask must not claim the quit target")
         XCTAssertTrue(OriginalBellProcess.hitsQuit(Touch(x: 255 - 240, y: 170), leftHanded: false))
         XCTAssertFalse(OriginalBellProcess.hitsQuit(Touch(x: 240, y: 170), leftHanded: false))
     }

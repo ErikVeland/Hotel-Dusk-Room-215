@@ -6,6 +6,10 @@ import AVFoundation
 /// Cue selection belongs to recovered game logic, not this audio adapter.
 @MainActor
 public final class AudioController: ObservableObject {
+    typealias MusicOutputFactory = @MainActor (
+        MusicSource, OriginalAudioLibrary, OriginalAudioLibrary.Sequence
+    ) throws -> any OriginalMusicOutput
+
     public enum MusicSource: String, CaseIterable, Identifiable {
         case native
         case recordings
@@ -23,7 +27,7 @@ public final class AudioController: ObservableObject {
     var playback: OriginalMusicPlayback? { musicOutput as? OriginalMusicPlayback }
     private var fadingOutput: (any OriginalMusicOutput)?
     private var preparedOutput: (source: MusicSource, id: Int, output: any OriginalMusicOutput)?
-    private var currentOutputGain: Float = 1
+    private(set) var currentOutputGain: Float = 1
     private var fadingOutputGain: Float = 1
     private var fadingSource: MusicSource?
     private var musicBalance: MusicSourceBalance?
@@ -32,6 +36,7 @@ public final class AudioController: ObservableObject {
     private var isPaused = false
     private var playingSequenceID: Int?
     private var recordings: RecordedMusicLibrary?
+    private var musicOutputFactory: MusicOutputFactory?
     private var preferences: UserDefaults?
     private var effects: OriginalEffectPlayback?
     private var library: OriginalAudioLibrary?
@@ -50,6 +55,16 @@ public final class AudioController: ObservableObject {
     private var walkingAmbient: OriginalMapSoundCue?
 
     public nonisolated init() {}
+
+    init(musicOutputFactory: @escaping MusicOutputFactory) {
+        self.musicOutputFactory = musicOutputFactory
+    }
+
+    init(preferences: UserDefaults, musicOutputFactory: @escaping MusicOutputFactory) {
+        self.musicOutputFactory = musicOutputFactory
+        self.preferences = preferences
+        musicSource = preferences.string(forKey: "musicSource").flatMap(MusicSource.init(rawValue:)) ?? .native
+    }
 
     public convenience init(preferences: UserDefaults) {
         self.init()
@@ -122,6 +137,7 @@ public final class AudioController: ObservableObject {
 
     private func makeMusicOutput(source: MusicSource, library: OriginalAudioLibrary,
                                  sequence: OriginalAudioLibrary.Sequence) throws -> any OriginalMusicOutput {
+        if let musicOutputFactory { return try musicOutputFactory(source, library, sequence) }
         switch source {
         case .native: return try OriginalMusicPlayback(library: library, sequence: sequence)
         case .recordings: return try RecordedMusicPlayback(track: recordingTrack(id: sequence.id))
@@ -250,6 +266,8 @@ public final class AudioController: ObservableObject {
             if cue.playerID == 16, output.matches(playerID: 16, archiveID: archiveID, entryID: entryID) { return }
         }
         let renderer = try OriginalEffectRenderer(archive: archive, driver: driver, archiveID: archiveID, entryID: entryID)
+        let level = volume.isFinite ? min(1, max(0, volume)) : 0
+        output.engine.mainMixerNode.outputVolume = isMuted ? 0 : level
         try output.play(renderer, playerID: cue.playerID)
         soundArchive = archive
         self.driver = driver

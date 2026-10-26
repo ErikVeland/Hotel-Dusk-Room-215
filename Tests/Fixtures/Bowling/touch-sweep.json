@@ -1,0 +1,223 @@
+{
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "14654604720ea8dfb602d70e8bc28a0062fc1113545edeaf7d085f3938d6b697",
+  "kind": "modified-checkpoint touch-selection and pin-result sweep",
+  "path": "Touch at (15, y), hold each eight-pixel horizontal step through (119, y) for eight frames, move to (125, y), hold eight frames, then release and capture after 180 frames.",
+  "samples": [
+    {
+      "rawTouchY": 40,
+      "commandsSHA256": "4cd091316f371ee276ab7e000441d9d9f6a2a6c9e506624dc5ffea9bda9b0571",
+      "stage": 2,
+      "substage": 1,
+      "roundIndex": 0,
+      "dragDelta20_12": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toppledPins": [],
+      "score": 0
+    },
+    {
+      "rawTouchY": 60,
+      "commandsSHA256": "19e7b35287265ca84f196400e34203245b600b4bbb5fcf2589ab3541e7cf0ac5",
+      "stage": 2,
+      "substage": 1,
+      "roundIndex": 0,
+      "dragDelta20_12": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toppledPins": [],
+      "score": 0
+    },
+    {
+      "rawTouchY": 75,
+      "commandsSHA256": "99b4a521711f44aae9061253f52dc1b18afa9c674da6b8059c5858a9912ed316",
+      "stage": 2,
+      "substage": 1,
+      "roundIndex": 0,
+      "dragDelta20_12": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toppledPins": [],
+      "score": 0
+    },
+    {
+      "rawTouchY": 90,
+      "commandsSHA256": "29720fd63a37de2222fbd03024e66d797d82c94d3fcb2a4e1c40f7dafb27c65c",
+      "stage": 2,
+      "substage": 2,
+      "roundIndex": 0,
+      "dragDelta20_12": [
+        -61,
+        1467,
+        -1755,
+        -82,
+        1467,
+        -2341
+      ],
+      "pinRotations": [
+        1070141403,
+        1070141403,
+        0,
+        1070141403,
+        1070141403,
+        0,
+        1070141403,
+        1070141403,
+        0,
+        0
+      ],
+      "toppledPins": [
+        0,
+        1,
+        3,
+        4,
+        6,
+        7
+      ],
+      "score": 6
+    },
+    {
+      "rawTouchY": 105,
+      "commandsSHA256": "773446a92bd076f21b1f7ecd4d2e2447d9e84c9aad9c72ce87d857a31d6a4eb8",
+      "stage": 2,
+      "substage": 2,
+      "roundIndex": 0,
+      "dragDelta20_12": [
+        95,
+        1472,
+        -1759,
+        126,
+        1472,
+        -2346
+      ],
+      "pinRotations": [
+        0,
+        0,
+        1070141403,
+        0,
+        0,
+        1070141403,
+        0,
+        0,
+        1070141403,
+        1070141403
+      ],
+      "toppledPins": [
+        2,
+        5,
+        8,
+        9
+      ],
+      "score": 4
+    },
+    {
+      "rawTouchY": 120,
+      "commandsSHA256": "2f9802708db537b8e6d7de20a9a495e289aa75feddc98a368dbe94e4d7e0716f",
+      "stage": 2,
+      "substage": 1,
+      "roundIndex": 0,
+      "dragDelta20_12": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toppledPins": [],
+      "score": 0
+    },
+    {
+      "rawTouchY": 140,
+      "commandsSHA256": "95d691dfbe31dc8438af123d0ec972f3de646f0e1112e1258407fa7f7cc8198a",
+      "stage": 2,
+      "substage": 1,
+      "roundIndex": 0,
+      "dragDelta20_12": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "toppledPins": [],
+      "score": 0
+    }
+  ]
+}

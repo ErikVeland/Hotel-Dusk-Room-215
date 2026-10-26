@@ -106,7 +106,7 @@ final class OriginalSearchCloseupTests: XCTestCase {
     private func compareImage(_ image: OriginalUpViewImage, capture: String) throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let ram = try Data(contentsOf: root.appendingPathComponent("extracted/reference/\(capture)-ram.bin"))
-        XCTAssertNotNil(ram.range(of: Data(image.packedHitMap)))
+        XCTAssertNotNil(ram.range(of: Data(image.sourcePackedHitMap)))
         let rgba = Array(image.rgba)
         var colours = Data()
         for pixel in stride(from: 0, to: rgba.count, by: 4) {

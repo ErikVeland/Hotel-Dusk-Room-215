@@ -47,6 +47,41 @@ final class OriginalTextureTests: XCTestCase {
         XCTAssertThrowsError(try OriginalTexture(data: Data(repeating: 0, count: 31)))
     }
 
+    func testChapterSixLabelPeelAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        for name in ["bottle", "label_01", "label_02", "label_03", "label_04"] {
+            let texture = try library.loadTexture(path: "trick/LabelPeel/\(name).bin")
+            XCTAssertGreaterThan(texture.logicalWidth, 0, name)
+            XCTAssertGreaterThan(texture.logicalHeight, 0, name)
+            XCTAssertFalse(texture.rgba.isEmpty, name)
+        }
+    }
+
+    func testChapterSevenChristmasTreeAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        let names = ["tree", "tree_s"] + (1...11).map { String(format: "kazari%02d", $0) }
+            + (1...4).map { String(format: "hook%02d", $0) }
+
+        for name in names {
+            let texture = try library.loadTexture(path: "trick/ChristmasTree/\(name).bin")
+            XCTAssertGreaterThan(texture.storedWidth, 0, name)
+            XCTAssertGreaterThan(texture.storedHeight, 0, name)
+        }
+    }
+
+    func testChapterSevenTreeBoxSearchAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        let names = ["kabe01", "sita", "sita2"] + (0...6).map { String(format: "soku%02d", $0) }
+            + ["switch", "tenjoh", "ue", "ue2", "yuka"]
+
+        for name in names {
+            let texture = try library.loadTexture(path: "trick/searchshed/\(name).bin")
+            XCTAssertGreaterThan(texture.storedWidth, 0, name)
+            XCTAssertGreaterThan(texture.storedHeight, 0, name)
+            XCTAssertFalse(texture.rgba.isEmpty, name)
+        }
+    }
+
     func testLobbyBlockStreamRetainsPartialRowWithoutFillingMissingBlocks() throws {
         let texture = try OriginalTextureLibrary.bundled().load(path: "map/R102/R102/laungr.dtx")
         XCTAssertEqual(texture.logicalHeight, 162)

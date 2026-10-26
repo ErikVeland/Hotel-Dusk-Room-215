@@ -2,12 +2,20 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalSuitcaseContentsRendering: AnyObject {
+    var initialContents: OriginalSuitcaseContents { get }
+    func render(_ process: OriginalSuitcaseContentsProcess, game: OriginalGameState) throws -> CGImage
+}
+
+public typealias OriginalSuitcaseContentsRendererFactory = @MainActor () throws -> any OriginalSuitcaseContentsRendering
+
 /**
  * Source suitcase model and compartment textures from overlay 24.
  */
 @MainActor
-final class OriginalSuitcaseContentsRenderer {
-    let initialContents: OriginalSuitcaseContents
+public final class OriginalSuitcaseContentsRenderer: OriginalSuitcaseContentsRendering {
+    public let initialContents: OriginalSuitcaseContents
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let bag: OriginalModelMetalPreview
@@ -19,7 +27,7 @@ final class OriginalSuitcaseContentsRenderer {
     private let strap: CGImage
     private var itemImages: [UInt8: CGImage] = [:]
 
-    init() throws {
+    public init() throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -50,7 +58,7 @@ final class OriginalSuitcaseContentsRenderer {
             device: device, textureLoader: texture)
     }
 
-    func render(_ process: OriginalSuitcaseContentsProcess, game: OriginalGameState) throws -> CGImage {
+    public func render(_ process: OriginalSuitcaseContentsProcess, game: OriginalGameState) throws -> CGImage {
         guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
             bytesPerRow: 192 * 4, space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {

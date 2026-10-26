@@ -127,6 +127,15 @@ struct OriginalPlayPage: View {
             } else if play.switchboard != nil {
                 if screen == 0 { OriginalSwitchboardView(play: play) }
                 else { retainedNotes }
+            } else if play.labelPeel != nil {
+                if screen == 0 { OriginalLabelPeelView(play: play) }
+                else { retainedNotes }
+            } else if play.christmasTree != nil {
+                if screen == 0 { OriginalChristmasTreeView(play: play) }
+                else { retainedNotes }
+            } else if play.searchShed != nil {
+                if screen == 0 { OriginalSearchShedView(play: play) }
+                else { retainedNotes }
             } else if play.thinWire != nil {
                 if screen == 0 { OriginalThinWireView(play: play) }
                 else { retainedNotes }

@@ -2,7 +2,7 @@
 
 Static story process coverage. Does not establish route completion, presentation fidelity, conditions, input fidelity, or optional inventory processes.
 
-The original chapter scripts reference 47 distinct embedded processes. 23 still have no native host handler.
+The original chapter scripts reference 47 distinct embedded processes. 19 still have no native host handler.
 
 | Chapter | Required process IDs | Missing handlers |
 | --- | --- | --- |
@@ -11,8 +11,8 @@ The original chapter scripts reference 47 distinct embedded processes. 23 still 
 | 3 | 39, 40, 41, 42, 47, 77, 84 | None |
 | 4 | 48, 73 | None |
 | 5 | 38, 60 | None |
-| 6 | 46, 51, 53, 54, 58 | 46, 58 |
-| 7 | 43, 55 | 43, 55 |
+| 6 | 46, 51, 53, 54, 58 | None |
+| 7 | 43, 55 | None |
 | 8 | 44, 45, 52, 76 | 44, 45, 52, 76 |
 | 9 | 63, 64, 81 | 63, 64, 81 |
 | 10 | 59, 61, 62, 67, 74, 75, 79, 80, 85, 86, 88, 90, 91 | 59, 61, 62, 67, 74, 75, 79, 85, 86, 88, 90, 91 |
@@ -21,13 +21,9 @@ The original chapter scripts reference 47 distinct embedded processes. 23 still 
 
 | Process | Original references |
 | --- | --- |
-| 43 | EP7_R122 event 7 |
 | 44 | EP8_R119 event 8 |
 | 45 | EP8_R114 event 13 |
-| 46 | EP6_R106 event 7 |
 | 52 | EP8_R114 event 15 |
-| 55 | EP7_R122 event 3 |
-| 58 | EP6_R105 event 60, EP6_R105 event 90 |
 | 59 | EP10_R301 event 14 |
 | 61 | EP10_R302 event 8 |
 | 62 | EP10_R301 event 62 |

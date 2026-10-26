@@ -25,7 +25,7 @@ The catalog enables 37 rooms with original collision data and floor plans. Every
 
 ## Remaining work
 
-Native handlers now cover the full, reverse and restored jigsaws (39, 40, 84), electrical panel (41), fountain pen (42), bookmark box (47) and four-pin door lock (77). Input and source-event tests cover these additions. The continuation replay has reached the pen rubbing and inspection, Louie's engraving conversation, Melissa's doll return, the full 20-piece jigsaw, its reverse-side fold and Kevin's conversation in Room 219. A further continuation restores the 6:40 PM corridor save, walks to Room 215, solves the bookmark box and obtains item 25 through the original script. The full Chapter 3 route, locked-room escape and chapter ending still require uninterrupted verification. Chapters 4–10, alternate branches, failure paths and endings require further implementation and route checks. Original character presentation and physical Duo testing also remain incomplete.
+Native handlers now cover the full, reverse and restored jigsaws (39, 40, 84), electrical panel (41), fountain pen (42), bookmark box (47) and four-pin door lock (77). Input and source-event tests cover these additions. Continuation replays reach the rooftop route, and the checked main route now completes Chapters 1–4. Chapter 5 has normal-input route tests in source, but this checkout has no generated Chapter 4 save to run them. Chapters 6–10 still need route implementation and checks. Alternate branches, failure paths, endings, original character presentation and physical Duo testing also remain incomplete.
 
 The author walkthrough identifies the route and dependencies: [neeker's walkthrough](https://gamefaqs.gamespot.com/ds/933043-hotel-dusk-room-215/faqs/46777). Recovered game scripts and native source determine state changes. New continuation checks establish native playability, not a complete byte-for-byte comparison with a matching original run.
 
@@ -67,7 +67,7 @@ The isolated original-process captures for the tank and bookmark box currently c
 
 The native continuation now returns Summer’s bookmark, asks both painting topics, hears Melissa behind Room 218, talks to Louie, and enters the electrical room (9.9-second continuation check). A second route restores power through process 41 and opens the four-pin lock through process 77 (5.4 seconds). Both use normal movement, object selection, and touch input. The original script consumes the thick wire. Entering the room and the remaining Melissa/roof conversation are the next route checks.
 
-The rescued Melissa conversation now passes using the original sympathetic choices
+The rescued Melissa conversation passes using the original sympathetic choices
 and all available question topics. The `melissa/resume.json` checkpoint is written
-after Melissa leaves Room 218, through ordinary game input. The subsequent rooftop
-route is under verification.
+after Melissa leaves Room 218, through ordinary game input. The Chapter 4 route
+continues from this checkpoint through the review.

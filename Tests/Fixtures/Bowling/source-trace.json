@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint-component-test",
+  "note": "Uses the original process factory from a valid walking checkpoint. Does not establish a normal Chapter 8 route or bowling completion.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "walkingCheckpointSHA256": "d93e9226d62ca739f148da56198aff5d1bcaa56adfa41606b73e58484f17545b",
+  "commandsSHA256": "c693b03646e5983c630d28d066c28157489a845166420ddbe3d0033d4465e896",
+  "opening": {
+    "update": "0x021FD530",
+    "stage": 1,
+    "substage": 20,
+    "roundIndex": 0,
+    "cameraMatrix": [
+      0,
+      12288,
+      21709,
+      0,
+      2048,
+      -43827,
+      0,
+      0,
+      0,
+      -4096,
+      0,
+      0,
+      0,
+      4096,
+      0,
+      0
+    ]
+  },
+  "ready": {
+    "update": "0x021FD530",
+    "stage": 1,
+    "substage": 1,
+    "roundIndex": 0,
+    "cameraMatrix": [
+      0,
+      12288,
+      21709,
+      0,
+      2048,
+      -43827,
+      0,
+      0,
+      0,
+      -4096,
+      0,
+      0,
+      0,
+      4096,
+      0,
+      0
+    ]
+  }
+}

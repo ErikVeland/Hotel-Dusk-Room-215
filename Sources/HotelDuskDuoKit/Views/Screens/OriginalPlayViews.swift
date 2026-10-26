@@ -99,9 +99,6 @@ struct OriginalEntrancePanelView: View {
                     } else {
                         Color.black
                     }
-                    if !upper, scene.awaitingHandle {
-                        handleMarker(in: size)
-                    }
                 }
                 .frame(width: size.width, height: size.height)
                 .contentShape(Rectangle())
@@ -121,25 +118,12 @@ struct OriginalEntrancePanelView: View {
         return CGSize(width: 192 * scale, height: 256 * scale)
     }
 
-    /// The 3D door is not rendered yet, so the original handle rectangle at
-    /// 0x021FE1D4 ([150, 84, 200, 101] after rotation) is outlined instead.
-    private func handleMarker(in size: CGSize) -> some View {
-        let sx = size.width / 192, sy = size.height / 256
-        return RoundedRectangle(cornerRadius: 3)
-            .strokeBorder(Color.black.opacity(0.7), lineWidth: 4)
-            .overlay(RoundedRectangle(cornerRadius: 3)
-                .strokeBorder(Color.white, style: StrokeStyle(lineWidth: 2, dash: [5, 3])))
-            .frame(width: 18 * sx, height: 51 * sy)
-            .position(x: (84 + 9) * sx, y: (150 + 25.5) * sy)
-            .allowsHitTesting(false)
-            .accessibilityLabel("Door handle")
-    }
 }
 
 /// Process 24 on the touch page: `bell02` (the counter) under `bell01` (the
 /// bell, palette index 0 transparent), both drawn on the 3D screen by
 /// 0x021FD7B4. The bell's swing (+0x444) and the trick-button sprites are
-/// not drawn; outlines mark the original bell rectangle and quit button.
+/// not drawn. Touch targets stay invisible.
 struct OriginalBellPageView: View {
     @ObservedObject var play: OriginalPlaySession
     let upper: Bool
@@ -167,16 +151,6 @@ struct OriginalBellPageView: View {
                                     .frame(width: size.width, height: size.height)
                             }
                         }
-                        if scene.awaitingTouch {
-                            // 0x021FE7F8: x′ 56–96, y′ 72–120 → page x 72–120, y 56–96.
-                            marker(x: 72, y: 56, width: 49, height: 41, scale: scale)
-                                .accessibilityLabel("Bell")
-                        }
-                        if scene.quitEnabled {
-                            // 0x020267F0 slot 5: x′ 228–252, y′ 156–188.
-                            marker(x: 156, y: 228, width: 33, height: 25, scale: scale)
-                                .accessibilityLabel("Quit")
-                        }
                     }
                     .frame(width: size.width, height: size.height)
                     .contentShape(Rectangle())
@@ -200,15 +174,6 @@ struct OriginalBellPageView: View {
         }
     }
 
-    private func marker(x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat, scale: CGFloat) -> some View {
-        RoundedRectangle(cornerRadius: 3)
-            .strokeBorder(Color.black.opacity(0.7), lineWidth: 4)
-            .overlay(RoundedRectangle(cornerRadius: 3)
-                .strokeBorder(Color.white, style: StrokeStyle(lineWidth: 2, dash: [5, 3])))
-            .frame(width: width * scale, height: height * scale)
-            .offset(x: x * scale, y: y * scale)
-            .allowsHitTesting(false)
-    }
 }
 
 /// Shown where the recovered game ends or a system is missing.
@@ -294,27 +259,6 @@ struct OriginalSignPageView: View {
                         Image(decorative: written, scale: 1).resizable().interpolation(.none)
                             .frame(width: size.width, height: size.height)
                             .mask(alignment: .topLeading) { reveal(scene.strokes, scale: scale) }
-                    }
-                    if scene.awaitingStroke {
-                        ForEach(0..<4, id: \.self) { field in
-                            if scene.strokes[field] == 0 {
-                                Rectangle().fill(Color.blue.opacity(0.12))
-                                    .frame(width: CGFloat(min(OriginalSignProcess.fieldWidth[field], 191 - OriginalSignProcess.fieldX[field])) * scale,
-                                           height: CGFloat(OriginalSignProcess.fieldHeight[field]) * scale)
-                                    .offset(x: CGFloat(OriginalSignProcess.fieldX[field]) * scale,
-                                            y: CGFloat(OriginalSignProcess.fieldY[field]) * scale)
-                                    .allowsHitTesting(false)
-                            }
-                        }
-                    }
-                    if scene.quitEnabled {
-                        // Trick base slot 5: x′ 228–252, y′ 156–188 → page x 156–188, y 228–252.
-                        RoundedRectangle(cornerRadius: 3)
-                            .strokeBorder(Color.white, style: StrokeStyle(lineWidth: 2, dash: [5, 3]))
-                            .frame(width: 33 * scale, height: 25 * scale)
-                            .offset(x: 156 * scale, y: 228 * scale)
-                            .allowsHitTesting(false)
-                            .accessibilityLabel("Quit")
                     }
                 }
                 .frame(width: size.width, height: size.height)

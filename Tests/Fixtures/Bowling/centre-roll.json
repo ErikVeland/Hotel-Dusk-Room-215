@@ -1,0 +1,33 @@
+{
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "14654604720ea8dfb602d70e8bc28a0062fc1113545edeaf7d085f3938d6b697",
+  "commandsSHA256": "29720fd63a37de2222fbd03024e66d797d82c94d3fcb2a4e1c40f7dafb27c65c",
+  "update": "0x021FD530",
+  "processBase": "0x310020",
+  "stage": 2,
+  "substage": 2,
+  "roundIndex": 0,
+  "dragDelta20_12": [
+    -61,
+    1467,
+    -1755,
+    -82,
+    1467,
+    -2341
+  ],
+  "pinRotations": [
+    1070141403,
+    1070141403,
+    0,
+    1070141403,
+    1070141403,
+    0,
+    1070141403,
+    1070141403,
+    0,
+    0
+  ],
+  "score": 6,
+  "touchPath": "Start at (15, 90), move right in eight-pixel steps through (119, 90), then move to (125, 90). Hold each point for eight frames.",
+  "captureAfterFrames": 180
+}

@@ -463,6 +463,14 @@ public struct OriginalEventRunner: Sendable {
     }
 
     /**
+     * Overlay 13 returns process result 2 after its terminal fade.
+     */
+    public mutating func finishChristmasTree(returnValue: Int16) {
+        guard case .process(43) = phase else { return }
+        finishProcess(returnValue: returnValue)
+    }
+
+    /**
      * The map consumes request 3 after the child and parent talk have returned.
      */
     mutating func consumeTimeRequest(_ value: Int16) {

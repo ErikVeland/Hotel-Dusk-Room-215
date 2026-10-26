@@ -6,7 +6,7 @@ The former demonstration dialogue, arbitrary initial inventory, chapter shortcut
 
 ## Playing on Duo
 
-The checked route completes Chapters 1 and 2 and continues into Chapter 3. Start with **Begin Chapter 1**. **Continue** restores the last walking checkpoint after quitting or restarting the app. Checkpoints save automatically when an interaction returns to walking, when you release movement, and when you pause while walking. Conversations and puzzles in progress return to their preceding checkpoint after quitting. The three chapter-boundary save slots remain separate.
+The automated native-input route completes Chapters 1–4 and reaches the Chapter 5 save prompt. Start with **Begin Chapter 1**. **Continue** restores the last walking checkpoint after quitting or restarting the app. Checkpoints save automatically when an interaction returns to walking, when you release movement, and when you pause while walking. Conversations and puzzles in progress return to their preceding checkpoint after quitting. The three chapter-boundary save slots remain separate.
 
 Dialogue turns one sheet across the spine. Swipe right or select **Previous pages** to reread written text. Swipe left or use the page control to return. **Book options → Previous conversations** opens the transcript outside dialogue and restores your place when you select **Return to game**. Active puzzles block this view. Selecting a dialogue choice shows its response without another Continue for a repeated answer. Folding the Duo retains the reading position and pauses unfinished writing, including through cover-display size changes.
 
@@ -16,7 +16,7 @@ Open **Book options → Pause game** for Resume, Reload checkpoint, sound contro
 
 To install on the physical Duo, open `HotelDuskDuo.xcodeproj` in Xcode, select the **HotelDuskDuoiOS** scheme, and select your connected Duo. Select your signing team under **Signing & Capabilities**, then Run. A simulator build cannot be installed on the phone. Physical hinge behaviour still needs a check on the actual device.
 
-The app still has incomplete character presentation and unsupported interactions. Chapter 3 is in progress. Chapters 4–10 are not yet verified playable. The development jigsaw preview is not a later playable chapter.
+The checked new-game route completes Chapters 1–4 and stops at the Chapter 5 save prompt. Chapter 5 has normal-input route tests, but they need a Chapter 4 save to run. Chapters 6–10 have no verified main route. Character presentation, story branches, failure paths, endings and Duo hardware checks remain incomplete. The development jigsaw preview is not a later playable chapter.
 
 The automated native-input route completes Louie's Chapter 2 confrontation, its photo interaction and the chapter review. It then enters Chapter 3 through the native save/title flow and continues through Rachel, Kevin, Louie and Iris, collects the rag doll, and completes dinner with Summer and Rosa, and reaches the 6:20 PM checkpoint. See [Chapter 3 progress](docs/chapter-three-progress.md). It also restores walking checkpoints from at least ten locations without replaying arrival events. This verifies the checked route, not every branch. Some original-state comparisons require reference captures that are not present in this checkout.
 

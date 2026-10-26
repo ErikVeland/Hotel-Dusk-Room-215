@@ -1,0 +1,12 @@
+load extracted/reference/component-walking-base/ready.mln
+write32 0227d2f0 4c
+write32 0227d2f4 4c
+frames 300
+capture ready
+touch 141 130
+frames 1
+capture tap-down
+release
+frames 8
+capture after-tap
+quit

@@ -2,11 +2,18 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalCrowbarRendering: AnyObject {
+    func render(_ puzzle: OriginalCrowbarProcess) throws -> CGImage
+}
+
+public typealias OriginalCrowbarRendererFactory = @MainActor (Bool) throws -> any OriginalCrowbarRendering
+
 /**
  * Overlay 5 crowbar, cabinet, wall and paper from the original archives.
  */
 @MainActor
-final class OriginalCrowbarRenderer {
+public final class OriginalCrowbarRenderer: OriginalCrowbarRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let cabinet: OriginalModelMetalPreview
@@ -20,7 +27,7 @@ final class OriginalCrowbarRenderer {
         var uv: SIMD2<Float>
     }
 
-    init(tornPaper: Bool) throws {
+    public init(tornPaper: Bool) throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -55,7 +62,7 @@ final class OriginalCrowbarRenderer {
         self.depth = depth
     }
 
-    func render(_ puzzle: OriginalCrowbarProcess) throws -> CGImage {
+    public func render(_ puzzle: OriginalCrowbarProcess) throws -> CGImage {
         let projection = Self.viewProjection(shake: puzzle.cameraShake)
         let scene = Self.translation(SIMD3(-5612, -2007, 0) / 4096)
             * Self.rotation(.pi, axis: SIMD3(0, 1, 0))
