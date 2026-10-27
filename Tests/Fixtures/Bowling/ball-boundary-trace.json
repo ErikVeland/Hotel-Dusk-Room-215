@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint isolated bowling ball boundary probes",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "384eff59872b036344257421f50326981fa9962342b5d050a0c6f2d820ddecfe",
+  "commandsSHA256": "62f62cd477d175f6e30205cc300ceda6cf6ac8b7b170d9be4f0971ec9f5c88ea",
+  "note": "All ten pin records are disabled before one source update. The lateral probe reaches the X boundary and stops outward velocity before the rejected position update. The longitudinal probe keeps moving in Z. This does not verify pin collisions or normal route input.",
+  "cases": {
+    "lateral-boundary": {
+      "input": [
+        9000,
+        0,
+        0,
+        1024,
+        0,
+        0
+      ],
+      "output": {
+        "positionFixed20_12": [
+          9714,
+          0,
+          0
+        ],
+        "velocityFixed20_12": [
+          0,
+          0,
+          0
+        ],
+        "stage": 2,
+        "substage": 2
+      }
+    },
+    "longitudinal-free": {
+      "input": [
+        0,
+        0,
+        -30000,
+        0,
+        0,
+        -1024
+      ],
+      "output": {
+        "positionFixed20_12": [
+          0,
+          0,
+          -31020
+        ],
+        "velocityFixed20_12": [
+          0,
+          0,
+          -1024
+        ],
+        "stage": 2,
+        "substage": 2
+      }
+    }
+  }
+}

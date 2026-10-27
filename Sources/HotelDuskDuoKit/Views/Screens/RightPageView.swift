@@ -25,13 +25,13 @@ public struct RightPageView: View {
                 else {
                     switch play.runner.phase {
                     case .dialogue, .itemNotice, .picture, .process, .waiting:
-                        OriginalPlayPage(play: play, screen: 0)
+                        OriginalPlayPage(play: play, hingeManager: session.hingeManager, screen: 0)
                     case .questions(let topics):
                         OriginalQuestionMenuView(play: play, topics: topics)
                     case .choice(let choices):
                         ScrollView { OriginalChoiceView(play: play, choices: choices) }
                     case .exploration where play.lobby != nil:
-                        OriginalPlayPage(play: play, screen: 0)
+                        OriginalPlayPage(play: play, hingeManager: session.hingeManager, screen: 0)
                     case .exploration, .halted:
                         Spacer()
                         OriginalPlayStatusView(session: session, play: play)

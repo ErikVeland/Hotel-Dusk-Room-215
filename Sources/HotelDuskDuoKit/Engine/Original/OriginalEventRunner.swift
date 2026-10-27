@@ -53,6 +53,18 @@ public struct OriginalEventRunner: Sendable {
         public let label: String
     }
 
+    /**
+     * Preserves the story event and selector state that created an embedded process.
+     */
+    public struct EmbeddedProcessInvocation: Equatable, Sendable {
+        public let processID: UInt16
+        public let programName: String
+        public let eventIndex: Int
+        public let eventSourceOffset: Int
+        public let eventBytes: Data
+        public let selection: OriginalEventSelectionContext
+    }
+
     /// Opcodes whose dispatcher cases (0x0203BC9C) only change controller or
     /// display state: portraits and backgrounds (3, 26, 27, 28), animation
     /// start and wait (43, 44), and empty cases. They do not write game state.
@@ -78,6 +90,7 @@ public struct OriginalEventRunner: Sendable {
     public private(set) var session: OriginalEventSession
     public private(set) var phase: Phase
     public private(set) var eventIndex: Int?
+    public private(set) var embeddedProcessInvocation: EmbeddedProcessInvocation?
     /// Presentation commands that the native renderer does not draw yet.
     public private(set) var unrenderedPresentation: [String] = []
     public private(set) var processRequests: [ProcessRequest] = []
@@ -450,6 +463,7 @@ public struct OriginalEventRunner: Sendable {
     /// The embedded process finished with its process-manager return value.
     public mutating func finishProcess(returnValue: Int16) {
         guard case .process(let id) = phase, inventoryProcess == nil else { return }
+        embeddedProcessInvocation = nil
         if timeTransition != nil {
             timeTransition = nil
             operationIndex += 1
@@ -460,6 +474,14 @@ public struct OriginalEventRunner: Sendable {
         if returnValue == 0 { game.markPuzzleCompleted(processID: id) }
         processReturn = returnValue
         run()
+    }
+
+    /**
+     * Stores overlay 38's persistent apple-letter bits while process 64 is active.
+     */
+    public mutating func storeApplePaintingFoundMask(_ mask: UInt16) {
+        guard phase == .process(id: 64) else { return }
+        game.applePaintingFoundMask = mask
     }
 
     /**
@@ -715,6 +737,7 @@ public struct OriginalEventRunner: Sendable {
         lastSelectionMiss = nil
         eventTrail.append(index)
         processReturn = 0
+        embeddedProcessInvocation = nil
         // 0x0203A444 clears the commit byte (0x02028470) once an event is set up.
         session.eventCommitted = false
         // 0x0203A444: a scene ID other than 0xFFFF, 0xFFFE or 0xFFFD names the
@@ -727,6 +750,11 @@ public struct OriginalEventRunner: Sendable {
             operations = try graph.operations(forEvent: index)
             operationIndex = Int(max(0, session.operationIndex))
             if let process = try OriginalEventCompletion.embeddedProcessID(event: graph.tables[2][index]) {
+                let event = graph.tables[2][index]
+                embeddedProcessInvocation = EmbeddedProcessInvocation(
+                    processID: process, programName: program.name, eventIndex: index,
+                    eventSourceOffset: event.sourceOffset, eventBytes: event.raw,
+                    selection: session.selection)
                 phase = .process(id: process)
                 return
             }

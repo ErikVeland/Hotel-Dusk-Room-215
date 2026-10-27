@@ -50,6 +50,23 @@ public final class OriginalPlaySession: ObservableObject {
     private var clockRenderer: OriginalClockRenderer?
     private var clockUpdates: UInt64 = 0
     private var resumesWalkingAfterClock = false
+    @Published public private(set) var cassetteBallpoint: OriginalCassetteBallpointProcess?
+    @Published public private(set) var cassetteRewind: OriginalCassetteRewindProcess?
+    @Published public private(set) var cassetteDeck: OriginalCassetteDeckProcess?
+    @Published public private(set) var cassetteImage: CGImage?
+    @Published public private(set) var cassetteOpacity = 1.0
+    private var cassetteRenderer: OriginalCassetteRenderer?
+    private var cassetteDeckRenderer: OriginalCassetteDeckRenderer?
+    private var cassetteTouch: SIMD2<Int>?
+    private var cassettePress: SIMD2<Int>?
+    @Published public private(set) var applePainting: OriginalApplePaintingProcess?
+    @Published public private(set) var applePaintingImage: CGImage?
+    private var applePaintingRenderer: OriginalApplePaintingRenderer?
+    @Published public private(set) var pencilSharpener: OriginalPencilSharpenerProcess?
+    @Published public private(set) var pencilSharpenerImage: CGImage?
+    private var applePaintingMask: OriginalApplePaintingMask?
+    @Published public private(set) var cpr: OriginalCPRProcess?
+    @Published public private(set) var appleWordEntry: OriginalAppleWordEntryProcess?
     @Published public private(set) var suitcaseKey: OriginalSuitcaseKeyProcess?
     @Published public private(set) var suitcaseImage: CGImage?
     private var suitcaseRenderer: (any OriginalSuitcaseRendering)?
@@ -230,6 +247,10 @@ public final class OriginalPlaySession: ObservableObject {
               clock == nil, suitcaseKey == nil, thinWire == nil, hanger == nil, switchboard == nil, fountainPen == nil, bookmarkBox == nil, dollRepair == nil, coinPuzzle == nil, matchsticks == nil, jukebox == nil, linenWagon == nil, differences == nil, toiletTank == nil,
               suitcaseContents == nil, memoPull == nil, cabinetDial == nil,
               crowbar == nil, memoDrawing == nil, paperclip == nil, labelPeel == nil, christmasTree == nil, searchShed == nil,
+              cassetteBallpoint == nil, cassetteRewind == nil,
+              applePainting == nil, appleWordEntry == nil,
+              pencilSharpener == nil,
+              cpr == nil,
               touchPicture == nil else { return false }
         switch runner.phase {
         case .dialogue, .itemNotice, .choice, .questions: return true
@@ -544,6 +565,16 @@ public final class OriginalPlaySession: ObservableObject {
         pendingTouch = OriginalEntranceProcess.Touch(x: 255 - pageY, y: pageX)
     }
 
+    /**
+     * Sends a tap to the Chapter 10 pencil-sharpener exit mask.
+     */
+    public func tapPencilSharpener(pageX: Int, pageY: Int) {
+        guard !isPaused, case .process(59) = runner.phase,
+              var process = pencilSharpener else { return }
+        process.tap(pageX: pageX, pageY: pageY)
+        pencilSharpener = process
+    }
+
     /// The held touch on the touch page, in rotated page pixels; nil on release.
     public func holdTouch(pageX: Int, pageY: Int) {
         guard signProcess != nil else { return }
@@ -587,6 +618,103 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func releaseSuitcaseTouch() { suitcaseTouch = nil }
+
+    public func holdCassetteTouch(pageX: Int, pageY: Int) {
+        guard !isPaused, (cassetteRewind != nil || cassetteBallpoint != nil || cassetteDeck != nil),
+              (0..<192).contains(pageX), (0..<256).contains(pageY) else { return }
+        captureCassetteTouch(pageX: pageX, pageY: pageY)
+    }
+
+    public func releaseCassetteTouch() { cassetteTouch = nil }
+
+    /**
+     * Selects the hidden letter through overlay 38's camera and artwork mask.
+     */
+    public func touchApplePainting(pageX: Int, pageY: Int) {
+        guard !isPaused, case .process(64) = runner.phase,
+              (0..<OriginalApplePaintingRenderer.pageWidth).contains(pageX),
+              (0..<OriginalApplePaintingRenderer.pageHeight).contains(pageY),
+              var process = applePainting, let mask = applePaintingMask else { return }
+        guard process.select(pageX: Int32(pageX), pageY: Int32(pageY),
+                             cameraX: process.cameraX, cameraY: process.cameraY,
+                             mask: mask) else { return }
+        runner.storeApplePaintingFoundMask(process.foundMask)
+        applePainting = process
+    }
+
+    /**
+     * Applies camera movement from a drag across the apple painting.
+     */
+    public func moveApplePaintingCamera(horizontalSteps: Int, verticalSteps: Int) {
+        guard !isPaused, case .process(64) = runner.phase,
+              var process = applePainting, process.phase == .looking,
+              let renderer = applePaintingRenderer else { return }
+        process.moveCamera(horizontalSteps: horizontalSteps, verticalSteps: verticalSteps)
+        guard let image = try? renderer.render(index: process.paintingIndex,
+                                               cameraX: process.cameraX, cameraY: process.cameraY) else { return }
+        applePaintingImage = image
+        applePainting = process
+    }
+
+    /**
+     * Completes process 63 after the player closes and fully reopens the Duo.
+     */
+    func receiveCPRFold(isClosed: Bool, isFullyOpen: Bool) {
+        guard case .process(63) = runner.phase, var process = cpr else { return }
+        let result = process.receiveFold(isClosed: isClosed, isFullyOpen: isFullyOpen)
+        if let result {
+            cpr = nil
+            runner.finishProcess(returnValue: result)
+            settle()
+        } else {
+            cpr = process
+        }
+    }
+
+    /**
+     * Returns process 64's source result after the letter is acknowledged.
+     */
+    public func acknowledgeApplePaintingLetter() {
+        guard !isPaused, case .process(64) = runner.phase, var process = applePainting,
+              let result = process.acknowledgeLetter() else { return }
+        applePainting = nil
+        applePaintingImage = nil
+        applePaintingRenderer = nil
+        applePaintingMask = nil
+        runner.finishProcess(returnValue: result)
+        settle()
+    }
+
+    /**
+     * Records one letter tap and returns process 81 after the ordered word is complete.
+     */
+    public func selectAppleWordLetter(at index: Int) {
+        guard !isPaused, case .process(81) = runner.phase,
+              var process = appleWordEntry else { return }
+        if let result = process.selectLetter(at: index) {
+            appleWordEntry = nil
+            runner.finishProcess(returnValue: result)
+            settle()
+        } else {
+            appleWordEntry = process
+        }
+    }
+
+    public func activateCassetteDeckControl() {
+        guard !isPaused, cassetteDeck != nil else { return }
+        cassetteDeck?.activateSelectedControl()
+    }
+
+    public func exitCassetteDeck() {
+        guard !isPaused, cassetteDeck != nil else { return }
+        cassetteDeck?.requestExit()
+    }
+
+    private func captureCassetteTouch(pageX: Int, pageY: Int) {
+        let rawTouch = SIMD2(255 - pageY, pageX)
+        if cassetteTouch == nil { cassettePress = rawTouch }
+        cassetteTouch = rawTouch
+    }
 
     public func quitSuitcaseKey() {
         guard !isPaused else { return }
@@ -1111,6 +1239,105 @@ public final class OriginalPlaySession: ObservableObject {
                 signProcess = OriginalSignProcess()
                 processReturn = 2
                 sign = SignScene(strokes: [0, 0, 0, 0], awaitingStroke: false, quitEnabled: false)
+            }
+            startTimer()
+        case .process(52):
+            if cassetteDeck == nil {
+                do {
+                    let renderer = try OriginalCassetteDeckRenderer()
+                    let process = OriginalCassetteDeckProcess()
+                    cassetteImage = try renderer.render(camera: process.camera, state: process.sceneState)
+                    cassetteDeckRenderer = renderer
+                    cassetteDeck = process
+                    cassetteTouch = nil
+                    cassettePress = nil
+                    cassetteOpacity = 1
+                    processReturn = 2
+                } catch {
+                    runner.halt("The cassette deck could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(59):
+            if pencilSharpener == nil {
+                do {
+                    let renderer = try OriginalPencilSharpenerRenderer()
+                    pencilSharpenerImage = renderer.image
+                    pencilSharpener = OriginalPencilSharpenerProcess()
+                    processReturn = 2
+                } catch {
+                    runner.halt("The pencil-sharpener scene could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(64):
+            guard applePainting == nil else { return }
+            guard let invocation = runner.embeddedProcessInvocation,
+                  OriginalAlphabetProcessContext.mode(for: invocation) == .paintingSearch,
+                  let index = OriginalAlphabetProcessContext.paintingIndex(for: invocation),
+                  OriginalAlphabetProcessContext.callerValue(forKey: 0x15, mode: .paintingSearch) == 10 else {
+                runner.halt("The apple painting call context could not be recovered")
+                return settle()
+            }
+            do {
+                let renderer = try OriginalApplePaintingRenderer(library: .bundled())
+                guard let process = OriginalApplePaintingProcess(
+                    paintingIndex: index, foundMask: runner.game.applePaintingFoundMask) else {
+                    throw OriginalDataError.invalid("Apple painting map selection")
+                }
+                applePaintingRenderer = renderer
+                applePaintingMask = try renderer.mask(for: index)
+                applePaintingImage = try renderer.render(index: index)
+                applePainting = process
+            } catch {
+                runner.halt("The apple painting could not be loaded: \(error)")
+                return settle()
+            }
+        case .process(63):
+            if cpr == nil { cpr = OriginalCPRProcess() }
+        case .process(81):
+            guard appleWordEntry == nil,
+                  let invocation = runner.embeddedProcessInvocation,
+                  OriginalAlphabetProcessContext.mode(for: invocation) == .wordEntry,
+                  let process = OriginalAppleWordEntryProcess(foundMask: runner.game.applePaintingFoundMask) else {
+                runner.halt("The apple word-entry call context or five found letters could not be recovered")
+                return settle()
+            }
+            appleWordEntry = process
+        case .process(45):
+            if cassetteBallpoint == nil {
+                do {
+                    let renderer = try OriginalCassetteRenderer(tool: .ballpoint)
+                    cassetteImage = try renderer.render()
+                    cassetteRenderer = renderer
+                    cassetteBallpoint = OriginalCassetteBallpointProcess()
+                    cassetteTouch = nil
+                    cassettePress = nil
+                    cassetteOpacity = 1
+                    processReturn = 2
+                } catch {
+                    runner.halt("The cassette could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(76):
+            if cassetteRewind == nil {
+                do {
+                    let renderer = try OriginalCassetteRenderer(tool: .pencil)
+                    cassetteImage = try renderer.render()
+                    cassetteRenderer = renderer
+                    cassetteRewind = OriginalCassetteRewindProcess()
+                    cassetteTouch = nil
+                    cassettePress = nil
+                    cassetteOpacity = 1
+                    processReturn = 2
+                } catch {
+                    runner.halt("The cassette could not be loaded: \(error)")
+                    return settle()
+                }
             }
             startTimer()
         case .process(26), .process(39), .process(40), .process(84):
@@ -1767,7 +1994,11 @@ public final class OriginalPlaySession: ObservableObject {
             return
         }
         if bellProcess != nil { return updateBell() }
+        if pencilSharpener != nil { return updatePencilSharpener() }
         if clock != nil { return updateClock() }
+        if cassetteDeck != nil { return updateCassetteDeck() }
+        if cassetteBallpoint != nil { return updateCassetteBallpoint() }
+        if cassetteRewind != nil { return updateCassetteRewind() }
         if signProcess != nil { return updateSign() }
         if thinWire != nil { return updateThinWire() }
         if differences != nil { return updateDifferences() }
@@ -1827,6 +2058,85 @@ public final class OriginalPlaySession: ObservableObject {
             runner.finishProcess(returnValue: processReturn)
             settle()
         }
+    }
+
+    private func updatePencilSharpener() {
+        guard var current = pencilSharpener else { return stopTimer() }
+        current.updateOneFrame()
+        pencilSharpener = current
+        guard let returnValue = current.returnedProcessValue else { return }
+        pencilSharpener = nil
+        pencilSharpenerImage = nil
+        stopTimer()
+        runner.finishProcess(returnValue: returnValue)
+        settle()
+    }
+
+    private func updateCassetteBallpoint() {
+        guard var process = cassetteBallpoint else { return }
+        let previousPhase = process.phase
+        process.update(newRawTouch: cassettePress)
+        cassettePress = nil
+        if process.phase == .fading { cassetteOpacity = max(0, 1 - Double(process.fadeUpdates) / Double(OriginalCassetteBallpointProcess.quitFadeUpdates)) }
+        if previousPhase == .quitDelay, process.phase == .fading { cassetteOpacity = 1 }
+        cassetteBallpoint = process
+        guard process.phase == .complete else { return }
+        cassetteTouch = nil
+        cassettePress = nil
+        cassetteBallpoint = nil
+        cassetteImage = nil
+        cassetteRenderer = nil
+        cassetteOpacity = 1
+        runner.finishProcess(returnValue: process.returnedProcessValue ?? 2)
+        settle()
+    }
+
+    private func updateCassetteDeck() {
+        guard var process = cassetteDeck, let renderer = cassetteDeckRenderer else { return }
+        let oldCamera = process.camera
+        let oldState = process.sceneState
+        let press = cassettePress
+        var sceneHit = false
+        if process.phase == .opening, let press {
+            let pagePoint = SIMD2(Float(press.y), Float(255 - press.x))
+            do { sceneHit = try renderer.hitTest(pagePoint: pagePoint, camera: process.camera,
+                                                  state: process.sceneState) != nil }
+            catch { runner.halt("The cassette deck could not be hit-tested: \(error)"); stopTimer(); return }
+        }
+        process.update(touch: cassetteTouch, pressedTouch: press, sceneHit: sceneHit)
+        cassettePress = nil
+        cassetteOpacity = process.opacity
+        if oldCamera != process.camera || oldState != process.sceneState {
+            do { cassetteImage = try renderer.render(camera: process.camera, state: process.sceneState) }
+            catch { runner.halt("The cassette deck could not be drawn: \(error)"); stopTimer(); return }
+        }
+        cassetteDeck = process
+        guard process.phase == .complete else { return }
+        cassetteTouch = nil
+        cassettePress = nil
+        cassetteDeck = nil
+        cassetteDeckRenderer = nil
+        cassetteImage = nil
+        cassetteOpacity = 1
+        runner.finishProcess(returnValue: process.returnedProcessValue ?? 2)
+        settle()
+    }
+
+    private func updateCassetteRewind() {
+        guard var process = cassetteRewind else { return }
+        let touch = process.phase == .ready ? cassettePress : cassetteTouch
+        process.update(rawTouch: touch)
+        cassettePress = nil
+        cassetteRewind = process
+        guard process.phase == .complete else { return }
+        cassetteTouch = nil
+        cassettePress = nil
+        cassetteRewind = nil
+        cassetteImage = nil
+        cassetteRenderer = nil
+        cassetteOpacity = 1
+        runner.finishProcess(returnValue: process.returnedProcessValue ?? 2)
+        settle()
     }
 
     private func updateClock() {

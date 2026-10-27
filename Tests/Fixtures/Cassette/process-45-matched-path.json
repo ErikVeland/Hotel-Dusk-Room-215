@@ -1,0 +1,232 @@
+{
+  "processID": 45,
+  "variant": 0,
+  "commandsSHA256": "c4da5050acb51d91cd67c3d2068aab45a17ee89934e14531fbd4b2ee219d39d9",
+  "rawTouchPath": "Tap (141, 130), move to raw X 135, then decrease raw Y from 130 to 100 one pixel per frame; hold 65 frames, release, then wait 40 frames.",
+  "states": {
+    "ready": {
+      "processPresent": true,
+      "processBase": "0x2310020",
+      "variant": 0,
+      "mainPhase": 1,
+      "mainReturnGate": 0,
+      "inputPhase": 2,
+      "inputTimer": 0,
+      "inputFlags": [
+        1,
+        0
+      ],
+      "cursor": [
+        163,
+        108
+      ],
+      "dragAccumulator": 25.0,
+      "gestureDelta": [
+        0,
+        0
+      ],
+      "gesturePosition": [
+        0,
+        0
+      ],
+      "gestureActive": 0,
+      "dragProgress": 100,
+      "interactionGate": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3,
+      "sourceCounter4E4": 0
+    },
+    "start": {
+      "processPresent": true,
+      "processBase": "0x2310020",
+      "variant": 0,
+      "mainPhase": 1,
+      "mainReturnGate": 0,
+      "inputPhase": 3,
+      "inputTimer": 0,
+      "inputFlags": [
+        0,
+        1
+      ],
+      "cursor": [
+        163,
+        108
+      ],
+      "dragAccumulator": 25.0,
+      "gestureDelta": [
+        0,
+        0
+      ],
+      "gesturePosition": [
+        130,
+        114
+      ],
+      "gestureActive": 1,
+      "dragProgress": 100,
+      "interactionGate": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3,
+      "sourceCounter4E4": 0
+    },
+    "x-edge": {
+      "processPresent": true,
+      "processBase": "0x2310020",
+      "variant": 0,
+      "mainPhase": 1,
+      "mainReturnGate": 0,
+      "inputPhase": 3,
+      "inputTimer": 0,
+      "inputFlags": [
+        0,
+        1
+      ],
+      "cursor": [
+        163,
+        108
+      ],
+      "dragAccumulator": 25.0,
+      "gestureDelta": [
+        0,
+        1
+      ],
+      "gesturePosition": [
+        130,
+        120
+      ],
+      "gestureActive": 1,
+      "dragProgress": 100,
+      "interactionGate": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3,
+      "sourceCounter4E4": 0
+    },
+    "y-edge": {
+      "processPresent": true,
+      "processBase": "0x2310020",
+      "variant": 0,
+      "mainPhase": 1,
+      "mainReturnGate": 0,
+      "inputPhase": 3,
+      "inputTimer": 0,
+      "inputFlags": [
+        0,
+        1
+      ],
+      "cursor": [
+        163,
+        108
+      ],
+      "dragAccumulator": 22.199989318847656,
+      "gestureDelta": [
+        -1,
+        0
+      ],
+      "gesturePosition": [
+        101,
+        120
+      ],
+      "gestureActive": 1,
+      "dragProgress": 86,
+      "interactionGate": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3,
+      "sourceCounter4E4": 0
+    },
+    "held-65": {
+      "processPresent": true,
+      "processBase": "0x2310020",
+      "variant": 0,
+      "mainPhase": 1,
+      "mainReturnGate": 0,
+      "inputPhase": 4,
+      "inputTimer": 1,
+      "inputFlags": [
+        0,
+        0
+      ],
+      "cursor": [
+        163,
+        108
+      ],
+      "dragAccumulator": 6.320012092590332,
+      "gestureDelta": [
+        0,
+        0
+      ],
+      "gesturePosition": [
+        100,
+        120
+      ],
+      "gestureActive": 1,
+      "dragProgress": 85,
+      "interactionGate": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3,
+      "sourceCounter4E4": 0
+    },
+    "released": {
+      "processPresent": true,
+      "processBase": "0x2310020",
+      "variant": 0,
+      "mainPhase": 1,
+      "mainReturnGate": 0,
+      "inputPhase": 5,
+      "inputTimer": 0,
+      "inputFlags": [
+        0,
+        0
+      ],
+      "cursor": [
+        108,
+        112
+      ],
+      "dragAccumulator": 6.0,
+      "gestureDelta": [
+        0,
+        0
+      ],
+      "gesturePosition": [
+        100,
+        120
+      ],
+      "gestureActive": 0,
+      "dragProgress": 85,
+      "interactionGate": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3,
+      "sourceCounter4E4": 1
+    },
+    "after-idle": {
+      "processPresent": true,
+      "processBase": "0x2310020",
+      "variant": 0,
+      "mainPhase": 1,
+      "mainReturnGate": 0,
+      "inputPhase": 5,
+      "inputTimer": 0,
+      "inputFlags": [
+        0,
+        0
+      ],
+      "cursor": [
+        108,
+        112
+      ],
+      "dragAccumulator": 6.0,
+      "gestureDelta": [
+        0,
+        0
+      ],
+      "gesturePosition": [
+        100,
+        120
+      ],
+      "gestureActive": 0,
+      "dragProgress": 85,
+      "interactionGate": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3,
+      "sourceCounter4E4": 1
+    }
+  }
+}

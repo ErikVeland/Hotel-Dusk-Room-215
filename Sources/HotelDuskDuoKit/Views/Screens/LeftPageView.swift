@@ -7,7 +7,7 @@ public struct LeftPageView: View {
     public var body: some View {
         Group {
             if let play = session.play {
-                OriginalPlayPage(play: play, screen: 1)
+                OriginalPlayPage(play: play, hingeManager: session.hingeManager, screen: 1)
                     .padding(24)
             } else if let frame = session.animationPreview {
                 OriginalAnimationFrameView(frame: frame)
@@ -23,6 +23,7 @@ public struct LeftPageView: View {
 /// One original screen of the running game, drawn on a book page.
 struct OriginalPlayPage: View {
     @ObservedObject var play: OriginalPlaySession
+    @ObservedObject var hingeManager: DuoHingeManager
     /// Original screen index: 1 is the left page, 0 the right (touch) page.
     let screen: UInt8
 
@@ -79,8 +80,22 @@ struct OriginalPlayPage: View {
                 retainedNotes
             }
         case .process:
-            if play.clock != nil {
+            if play.pencilSharpener != nil {
+                if screen == 0 { OriginalPencilSharpenerView(play: play) }
+                else { retainedNotes }
+            } else if play.cpr != nil {
+                OriginalCPRView(hingeManager: hingeManager, screen: screen)
+            } else if play.appleWordEntry != nil {
+                if screen == 0 { OriginalAppleWordEntryView(play: play) }
+                else { retainedNotes }
+            } else if play.applePainting != nil {
+                if screen == 0 { OriginalApplePaintingView(play: play) }
+                else { retainedNotes }
+            } else if play.clock != nil {
                 if screen == 0 { OriginalClockView(play: play) }
+                else { retainedNotes }
+            } else if play.cassetteBallpoint != nil || play.cassetteRewind != nil || play.cassetteDeck != nil {
+                if screen == 0 { OriginalCassetteRewindView(play: play) }
                 else { retainedNotes }
             } else if play.cabinetDial != nil {
                 if screen == 0 { OriginalCabinetDialView(play: play) }

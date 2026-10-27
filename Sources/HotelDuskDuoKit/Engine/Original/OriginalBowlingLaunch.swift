@@ -14,7 +14,7 @@ public enum OriginalBowlingLaunch {
     public static func velocity(currentDelta: SIMD3<Int32>, previousDelta: SIMD3<Int32>) -> SIMD3<Int32>? {
         var velocity = SIMD3<Int32>(
             average(currentDelta.x, previousDelta.x),
-            average(currentDelta.y, previousDelta.y),
+            0,
             average(currentDelta.z, previousDelta.z)
         )
         guard velocity.z < minimumForwardDelta else { return nil }

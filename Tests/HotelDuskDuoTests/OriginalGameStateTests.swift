@@ -51,6 +51,16 @@ final class OriginalGameStateTests: XCTestCase {
         XCTAssertEqual(restored.bytes[0xDA..<0xDC], [0, 0])
     }
 
+    func testApplePaintingFlagsUseOverlay38SavedOffset() throws {
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        XCTAssertEqual(game.applePaintingFoundMask, 0)
+
+        game.applePaintingFoundMask = 0xFFFF
+        XCTAssertEqual(game.applePaintingFoundMask, 0x1F)
+        XCTAssertEqual(Array(game.bytes[0xD8..<0xDA]), [0x1F, 0])
+        XCTAssertEqual(try OriginalGameState(snapshot: game.snapshot).applePaintingFoundMask, 0x1F)
+    }
+
     func testCommitAndCloseupRestorationUseOriginalSessionFields() throws {
         let conditions = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102").conditions
         let game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)

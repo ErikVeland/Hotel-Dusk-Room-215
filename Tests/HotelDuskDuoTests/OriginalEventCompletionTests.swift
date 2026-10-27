@@ -36,6 +36,34 @@ final class OriginalEventCompletionTests: XCTestCase {
         XCTAssertEqual(session.selection.eventID, 2)
     }
 
+    func testEmbeddedProcessRetainsItsStoryCallerContextUntilReturn() throws {
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102")
+        let event = try XCTUnwrap(program.blocks.tables[2].first {
+            try OriginalEventCompletion.embeddedProcessID(event: $0) == 56
+        })
+        let reader = OriginalBytes(event.raw)
+        let game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
+        var selection = OriginalEventSelectionContext(
+            sceneID: .max, blockID: 0, modeID: 15,
+            eventID: try reader.u16(4),
+            nowTime: game.nowTime, mapID: game.mapID)
+        selection.debugEventSelection = true
+        var runner = try OriginalEventRunner(program: program, game: game, selection: selection)
+
+        XCTAssertEqual(runner.phase, OriginalEventRunner.Phase.process(id: 56))
+        let invocation = try XCTUnwrap(runner.embeddedProcessInvocation)
+        XCTAssertEqual(invocation.processID, 56)
+        XCTAssertEqual(invocation.programName, program.name)
+        XCTAssertEqual(invocation.eventIndex, event.index)
+        XCTAssertEqual(invocation.eventSourceOffset, event.sourceOffset)
+        XCTAssertEqual(invocation.eventBytes, event.raw)
+        XCTAssertEqual(invocation.selection, selection)
+
+        runner.finishProcess(returnValue: 2)
+
+        XCTAssertNil(runner.embeddedProcessInvocation)
+    }
+
     func testOriginalProcessOutcomeSelectsItsOwnTransition() throws {
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102")
         let event = try program.blocks.tables[2][4], conditions = try program.conditions
@@ -92,6 +120,26 @@ final class OriginalEventCompletionTests: XCTestCase {
             }
             XCTAssertEqual(completion.transition?.sourceOffset, 368 + Int(result) * 16)
             XCTAssertEqual(completion.transition?.sceneID, 4)
+            XCTAssertEqual(completion.transition?.modeID, 3)
+            XCTAssertEqual(completion.transition?.eventID, expectedEvent)
+        }
+    }
+
+    func testChapterEightCassetteDeckProcessHasRecoveredReturnTransitions() throws {
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP8_R114")
+        let events = try program.blocks.tables[2].filter {
+            try OriginalEventCompletion.embeddedProcessID(event: $0) == 52
+        }
+        XCTAssertEqual(events.count, 1)
+        let event = try XCTUnwrap(events.first)
+
+        for (result, expectedEvent) in [(Int16(0), UInt16(16)), (1, 17), (2, 17), (3, 18)] {
+            guard case .completed(let completion) = try OriginalEventCompletion.stateOnlyExit(
+                event: event, conditions: program.conditions, processReturn: result) else {
+                return XCTFail("Cassette deck result \(result) must select an original transition")
+            }
+            XCTAssertEqual(completion.transition?.sourceOffset, 832 + Int(result) * 16)
+            XCTAssertEqual(completion.transition?.sceneID, UInt16.max - 1)
             XCTAssertEqual(completion.transition?.modeID, 3)
             XCTAssertEqual(completion.transition?.eventID, expectedEvent)
         }

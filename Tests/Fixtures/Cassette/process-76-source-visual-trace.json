@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint Process 76 source screen captures",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "walkingCheckpointSHA256": "d93e9226d62ca739f148da56198aff5d1bcaa56adfa41606b73e58484f17545b",
+  "commandsSHA256": "a9cc5d08fe2693c805c8fc7e360c006cae8559c1b2174451cd5829148b06126d",
+  "coordinates": "256x192 source orientation; bottom screen only",
+  "frames": [
+    {
+      "state": "ready",
+      "image": "Tests/Fixtures/Cassette/ReferenceFrames/process-76-ready.png",
+      "imageSHA256": "35f9a209dd398cd3baba07b0031d7475eb1945e49f3e7ccdae37bff3ac54c2df",
+      "mainPhase": 1,
+      "inputPhase": 2,
+      "dragProgress": 100,
+      "sourceCounter4E4": 0,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3
+    },
+    {
+      "state": "rewind-progress",
+      "image": "Tests/Fixtures/Cassette/ReferenceFrames/process-76-rewind-progress.png",
+      "imageSHA256": "c3132c6ea313d03e49b1ade42b11c3a7f00b3d46cb9f944b7466fb5fa74a8a77",
+      "mainPhase": 1,
+      "inputPhase": 100,
+      "dragProgress": 85,
+      "sourceCounter4E4": 6,
+      "interactionGateTimer": 0,
+      "interactionGateMode": 3
+    },
+    {
+      "state": "completion-fade",
+      "image": "Tests/Fixtures/Cassette/ReferenceFrames/process-76-completion-fade.png",
+      "imageSHA256": "2862060b956f3539a97502875c1e409beade37de441de76d4d50286a0f5a192e",
+      "mainPhase": 1,
+      "inputPhase": 12,
+      "dragProgress": 85,
+      "sourceCounter4E4": 6,
+      "interactionGateTimer": 28,
+      "interactionGateMode": 2
+    }
+  ],
+  "note": "The source process moves the tool and changes the scene during rewind. Captures are modified-checkpoint evidence, not a normal Chapter 8 route.",
+  "geometryCapture": {
+    "path": "Tests/Fixtures/Cassette/ReferenceFrames/process-76-ready-geometry.txt",
+    "sha256": "7e40f861edd618f5816f01373e5f185cee1eebb2979bc1c427faad7583190c9d",
+    "polygonCount": 744,
+    "modelTriangleCounts": {
+      "trick/cassette/ballpen.mdf": 500,
+      "trick/cassette/pencil.mdf": 24,
+      "trick/cassette/tape.mdf": 238
+    },
+    "combinedModelTriangleCount": 762
+  }
+}

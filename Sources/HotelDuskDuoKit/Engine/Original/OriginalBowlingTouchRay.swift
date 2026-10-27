@@ -5,6 +5,16 @@ import simd
  * Builds the normalised touch ray used by overlay 11's bowling hit test.
  */
 public enum OriginalBowlingTouchRay {
+    public struct DragAnchor: Equatable, Sendable {
+        public let lanePoint: SIMD3<Float>
+        public let ballPoint: SIMD3<Float>
+
+        public init(lanePoint: SIMD3<Float>, ballPoint: SIMD3<Float>) {
+            self.lanePoint = lanePoint
+            self.ballPoint = ballPoint
+        }
+    }
+
     public enum TouchOrientation: Sendable {
         case rotated
         case unrotated
@@ -125,6 +135,23 @@ public enum OriginalBowlingTouchRay {
             }
         }
         return nil
+    }
+
+    /**
+     * Resolves the lane hit before the ball-plane hit, as overlay 11 does when
+     * it starts a held-touch drag.
+     */
+    public static func dragAnchor(
+        origin: SIMD3<Float>,
+        direction: SIMD3<Float>,
+        laneVertices: [SIMD3<Float>],
+        ballVertices: [SIMD3<Float>]
+    ) -> DragAnchor? {
+        guard let lanePoint = firstHit(origin: origin, direction: direction, vertices: laneVertices),
+              let ballPoint = firstHit(origin: origin, direction: direction, vertices: ballVertices) else {
+            return nil
+        }
+        return DragAnchor(lanePoint: lanePoint, ballPoint: ballPoint)
     }
 
     private static func intersectionDistance(

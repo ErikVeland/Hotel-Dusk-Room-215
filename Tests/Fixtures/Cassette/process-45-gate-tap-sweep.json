@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint Process 45 tap sweep",
+  "note": "Samples taps inside the recovered source gate from an isolated walking checkpoint. This does not establish a normal Chapter 8 route or a visible object mask.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "walkingCheckpointSHA256": "d93e9226d62ca739f148da56198aff5d1bcaa56adfa41606b73e58484f17545b",
+  "samples": [
+    {
+      "rawTouch": [
+        135,
+        100
+      ],
+      "commandsSHA256": "162dfd438f9742db9e956494d323f8a8fe644362eb787c9ca02933a5aab65aa4",
+      "states": {
+        "ready": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            1,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            0,
+            0
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "down": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            120
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "held": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            120
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "released": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            120
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        }
+      }
+    },
+    {
+      "rawTouch": [
+        141,
+        100
+      ],
+      "commandsSHA256": "69cc7dec5cd175255e8ade0641727edff4e9351544dd3f5023da92f2e9efea30",
+      "states": {
+        "ready": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            1,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            0,
+            0
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "down": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            114
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "held": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            114
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "released": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            114
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        }
+      }
+    },
+    {
+      "rawTouch": [
+        147,
+        100
+      ],
+      "commandsSHA256": "e9707c6d976946d51dcd2456ea2b43a5342655c0aba6296ee2292efed25bfccf",
+      "states": {
+        "ready": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            1,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            0,
+            0
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "down": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            108
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "held": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            108
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "released": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            100,
+            108
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        }
+      }
+    },
+    {
+      "rawTouch": [
+        135,
+        130
+      ],
+      "commandsSHA256": "070916ccb266f09819813b7ee23475f0119b042628722f757b1c68c4809cf0a6",
+      "states": {
+        "ready": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            1,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            0,
+            0
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "down": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            120
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "held": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            120
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "released": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            120
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        }
+      }
+    },
+    {
+      "rawTouch": [
+        141,
+        130
+      ],
+      "commandsSHA256": "a66a26968ccb857692d704219db9d1b67560b80d697e27db2b497eaefa7b7620",
+      "states": {
+        "ready": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            1,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            0,
+            0
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "down": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            114
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "held": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            114
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "released": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            114
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        }
+      }
+    },
+    {
+      "rawTouch": [
+        147,
+        130
+      ],
+      "commandsSHA256": "94a1895057a811e95365015c73ad6ea33123ccae2e4ff87a13fcb14f2bc58d47",
+      "states": {
+        "ready": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            1,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            0,
+            0
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "down": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            108
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "held": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 3,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            1
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            108
+          ],
+          "gestureActive": 1,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        },
+        "released": {
+          "processPresent": true,
+          "processBase": "0x2310020",
+          "variant": 0,
+          "mainPhase": 1,
+          "mainReturnGate": 0,
+          "inputPhase": 2,
+          "inputTimer": 0,
+          "inputFlags": [
+            0,
+            0
+          ],
+          "cursor": [
+            163,
+            108
+          ],
+          "dragAccumulator": 25.0,
+          "gestureDelta": [
+            0,
+            0
+          ],
+          "gesturePosition": [
+            130,
+            108
+          ],
+          "gestureActive": 0,
+          "dragProgress": 100,
+          "interactionGate": 0,
+          "interactionGateTimer": 0,
+          "interactionGateMode": 3,
+          "sourceCounter4E4": 0
+        }
+      }
+    }
+  ]
+}

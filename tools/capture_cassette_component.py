@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 import struct
+import subprocess
+import tempfile
 
 from capture_bowling_component import ROOT, ROM, WALKING, run
 
@@ -26,15 +28,25 @@ def process_base(data):
 
 def snapshot(path):
     data = path.read_bytes()
-    base = process_base(data)
+    try:
+        base = process_base(data)
+    except ValueError:
+        return {
+            "processPresent": False,
+            "interactionGate": data[0x10BDA4],
+            "interactionGateTimer": struct.unpack_from("<h", data, 0x10BDA2)[0],
+            "interactionGateMode": data[0x10BDA5],
+        }
 
     def signed16(offset):
         return struct.unpack_from("<h", data, base + offset)[0]
 
     return {
+        "processPresent": True,
         "processBase": hex(base + 0x02000000),
         "variant": signed16(0x2A8),
         "mainPhase": signed16(0x2AA),
+        "mainReturnGate": signed16(0x438),
         "inputPhase": signed16(0x43A),
         "inputTimer": signed16(0x43C),
         "inputFlags": [data[base + 0x43E], data[base + 0x444]],
@@ -45,7 +57,9 @@ def snapshot(path):
         "gestureActive": signed16(0x4D8),
         "dragProgress": struct.unpack_from("<i", data, 0x1FFF38)[0],
         "interactionGate": data[0x10BDA4],
-        "strokeCounter": signed16(0x4E4),
+        "interactionGateTimer": struct.unpack_from("<h", data, 0x10BDA2)[0],
+        "interactionGateMode": data[0x10BDA5],
+        "sourceCounter4E4": signed16(0x4E4),
     }
 
 
@@ -107,6 +121,7 @@ def capture_variant(process_id, name):
 
 
 def capture_repeated_swipes():
+    """Capture the matched process-45 direction across repeated touch cycles."""
     commands = [
         f"load {WALKING}",
         "write32 0227d2f0 2d",
@@ -116,22 +131,15 @@ def capture_repeated_swipes():
     ]
     state_names = ["ready"]
     for index in range(1, 7):
-        commands.extend([
-            "touch 141 130",
-            "frames 1",
-            "touch 135 130",
-            "frames 1",
-            "touch 135 190",
-            "frames 1",
-            "frames 30",
-            f"capture swipe-{index}-held",
-            "release",
-            "frames 1",
-            "frames 10",
-            f"capture swipe-{index}-released",
-        ])
+        commands.extend(["touch 141 130", "frames 1"])
+        for x in (140, 139, 138, 137, 136, 135):
+            commands.extend([f"touch {x} 130", "frames 1"])
+        for y in range(129, 99, -1):
+            commands.extend([f"touch 135 {y}", "frames 1"])
+        commands.extend(["frames 65", f"capture swipe-{index}-held", "release",
+                         "frames 8", f"capture swipe-{index}-released"])
         state_names.extend([f"swipe-{index}-held", f"swipe-{index}-released"])
-    directory = run("component-cassette-repeated-swipes", commands)
+    directory = run("component-cassette-45-repeated-matched-strokes", commands)
     return {
         "processID": 45,
         "variant": 0,
@@ -185,6 +193,12 @@ def capture_rewind_completion():
         "frames 1",
         "capture a-release",
     ])
+    elapsed = 0
+    for delay in (5, 5, 5, 5, 10):
+        elapsed += delay
+        state = f"after-{elapsed}-more-frames"
+        commands.extend([f"frames {delay}", f"capture {state}"])
+        states.append(state)
     states.extend(["at-y100", "after-65", "after-125", "after-185",
                    "after-245", "released-at-phase12", "a-press", "a-release"])
     directory = run("component-cassette-76-rewind-finish-probe", commands)
@@ -198,6 +212,142 @@ def capture_rewind_completion():
             for state in states
         },
     }
+
+
+def capture_matched_variant45_path():
+    """Compare variant 0 with the same mapped gesture used for variant 1."""
+    commands = [
+        f"load {WALKING}",
+        "write32 0227d2f0 2d",
+        "write32 0227d2f4 2d",
+        "frames 300",
+        "capture ready",
+        "touch 141 130",
+        "frames 1",
+        "capture start",
+    ]
+    for x in (140, 139, 138, 137, 136, 135):
+        commands.extend([f"touch {x} 130", "frames 1"])
+    commands.append("capture x-edge")
+    for y in range(129, 99, -1):
+        commands.extend([f"touch 135 {y}", "frames 1"])
+    commands.extend([
+        "capture y-edge",
+        "frames 65",
+        "capture held-65",
+        "release",
+        "frames 8",
+        "capture released",
+        "frames 40",
+        "capture after-idle",
+    ])
+    directory = run("component-cassette-45-matched-rewind-path", commands)
+    states = ("ready", "start", "x-edge", "y-edge", "held-65", "released", "after-idle")
+    result = {
+        "processID": 45,
+        "variant": 0,
+        "commandsSHA256": digest(directory / "commands.txt"),
+        "rawTouchPath": "Tap (141, 130), move to raw X 135, then decrease raw Y from 130 to 100 one pixel per frame; hold 65 frames, release, then wait 40 frames.",
+        "states": {state: snapshot(directory / f"{state}-ram.bin") for state in states},
+    }
+    fixture = ROOT / "Tests/Fixtures/Cassette/process-45-matched-path.json"
+    fixture.write_text(json.dumps(result, indent=2) + "\n")
+    return result
+
+
+def capture_variant45_quit_path():
+    """Verify the overlay's shared quit-slot return for variant 0."""
+    commands = [
+        f"load {WALKING}",
+        "write32 0227d2f0 2d",
+        "write32 0227d2f4 2d",
+        "frames 300",
+        "touch 141 130",
+        "frames 1",
+    ]
+    for x in (140, 139, 138, 137, 136, 135):
+        commands.extend([f"touch {x} 130", "frames 1"])
+    for y in range(129, 99, -1):
+        commands.extend([f"touch 135 {y}", "frames 1"])
+    commands.extend([
+        "frames 65",
+        "release",
+        "frames 8",
+        "frames 40",
+        "capture before-quit",
+        "touch 15 170",
+        "frames 1",
+        "capture after-quit-input",
+        "release",
+        "frames 10",
+        "capture quit-gate-set",
+        "frames 50",
+        "capture quit-fade-progress",
+        "frames 10",
+        "capture after-quit-return",
+    ])
+    directory = run("component-cassette-45-quit-path", commands)
+    states = ("before-quit", "after-quit-input", "quit-gate-set", "quit-fade-progress", "after-quit-return")
+    result = {
+        "processID": 45,
+        "variant": 0,
+        "commandsSHA256": digest(directory / "commands.txt"),
+        "rawTouchPath": "Complete the matched process-45 stroke, then press quit slot 5 at raw touch (15, 170).",
+        "states": {state: snapshot(directory / f"{state}-ram.bin") for state in states},
+    }
+    fixture = ROOT / "Tests/Fixtures/Cassette/process-45-quit-path.json"
+    fixture.write_text(json.dumps(result, indent=2) + "\n")
+    return result
+
+
+def capture_variant45_gate_tap_sweep():
+    """Record tap and release state across the source gate bounds."""
+    points = [(135, 100), (141, 100), (147, 100),
+              (135, 130), (141, 130), (147, 130)]
+    samples = []
+    for x, y in points:
+        commands = [
+            f"load {WALKING}",
+            "write32 0227d2f0 2d",
+            "write32 0227d2f4 2d",
+            "frames 300",
+            "capture ready",
+            f"touch {x} {y}",
+            "frames 1",
+            "capture down",
+            "frames 20",
+            "capture held",
+            "release",
+            "frames 8",
+            "capture released",
+        ]
+        command_text = "\n".join(commands + ["quit"]) + "\n"
+        with tempfile.TemporaryDirectory(prefix="hotel-dusk-cassette45-") as temporary:
+            directory = Path(temporary)
+            (directory / "commands.txt").write_text(command_text)
+            subprocess.run([str(ROOT / ".build/rom-reference/hotel-reference"), str(ROM), str(directory)],
+                           input=command_text, text=True, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.STDOUT, check=True, cwd=ROOT)
+            states = {
+                name: snapshot(directory / f"{name}-ram.bin")
+                for name in ("ready", "down", "held", "released")
+            }
+        samples.append({
+            "rawTouch": [x, y],
+            "commandsSHA256": hashlib.sha256(command_text.encode()).hexdigest(),
+            "states": states,
+        })
+    result = {
+        "schemaVersion": 1,
+        "kind": "modified-checkpoint Process 45 tap sweep",
+        "note": "Samples taps inside the recovered source gate from an isolated walking checkpoint. This does not establish a normal Chapter 8 route or a visible object mask.",
+        "romSHA256": digest(ROM),
+        "walkingCheckpointSHA256": digest(WALKING),
+        "samples": samples,
+    }
+    fixture = ROOT / "Tests/Fixtures/Cassette/process-45-gate-tap-sweep.json"
+    fixture.write_text(json.dumps(result, indent=2) + "\n")
+    return result
 
 
 def main():
@@ -218,6 +368,9 @@ def main():
         "traces": traces,
         "repeatedSwipes": capture_repeated_swipes(),
         "rewindCompletionProbe": capture_rewind_completion(),
+        "variant45MatchedPath": capture_matched_variant45_path(),
+        "variant45QuitPath": capture_variant45_quit_path(),
+        "variant45GateTapSweep": capture_variant45_gate_tap_sweep(),
     }
     fixture = ROOT / "Tests/Fixtures/Cassette"
     fixture.mkdir(parents=True, exist_ok=True)

@@ -172,6 +172,14 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
     public mutating func storeCashboxDialValue(_ value: UInt16) { write16(0x13DE, value) }
 
     /**
+     * Overlay 38 saves the five apple-letter flags at game offset 0xD8.
+     */
+    public var applePaintingFoundMask: UInt16 {
+        get { read16(0xD8) }
+        set { write16(0xD8, newValue & 0x1F) }
+    }
+
+    /**
      * Overlay 10 stores 999 minus the displayed cabinet number when the process exits.
      */
     public mutating func storeCabinetDialValue(_ value: UInt16) { write16(0x13D6, value) }

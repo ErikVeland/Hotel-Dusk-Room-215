@@ -26,11 +26,16 @@ def main():
     common = math.pow(10, -3 / 20)
     rows = []
     for row in profile["tracks"]:
-        delta = row["recorded"]["rmsDBFS"] - row["native"]["rmsDBFS"]
+        # Runtime profiles include raw and calibrated measurements. Derive
+        # gains from the raw pair to avoid applying the current balance twice.
+        native_measurement = row.get("unbalancedNative", row.get("native"))
+        recorded_measurement = row.get("unbalancedRecorded", row.get("recorded"))
+        assert native_measurement is not None and recorded_measurement is not None, "Profile needs raw source measurements"
+        delta = recorded_measurement["rmsDBFS"] - native_measurement["rmsDBFS"]
         assert math.isfinite(delta) and delta < 0, "Calibration must not amplify either source"
         gain = common * math.pow(10, delta / 20)
-        assert row["native"]["peakDBFS"] + 20 * math.log10(gain) < 0
-        assert row["recorded"]["peakDBFS"] - 3 < 0
+        assert native_measurement["peakDBFS"] + 20 * math.log10(gain) < 0
+        assert recorded_measurement["peakDBFS"] - 3 < 0
         rows.append({"id": row["id"], "nativeGain": gain, "recordedGain": common})
     result = {"schemaVersion": 1, "method": "Whole native introduction and loop RMS; both sources attenuated, shared 3 dB headroom.",
               "profileSHA256": hashlib.sha256(args.profile.read_bytes()).hexdigest(),

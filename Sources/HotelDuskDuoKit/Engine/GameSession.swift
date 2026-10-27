@@ -222,6 +222,10 @@ public final class GameSession: ObservableObject {
                 } else if !self.isPauseMenuOpen {
                     self.play?.receiveJigsawFold(isClosed: false)
                 } else { self.play?.cancelPendingJigsawFold() }
+                if !self.isPauseMenuOpen {
+                    self.play?.receiveCPRFold(isClosed: state == .closed,
+                                              isFullyOpen: state == .fullyOpen)
+                }
                 // A closed book pauses the original update loop and audio.
                 self.updatePlayActivity(bookClosed: state == .closed)
                 guard self.isJigsawPuzzleOpen else { return }

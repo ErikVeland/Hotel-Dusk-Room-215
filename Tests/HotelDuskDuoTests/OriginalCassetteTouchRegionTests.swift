@@ -21,4 +21,49 @@ final class OriginalCassetteTouchRegionTests: XCTestCase {
         XCTAssertFalse(OriginalCassetteTouchRegion.containsStartTap(SIMD2(141, 192), rotated: false))
         XCTAssertFalse(OriginalCassetteTouchRegion.containsStartTap(SIMD2(-1, 130), rotated: false))
     }
+
+    func testPencilRewindMatchesCapturedSwipeAndReturnTiming() {
+        var process = OriginalCassetteRewindProcess()
+        process.update(rawTouch: SIMD2(141, 130))
+        for x in stride(from: 140, through: 135, by: -1) {
+            process.update(rawTouch: SIMD2(x, 130))
+        }
+        for y in stride(from: 129, through: 100, by: -1) {
+            process.update(rawTouch: SIMD2(135, y))
+        }
+        for _ in 0..<5 {
+            process.update(rawTouch: SIMD2(135, 100))
+        }
+
+        XCTAssertEqual(process.phase, .rewindAnimation)
+        XCTAssertEqual(process.dragProgress, 85)
+        XCTAssertEqual(process.qualifyingTouchFrames, OriginalCassetteRewindProcess.completionCounter)
+
+        for _ in 0..<OriginalCassetteRewindProcess.animationWaitUpdates {
+            process.update(rawTouch: nil)
+        }
+        XCTAssertEqual(process.phase, .returnPending)
+        XCTAssertNil(process.returnedProcessValue)
+
+        process.update(rawTouch: nil)
+        XCTAssertNil(process.returnedProcessValue)
+        process.update(rawTouch: nil)
+        XCTAssertEqual(process.phase, .complete)
+        XCTAssertEqual(process.returnedProcessValue, 2)
+    }
+
+    func testOppositeSwipeDoesNotRewindTape() {
+        var process = OriginalCassetteRewindProcess()
+        process.update(rawTouch: SIMD2(141, 130))
+        for x in stride(from: 140, through: 135, by: -1) {
+            process.update(rawTouch: SIMD2(x, 130))
+        }
+        for y in 131...190 {
+            process.update(rawTouch: SIMD2(135, y))
+        }
+
+        XCTAssertEqual(process.phase, .tracking)
+        XCTAssertEqual(process.dragProgress, 100)
+        XCTAssertEqual(process.qualifyingTouchFrames, 0)
+    }
 }

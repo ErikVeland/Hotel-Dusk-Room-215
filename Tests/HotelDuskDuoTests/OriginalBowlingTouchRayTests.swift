@@ -16,6 +16,21 @@ final class OriginalBowlingTouchRayTests: XCTestCase {
         XCTAssertEqual(camera.forward.z, -0.988, accuracy: 0.002)
     }
 
+    func testCameraBasisTracksTheSecondSourceCameraMode() throws {
+        let camera = try XCTUnwrap(OriginalBowlingCameraBasis(matrixFixed20_12: [
+            0, 8_192, -12_288, 0, 0, -22_528, 0, 0,
+            0, -4_096, 0, 0, 0, 4_096, 0, 0
+        ]))
+
+        XCTAssertEqual(camera.origin.y, 2, accuracy: 0.0001)
+        XCTAssertEqual(camera.origin.z, -3, accuracy: 0.0001)
+        XCTAssertEqual(camera.forward.y, -0.625, accuracy: 0.002)
+        XCTAssertEqual(camera.forward.z, -0.781, accuracy: 0.002)
+        XCTAssertEqual(camera.right.x, 1, accuracy: 0.0001)
+        XCTAssertEqual(camera.up.y, 0.781, accuracy: 0.002)
+        XCTAssertEqual(camera.up.z, -0.625, accuracy: 0.002)
+    }
+
     func testCameraMatrixProducesAWorldSpaceTouchRay() throws {
         let camera = try XCTUnwrap(OriginalBowlingCameraBasis(matrixFixed20_12: [
             0, 12_288, 21_709, 0, 2_048, -43_827, 0, 0,
@@ -124,5 +139,38 @@ final class OriginalBowlingTouchRayTests: XCTestCase {
 
         XCTAssertEqual(laneHit?.y ?? 9, 0, accuracy: 0.0001)
         XCTAssertEqual(ballHit?.z ?? 9, 0, accuracy: 0.0001)
+    }
+
+    func testDragAnchorRequiresLaneThenBallPlaneHits() throws {
+        let lane: [SIMD3<Float>] = [
+            SIMD3(-1, 0, 0), SIMD3(1, 0, 0), SIMD3(-1, 0, 1),
+            SIMD3(1, 0, 0), SIMD3(-1, 0, 1), SIMD3(1, 0, 1)
+        ]
+        let ball: [SIMD3<Float>] = [
+            SIMD3(-1, -1, 0.5), SIMD3(1, -1, 0.5), SIMD3(-1, 1, 0.5),
+            SIMD3(1, -1, 0.5), SIMD3(-1, 1, 0.5), SIMD3(1, 1, 0.5)
+        ]
+        let anchor = try XCTUnwrap(OriginalBowlingTouchRay.dragAnchor(
+            origin: SIMD3(0, 2, 2), direction: SIMD3(0, -1, -1),
+            laneVertices: lane, ballVertices: ball))
+
+        XCTAssertEqual(anchor.lanePoint.x, 0, accuracy: 0.0001)
+        XCTAssertEqual(anchor.lanePoint.y, 0, accuracy: 0.0001)
+        XCTAssertEqual(anchor.lanePoint.z, 0, accuracy: 0.0001)
+        XCTAssertEqual(anchor.ballPoint.x, 0, accuracy: 0.0001)
+        XCTAssertEqual(anchor.ballPoint.y, 0.5, accuracy: 0.0001)
+        XCTAssertEqual(anchor.ballPoint.z, 0.5, accuracy: 0.0001)
+    }
+
+    func testDragAnchorRejectsTouchOutsideTheLaneEvenIfItHitsBallPlane() {
+        let lane = OriginalBowlingTouchRay.lanePlaneVertices
+        let ball: [SIMD3<Float>] = [
+            SIMD3(-30, -30, 0.5), SIMD3(30, -30, 0.5), SIMD3(-30, 30, 0.5),
+            SIMD3(30, -30, 0.5), SIMD3(-30, 30, 0.5), SIMD3(30, 30, 0.5)
+        ]
+
+        XCTAssertNil(OriginalBowlingTouchRay.dragAnchor(
+            origin: SIMD3(20, 2, 2), direction: SIMD3(0, -1, -1),
+            laneVertices: lane, ballVertices: ball))
     }
 }

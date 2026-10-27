@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint isolated pin-boundary captures",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "384eff59872b036344257421f50326981fa9962342b5d050a0c6f2d820ddecfe",
+  "note": "Only pin 0 is near the right or left lane boundary. The ball is parked far away. Each capture advances one original process update.",
+  "cases": {
+    "inside-flat": {
+      "commandsSHA256": "d65e5b30f6d68da81c318d281cdafedd37109da036474918f649365fc38510ea",
+      "input": {
+        "x": 3.0,
+        "rotation": 0.0
+      },
+      "states": {
+        "before": {
+          "positionFixed20_12": [
+            12288,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        },
+        "after": {
+          "positionFixed20_12": [
+            12288,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        }
+      }
+    },
+    "edge-flat": {
+      "commandsSHA256": "3b5259531ac68d073f6a60e58a1988b8832848b01fe70ebeaaba484eb37b8f8c",
+      "input": {
+        "x": 3.1,
+        "rotation": 0.0
+      },
+      "states": {
+        "before": {
+          "positionFixed20_12": [
+            12698,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        },
+        "after": {
+          "positionFixed20_12": [
+            12288,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        }
+      }
+    },
+    "outside-flat": {
+      "commandsSHA256": "d78b28a782329018a1715d97ea8ceb7fce22682ea8a6b543f6e38a833b4dc9a5",
+      "input": {
+        "x": 3.2,
+        "rotation": 0.0
+      },
+      "states": {
+        "before": {
+          "positionFixed20_12": [
+            13107,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        },
+        "after": {
+          "positionFixed20_12": [
+            12697,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        }
+      }
+    },
+    "outside-quarter-turn": {
+      "commandsSHA256": "1c58e96936ddea224c3f2f9a6e4dad5777521032951232cbd89bb151203c97c5",
+      "input": {
+        "x": 3.2,
+        "rotation": 1.5707963267948966
+      },
+      "states": {
+        "before": {
+          "positionFixed20_12": [
+            13107,
+            0,
+            0
+          ],
+          "rotationFloat": 1.5707963705062866,
+          "angularVelocityFloat": 0.0
+        },
+        "after": {
+          "positionFixed20_12": [
+            12697,
+            0,
+            0
+          ],
+          "rotationFloat": 1.5707963705062866,
+          "angularVelocityFloat": 0.0
+        }
+      }
+    },
+    "outside-half-turn": {
+      "commandsSHA256": "e341d32fd9c3af6a88b58d5ec8f08fb4e61e5352c31436ec8c5c1731fd00b97d",
+      "input": {
+        "x": 3.2,
+        "rotation": 3.141592653589793
+      },
+      "states": {
+        "before": {
+          "positionFixed20_12": [
+            13107,
+            0,
+            0
+          ],
+          "rotationFloat": 3.1415927410125732,
+          "angularVelocityFloat": 0.0
+        },
+        "after": {
+          "positionFixed20_12": [
+            12697,
+            0,
+            0
+          ],
+          "rotationFloat": 3.1415927410125732,
+          "angularVelocityFloat": 0.0
+        }
+      }
+    },
+    "outside-three-quarter-turn": {
+      "commandsSHA256": "e29c2b22ef316e752bc20d1bc382972e436837c69ebd328ab7092d6d428596b9",
+      "input": {
+        "x": 3.2,
+        "rotation": 4.71238898038469
+      },
+      "states": {
+        "before": {
+          "positionFixed20_12": [
+            13107,
+            0,
+            0
+          ],
+          "rotationFloat": 4.71238899230957,
+          "angularVelocityFloat": 0.0
+        },
+        "after": {
+          "positionFixed20_12": [
+            12697,
+            0,
+            0
+          ],
+          "rotationFloat": 4.71238899230957,
+          "angularVelocityFloat": 0.0
+        }
+      }
+    },
+    "outside-negative": {
+      "commandsSHA256": "7e667b8b0b0ef5e25c2465b324acbc1a2f82eb7349e53e791ea2d5f561126f6e",
+      "input": {
+        "x": -3.2,
+        "rotation": 0.0
+      },
+      "states": {
+        "before": {
+          "positionFixed20_12": [
+            -13107,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        },
+        "after": {
+          "positionFixed20_12": [
+            -12697,
+            0,
+            0
+          ],
+          "rotationFloat": 0.0,
+          "angularVelocityFloat": 0.0
+        }
+      }
+    }
+  }
+}

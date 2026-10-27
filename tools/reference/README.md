@@ -12,7 +12,7 @@ cmake --build .build/rom-reference -j6
 .build/rom-reference/hotel-reference 'Source/ROM/Hotel Dusk - Room 215.nds' extracted/reference/new-run < commands.txt
 ```
 
-Use a fresh output directory for each trace. A run writes `inputs.txt`, signed 16-bit little-endian stereo PCM at 48,000 Hz, and `audio-cues.csv`. The CSV records changes in the original sound manager at `0x020FDC60`, including exact emitted audio-frame counts. Emulated frame duration follows the DS; it is not assumed to be 1/60 second. RTC starts at 2007-01-22 12:00:00; loading a state restores that state's clock.
+Use a fresh output directory for each trace. A run writes `inputs.txt`, signed 16-bit little-endian stereo PCM at 48,000 Hz, and `audio-cues.csv`. The CSV records BGM state and emitted audio-frame counts. It does not record sound-effect requests or identify which effect produced PCM. Emulated frame duration follows the DS; it is not assumed to be 1/60 second. RTC starts at 2007-01-22 12:00:00; loading a state restores that state's clock.
 
 Commands:
 
@@ -27,6 +27,7 @@ Commands:
 - `until32 ADDRESS VALUE LIMIT`: advance at most LIMIT frames until a main-RAM word equals VALUE (hexadecimal address and value).
 - `until-nonzero32 ADDRESS LIMIT`: advance until the word becomes nonzero.
 - `write8 ADDRESS VALUE`, `write16 ADDRESS VALUE`, `write32 ADDRESS VALUE`: write an aligned main-RAM diagnostic fixture (hexadecimal address and value). Every write is recorded in `inputs.txt`. A modified run is an isolated component test, not evidence of a normal story path. Keep its output separate from unmodified playthrough captures.
+- `peek8 ADDRESS`, `peek16 ADDRESS`, `peek32 ADDRESS`: read an aligned main-RAM value to `runner.log` without changing game memory.
 - `trace-cinematic ADDRESS`: log the original queue's active object, handler and first state fields each frame in `cinematic-frames.csv`; hexadecimal ADDRESS is the controller base (opening: `022543f4`). Use `0` to stop tracing. This reads game memory without modifying it.
 - `trace-clock ADDRESS`: log process 126 counters, hand values and numeric time each frame in `clock-frames.csv`. ADDRESS is the hexadecimal process base. Use `0` to stop. This reads game memory without modifying it.
 - `quit`: stop the run.
@@ -34,3 +35,9 @@ Commands:
 The microphone provides silence; network, DSi camera and accessory input are disabled. Captures cannot verify microphone puzzles until scripted microphone input is added. Cartridge save writes are confined to the trace directory. A checkpoint is specific to the pinned core build and supplied ROM.
 
 The opening trace files record actual input sequences. Native comparisons must identify both the trace and checkpoint; a decoder hash alone does not establish story, puzzle or audio playback fidelity.
+
+Capture the process-52 cassette controls and isolated input path with
+`python3 tools/capture_cassette02_controls.py`. The control probes write an
+internal process state. The input path injects process 52 from a walking
+checkpoint. Neither trace verifies Chapter 8 entry or its parent return. The
+audio cue log records BGM state only.

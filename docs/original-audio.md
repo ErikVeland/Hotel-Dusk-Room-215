@@ -32,13 +32,22 @@ transfers the current musical position and crossfades over 150 ms during play.
 Switching while paused retains the paused position. Music fades, mute, volume
 and sound effects remain under the same controller. A preparation failure keeps
 the existing source playing and reports the error. Both sources use per-cue level calibration from complete introductions and loops.
-The native sampler was 10.76–22.62 dB louder by RMS before correction. Native
-output is attenuated to match the recordings, and both sources retain 3 dB of
-shared headroom. This changes gain, not musical dynamics or file contents.
+The baseline profile measured native RMS 10.76–22.62 dB above the recordings.
+The calibration table attenuates native output, and both sources retain 3 dB of
+shared headroom. These are reference-host level measurements. The audio profile
+test reports current calibrated and uncalibrated RMS differences without using
+them as pass criteria. RMS does not measure fidelity or perceived loudness.
 Listening on the target device is still needed to assess perceived loudness and
 timbral changes. `docs/audio-source-profile.json` retains the baseline measurements;
 `tools/calibrate_music_levels.py` reproduces the bundled calibration and binds it
-to both exact resource manifests.
+to both exact resource manifests. When it reads a runtime profile, it uses the
+unbalanced measurements. For the original raw-only profile, it uses the
+`native` and `recorded` measurements. This avoids applying the current balance
+twice.
+
+The current host skips `AudioProfilingTests.testBothBackendsProduceFiniteAudioAndRecordPreparationCost`
+because its Apple sampler audio unit is unavailable. That run produced no current
+runtime profile. The host has therefore not verified the calibrated music output.
 
 The controller retains at most one alternate backend for the current cue, with
 its transport paused and muted and its engine graph ready. Switching back reuses it. Changing the cue or stopping the
@@ -77,6 +86,10 @@ record. Copies of all raw files are also bundled under `Audio/Nitro`.
 The 186 archive entries include stingers, system sounds, footsteps, environmental
 audio and puzzle effects. Native SSAR sequencing and sample rendering are
 implemented. Recovered menu, dialogue and puzzle call sites select the cues.
+The ROM reference runner records PCM during isolated process captures even when
+`activeBGM` is `-1`. Those files contain non-silent audio, but the current cue log
+does not identify sound-effect requests or attribute PCM to an effect. Do not use
+those captures as music playback evidence.
 Walking footsteps now use the map-specific pair of original cues, the original
 6/8-tick cadence increments, and actual movement after collision handling. Idle
 frames reset the counter to 200 after walking has started; untouched initial idle

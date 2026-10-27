@@ -8,7 +8,7 @@ final class OriginalBowlingLaunchTests: XCTestCase {
             previousDelta: SIMD3(10, 30, -400)
         )
 
-        XCTAssertEqual(velocity, SIMD3(15, 10, -450))
+        XCTAssertEqual(velocity, SIMD3(15, 0, -450))
     }
 
     func testRejectsForwardDeltaAtOrAboveLaunchThreshold() {
@@ -31,6 +31,6 @@ final class OriginalBowlingLaunchTests: XCTestCase {
             currentDelta: SIMD3(-61, 1467, -1755),
             previousDelta: SIMD3(-82, 1467, -2341))
 
-        XCTAssertEqual(velocity, SIMD3(-71, 1467, -819))
+        XCTAssertEqual(velocity, SIMD3(-71, 0, -819))
     }
 }

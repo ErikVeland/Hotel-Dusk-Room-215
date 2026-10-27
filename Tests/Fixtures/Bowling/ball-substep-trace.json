@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint isolated ball-motion probe",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "384eff59872b036344257421f50326981fa9962342b5d050a0c6f2d820ddecfe",
+  "commandsSHA256": "14a0bc9481a117e3c8fdadd5528443c6b268571d4623c047d752ec3302f30d27",
+  "note": "Starts from the captured roll-23 checkpoint, sets the ball position and velocity, disables all ten pins, and advances one source update. The sibling ball-boundary-trace fixture covers the lateral stop and continued longitudinal movement. Neither fixture verifies pin collisions, normal Chapter 8 entry, or the process return.",
+  "initial": {
+    "positionFixed20_12": [0, 0, 0],
+    "velocityFixed20_12": [1024, 0, -2048]
+  },
+  "afterOneUpdate": {
+    "positionFixed20_12": [1020, 0, -2040],
+    "velocityFixed20_12": [1024, 0, -2048]
+  },
+  "disabledPinCount": 10
+}

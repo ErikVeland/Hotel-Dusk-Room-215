@@ -62,9 +62,97 @@ through normal play.
 | 5 | R102, R111, R113, R117–R119, R203–R205, R207, R212–R213 | 38, 60: handlers present | Three normal-input route tests cover Mila and the doll, evidence against Jeff, and the confession and review. Run them from the Chapter 4 save. |
 | 6 | R104–R106, R126, R202, R205, R213 | 46, 51, 53, 54, 58: handlers present | A normal-input test now starts from the Chapter 5 save and follows R205 → R213 → R117 → R126 → R104. It saves a bar checkpoint for the next route segment. The test skips until the Chapter 5 route creates its save. No full Chapter 6 route test exists. Process 46 uses the original label mask, drag reveal and 99.5% completion threshold. Its native placement and route still need reference confirmation. Check the vending prize, coins, matchsticks, bottles and wine label. |
 | 7 | R102, R103, R105, R112, R117, R118, R122, R126, R205–R206, R213 | 55 and 43: native handlers added | No chapter route test found. Process 55 loads the source cube at the 26 recovered transforms and opens the tree-box selection. Process 43 now renders ornaments and accepts drag-and-drop through their alpha masks. Its native target-to-page fit is inferred and has no original-run comparison. The other tree interaction stages and the chapter route remain incomplete. |
-| 8 | R102, R105, R113–R114, R118–R119, R124, R205–R206, R213, R401 | 44, 45, 52, 76: no native handlers | No chapter route test found. An isolated trace reaches process 76's source stroke threshold, but has no native handler or parent return. Process 44, 45 and 52 remain unverified. Check the cassette, bowling, rooftop meeting, brochure and Rosa's room. |
-| 9 | R103, R105, R107, R112–R114, R116–R118, R123, R125, R205, R207, R213 | 63, 64, 81: missing | No chapter route test found. Check the apple paintings, Room 111, CPR, birthday cards and secret door. |
-| 10 | R102–R103, R108, R117–R118, R205, R210, R213, R301–R302, R304–R305, R401 | 59, 61, 62, 67, 74, 75, 79, 85, 86, 88, 90, 91: missing; 80: handler present | No chapter route test found. Check the cellar, timed escape, wall and painting interactions, final conversations and endings. |
+| 8 | R102, R105, R113–R114, R118–R119, R124, R205–R206, R213, R401 | 45, 52, 76: partial native cassette handlers; 44: no native handler | No chapter route test found. Process 76 accepts the captured pencil swipe and returns to its parent. Process 45 returns through slot 5 after its delay and fade. Process 52 has an isolated scene handler, but the normal `R114` route and control selection remain unverified. The control selection capture injects an internal input phase; a tap after the native scene transition does not change the selector in the new source capture. Cassette previews have a known table-placement mismatch. The Chapter 8 route remains unverified, and process 44 needs a native handler. Check the cassette, bowling, rooftop meeting, brochure and Rosa's room. |
+| 9 | R103, R105, R107, R112–R114, R116–R118, R123, R125, R205, R207, R213 | 63, 64 and 81: native handlers present | Process 63 waits for a full close and reopen. Process 64 resolves its embedded call context and map, renders the painting, checks its source region against the bitmap alpha mask, saves the found bit and returns result 2 after acknowledgement. Process 81 accepts five player taps in apple-count order and returns result 2 after J-E-N-N-Y. The CPR scene and physical hinge input need a DS comparison. Process 64 camera input, process 81 notebook presentation, source transition timing and the chapter route also need checks. |
+| 10 | R102–R103, R108, R117–R118, R205, R210, R213, R301–R302, R304–R305, R401 | 59: native exit handler; 61, 62, 67, 74, 75, 79, 85, 86, 88, 90, 91: missing; 80: handler present | Process 59 displays a captured scene and returns through its source exit delay. Its pencil animation is not modelled. No Chapter 10 route test exists. Check the cellar, timed escape, wall and painting interactions, final conversations and endings. |
+
+Chapter 9's apple-letter interaction uses overlay 38. Its five painting indices
+come from the map-ID table at `0x02200370`, and the target word is `JENNY` at
+`0x02200390`. The five map IDs, in painting order, are `11, 39, 17, 33, 31`.
+The source stores the five found paintings in a bit mask at process offset
+`+0x546`. Process initialisation queries its caller with key
+`0x15` and selects the painting-search path only when the returned value is
+`10`; another value enters the word-entry path. A process-ID RAM write does
+not construct this caller context. Injecting process 64 from the walking
+checkpoint therefore produces a blank scene, and that capture is not evidence
+for normal apple-search input. `OriginalEventRunner` retains the embedded event
+bytes, source offset and selection context for the active process.
+`OriginalAlphabetProcessContext` now maps the five recovered process-64 call
+sites to painting search and the process-81 call site to word entry. It returns
+the source key `0x15` value 10 for search only; the word-entry caller value is
+still unknown. Overlay initialisation at `0x021FCC60` takes the search path only
+when that caller value is exactly 10. Every other value creates the shared
+`0x2DC` text-entry object with `0x02028090` and `0x02028160`, then starts the
+entry path. The recovered update at `0x021FFC80` waits for that control and
+writes `6` to the overlay result field at `+0x59A`. The parent process then
+returns manager value 2 after acknowledgement. The subsequent overlay state
+(`0x021FD310`, state 8) lets the player move through the five word positions
+and returns to the letter-search state when a position changes. These source
+transitions identify the branch, but not its valid caller value, on-screen
+layout, or exact input behaviour. Process 81 now has a native handler based on
+the recovered five-slot selection flow and the `CHP913` guide: each tap selects
+the next letter in apple-count order, and an incorrect tap clears the partial
+entry. It requires all five found bits and returns result 2 after the full
+sequence. This is a source-informed native interaction, not a matched DS
+capture of the notebook controls. The apple images use `apple%d.bin` from the
+alphabet archive. Process 64 has a partial native handler and an embedded-call
+session test; no full Chapter 9 route test exists yet.
+
+`EP9_R116` event 4 selects process 63. Its mode-15 record has selector 40 at
+byte 16, and the source adds 23. The event sits between dialogue about helping
+Mila and the next response. The `CHP914` walkthrough says the player performs CPR by
+closing and reopening the DS. The native process waits for a closed hinge state,
+then a fully open state, and returns success. This maps process 63 to the CPR
+interaction from the script order and guide. A matching original process capture
+is still needed. The simulator and Mac views offer a fold action through the
+existing hinge simulator. The face images and physical Duo input remain
+unverified.
+For a recovered process-64 invocation, the context adapter now resolves the
+active painting index from its preserved map ID. The source call sites are
+verified from the bundled event tables; the test does not assume a fixed
+call-site-to-map-ID pairing.
+`OriginalApplePaintingSearch` now models the five source map IDs, their found
+bits and the `JENNY` target word. Its tests cover map ordering, duplicate hits,
+the five-bit completion state, and letter reveal from the active map ID.
+`OriginalApplePaintingMask` reads the alpha representation from all five source
+images. `OriginalApplePaintingRenderer` draws the selected 256×256 image into
+the 192×256 page using the source three-to-one scale. Process 64 now uses the
+saved map ID to select the painting, accepts its source hit region through that
+mask, persists the found bit at game offset `0xD8`, and returns source result 2
+after acknowledgement. Session tests cover all five map-selected bitmaps in
+isolated process calls. The drag gesture changes the camera in 0.03-unit steps
+and redraws the image. It uses a native mapping from drag distance to camera
+steps. Held-input timing and source transition timing need a DS comparison. A
+full Chapter 9 route test also remains open.
+
+Overlay 38's selection check in `021fe830` transforms the active camera position
+and touch point before testing the selected painting. `OriginalApplePaintingSearch`
+now reproduces that transform and tests the 16×16 region
+from `(anchorX - 32, anchorY)` to `(anchorX - 16, anchorY + 16)`. The five
+anchor pairs, read from the interleaved tables at `0x0220037a` and `0x0220037c`,
+are `(86,214)`, `(32,224)`, `(188,188)`, `(160,74)` and `(186,74)`. These are
+camera-space values, not page coordinates. The source
+also moves the camera with directional input and arrow hitboxes, and reveals
+the selected letter only after the painting-selection transition. The renderer
+and mask now use the same camera-space model as input. Drag movement updates
+the camera fields and shows no hit-region overlay. The native mapping from drag
+distance to camera steps needs a DS comparison. Treating anchor pairs as screen
+hitboxes would select the wrong regions. The source selection also advances
+through a five-step word list and stores recovered paintings in the `+0x546`
+bit mask.
+
+The alphabet assets are linear DS bitmaps. `apple1.bin` through `apple5.bin`
+are 256×256; `answer.bin` is 256×192; and `word.bin`, `arrows1.bin` and
+`arrows2.bin` are 32×128. Load them through the hash-checked
+`OriginalBitmapLibrary.loadLinear` path. They are not covered by the tiled
+bitmap decoder.
+
+The recovered event tables call process 64 from `EP9_R117` event 1,
+`EP9_R125` event 2, `EP9_R205` event 2, and event 1 in `EP9_R207` and
+`EP9_R213`. Process 81 is called from `EP9_R125` event 5. These are embedded
+mode-15 processes: their process selector is byte 16 plus 23. Preserve the
+event/map context when adding the handlers; the event IDs alone do not
+establish which painting or word-entry state is active.
 
 Chapter 7 process 43 maps to overlay 13 and loads `ChristmasTree.tbl` and
 `ChristmasTree.wpf`. The 17 tree, ornament and hook textures decode through the
@@ -126,10 +214,12 @@ process selector as byte 16 plus 23. The recovered dialogue and `CHP802`
 walkthrough establish the required item sequence: the ballpoint pen fails
 because it is round; the pencil rewinds the tape after repeated downward
 strokes; the rewound tape returns to inventory and is then used on Louie's
-deck, where side A or B can be selected. Isolated process injections render
-the cassette scene for both IDs, but they do not establish the normal `R114`
-inventory and story-state conditions or the native gesture thresholds. Both
-process handlers remain missing.
+deck, where side A or B can be selected. The native session now connects the
+captured process-76 swipe and parent return. It does not establish the normal
+`R114` inventory conditions, source-matched rendering, or audio. Process 45
+now displays the ballpoint preview and returns through the captured slot 5
+quit target. Its repeated-stroke behaviour does not establish a successful
+ballpoint interaction.
 
 A fresh modified-checkpoint capture of process 76 reaches overlay 25, variant 1,
 interaction state 2 after its entrance animation. Its image shows the cassette
@@ -140,36 +230,174 @@ Overlay 25's state-2 tap gate reads four bounds at `0x021FFF34` through
 `FUN_0200985C`. The source values are `[108, 100, 120, 192]`; the helper checks
 transformed X against 108–120 and transformed Y against 100–192.
 
+A new isolated Process 45 tap sweep sampled raw X 135, 141 and 147 at raw Y 100
+and 130. All six taps enter input phase 3, remain there while held, then return
+to phase 2 on release. The drag-progress value stays 100 and the source counter
+stays zero. This confirms the gate response at those sample points only; it
+does not establish a visible-object mask or the normal `R114` item-use route.
+The RAM snapshots and command hashes are in
+[`process-45-gate-tap-sweep.json`](../Tests/Fixtures/Cassette/process-45-gate-tap-sweep.json).
+
 The captured orientation flag at `0x021046B8` is zero. In that mode,
 `FUN_02009920` returns raw Y and `FUN_02009960` returns `255 − raw X`. The
 source gate therefore checks X 108–120 and Y 100–192. Raw touch `(141, 130)`
 maps to `(114, 130)` and enters the gate; the earlier probe at `(114, 130)` maps
 to `(141, 130)` and misses it. `tools/capture_cassette_component.py` records
 process fields and touch deltas. Process 45 stays at input phase 3 during a
-downward raw-Y swipe, and its stroke counter stays at zero. Process 76 (variant
+downward raw-Y swipe, and field `+0x4E4` stays at zero. Process 76 (variant
 1) reaches its source success branch with a different path: tap `(141, 130)`,
 move to raw X 135 (source X 120), then decrease raw Y from 130 to 100 one
-pixel per frame. After 65 held frames, it reaches input phase 100 with six
-strokes. After 245 held frames, it reaches input phase 12. This matches the
-source `strokeCounter > 5` branch. The guide describes a downward stroke, so
-the direction mapping still needs a display check. An A press and a touch
-release do not leave phase 12 in this isolated run. The handler polls byte
-`0x0210BDA4` before it leaves phase 12. The isolated checkpoint keeps this byte
-at 1, while an unrelated dialogue capture has 0. This comparison does not
-establish the required `R114` value. The normal parent state and process return
-remain unverified. The RAM snapshots and hashes are in
+pixel per frame. After 65 held frames, input phase 100 has a `+0x4E4` counter
+value above five. The source increments this counter during qualifying touch
+frames, so it is not a verified stroke count. After 245 held frames, input
+phase 12. This matches the source `+0x4E4 > 5` branch. The guide describes a
+downward stroke, so the
+direction mapping still needs a display check. An A press and a touch release
+do not leave phase 12 in this isolated run. Source phase 12 checks
+`FUN_02081550(0x0210BC08, 0)`. This checks the screen-0 animation-manager job,
+not touch or button input. The trace now records its active flag, timer and
+mode. At phase 12 the job has mode 2 and a 28-frame timer; after 20 more frames
+the job is idle, the cassette input phase resets, and the process main phase
+advances. At 30 more frames, the process fields have reset. This verifies the
+isolated completion path only; it does not establish the normal parent or
+`R114` state.
+
+The same source run now saves the bottom-screen image before input, after the
+rewind drag and during its completion fade. It shows that the tool follows the
+gesture and that the scene changes during the interaction. These source frames
+are reference images for the renderer, not a replacement for its dynamic
+scene. The source geometry dump contains 744 polygons; the tape, pencil and
+ballpoint meshes contain 762 triangles combined. The dump is saved in
+[`process-76-ready-geometry.txt`](../Tests/Fixtures/Cassette/ReferenceFrames/process-76-ready-geometry.txt).
+Their counts are close, so
+the dump does not indicate that most model geometry is missing. It does not
+prove that the native transforms or composition match. The table surface still
+appears in the wrong part of the native preview. Reproduce the captures with
+[`component-cassette-rewind-visual.txt`](../tools/reference/component-cassette-rewind-visual.txt);
+image hashes and checkpoint identity are in
+[`process-76-source-visual-trace.json`](../Tests/Fixtures/Cassette/process-76-source-visual-trace.json).
+
+The source requests sound event `0x2B` during qualifying drag frames and sound
+event `6` on success. The captured PCM has no confirmed cassette cue. Its
+sound-manager fields report no active BGM and retain last-BGM value 17. Those
+fields do not verify sound effects. Treat the PCM as runner output, not as a
+cassette audio check. The RAM snapshots and hashes are in
 [`held-touch-trace.json`](../Tests/Fixtures/Cassette/held-touch-trace.json).
 Reproduce the input with
 [`component-cassette-rewind.txt`](../tools/reference/component-cassette-rewind.txt)
-and [`component-cassette-repeated-swipes.txt`](../tools/reference/component-cassette-repeated-swipes.txt).
+and [`component-cassette-45-repeated-matched-strokes.txt`](../tools/reference/component-cassette-45-repeated-matched-strokes.txt).
 The deck probe remains in
 [`component-cassette-deck.txt`](../tools/reference/component-cassette-deck.txt).
 `OriginalCassetteTouchRegion` records the invisible source tap region and draws
-no touch overlay.
+no touch overlay. Overlay 25 checks this gate with explicit rectangular
+bounds; no separate source mask check appears in the recovered handler. The
+cassette, pencil and ballpoint MDFs have render geometry but no recovered hit
+geometry. `OriginalModelProjectedMask` now projects those render triangles into
+screen-space masks. The cassette preview can make tape and tool masks from the
+same camera and transforms as its rendered meshes. Callers can add edge padding
+without drawing overlays. Tests cover all three model silhouettes. The masks
+are not connected to gameplay, and the preview still does not match the source
+scene. A matched raw-Y-decreasing
+gesture on process 45 reaches input phase 5 and changes field `+0x4E4` from 0
+to 1, but remains in phase 5 after release and a 40-frame wait. Repeating that
+path six times leaves the process in phase 5 and the field reaches 380. The
+field is not established as a completed-stroke count or success condition.
+The capture is in
+[`process-45-matched-path.json`](../Tests/Fixtures/Cassette/process-45-matched-path.json);
+it does not identify the normal item-selection condition. A separate quit
+probe confirms the overlay's slot-5 return path: without input, variant 0 stays
+at main phase 1 and input phase 5; a tap at raw `(15, 170)` sets the main
+return gate, and the process fields reset after the 60-frame exit fade. This
+is modified-checkpoint evidence only. The session uses this slot 5 target and a
+60-update fade before it returns. See
+[`process-45-quit-path.json`](../Tests/Fixtures/Cassette/process-45-quit-path.json).
 
-An isolated process-52 injection from the walking checkpoint is also
-inconclusive: its frame-300 capture establishes neither a verified interaction
-nor a process return. The normal `R114` parent state is absent from that run.
+Overlay 25 loads `bg.bin` and `table.bin` as textures, then loads `pencil.mdf`,
+`ballpen.mdf` and `tape.mdf` with their matching source textures. The bundled
+model report decodes the pencil and ballpoint as cylinder meshes and the tape
+as a cube mesh with side-A and side-B materials. The source draws `table.bin`
+as a four-vertex textured quad in `021FF614`, with dimensions from the texture
+record and a transform at `021FFC50`. The current preview uses that transform,
+including Z −90°, X 4° and Y −50° rotations and translation
+`(−4, 0.5, −26)`,
+but its tabletop still covers the wrong part of the frame. The source camera
+uses a 20-degree field of view, 4:3 aspect, eye `(0, 0, 4)`, up `(0, −1, 0)`,
+target `(0, 0, 0)`, near plane `0.1` and far plane `60`. The renderer now uses
+these values. Texture coordinates or matrix conventions may still differ.
+The session displays this renderer during processes 45 and 76. Its table
+placement still does not match the source capture, so neither process is
+visually verified for normal play. The quit path has no confirmed cassette
+sound cue. Do not treat the visible scene or its audio as source-matched
+evidence.
+
+The first isolated process-52 capture from the walking checkpoint stopped at
+frame 300 and established neither interaction nor return. A later input trace
+reaches the cassette controls and requests exit. The `R114` parent state is
+absent from this workspace, so the Chapter 8 return has not been verified in
+the story route.
+
+The process factory maps process 52 to overlay 28 with variant 6
+(`0200b334`, case `0x52`). Overlay 28 loads `/data/trick/cassette02.tbl` and
+`/data/trick/cassette02.wpf`. Its resources include the `front`, `radio` and
+`tape` models, plus play, stop, pause, rewind and fast-forward button images
+(`021fcd14`). The update callback has timed states and input checks
+(`021fde70`, `021ff360`). A normal-input process trace now touches the cassette
+at `(76, 156)`, drags upward to `(76, 108)`, reaches input state 103, and starts
+the playback sequence with A. A tap at the back control sets the source exit
+flag. The audio log records BGM state only. It does not verify the cassette
+sound.
+The same fixture records the four fixed-point vectors copied into the source
+camera object and the radio, front and tape model transforms at opening,
+controls-ready, playback, exit-requested and after-exit frames. The vectors
+change between opening and controls-ready, then change again on playback; the
+captured model transforms remain fixed in these states. The new
+`OriginalCassetteDeckCamera` helper maps the recovered position, up and target
+vectors initialised in `021fcd14` and updated in `021fde70`. Camera setters
+`02089254`, `02089270`, `0208928c` and `02089238` place them in the camera
+object; `020895f4` uses the position, up and target fields for the view
+transform. Projection values come from `02088fec`. `OriginalCassetteDeckRenderer`
+renders the radio, front and tape models and builds invisible projected-mesh
+masks with edge padding. Process 52 now starts this renderer in the native
+session. Its controller follows the captured object hit, upward drag, 180-update
+camera turn, control selection and 60-update back exit. The native Play
+selection button maps to the DS A-button press, and Return to story maps to the
+source back control. These touch adaptations, the model rotation order and the
+rendered comparison against source frames are not verified. The native process
+return is not yet verified through `R114`.
+
+The recovered `EP8_R114` BLK record at offset 492 calls process 52. Its CHK
+transition table maps return values 0, 1, 2 and 3 to events 16, 17, 17 and 18.
+This defines the script return contract. The observed back-control path returns
+2 and selects event 17. `OriginalEventCompletionTests` checks all four source
+transitions; the Chapter 8 parent route is still unverified.
+
+Overlay 28's control branch checks two source rectangles through
+`FUN_0200985c` at input state 103. With orientation flag 0, the bounds are
+`[192, 16, 224, 80]` and `[192, 112, 224, 176]` in transformed coordinates.
+Independent taps at raw `(47, 47)` and `(47, 143)` advance input state 103 to
+104 and set selector values 0 and 1. The capture writes state 103 directly.
+It verifies the bounds only and does not identify the visible button masks.
+After the native scene transition, a tap at `(47, 47)` leaves the selector at
+0 and input state at 103. This normal-input probe does not verify the control
+branch. Its RAM and command hashes are in
+[`process-52-normal-control-tap.json`](../Tests/Fixtures/Cassette/process-52-normal-control-tap.json).
+The native view does not draw the source bounds. Reproduce the injected-state
+check with [`capture_cassette02_controls.py`](../tools/capture_cassette02_controls.py)
+and the normal-input probe with
+[`capture_cassette52_control_path.py`](../tools/capture_cassette52_control_path.py).
+
+Overlay 28's update callback returns 2 when its exit flag reaches the timed
+exit path (`021fd888`). The `EP8_R114` CHK table therefore selects event 17
+for the observed back-control exit. This closes the source return-value
+question for that path. Return values 0, 1 and 3 remain unverified.
+
+The same script samples 42 raw touch points against overlay 28's 3D scene from
+the initial view, with a release before each sample. Twenty-five points enter
+input state 2. All sampled hits fall between X 60–92 and Y 108–156. This coarse
+grid supports mask work, but it does not define the full silhouette or prove
+that a native model projection matches the source. The runner reads the process
+state and touch-active byte directly. It does not save a full RAM image for each
+sample.
 
 Chapter 7's `EP7_R122` calls process 55 at event 3, then process 43 at event 7.
 The supplied guide places the tree-box search before tree decoration. The
@@ -198,15 +426,25 @@ uses player 0's three scores and three round-status values (`021fea90`). This
 agrees with the guide's three rounds and Louie's final roll into a potted plant.
 `OriginalBowlingResult` now records this interleaved layout and the recovered
 round comparisons and final-check predicate; focused tests cover slot order,
-score recording, round status and the finish rule. The current native session has
-no process-44 handler, scene renderer or input path. Ball hit geometry,
-drag-to-velocity mapping, pin outcomes and the final story return still need
-implementation and comparison.
+score recording, round status and the finish rule. `OriginalBowlingRenderer`
+composes the recovered lane, ball and pin models and builds a projected mesh
+mask for ball selection. The Metal rendering test skips on hosts without a Metal
+device, so the scene is not yet compared with the source image or connected to
+the native session. Process 44 still needs a session handler, drag-to-velocity
+mapping, pin-pair response, turn progression and a verified final story return.
 
 The `EP8_R119` process-44 event selects event 9 for process result 0, event 10
 for result 1, and event 11 for result 2. A focused script test verifies all
 three source transitions and their offsets. This identifies the return contract;
 it does not establish which bowling outcome reaches each return in a normal run.
+
+The overlay's normal completed-match path sets the process stage to 3, then
+`021ff1b8` returns process result 2 after its audio cue finishes. The one-roll
+probe also records the dialogue callback flag after the score dialogue begins.
+That flag belongs to the dialogue controller; it is not the match result. The
+isolated process still has no parent event, and all six score slots remain
+unset. The source paths that produce results 0 and 1 are not yet tied to a
+normal Chapter 8 interaction.
 
 `tools/capture_bowling_component.py` now creates a reproducible process-start
 trace from a valid walking checkpoint. It records the opening state at frame
@@ -215,6 +453,17 @@ trace from a valid walking checkpoint. It records the opening state at frame
 injects process 44 through the original factory, so this confirms scene
 initialisation only. It does not establish normal Chapter 8 route completion,
 ball selection, a roll, or the story return.
+
+The `--turn-phase-probe` capture adds one centre roll from that isolated
+checkpoint. Its six toppled pins are visible in the source process data. The
+ball stops by frame 30, and the captured screens then show the bowling
+dialogue. An A press advances to Louie's reply. The isolated object remains in
+its final state and its score slots remain unset, so this probe does not prove
+the process-manager return or a complete turn. See
+[`turn-phase-probe.json`](../Tests/Fixtures/Bowling/turn-phase-probe.json).
+The fixture also records the dialogue request, callback flag and callback
+delay. The callback flag at `+0xC58` belongs to the dialogue controller; it is
+not the match result.
 
 Overlay 11's touch path is now traced through `02202D74` and `02202F88`.
 `02202D74` builds a camera ray from the current camera basis and touch point.
@@ -228,10 +477,13 @@ the native process does not yet supply the source camera basis or live lane
 vertices for hit tests. The raw touch conversion from `02009920` and `02009960`
 is now represented for both screen orientations: the resulting page point is
 `(191 - y, x)` when rotated and `(y, 255 - x)` otherwise. Focused tests cover
-both formulas and the 256×192 input bounds. The new component trace records
-the initial camera matrix. Native input still needs the per-frame camera
-basis, transformed lane vertices, and comparison against original touch input
-before integration.
+both formulas and the 256×192 input bounds. `dragAnchor` now requires a
+lane-plane hit followed by a ball-plane hit and returns both world-space
+intersections. Focused tests cover that order and reject a ball-plane hit
+outside the lane mask. The component trace records the initial camera matrix
+and both 24-word drag hit-test input blocks. Native input still needs the
+per-frame camera basis, transformed lane vertices, and comparison against
+original touch input before integration.
 The decoded `2Frouka`, `boulball` and `boulpin` render groups do not include
 hit triangles, so the renderer's mesh picker cannot stand in for this path.
 Recover the overlay's live camera basis and transformed lane vertices before
@@ -241,14 +493,16 @@ provide those values.
 The decoded overlay image supplies two static six-vertex planes used by
 `021FF914`: `0x02204B30` spans X/Z from −5 to +5 at Y=0, and `0x02204B78`
 spans X/Y from −0.3 to +0.3 at Z=0. Both use 20.12 fixed-point coordinates.
-They are copied to process offsets `+0x300` and `+0x348`. The 96-byte
-structures at `+0x438`, `+0x498` and `+0x4F8` copy the same six 3D vectors from
-the process template at `+0x3D8` (`022044F4`). The touch test transforms the
-six vectors from `+0x4F8` before ray intersection. This is transform data, not
-the model's missing hit triangles. `OriginalBowlingTouchRay` now stores the
-two source six-vertex plane templates and checks forward ray hits against their
-two triangles. Exact source segment clipping and the live camera transform
-remain unverified, so this helper is not yet connected to bowling input.
+They are copied to process offsets `+0x300` and `+0x348`. The process trace
+shows temporary data at `+0x438`, `+0x498` and `+0x4F8`. The component capture
+now records the 24 words copied from `+0x498` and `+0x4F8` immediately before
+each hit-test call. The decompiler's fifth-argument layout does not establish
+the vertex stride, so these raw words are evidence for follow-up analysis, not
+transformed hit-test vertices. The source hit-test path still needs a clearer
+account of its transformed triangles. `OriginalBowlingTouchRay` stores the two
+static six-vertex plane templates and checks forward ray hits against their
+triangles. Exact source segment clipping and the live camera transform remain
+unverified, so this helper is not yet connected to bowling input.
 
 While the player holds the ball, `021FDA10` stores the current and previous
 drag deltas. On release, `021FEB08` averages those two deltas for each velocity
@@ -257,7 +511,14 @@ negative threshold (`−205` in 20.12 fixed point), then clamps that component
 to the source minimum. `OriginalBowlingLaunch` now implements this conversion.
 The roll score counts the ten pins with non-zero rotation (`021FE9D4`).
 `OriginalBowlingPinField` records those rotation states and the four-row pin
-centres recovered from `021FFDFC`. A launch regression test now feeds in the
+centres recovered from `021FFDFC`. Its rotation values now use the source float
+format at `+0x594`, which the captured roll records as π/2 for toppled pins.
+Comparing its old centre formula with the
+captured process state showed that its X spacing and Z positions were half the
+source values. The component now uses the source formation, and the trace stores
+each pin's 20.12 position and motion, rotation and active flag.
+`OriginalBowlingPinField.Pin` now retains those fixed-point vectors, float
+angles and update flags. A launch regression test now feeds in the
 captured final drag deltas and confirms the source threshold accepts the roll
 and clamps its forward speed. The pin simulation and process-44 scene, input
 and return path still need implementation.
@@ -275,6 +536,95 @@ inputs and numeric scores, but they do not verify normal Chapter 8 entry, later
 turns, or the process return transition. This is emulator reference evidence
 from a modified checkpoint, not a hardware run.
 
+`Tests/Fixtures/Bowling/camera-input-trace.json` replays the same centred roll
+and records the camera matrix, drag deltas, launch velocity and pin rotations
+at selected points. It now records each pin's angular velocity and update flag,
+plus states after each of the first 40 post-release runner frames. The first
+moving pin appears at sample 24. Its motion changes again with later pin
+collisions, so the per-pin movement routine alone cannot reproduce this trace.
+The camera matrix stays unchanged from ready through drag
+and release. It switches to a second fixed matrix by the first captured point
+10 frames into the roll, then stays there through frame 180. This supports two
+source camera modes. `OriginalBowlingCameraBasis` now has a focused comparison
+for both captured matrices. This verifies the basis conversion only. It does
+not establish the renderer or pin motion between captures. The decompiled
+movement routine uses a 0.9 motion factor, a 0.0001 motion threshold, a 0.05
+angular step and angle bounds from π/2 and 3π/2. `OriginalBowlingPinField` now
+implements per-pin X/Z position, Y-motion reset, 0.9 linear damping and the
+per-axis stationary threshold. It also advances rotation by angular velocity,
+adds the source's 0.05 angular step and clamps at either rotation limit. The
+captured pin 0 state at roll 24 advances to its roll 27 rotation and angular
+velocity under this rule. The helper still does not model pin collisions and is
+not connected to process 44. The isolated ball-to-pin model is described below;
+pin-pair response remains separate.
+The reference checkpoint resolves the shared pin collision radius at
+`0x02204D90` to `0.484848` (`02204BC0` initialises it). The pair routine squares
+this radius before comparing it with the squared X/Z pin distance.
+`OriginalBowlingPinField.overlappingMovingPinPairs` now implements that active,
+moving-pair and distance gate. The ball-to-pin source uses radius fields
+`0.2424242` and `0.7272727`, which sum to `0.9696969` world units.
+`pin-pair-sweep.json` adds twelve isolated one-update captures across X, Z and
+diagonal contacts, with motion along and across each contact axis. The original
+changes both pins' positions and velocities, but the decompiled pair routine has
+unreliable recovered branches. These captures narrow the response rules; they
+do not support a complete native pair response yet.
+`OriginalBowlingPinField.ballContactCandidates` checks active pins that are not
+already updating against this strict X/Z distance limit. The isolated capture
+sweep records contact at `0.9668` after seven substeps and no contact at
+`0.9766`; this brackets the source limit. The moving-away case also changes
+ball and pin state, so the source has no approach-direction gate.
+`OriginalBowlingPinField.resolveBallContacts` now applies the captured
+ball-to-pin linear and angular response. `OriginalBowlingBallPinSimulation`
+combines it with ten fixed-point ball substeps and the outer positive-Z speed
+rule. Its state matches every case in `ball-pin-collisions.json`. This verifies
+the isolated source captures only; pin-pair response, process 44 rendering and
+touch integration remain open. The simulation is not yet connected to the
+normal Chapter 8 route.
+`OriginalBowlingBallMotion` clears vertical velocity during a normal substep,
+applies the recovered lateral X stop boundary and continues longitudinal Z
+motion. The isolated original-runner fixture checks both behaviours with all
+pin records disabled.
+An earlier pin-state write trace was exploratory, not isolated collision
+evidence. It loaded roll frame 23, modified pin fields, and advanced one frame.
+It left the ball moving and placed inactive test pins at the same position.
+Those conditions could produce ball-to-pin and pin-to-pin collisions, so the
+trace cannot isolate either response. The renamed
+[`pin-state-write-probes.json`](../Tests/Fixtures/Bowling/pin-state-write-probes.json)
+preserves these exploratory captures. The roll process uses `+0x4F8` and
+`+0x500` for ball X/Z position and `+0x51C` and `+0x524` for X/Z velocity.
+The new
+[`isolated-pin-interactions.json`](../Tests/Fixtures/Bowling/isolated-pin-interactions.json)
+parks the ball at a distant position, sets zero velocity, spaces unused pins
+apart, and records one update for seven pin configurations. The separated-pin
+case confirms 20.12 position integration, 0.9 velocity damping, and the 0.05
+angular-velocity step from rest. `OriginalBowlingPinField` now matches that
+one-frame pin update. The other cases record the source pair response for
+axial, diagonal, approaching, separating and tangential motion. These captures
+provide collision evidence, but the full pin response is not yet implemented
+in the native process. Process update `022043c0` also applies a one-step X-axis
+lane-edge correction of 410 fixed-point units at ±3.1 units. Seven isolated
+source captures cover both edges and four pin rotations; the native pin field
+now matches these positions. `02203db8` still applies a separate positional
+correction during pair response.
+The source update order in `021FDF64` is `021FEDA0`, `0220368C`,
+`021FEF34`, `022043C0`, then `02203DB8`. The final routine processes every
+active pin pair and applies positional and velocity corrections after the
+individual pin update. The native model currently checks pair overlap but does
+not reproduce this response. A full bowling turn and its score therefore remain
+unverified.
+The new
+[`ball-pin-collisions.json`](../Tests/Fixtures/Bowling/ball-pin-collisions.json)
+adds isolated captures for head-on, diagonal, near-edge, outer-edge, stationary
+overlap, moving-away overlap and axial contact-limit inputs. These captures
+span a complete process update, not individual substeps. The isolated model
+matches these states, but does not establish full pin-to-pin response or normal
+route behaviour.
+Overlay 11's draw routines build model transforms from process values at
+`+0x468` and `+0x4A0`. The trace records both inputs, but they stay fixed during
+the sampled roll. The draw parameter blocks at `+0x448` and `+0x480` are mostly
+zero in these states. The captures still do not identify the rendered ball
+transform or the object masks.
+
 A follow-up trace waited 1,200 frames after the centred roll. The six pin
 rotation fields remained set, while the process stayed at scene state 2,
 substate 2, internal state 5, round index 0, with all six result slots at −1.
@@ -289,12 +639,22 @@ the process return still needs verification in the `EP8_R119` story context.
 
 The original factory maps process 44 to bowling, process 46 to label peeling,
 process 55 to the search shed, process 59 to the pencil sharpener, process 61 to picture peeling,
-process 62 and 67 to the code puzzle, process 63 to the Chapter 9 character
-lookup, process 64 and 81 to the alphabet puzzle, process 74, 86, 90 and 91 to
+process 62 and 67 to the code puzzle, process 63 to the Chapter 9 CPR interaction,
+process 64 and 81 to the alphabet puzzle, process 74, 86, 90 and 91 to
 the typewriter, process 75 and 79 to the brick/search-shed overlay, process 85
 to the confession scene, and process 88 to an overlay with no recovered asset
 strings. These mappings identify original code and assets. They do not prove
 native input or route behaviour.
+
+Process 59 has a repeatable isolated reference capture from the walking
+checkpoint. A 20-frame touch at `(100, 100)` sets the held-pencil flag at
+`+0x2ED`. Four frames at `(15, 172)` enter exit state 3. The overlay returns
+result 2 after its exit callback. The native session now displays a captured
+portrait scene, uses a hidden rounded mask for the exit icon, waits 60 updates,
+and returns result 2. A focused session test runs `EP10_R301` event 14 through
+the parent event runner. The pencil sharpening animation and the full Chapter
+10 route remain unverified. See
+[`source-trace.json`](../Tests/Fixtures/PencilSharpener/source-trace.json).
 
 The 26 October verification attempt skipped all three Chapter 5 route tests
 because the Chapter 4 save was absent. The reference profile also failed in

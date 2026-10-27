@@ -1,0 +1,480 @@
+load /Users/erikveland/Hotel-Dusk-Room-215/extracted/reference/component-walking-base/ready.mln
+write32 0227d2f0 2d
+write32 0227d2f4 2d
+frames 300
+capture ready
+touch 141 130
+frames 1
+touch 140 130
+frames 1
+touch 139 130
+frames 1
+touch 138 130
+frames 1
+touch 137 130
+frames 1
+touch 136 130
+frames 1
+touch 135 130
+frames 1
+touch 135 129
+frames 1
+touch 135 128
+frames 1
+touch 135 127
+frames 1
+touch 135 126
+frames 1
+touch 135 125
+frames 1
+touch 135 124
+frames 1
+touch 135 123
+frames 1
+touch 135 122
+frames 1
+touch 135 121
+frames 1
+touch 135 120
+frames 1
+touch 135 119
+frames 1
+touch 135 118
+frames 1
+touch 135 117
+frames 1
+touch 135 116
+frames 1
+touch 135 115
+frames 1
+touch 135 114
+frames 1
+touch 135 113
+frames 1
+touch 135 112
+frames 1
+touch 135 111
+frames 1
+touch 135 110
+frames 1
+touch 135 109
+frames 1
+touch 135 108
+frames 1
+touch 135 107
+frames 1
+touch 135 106
+frames 1
+touch 135 105
+frames 1
+touch 135 104
+frames 1
+touch 135 103
+frames 1
+touch 135 102
+frames 1
+touch 135 101
+frames 1
+touch 135 100
+frames 1
+frames 65
+capture swipe-1-held
+release
+frames 8
+capture swipe-1-released
+touch 141 130
+frames 1
+touch 140 130
+frames 1
+touch 139 130
+frames 1
+touch 138 130
+frames 1
+touch 137 130
+frames 1
+touch 136 130
+frames 1
+touch 135 130
+frames 1
+touch 135 129
+frames 1
+touch 135 128
+frames 1
+touch 135 127
+frames 1
+touch 135 126
+frames 1
+touch 135 125
+frames 1
+touch 135 124
+frames 1
+touch 135 123
+frames 1
+touch 135 122
+frames 1
+touch 135 121
+frames 1
+touch 135 120
+frames 1
+touch 135 119
+frames 1
+touch 135 118
+frames 1
+touch 135 117
+frames 1
+touch 135 116
+frames 1
+touch 135 115
+frames 1
+touch 135 114
+frames 1
+touch 135 113
+frames 1
+touch 135 112
+frames 1
+touch 135 111
+frames 1
+touch 135 110
+frames 1
+touch 135 109
+frames 1
+touch 135 108
+frames 1
+touch 135 107
+frames 1
+touch 135 106
+frames 1
+touch 135 105
+frames 1
+touch 135 104
+frames 1
+touch 135 103
+frames 1
+touch 135 102
+frames 1
+touch 135 101
+frames 1
+touch 135 100
+frames 1
+frames 65
+capture swipe-2-held
+release
+frames 8
+capture swipe-2-released
+touch 141 130
+frames 1
+touch 140 130
+frames 1
+touch 139 130
+frames 1
+touch 138 130
+frames 1
+touch 137 130
+frames 1
+touch 136 130
+frames 1
+touch 135 130
+frames 1
+touch 135 129
+frames 1
+touch 135 128
+frames 1
+touch 135 127
+frames 1
+touch 135 126
+frames 1
+touch 135 125
+frames 1
+touch 135 124
+frames 1
+touch 135 123
+frames 1
+touch 135 122
+frames 1
+touch 135 121
+frames 1
+touch 135 120
+frames 1
+touch 135 119
+frames 1
+touch 135 118
+frames 1
+touch 135 117
+frames 1
+touch 135 116
+frames 1
+touch 135 115
+frames 1
+touch 135 114
+frames 1
+touch 135 113
+frames 1
+touch 135 112
+frames 1
+touch 135 111
+frames 1
+touch 135 110
+frames 1
+touch 135 109
+frames 1
+touch 135 108
+frames 1
+touch 135 107
+frames 1
+touch 135 106
+frames 1
+touch 135 105
+frames 1
+touch 135 104
+frames 1
+touch 135 103
+frames 1
+touch 135 102
+frames 1
+touch 135 101
+frames 1
+touch 135 100
+frames 1
+frames 65
+capture swipe-3-held
+release
+frames 8
+capture swipe-3-released
+touch 141 130
+frames 1
+touch 140 130
+frames 1
+touch 139 130
+frames 1
+touch 138 130
+frames 1
+touch 137 130
+frames 1
+touch 136 130
+frames 1
+touch 135 130
+frames 1
+touch 135 129
+frames 1
+touch 135 128
+frames 1
+touch 135 127
+frames 1
+touch 135 126
+frames 1
+touch 135 125
+frames 1
+touch 135 124
+frames 1
+touch 135 123
+frames 1
+touch 135 122
+frames 1
+touch 135 121
+frames 1
+touch 135 120
+frames 1
+touch 135 119
+frames 1
+touch 135 118
+frames 1
+touch 135 117
+frames 1
+touch 135 116
+frames 1
+touch 135 115
+frames 1
+touch 135 114
+frames 1
+touch 135 113
+frames 1
+touch 135 112
+frames 1
+touch 135 111
+frames 1
+touch 135 110
+frames 1
+touch 135 109
+frames 1
+touch 135 108
+frames 1
+touch 135 107
+frames 1
+touch 135 106
+frames 1
+touch 135 105
+frames 1
+touch 135 104
+frames 1
+touch 135 103
+frames 1
+touch 135 102
+frames 1
+touch 135 101
+frames 1
+touch 135 100
+frames 1
+frames 65
+capture swipe-4-held
+release
+frames 8
+capture swipe-4-released
+touch 141 130
+frames 1
+touch 140 130
+frames 1
+touch 139 130
+frames 1
+touch 138 130
+frames 1
+touch 137 130
+frames 1
+touch 136 130
+frames 1
+touch 135 130
+frames 1
+touch 135 129
+frames 1
+touch 135 128
+frames 1
+touch 135 127
+frames 1
+touch 135 126
+frames 1
+touch 135 125
+frames 1
+touch 135 124
+frames 1
+touch 135 123
+frames 1
+touch 135 122
+frames 1
+touch 135 121
+frames 1
+touch 135 120
+frames 1
+touch 135 119
+frames 1
+touch 135 118
+frames 1
+touch 135 117
+frames 1
+touch 135 116
+frames 1
+touch 135 115
+frames 1
+touch 135 114
+frames 1
+touch 135 113
+frames 1
+touch 135 112
+frames 1
+touch 135 111
+frames 1
+touch 135 110
+frames 1
+touch 135 109
+frames 1
+touch 135 108
+frames 1
+touch 135 107
+frames 1
+touch 135 106
+frames 1
+touch 135 105
+frames 1
+touch 135 104
+frames 1
+touch 135 103
+frames 1
+touch 135 102
+frames 1
+touch 135 101
+frames 1
+touch 135 100
+frames 1
+frames 65
+capture swipe-5-held
+release
+frames 8
+capture swipe-5-released
+touch 141 130
+frames 1
+touch 140 130
+frames 1
+touch 139 130
+frames 1
+touch 138 130
+frames 1
+touch 137 130
+frames 1
+touch 136 130
+frames 1
+touch 135 130
+frames 1
+touch 135 129
+frames 1
+touch 135 128
+frames 1
+touch 135 127
+frames 1
+touch 135 126
+frames 1
+touch 135 125
+frames 1
+touch 135 124
+frames 1
+touch 135 123
+frames 1
+touch 135 122
+frames 1
+touch 135 121
+frames 1
+touch 135 120
+frames 1
+touch 135 119
+frames 1
+touch 135 118
+frames 1
+touch 135 117
+frames 1
+touch 135 116
+frames 1
+touch 135 115
+frames 1
+touch 135 114
+frames 1
+touch 135 113
+frames 1
+touch 135 112
+frames 1
+touch 135 111
+frames 1
+touch 135 110
+frames 1
+touch 135 109
+frames 1
+touch 135 108
+frames 1
+touch 135 107
+frames 1
+touch 135 106
+frames 1
+touch 135 105
+frames 1
+touch 135 104
+frames 1
+touch 135 103
+frames 1
+touch 135 102
+frames 1
+touch 135 101
+frames 1
+touch 135 100
+frames 1
+frames 65
+capture swipe-6-held
+release
+frames 8
+capture swipe-6-released
+quit

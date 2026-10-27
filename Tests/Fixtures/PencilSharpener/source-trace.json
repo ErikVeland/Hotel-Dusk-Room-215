@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint process 59 input trace",
+  "note": "The trace verifies isolated process input states. It does not verify the Chapter 10 parent event, story return, or ending route.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "d93e9226d62ca739f148da56198aff5d1bcaa56adfa41606b73e58484f17545b",
+  "commandsSHA256": "3205da83ebb20940119436cc20d67441ee75b5eaf9a79339d02c67c58918d252",
+  "exitInput": {
+    "rawTouch": [
+      15,
+      172
+    ],
+    "heldFrames": 4
+  },
+  "states": {
+    "ready": {
+      "state": [
+        1,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1621,
+        4096,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "pencil-held": {
+      "state": [
+        1,
+        1,
+        0
+      ],
+      "pencilHeld": true,
+      "exitFlags": [
+        0,
+        1
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "pencil-dragged": {
+      "state": [
+        1,
+        1,
+        0
+      ],
+      "pencilHeld": true,
+      "exitFlags": [
+        0,
+        1
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "after-pencil": {
+      "state": [
+        1,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-requested": {
+      "state": [
+        3,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-plus-1": {
+      "state": [
+        3,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-plus-2": {
+      "state": [
+        3,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-plus-10": {
+      "state": [
+        3,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-plus-30": {
+      "state": [
+        3,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-plus-60": {
+      "state": [
+        0,
+        0,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1622,
+        4096,
+        3968,
+        4294964523,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-plus-120": {
+      "state": [
+        2,
+        0,
+        21
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1621,
+        4096,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "exit-plus-240": {
+      "state": [
+        1,
+        1,
+        0
+      ],
+      "pencilHeld": false,
+      "exitFlags": [
+        0,
+        0
+      ],
+      "touchAndDragWords": [
+        4294963499,
+        1621,
+        4096,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

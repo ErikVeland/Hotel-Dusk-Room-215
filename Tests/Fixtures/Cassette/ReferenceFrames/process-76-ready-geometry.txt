@@ -1,0 +1,3225 @@
+display 19 clear 1f0000 fog 0
+display-a 4001111d display-b 11035 capture 80320010
+polygon 0 attributes 1f00c0 texture 50007700 palette 0
+vertex 138 16 uv 472 333 colour 511 511 463
+vertex 137 0 uv 470 157 colour 511 511 463
+vertex 134 0 uv 499 155 colour 511 511 463
+polygon 1 attributes 1f00c0 texture 50007700 palette 0
+vertex 139 0 uv 447 158 colour 511 511 463
+vertex 137 0 uv 470 157 colour 511 511 463
+vertex 138 16 uv 472 333 colour 511 511 463
+vertex 143 17 uv 419 346 colour 511 511 463
+polygon 2 attributes 1f00c0 texture 50007700 palette 0
+vertex 142 0 uv 417 160 colour 511 511 463
+vertex 139 0 uv 447 158 colour 511 511 463
+vertex 143 17 uv 419 346 colour 511 511 463
+polygon 3 attributes 1f00c0 texture 50007700 palette 0
+vertex 133 18 uv 525 346 colour 511 511 463
+vertex 138 16 uv 472 333 colour 511 511 463
+vertex 134 0 uv 499 155 colour 511 511 463
+vertex 132 0 uv 523 153 colour 511 511 463
+polygon 4 attributes 1f00c0 texture 50007700 palette 0
+vertex 132 0 uv 523 153 colour 511 511 463
+vertex 129 0 uv 553 151 colour 511 511 463
+vertex 133 18 uv 525 346 colour 511 511 463
+polygon 5 attributes 1f00c0 texture 523432ab palette f18
+vertex 183 0 uv 0 167 colour 303 303 287
+vertex 182 0 uv 0 189 colour 303 303 287
+vertex 181 19 uv 0 398 colour 303 303 287
+polygon 6 attributes 1f00c0 texture 523432ab palette f18
+vertex 138 19 uv 472 333 colour 511 511 463
+vertex 137 0 uv 470 126 colour 511 511 463
+vertex 140 0 uv 437 128 colour 511 511 463
+polygon 7 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 57 19 uv 8 2880 colour 47 47 0
+vertex 59 15 uv 8 2880 colour 207 207 0
+vertex 58 15 uv 8 2880 colour 207 207 0
+vertex 57 18 uv 8 2880 colour 47 47 0
+polygon 8 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 57 18 uv 8 2880 colour 47 47 0
+vertex 58 15 uv 8 2880 colour 207 207 0
+vertex 58 15 uv 8 2880 colour 207 207 0
+vertex 56 19 uv 8 2880 colour 47 47 0
+polygon 9 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 56 19 uv 8 2880 colour 47 47 0
+vertex 58 15 uv 8 2880 colour 207 207 0
+vertex 57 16 uv 8 2880 colour 207 207 0
+vertex 56 19 uv 8 2880 colour 47 47 0
+polygon a attributes 1f00c0 texture 523432ab palette f18
+vertex 138 19 uv 472 333 colour 303 303 287
+vertex 138 16 uv 472 333 colour 303 303 287
+vertex 133 18 uv 525 346 colour 303 303 287
+polygon b attributes 1f00c0 texture 523432ab palette f18
+vertex 142 0 uv 417 129 colour 511 511 463
+vertex 146 0 uv 384 132 colour 511 511 463
+vertex 143 20 uv 419 346 colour 511 511 463
+polygon c attributes 1f00c0 texture 523432ab palette f18
+vertex 143 20 uv 419 346 colour 511 511 463
+vertex 138 19 uv 472 333 colour 511 511 463
+vertex 140 0 uv 437 128 colour 511 511 463
+vertex 142 0 uv 417 129 colour 511 511 463
+polygon d attributes 1f00c0 texture 50007700 palette 0
+vertex 181 0 uv 17 188 colour 511 511 463
+vertex 178 0 uv 42 186 colour 511 511 463
+vertex 177 20 uv 42 402 colour 511 511 463
+polygon e attributes 1f00c0 texture 50007700 palette 0
+vertex 181 19 uv 0 398 colour 511 511 463
+vertex 182 0 uv 0 189 colour 511 511 463
+vertex 181 0 uv 17 188 colour 511 511 463
+vertex 177 20 uv 42 402 colour 511 511 463
+polygon f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 58 20 uv 8 2880 colour 47 47 0
+vertex 59 16 uv 8 2880 colour 207 207 0
+vertex 59 15 uv 8 2880 colour 207 207 0
+vertex 57 19 uv 8 2880 colour 47 47 0
+polygon 10 attributes 1f00c0 texture 523432ab palette f18
+vertex 138 16 uv 472 333 colour 303 303 287
+vertex 138 19 uv 472 333 colour 303 303 287
+vertex 143 20 uv 419 346 colour 303 303 287
+polygon 11 attributes 1f00c0 texture 523432ab palette f18
+vertex 143 17 uv 419 346 colour 303 303 287
+vertex 138 16 uv 472 333 colour 303 303 287
+vertex 143 20 uv 419 346 colour 303 303 287
+polygon 12 attributes 1f00c0 texture 523432ab palette f18
+vertex 135 0 uv 489 125 colour 511 511 463
+vertex 137 0 uv 470 126 colour 511 511 463
+vertex 138 19 uv 472 333 colour 511 511 463
+vertex 133 21 uv 525 346 colour 511 511 463
+polygon 13 attributes 1f00c0 texture 523432ab palette f18
+vertex 132 0 uv 523 122 colour 511 511 463
+vertex 135 0 uv 489 125 colour 511 511 463
+vertex 133 21 uv 525 346 colour 511 511 463
+polygon 14 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 58 21 uv 8 2880 colour 47 47 0
+vertex 60 18 uv 8 2880 colour 207 207 0
+vertex 59 16 uv 8 2880 colour 207 207 0
+vertex 58 20 uv 8 2880 colour 47 47 0
+polygon 15 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 56 19 uv 8 2880 colour 47 47 0
+vertex 57 16 uv 8 2880 colour 207 207 0
+vertex 57 17 uv 8 2880 colour 207 207 0
+vertex 55 21 uv 8 2880 colour 47 47 0
+polygon 16 attributes 1f00c0 texture 523432ab palette f18
+vertex 133 21 uv 525 346 colour 303 303 287
+vertex 138 19 uv 472 333 colour 303 303 287
+vertex 133 18 uv 525 346 colour 303 303 287
+polygon 17 attributes 1f00c0 texture 50007700 palette 0
+vertex 165 0 uv 181 177 colour 511 511 463
+vertex 147 0 uv 363 164 colour 511 511 463
+vertex 148 22 uv 363 402 colour 511 511 463
+polygon 18 attributes 1f00c0 texture 50007700 palette 0
+vertex 177 20 uv 42 402 colour 511 511 463
+vertex 178 0 uv 42 186 colour 511 511 463
+vertex 165 0 uv 181 177 colour 511 511 463
+vertex 148 22 uv 363 402 colour 511 511 463
+polygon 19 attributes 1f00c0 texture 50007700 palette 0
+vertex 148 22 uv 363 402 colour 511 511 463
+vertex 147 0 uv 363 164 colour 511 511 463
+vertex 144 0 uv 395 162 colour 511 511 463
+polygon 1a attributes 1f00c0 texture 50007700 palette 0
+vertex 143 17 uv 419 346 colour 511 511 463
+vertex 148 22 uv 363 402 colour 511 511 463
+vertex 144 0 uv 395 162 colour 511 511 463
+vertex 142 0 uv 417 160 colour 511 511 463
+polygon 1b attributes 1f00c0 texture 523432ab palette f18
+vertex 181 0 uv 26 154 colour 511 511 463
+vertex 184 0 uv 0 155 colour 511 511 463
+vertex 182 23 uv 0 398 colour 511 511 463
+polygon 1c attributes 1f00c0 texture 523432ab palette f18
+vertex 178 23 uv 42 402 colour 511 511 463
+vertex 180 0 uv 42 153 colour 511 511 463
+vertex 181 0 uv 26 154 colour 511 511 463
+vertex 182 23 uv 0 398 colour 511 511 463
+polygon 1d attributes 1f00c0 texture 523432ab palette f18
+vertex 182 23 uv 0 398 colour 303 303 287
+vertex 184 0 uv 0 155 colour 303 303 287
+vertex 183 0 uv 0 167 colour 303 303 287
+vertex 181 19 uv 0 398 colour 303 303 287
+polygon 1e attributes 1f00c0 texture 523432ab palette f18
+vertex 159 0 uv 252 140 colour 511 511 463
+vertex 180 0 uv 42 153 colour 511 511 463
+vertex 178 23 uv 42 402 colour 511 511 463
+polygon 1f attributes 1f00c0 texture 50007700 palette 0
+vertex 127 0 uv 574 150 colour 511 511 463
+vertex 98 0 uv 878 130 colour 511 511 463
+vertex 129 23 uv 574 402 colour 511 511 463
+polygon 20 attributes 1f00c0 texture 50007700 palette 0
+vertex 129 0 uv 553 151 colour 511 511 463
+vertex 127 0 uv 574 150 colour 511 511 463
+vertex 129 23 uv 574 402 colour 511 511 463
+vertex 133 18 uv 525 346 colour 511 511 463
+polygon 21 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 21 uv 8 2880 colour 47 47 0
+vertex 57 17 uv 8 2880 colour 207 207 0
+vertex 57 19 uv 8 2880 colour 207 207 0
+vertex 55 23 uv 8 2880 colour 47 47 0
+polygon 22 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 59 23 uv 8 2880 colour 47 47 0
+vertex 60 20 uv 8 2880 colour 207 207 0
+vertex 60 18 uv 8 2880 colour 207 207 0
+vertex 58 21 uv 8 2880 colour 47 47 0
+polygon 23 attributes 1f00c0 texture 523432ab palette f18
+vertex 133 18 uv 525 346 colour 303 303 287
+vertex 129 23 uv 574 402 colour 303 303 287
+vertex 133 21 uv 525 346 colour 303 303 287
+polygon 24 attributes 1f00c0 texture 523432ab palette f18
+vertex 182 23 uv 0 398 colour 303 303 287
+vertex 181 19 uv 0 398 colour 303 303 287
+vertex 181 23 uv 0 449 colour 303 303 287
+polygon 25 attributes 1f00c0 texture 50007700 palette 0
+vertex 181 19 uv 0 398 colour 511 511 463
+vertex 177 20 uv 42 402 colour 511 511 463
+vertex 177 24 uv 42 453 colour 511 511 463
+polygon 26 attributes 1f00c0 texture 50007700 palette 0
+vertex 181 23 uv 0 449 colour 511 511 463
+vertex 181 19 uv 0 398 colour 511 511 463
+vertex 177 24 uv 42 453 colour 511 511 463
+polygon 27 attributes 1f00c0 texture 523432ab palette f18
+vertex 148 25 uv 363 402 colour 511 511 463
+vertex 148 0 uv 363 133 colour 511 511 463
+vertex 159 0 uv 252 140 colour 511 511 463
+vertex 178 23 uv 42 402 colour 511 511 463
+polygon 28 attributes 1f00c0 texture 523432ab palette f18
+vertex 146 0 uv 384 132 colour 511 511 463
+vertex 148 0 uv 363 133 colour 511 511 463
+vertex 148 25 uv 363 402 colour 511 511 463
+vertex 143 20 uv 419 346 colour 511 511 463
+polygon 29 attributes 1f00c0 texture 50007700 palette 0
+vertex 98 0 uv 878 130 colour 511 511 463
+vertex 84 0 uv 1024 121 colour 511 511 463
+vertex 88 25 uv 1024 397 colour 511 511 463
+vertex 129 23 uv 574 402 colour 511 511 463
+polygon 2a attributes 1f00c0 texture 523432ab palette f18
+vertex 148 25 uv 363 402 colour 303 303 287
+vertex 148 22 uv 363 402 colour 303 303 287
+vertex 143 17 uv 419 346 colour 303 303 287
+polygon 2b attributes 1f00c0 texture 523432ab palette f18
+vertex 143 20 uv 419 346 colour 303 303 287
+vertex 148 25 uv 363 402 colour 303 303 287
+vertex 143 17 uv 419 346 colour 303 303 287
+polygon 2c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 23 uv 8 2880 colour 47 47 0
+vertex 57 19 uv 8 2880 colour 207 207 0
+vertex 57 22 uv 8 2880 colour 207 207 0
+vertex 55 25 uv 8 2880 colour 47 47 0
+polygon 2d attributes 1f00c0 texture 523432ab palette f18
+vertex 129 26 uv 574 402 colour 511 511 463
+vertex 127 0 uv 574 119 colour 511 511 463
+vertex 130 0 uv 537 122 colour 511 511 463
+polygon 2e attributes 1f00c0 texture 523432ab palette f18
+vertex 133 21 uv 525 346 colour 511 511 463
+vertex 129 26 uv 574 402 colour 511 511 463
+vertex 130 0 uv 537 122 colour 511 511 463
+vertex 132 0 uv 523 122 colour 511 511 463
+polygon 2f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 89 15 uv 8 2880 colour 47 47 0
+vertex 90 11 uv 8 2880 colour 207 207 0
+vertex 83 22 uv 8 2880 colour 207 207 0
+vertex 82 26 uv 8 2880 colour 47 47 0
+polygon 30 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 26 uv 8 2880 colour 47 47 0
+vertex 61 22 uv 8 2880 colour 207 207 0
+vertex 60 20 uv 8 2880 colour 207 207 0
+vertex 59 23 uv 8 2880 colour 47 47 0
+polygon 31 attributes 1f00c0 texture 50007700 palette 0
+vertex 177 20 uv 42 402 colour 511 511 463
+vertex 148 22 uv 363 402 colour 511 511 463
+vertex 149 26 uv 347 453 colour 511 511 463
+polygon 32 attributes 1f00c0 texture 50007700 palette 0
+vertex 177 24 uv 42 453 colour 511 511 463
+vertex 177 20 uv 42 402 colour 511 511 463
+vertex 149 26 uv 347 453 colour 511 511 463
+polygon 33 attributes 1f00c0 texture 523432ab palette f18
+vertex 129 23 uv 574 402 colour 303 303 287
+vertex 129 26 uv 574 402 colour 303 303 287
+vertex 133 21 uv 525 346 colour 303 303 287
+polygon 34 attributes 1f00c0 texture 523432ab palette f18
+vertex 182 27 uv 0 449 colour 303 303 287
+vertex 182 23 uv 0 398 colour 303 303 287
+vertex 181 23 uv 0 449 colour 303 303 287
+polygon 35 attributes 1f00c0 texture 523432ab palette f18
+vertex 129 26 uv 574 402 colour 303 303 287
+vertex 129 23 uv 574 402 colour 303 303 287
+vertex 128 27 uv 589 453 colour 303 303 287
+polygon 36 attributes 1f00c0 texture 523432ab palette f18
+vertex 178 23 uv 42 402 colour 511 511 463
+vertex 182 23 uv 0 398 colour 511 511 463
+vertex 182 27 uv 0 449 colour 511 511 463
+polygon 37 attributes 1f00c0 texture 523432ab palette f18
+vertex 178 28 uv 42 453 colour 511 511 463
+vertex 178 23 uv 42 402 colour 511 511 463
+vertex 182 27 uv 0 449 colour 511 511 463
+polygon 38 attributes 1f00c0 texture 523432ab palette f18
+vertex 148 25 uv 363 402 colour 511 511 463
+vertex 178 23 uv 42 402 colour 511 511 463
+vertex 178 28 uv 42 453 colour 511 511 463
+polygon 39 attributes 1f00c0 texture 523432ab palette f18
+vertex 181 23 uv 0 449 colour 303 303 287
+vertex 180 28 uv 0 501 colour 303 303 287
+vertex 182 27 uv 0 449 colour 303 303 287
+polygon 3a attributes 1f00c0 texture 50007700 palette 0
+vertex 177 28 uv 42 504 colour 511 511 463
+vertex 180 28 uv 0 501 colour 511 511 463
+vertex 181 23 uv 0 449 colour 511 511 463
+polygon 3b attributes 1f00c0 texture 50007700 palette 0
+vertex 177 24 uv 42 453 colour 511 511 463
+vertex 177 28 uv 42 504 colour 511 511 463
+vertex 181 23 uv 0 449 colour 511 511 463
+polygon 3c attributes 1f00c0 texture 523432ab palette f18
+vertex 87 29 uv 1024 397 colour 511 511 463
+vertex 82 0 uv 1024 86 colour 511 511 463
+vertex 115 0 uv 697 110 colour 511 511 463
+polygon 3d attributes 1f00c0 texture 523432ab palette f18
+vertex 129 26 uv 574 402 colour 511 511 463
+vertex 87 29 uv 1024 397 colour 511 511 463
+vertex 115 0 uv 697 110 colour 511 511 463
+vertex 127 0 uv 574 119 colour 511 511 463
+polygon 3e attributes 1f00c0 texture 523432ab palette f18
+vertex 83 0 uv 1024 111 colour 191 191 175
+vertex 82 0 uv 1024 86 colour 191 191 175
+vertex 87 29 uv 1024 397 colour 191 191 175
+polygon 3f attributes 1f00c0 texture 523432ab palette f18
+vertex 88 25 uv 1024 397 colour 191 191 175
+vertex 84 0 uv 1024 121 colour 191 191 175
+vertex 83 0 uv 1024 111 colour 191 191 175
+vertex 87 29 uv 1024 397 colour 191 191 175
+polygon 40 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 89 24 uv 8 2880 colour 47 47 0
+vertex 90 19 uv 8 2880 colour 207 207 0
+vertex 78 25 uv 8 2880 colour 207 207 0
+vertex 76 29 uv 8 2880 colour 47 47 0
+polygon 41 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 29 uv 8 2880 colour 47 47 0
+vertex 62 25 uv 8 2880 colour 207 207 0
+vertex 61 22 uv 8 2880 colour 207 207 0
+vertex 60 26 uv 8 2880 colour 47 47 0
+polygon 42 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 25 uv 8 2880 colour 47 47 0
+vertex 57 22 uv 8 2880 colour 207 207 0
+vertex 57 25 uv 8 2880 colour 207 207 0
+vertex 55 29 uv 8 2880 colour 47 47 0
+polygon 43 attributes 1f00c0 texture 523432ab palette f18
+vertex 148 22 uv 363 402 colour 303 303 287
+vertex 148 25 uv 363 402 colour 303 303 287
+vertex 150 29 uv 347 453 colour 303 303 287
+polygon 44 attributes 1f00c0 texture 523432ab palette f18
+vertex 149 26 uv 347 453 colour 303 303 287
+vertex 148 22 uv 363 402 colour 303 303 287
+vertex 150 29 uv 347 453 colour 303 303 287
+polygon 45 attributes 1f00c0 texture 50007700 palette 0
+vertex 129 23 uv 574 402 colour 511 511 463
+vertex 88 25 uv 1024 397 colour 511 511 463
+vertex 89 29 uv 1024 449 colour 511 511 463
+polygon 46 attributes 1f00c0 texture 50007700 palette 0
+vertex 128 27 uv 589 453 colour 511 511 463
+vertex 129 23 uv 574 402 colour 511 511 463
+vertex 89 29 uv 1024 449 colour 511 511 463
+polygon 47 attributes 1f00c0 texture 523432ab palette f18
+vertex 150 29 uv 347 453 colour 511 511 463
+vertex 148 25 uv 363 402 colour 511 511 463
+vertex 178 28 uv 42 453 colour 511 511 463
+polygon 48 attributes 1f00c0 texture 50007700 palette 0
+vertex 148 30 uv 363 503 colour 511 511 463
+vertex 177 28 uv 42 504 colour 511 511 463
+vertex 177 24 uv 42 453 colour 511 511 463
+polygon 49 attributes 1f00c0 texture 50007700 palette 0
+vertex 149 26 uv 347 453 colour 511 511 463
+vertex 148 30 uv 363 503 colour 511 511 463
+vertex 177 24 uv 42 453 colour 511 511 463
+polygon 4a attributes 1f00c0 texture 523432ab palette f18
+vertex 128 31 uv 589 453 colour 303 303 287
+vertex 129 26 uv 574 402 colour 303 303 287
+vertex 128 27 uv 589 453 colour 303 303 287
+polygon 4b attributes 1f00c0 texture 523432ab palette f18
+vertex 87 29 uv 1024 397 colour 511 511 463
+vertex 129 26 uv 574 402 colour 511 511 463
+vertex 128 31 uv 589 453 colour 511 511 463
+polygon 4c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 32 uv 8 2880 colour 47 47 0
+vertex 63 28 uv 8 2880 colour 207 207 0
+vertex 62 25 uv 8 2880 colour 207 207 0
+vertex 60 29 uv 8 2880 colour 47 47 0
+polygon 4d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 29 uv 8 2880 colour 47 47 0
+vertex 57 25 uv 8 2880 colour 207 207 0
+vertex 57 29 uv 8 2880 colour 207 207 0
+vertex 55 32 uv 8 2880 colour 47 47 0
+polygon 4e attributes 1f00c0 texture 523432ab palette f18
+vertex 182 27 uv 0 449 colour 511 511 463
+vertex 182 32 uv 0 501 colour 511 511 463
+vertex 178 28 uv 42 453 colour 511 511 463
+polygon 4f attributes 1f00c0 texture 523432ab palette f18
+vertex 180 28 uv 0 501 colour 303 303 287
+vertex 182 32 uv 0 501 colour 303 303 287
+vertex 182 27 uv 0 449 colour 303 303 287
+polygon 50 attributes 1f00c0 texture 523432ab palette f18
+vertex 128 27 uv 589 453 colour 303 303 287
+vertex 129 32 uv 574 503 colour 303 303 287
+vertex 128 31 uv 589 453 colour 303 303 287
+polygon 51 attributes 1f00c0 texture 523432ab palette f18
+vertex 178 28 uv 42 453 colour 511 511 463
+vertex 178 32 uv 42 504 colour 511 511 463
+vertex 150 29 uv 347 453 colour 511 511 463
+polygon 52 attributes 1f00c0 texture 523432ab palette f18
+vertex 182 32 uv 0 501 colour 511 511 463
+vertex 178 32 uv 42 504 colour 511 511 463
+vertex 178 28 uv 42 453 colour 511 511 463
+polygon 53 attributes 1f00c0 texture 523432ab palette f18
+vertex 88 25 uv 1024 397 colour 191 191 175
+vertex 87 29 uv 1024 397 colour 191 191 175
+vertex 88 33 uv 1024 449 colour 191 191 175
+polygon 54 attributes 1f00c0 texture 523432ab palette f18
+vertex 89 29 uv 1024 449 colour 191 191 175
+vertex 88 25 uv 1024 397 colour 191 191 175
+vertex 88 33 uv 1024 449 colour 191 191 175
+polygon 55 attributes 1f00c0 texture 523432ab palette f18
+vertex 88 33 uv 1024 449 colour 511 511 463
+vertex 87 29 uv 1024 397 colour 511 511 463
+vertex 128 31 uv 589 453 colour 511 511 463
+polygon 56 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 76 29 uv 8 2880 colour 47 47 0
+vertex 78 25 uv 8 2880 colour 207 207 0
+vertex 68 30 uv 8 2880 colour 207 207 0
+vertex 66 34 uv 8 2880 colour 47 47 0
+polygon 57 attributes 1f00c0 texture 523432ab palette f18
+vertex 148 34 uv 363 503 colour 303 303 287
+vertex 148 30 uv 363 503 colour 303 303 287
+vertex 149 26 uv 347 453 colour 303 303 287
+polygon 58 attributes 1f00c0 texture 523432ab palette f18
+vertex 150 29 uv 347 453 colour 303 303 287
+vertex 148 34 uv 363 503 colour 303 303 287
+vertex 149 26 uv 347 453 colour 303 303 287
+polygon 59 attributes 1f00c0 texture 50007700 palette 0
+vertex 90 34 uv 1024 500 colour 511 511 463
+vertex 129 32 uv 574 503 colour 511 511 463
+vertex 128 27 uv 589 453 colour 511 511 463
+polygon 5a attributes 1f00c0 texture 50007700 palette 0
+vertex 89 29 uv 1024 449 colour 511 511 463
+vertex 90 34 uv 1024 500 colour 511 511 463
+vertex 128 27 uv 589 453 colour 511 511 463
+polygon 5b attributes 1f00c0 texture 523432ab palette f18
+vertex 178 32 uv 42 504 colour 511 511 463
+vertex 148 34 uv 363 503 colour 511 511 463
+vertex 150 29 uv 347 453 colour 511 511 463
+polygon 5c attributes 1f00c0 texture 523432ab palette f18
+vertex 128 31 uv 589 453 colour 511 511 463
+vertex 129 35 uv 574 503 colour 511 511 463
+vertex 88 33 uv 1024 449 colour 511 511 463
+polygon 5d attributes 1f00c0 texture 523432ab palette f18
+vertex 129 32 uv 574 503 colour 303 303 287
+vertex 129 35 uv 574 503 colour 303 303 287
+vertex 128 31 uv 589 453 colour 303 303 287
+polygon 5e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 62 36 uv 8 2880 colour 47 47 0
+vertex 63 32 uv 8 2880 colour 207 207 0
+vertex 63 28 uv 8 2880 colour 207 207 0
+vertex 61 32 uv 8 2880 colour 47 47 0
+polygon 5f attributes 1f00c0 texture 523432ab palette f18
+vertex 89 36 uv 1024 500 colour 191 191 175
+vertex 90 34 uv 1024 500 colour 191 191 175
+vertex 89 29 uv 1024 449 colour 191 191 175
+polygon 60 attributes 1f00c0 texture 523432ab palette f18
+vertex 129 35 uv 574 503 colour 303 303 287
+vertex 129 32 uv 574 503 colour 303 303 287
+vertex 134 36 uv 527 555 colour 303 303 287
+polygon 61 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 32 uv 8 2880 colour 47 47 0
+vertex 57 29 uv 8 2880 colour 207 207 0
+vertex 57 33 uv 8 2880 colour 207 207 0
+vertex 55 37 uv 8 2880 colour 47 47 0
+polygon 62 attributes 1f00c0 texture 523432ab palette f18
+vertex 89 38 uv 1024 500 colour 191 191 175
+vertex 89 36 uv 1024 500 colour 191 191 175
+vertex 89 29 uv 1024 449 colour 191 191 175
+polygon 63 attributes 1f00c0 texture 523432ab palette f18
+vertex 88 33 uv 1024 449 colour 191 191 175
+vertex 89 38 uv 1024 500 colour 191 191 175
+vertex 89 29 uv 1024 449 colour 191 191 175
+polygon 64 attributes 1f00c0 texture 523432ab palette f18
+vertex 148 30 uv 363 503 colour 303 303 287
+vertex 148 34 uv 363 503 colour 303 303 287
+vertex 145 38 uv 408 555 colour 303 303 287
+polygon 65 attributes 1f00c0 texture 523432ab palette f18
+vertex 144 35 uv 408 555 colour 303 303 287
+vertex 148 30 uv 363 503 colour 303 303 287
+vertex 145 38 uv 408 555 colour 303 303 287
+polygon 66 attributes 1f00c0 texture 523432ab palette f18
+vertex 129 35 uv 574 503 colour 511 511 463
+vertex 89 38 uv 1024 500 colour 511 511 463
+vertex 88 33 uv 1024 449 colour 511 511 463
+polygon 67 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 66 34 uv 8 2880 colour 47 47 0
+vertex 68 30 uv 8 2880 colour 207 207 0
+vertex 60 34 uv 8 2880 colour 207 207 0
+vertex 59 39 uv 8 2880 colour 47 47 0
+polygon 68 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 49 39 uv 8 2880 colour 47 47 0
+vertex 51 35 uv 8 2880 colour 207 207 0
+vertex 52 35 uv 8 2880 colour 207 207 0
+vertex 50 39 uv 8 2880 colour 47 47 0
+polygon 69 attributes 1f00c0 texture 523432ab palette f18
+vertex 134 39 uv 527 555 colour 303 303 287
+vertex 129 35 uv 574 503 colour 303 303 287
+vertex 134 36 uv 527 555 colour 303 303 287
+polygon 6a attributes 1f00c0 texture 523432ab palette f18
+vertex 134 36 uv 527 555 colour 303 303 287
+vertex 139 36 uv 467 569 colour 303 303 287
+vertex 134 39 uv 527 555 colour 303 303 287
+polygon 6b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 63 40 uv 8 2880 colour 47 47 0
+vertex 64 36 uv 8 2880 colour 207 207 0
+vertex 63 32 uv 8 2880 colour 207 207 0
+vertex 62 36 uv 8 2880 colour 47 47 0
+polygon 6c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 47 40 uv 8 2880 colour 47 47 0
+vertex 49 35 uv 8 2880 colour 207 207 0
+vertex 51 35 uv 8 2880 colour 207 207 0
+vertex 49 39 uv 8 2880 colour 47 47 0
+polygon 6d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 50 39 uv 8 2880 colour 47 47 0
+vertex 52 35 uv 8 2880 colour 207 207 0
+vertex 53 36 uv 8 2880 colour 207 207 0
+vertex 52 40 uv 8 2880 colour 47 47 0
+polygon 6e attributes 1f00c0 texture 523432ab palette f18
+vertex 139 40 uv 467 569 colour 303 303 287
+vertex 139 36 uv 467 569 colour 303 303 287
+vertex 144 35 uv 408 555 colour 303 303 287
+polygon 6f attributes 1f00c0 texture 523432ab palette f18
+vertex 145 38 uv 408 555 colour 303 303 287
+vertex 139 40 uv 467 569 colour 303 303 287
+vertex 144 35 uv 408 555 colour 303 303 287
+polygon 70 attributes 1f00c0 texture 523432ab palette f18
+vertex 139 36 uv 467 569 colour 303 303 287
+vertex 139 40 uv 467 569 colour 303 303 287
+vertex 134 39 uv 527 555 colour 303 303 287
+polygon 71 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 37 uv 8 2880 colour 47 47 0
+vertex 57 33 uv 8 2880 colour 207 207 0
+vertex 57 37 uv 8 2880 colour 207 207 0
+vertex 55 41 uv 8 2880 colour 47 47 0
+polygon 72 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 46 41 uv 8 2880 colour 47 47 0
+vertex 48 36 uv 8 2880 colour 207 207 0
+vertex 49 35 uv 8 2880 colour 207 207 0
+vertex 47 40 uv 8 2880 colour 47 47 0
+polygon 73 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 52 40 uv 8 2880 colour 47 47 0
+vertex 53 36 uv 8 2880 colour 207 207 0
+vertex 55 37 uv 8 2880 colour 207 207 0
+vertex 53 41 uv 8 2880 colour 47 47 0
+polygon 74 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 45 42 uv 8 2880 colour 47 47 0
+vertex 47 38 uv 8 2880 colour 207 207 0
+vertex 48 36 uv 8 2880 colour 207 207 0
+vertex 46 41 uv 8 2880 colour 47 47 0
+polygon 75 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 53 41 uv 8 2880 colour 47 47 0
+vertex 55 37 uv 8 2880 colour 207 207 0
+vertex 57 39 uv 8 2880 colour 207 207 0
+vertex 55 43 uv 8 2880 colour 47 47 0
+polygon 76 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 59 39 uv 8 2880 colour 47 47 0
+vertex 60 34 uv 8 2880 colour 207 207 0
+vertex 55 39 uv 8 2880 colour 207 207 0
+vertex 53 44 uv 8 2880 colour 47 47 0
+polygon 77 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 63 44 uv 8 2880 colour 47 47 0
+vertex 65 40 uv 8 2880 colour 207 207 0
+vertex 64 36 uv 8 2880 colour 207 207 0
+vertex 63 40 uv 8 2880 colour 47 47 0
+polygon 78 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 43 44 uv 8 2880 colour 47 47 0
+vertex 46 40 uv 8 2880 colour 207 207 0
+vertex 47 38 uv 8 2880 colour 207 207 0
+vertex 45 42 uv 8 2880 colour 47 47 0
+polygon 79 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 43 uv 8 2880 colour 47 47 0
+vertex 57 39 uv 8 2880 colour 207 207 0
+vertex 58 40 uv 8 2880 colour 207 207 0
+vertex 56 44 uv 8 2880 colour 47 47 0
+polygon 7a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 41 uv 8 2880 colour 47 47 0
+vertex 57 37 uv 8 2880 colour 207 207 0
+vertex 57 42 uv 8 2880 colour 207 207 0
+vertex 56 46 uv 8 2880 colour 47 47 0
+polygon 7b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 43 47 uv 8 2880 colour 47 47 0
+vertex 45 42 uv 8 2880 colour 207 207 0
+vertex 46 40 uv 8 2880 colour 207 207 0
+vertex 43 44 uv 8 2880 colour 47 47 0
+polygon 7c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 56 44 uv 8 2880 colour 47 47 0
+vertex 58 40 uv 8 2880 colour 207 207 0
+vertex 60 43 uv 8 2880 colour 207 207 0
+vertex 58 47 uv 8 2880 colour 47 47 0
+polygon 7d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 53 44 uv 8 2880 colour 47 47 0
+vertex 55 39 uv 8 2880 colour 207 207 0
+vertex 51 43 uv 8 2880 colour 207 207 0
+vertex 49 48 uv 8 2880 colour 47 47 0
+polygon 7e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 64 48 uv 8 2880 colour 47 47 0
+vertex 66 45 uv 8 2880 colour 207 207 0
+vertex 65 40 uv 8 2880 colour 207 207 0
+vertex 63 44 uv 8 2880 colour 47 47 0
+polygon 7f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 58 47 uv 8 2880 colour 47 47 0
+vertex 60 43 uv 8 2880 colour 207 207 0
+vertex 61 45 uv 8 2880 colour 207 207 0
+vertex 60 49 uv 8 2880 colour 47 47 0
+polygon 80 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 42 50 uv 8 2880 colour 47 47 0
+vertex 44 45 uv 8 2880 colour 207 207 0
+vertex 45 42 uv 8 2880 colour 207 207 0
+vertex 43 47 uv 8 2880 colour 47 47 0
+polygon 81 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 49 uv 8 2880 colour 47 47 0
+vertex 61 45 uv 8 2880 colour 207 207 0
+vertex 63 47 uv 8 2880 colour 207 207 0
+vertex 61 51 uv 8 2880 colour 47 47 0
+polygon 82 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 56 46 uv 8 2880 colour 47 47 0
+vertex 57 42 uv 8 2880 colour 207 207 0
+vertex 58 48 uv 8 2880 colour 207 207 0
+vertex 56 52 uv 8 2880 colour 47 47 0
+polygon 83 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 49 48 uv 8 2880 colour 47 47 0
+vertex 51 43 uv 8 2880 colour 207 207 0
+vertex 50 47 uv 8 2880 colour 207 207 0
+vertex 47 52 uv 8 2880 colour 47 47 0
+polygon 84 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 65 53 uv 8 2880 colour 47 47 0
+vertex 66 49 uv 8 2880 colour 207 207 0
+vertex 66 45 uv 8 2880 colour 207 207 0
+vertex 64 48 uv 8 2880 colour 47 47 0
+polygon 85 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 41 54 uv 8 2880 colour 47 47 0
+vertex 44 49 uv 8 2880 colour 207 207 0
+vertex 44 45 uv 8 2880 colour 207 207 0
+vertex 42 50 uv 8 2880 colour 47 47 0
+polygon 86 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 51 uv 8 2880 colour 47 47 0
+vertex 63 47 uv 8 2880 colour 207 207 0
+vertex 64 50 uv 8 2880 colour 207 207 0
+vertex 63 54 uv 8 2880 colour 47 47 0
+polygon 87 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 47 52 uv 8 2880 colour 47 47 0
+vertex 50 47 uv 8 2880 colour 207 207 0
+vertex 50 51 uv 8 2880 colour 207 207 0
+vertex 48 56 uv 8 2880 colour 47 47 0
+polygon 88 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 63 54 uv 8 2880 colour 47 47 0
+vertex 64 50 uv 8 2880 colour 207 207 0
+vertex 66 53 uv 8 2880 colour 207 207 0
+vertex 64 57 uv 8 2880 colour 47 47 0
+polygon 89 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 56 52 uv 8 2880 colour 47 47 0
+vertex 58 48 uv 8 2880 colour 207 207 0
+vertex 58 53 uv 8 2880 colour 207 207 0
+vertex 56 58 uv 8 2880 colour 47 47 0
+polygon 8a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 66 58 uv 8 2880 colour 47 47 0
+vertex 67 54 uv 8 2880 colour 207 207 0
+vertex 66 49 uv 8 2880 colour 207 207 0
+vertex 65 53 uv 8 2880 colour 47 47 0
+polygon 8b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 41 58 uv 8 2880 colour 47 47 0
+vertex 43 53 uv 8 2880 colour 207 207 0
+vertex 44 49 uv 8 2880 colour 207 207 0
+vertex 41 54 uv 8 2880 colour 47 47 0
+polygon 8c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 48 56 uv 8 2880 colour 47 47 0
+vertex 50 51 uv 8 2880 colour 207 207 0
+vertex 51 54 uv 8 2880 colour 207 207 0
+vertex 49 59 uv 8 2880 colour 47 47 0
+polygon 8d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 64 57 uv 8 2880 colour 47 47 0
+vertex 66 53 uv 8 2880 colour 207 207 0
+vertex 67 56 uv 8 2880 colour 207 207 0
+vertex 66 60 uv 8 2880 colour 47 47 0
+polygon 8e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 49 59 uv 8 2880 colour 47 47 0
+vertex 51 54 uv 8 2880 colour 207 207 0
+vertex 51 56 uv 8 2880 colour 207 207 0
+vertex 49 61 uv 8 2880 colour 47 47 0
+polygon 8f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 66 62 uv 8 2880 colour 47 47 0
+vertex 68 59 uv 8 2880 colour 207 207 0
+vertex 67 54 uv 8 2880 colour 207 207 0
+vertex 66 58 uv 8 2880 colour 47 47 0
+polygon 90 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 40 63 uv 8 2880 colour 47 47 0
+vertex 43 58 uv 8 2880 colour 207 207 0
+vertex 43 53 uv 8 2880 colour 207 207 0
+vertex 41 58 uv 8 2880 colour 47 47 0
+polygon 91 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 66 60 uv 8 2880 colour 47 47 0
+vertex 67 56 uv 8 2880 colour 207 207 0
+vertex 68 59 uv 8 2880 colour 207 207 0
+vertex 67 63 uv 8 2880 colour 47 47 0
+polygon 92 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 132 63 uv 8 2880 colour 47 47 0
+vertex 132 58 uv 8 2880 colour 207 207 0
+vertex 132 58 uv 8 2880 colour 207 207 0
+vertex 132 63 uv 8 2880 colour 47 47 0
+polygon 93 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 56 58 uv 8 2880 colour 47 47 0
+vertex 58 53 uv 8 2880 colour 207 207 0
+vertex 58 59 uv 8 2880 colour 207 207 0
+vertex 57 64 uv 8 2880 colour 47 47 0
+polygon 94 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 49 61 uv 8 2880 colour 47 47 0
+vertex 51 56 uv 8 2880 colour 207 207 0
+vertex 52 59 uv 8 2880 colour 207 207 0
+vertex 50 64 uv 8 2880 colour 47 47 0
+polygon 95 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 37 64 uv 8 2880 colour 47 47 0
+vertex 39 59 uv 8 2880 colour 207 207 0
+vertex 38 58 uv 8 2880 colour 207 207 0
+vertex 35 64 uv 8 2880 colour 47 47 0
+polygon 96 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 35 64 uv 8 2880 colour 47 47 0
+vertex 38 58 uv 8 2880 colour 207 207 0
+vertex 36 58 uv 8 2880 colour 207 207 0
+vertex 33 64 uv 8 2880 colour 47 47 0
+polygon 97 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 33 64 uv 8 2880 colour 47 47 0
+vertex 36 58 uv 8 2880 colour 207 207 0
+vertex 35 58 uv 8 2880 colour 207 207 0
+vertex 32 64 uv 8 2880 colour 47 47 0
+polygon 98 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 38 64 uv 8 2880 colour 47 47 0
+vertex 41 59 uv 8 2880 colour 207 207 0
+vertex 39 59 uv 8 2880 colour 207 207 0
+vertex 37 64 uv 8 2880 colour 47 47 0
+polygon 99 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 32 64 uv 8 2880 colour 47 47 0
+vertex 35 58 uv 8 2880 colour 207 207 0
+vertex 33 59 uv 8 2880 colour 207 207 0
+vertex 30 65 uv 8 2880 colour 47 47 0
+polygon 9a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 50 64 uv 8 2880 colour 47 47 0
+vertex 52 59 uv 8 2880 colour 207 207 0
+vertex 51 60 uv 8 2880 colour 207 207 0
+vertex 49 65 uv 8 2880 colour 47 47 0
+polygon 9b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 40 65 uv 8 2880 colour 47 47 0
+vertex 42 60 uv 8 2880 colour 207 207 0
+vertex 41 59 uv 8 2880 colour 207 207 0
+vertex 38 64 uv 8 2880 colour 47 47 0
+polygon 9c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 67 63 uv 8 2880 colour 47 47 0
+vertex 68 59 uv 8 2880 colour 207 207 0
+vertex 69 61 uv 8 2880 colour 207 207 0
+vertex 68 65 uv 8 2880 colour 47 47 0
+polygon 9d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 42 65 uv 8 2880 colour 47 47 0
+vertex 44 60 uv 8 2880 colour 207 207 0
+vertex 42 60 uv 8 2880 colour 207 207 0
+vertex 40 65 uv 8 2880 colour 47 47 0
+polygon 9e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 30 65 uv 8 2880 colour 47 47 0
+vertex 33 59 uv 8 2880 colour 207 207 0
+vertex 32 60 uv 8 2880 colour 207 207 0
+vertex 29 66 uv 8 2880 colour 47 47 0
+polygon 9f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 49 65 uv 8 2880 colour 47 47 0
+vertex 51 60 uv 8 2880 colour 207 207 0
+vertex 51 61 uv 8 2880 colour 207 207 0
+vertex 48 66 uv 8 2880 colour 47 47 0
+polygon a0 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 43 66 uv 8 2880 colour 47 47 0
+vertex 46 61 uv 8 2880 colour 207 207 0
+vertex 44 60 uv 8 2880 colour 207 207 0
+vertex 42 65 uv 8 2880 colour 47 47 0
+polygon a1 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 48 66 uv 8 2880 colour 47 47 0
+vertex 51 61 uv 8 2880 colour 207 207 0
+vertex 50 61 uv 8 2880 colour 207 207 0
+vertex 47 66 uv 8 2880 colour 47 47 0
+polygon a2 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 47 66 uv 8 2880 colour 47 47 0
+vertex 50 61 uv 8 2880 colour 207 207 0
+vertex 48 61 uv 8 2880 colour 207 207 0
+vertex 46 66 uv 8 2880 colour 47 47 0
+polygon a3 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 46 66 uv 8 2880 colour 47 47 0
+vertex 48 61 uv 8 2880 colour 207 207 0
+vertex 47 61 uv 8 2880 colour 207 207 0
+vertex 45 66 uv 8 2880 colour 47 47 0
+polygon a4 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 45 66 uv 8 2880 colour 47 47 0
+vertex 47 61 uv 8 2880 colour 207 207 0
+vertex 46 61 uv 8 2880 colour 207 207 0
+vertex 43 66 uv 8 2880 colour 47 47 0
+polygon a5 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 67 67 uv 8 2880 colour 47 47 0
+vertex 68 63 uv 8 2880 colour 207 207 0
+vertex 68 59 uv 8 2880 colour 207 207 0
+vertex 66 62 uv 8 2880 colour 47 47 0
+polygon a6 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 29 66 uv 8 2880 colour 47 47 0
+vertex 32 60 uv 8 2880 colour 207 207 0
+vertex 31 61 uv 8 2880 colour 207 207 0
+vertex 28 67 uv 8 2880 colour 47 47 0
+polygon a7 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 40 68 uv 8 2880 colour 47 47 0
+vertex 43 63 uv 8 2880 colour 207 207 0
+vertex 43 58 uv 8 2880 colour 207 207 0
+vertex 40 63 uv 8 2880 colour 47 47 0
+polygon a8 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 68 65 uv 8 2880 colour 47 47 0
+vertex 69 61 uv 8 2880 colour 207 207 0
+vertex 70 64 uv 8 2880 colour 207 207 0
+vertex 69 68 uv 8 2880 colour 47 47 0
+polygon a9 attributes 1f00c0 texture 50007700 palette 0
+vertex 140 69 uv 467 1003 colour 511 511 463
+vertex 139 36 uv 467 569 colour 511 511 463
+vertex 134 36 uv 527 555 colour 511 511 463
+polygon aa attributes 3c1f00c0 texture 50007700 palette 0
+vertex 28 67 uv 8 2880 colour 47 47 0
+vertex 31 61 uv 8 2880 colour 207 207 0
+vertex 30 63 uv 8 2880 colour 207 207 0
+vertex 27 69 uv 8 2880 colour 47 47 0
+polygon ab attributes 1f00c0 texture 50007700 palette 0
+vertex 134 36 uv 527 555 colour 511 511 463
+vertex 129 32 uv 574 503 colour 511 511 463
+vertex 136 70 uv 527 1023 colour 511 511 463
+polygon ac attributes 1f00c0 texture 50007700 palette 0
+vertex 144 35 uv 408 555 colour 511 511 463
+vertex 139 36 uv 467 569 colour 511 511 463
+vertex 145 70 uv 408 1023 colour 511 511 463
+polygon ad attributes 1f00c0 texture 50007700 palette 0
+vertex 136 70 uv 527 1023 colour 511 511 463
+vertex 140 69 uv 467 1003 colour 511 511 463
+vertex 134 36 uv 527 555 colour 511 511 463
+polygon ae attributes 1f00c0 texture 50007700 palette 0
+vertex 139 36 uv 467 569 colour 511 511 463
+vertex 140 69 uv 467 1003 colour 511 511 463
+vertex 145 70 uv 408 1023 colour 511 511 463
+polygon af attributes 3c1f00c0 texture 50007700 palette 0
+vertex 57 64 uv 8 2880 colour 47 47 0
+vertex 58 59 uv 8 2880 colour 207 207 0
+vertex 59 65 uv 8 2880 colour 207 207 0
+vertex 57 70 uv 8 2880 colour 47 47 0
+polygon b0 attributes 1f00c0 texture 50007700 palette 0
+vertex 178 71 uv 0 1071 colour 511 511 463
+vertex 180 28 uv 0 501 colour 511 511 463
+vertex 177 28 uv 42 504 colour 511 511 463
+polygon b1 attributes 1f00c0 texture 50007700 palette 0
+vertex 174 71 uv 42 1068 colour 511 511 463
+vertex 178 71 uv 0 1071 colour 511 511 463
+vertex 177 28 uv 42 504 colour 511 511 463
+polygon b2 attributes 1f00c0 texture 50007700 palette 0
+vertex 174 71 uv 42 1068 colour 511 511 463
+vertex 177 28 uv 42 504 colour 511 511 463
+vertex 148 30 uv 363 503 colour 511 511 463
+polygon b3 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 27 69 uv 8 2880 colour 47 47 0
+vertex 30 63 uv 8 2880 colour 207 207 0
+vertex 30 65 uv 8 2880 colour 207 207 0
+vertex 27 71 uv 8 2880 colour 47 47 0
+polygon b4 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 68 uv 8 2880 colour 47 47 0
+vertex 70 64 uv 8 2880 colour 207 207 0
+vertex 71 67 uv 8 2880 colour 207 207 0
+vertex 70 71 uv 8 2880 colour 47 47 0
+polygon b5 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 67 72 uv 8 2880 colour 47 47 0
+vertex 69 68 uv 8 2880 colour 207 207 0
+vertex 68 63 uv 8 2880 colour 207 207 0
+vertex 67 67 uv 8 2880 colour 47 47 0
+polygon b6 attributes 1f00c0 texture 50007700 palette 0
+vertex 149 73 uv 363 1069 colour 511 511 463
+vertex 174 71 uv 42 1068 colour 511 511 463
+vertex 148 30 uv 363 503 colour 511 511 463
+polygon b7 attributes 1f00c0 texture 50007700 palette 0
+vertex 149 73 uv 363 1069 colour 511 511 463
+vertex 148 30 uv 363 503 colour 511 511 463
+vertex 144 35 uv 408 555 colour 511 511 463
+polygon b8 attributes 1f00c0 texture 50007700 palette 0
+vertex 145 70 uv 408 1023 colour 511 511 463
+vertex 149 73 uv 363 1069 colour 511 511 463
+vertex 144 35 uv 408 555 colour 511 511 463
+polygon b9 attributes 1f00c0 texture 523432ab palette f18
+vertex 141 73 uv 467 1003 colour 511 511 463
+vertex 139 40 uv 467 569 colour 511 511 463
+vertex 145 38 uv 408 555 colour 511 511 463
+polygon ba attributes 3c1f00c0 texture 50007700 palette 0
+vertex 27 71 uv 8 2880 colour 47 47 0
+vertex 30 65 uv 8 2880 colour 207 207 0
+vertex 30 67 uv 8 2880 colour 207 207 0
+vertex 27 73 uv 8 2880 colour 47 47 0
+polygon bb attributes 1f00c0 texture 523432ab palette f18
+vertex 141 73 uv 467 1003 colour 303 303 287
+vertex 140 69 uv 467 1003 colour 303 303 287
+vertex 136 70 uv 527 1023 colour 303 303 287
+polygon bc attributes 1f00c0 texture 50007700 palette 0
+vertex 129 32 uv 574 503 colour 511 511 463
+vertex 90 34 uv 1024 500 colour 511 511 463
+vertex 132 74 uv 574 1069 colour 511 511 463
+polygon bd attributes 1f00c0 texture 50007700 palette 0
+vertex 129 32 uv 574 503 colour 511 511 463
+vertex 132 74 uv 574 1069 colour 511 511 463
+vertex 136 70 uv 527 1023 colour 511 511 463
+polygon be attributes 1f00c0 texture 523432ab palette f18
+vertex 145 38 uv 408 555 colour 511 511 463
+vertex 148 34 uv 363 503 colour 511 511 463
+vertex 146 74 uv 408 1023 colour 511 511 463
+polygon bf attributes 1f00c0 texture 523432ab palette f18
+vertex 146 74 uv 408 1023 colour 511 511 463
+vertex 141 73 uv 467 1003 colour 511 511 463
+vertex 145 38 uv 408 555 colour 511 511 463
+polygon c0 attributes 1f00c0 texture 523432ab palette f18
+vertex 134 39 uv 527 555 colour 511 511 463
+vertex 139 40 uv 467 569 colour 511 511 463
+vertex 136 74 uv 527 1023 colour 511 511 463
+polygon c1 attributes 1f00c0 texture 523432ab palette f18
+vertex 139 40 uv 467 569 colour 511 511 463
+vertex 141 73 uv 467 1003 colour 511 511 463
+vertex 136 74 uv 527 1023 colour 511 511 463
+polygon c2 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 41 74 uv 8 2880 colour 47 47 0
+vertex 43 68 uv 8 2880 colour 207 207 0
+vertex 43 63 uv 8 2880 colour 207 207 0
+vertex 40 68 uv 8 2880 colour 47 47 0
+polygon c3 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 70 71 uv 8 2880 colour 47 47 0
+vertex 71 67 uv 8 2880 colour 207 207 0
+vertex 72 70 uv 8 2880 colour 207 207 0
+vertex 71 74 uv 8 2880 colour 47 47 0
+polygon c4 attributes 1f00c0 texture 523432ab palette f18
+vertex 140 69 uv 467 1003 colour 303 303 287
+vertex 141 73 uv 467 1003 colour 303 303 287
+vertex 146 74 uv 408 1023 colour 303 303 287
+polygon c5 attributes 1f00c0 texture 523432ab palette f18
+vertex 145 70 uv 408 1023 colour 303 303 287
+vertex 140 69 uv 467 1003 colour 303 303 287
+vertex 146 74 uv 408 1023 colour 303 303 287
+polygon c6 attributes 1f00c0 texture 523432ab palette f18
+vertex 136 74 uv 527 1023 colour 303 303 287
+vertex 141 73 uv 467 1003 colour 303 303 287
+vertex 136 70 uv 527 1023 colour 303 303 287
+polygon c7 attributes 1f00c0 texture 523432ab palette f18
+vertex 136 70 uv 527 1023 colour 303 303 287
+vertex 132 74 uv 574 1069 colour 303 303 287
+vertex 136 74 uv 527 1023 colour 303 303 287
+polygon c8 attributes 1f00c0 texture 50007700 palette 0
+vertex 178 71 uv 0 1071 colour 511 511 463
+vertex 174 71 uv 42 1068 colour 511 511 463
+vertex 174 74 uv 42 1119 colour 511 511 463
+polygon c9 attributes 1f00c0 texture 50007700 palette 0
+vertex 177 74 uv 0 1123 colour 511 511 463
+vertex 178 71 uv 0 1071 colour 511 511 463
+vertex 174 74 uv 42 1119 colour 511 511 463
+polygon ca attributes 1f00c0 texture 523432ab palette f18
+vertex 179 75 uv 0 1071 colour 303 303 287
+vertex 182 32 uv 0 501 colour 303 303 287
+vertex 180 28 uv 0 501 colour 303 303 287
+polygon cb attributes 1f00c0 texture 523432ab palette f18
+vertex 178 71 uv 0 1071 colour 303 303 287
+vertex 179 75 uv 0 1071 colour 303 303 287
+vertex 180 28 uv 0 501 colour 303 303 287
+polygon cc attributes 1f00c0 texture 523432ab palette f18
+vertex 182 32 uv 0 501 colour 511 511 463
+vertex 179 75 uv 0 1071 colour 511 511 463
+vertex 175 75 uv 42 1068 colour 511 511 463
+polygon cd attributes 1f00c0 texture 523432ab palette f18
+vertex 178 32 uv 42 504 colour 511 511 463
+vertex 182 32 uv 0 501 colour 511 511 463
+vertex 175 75 uv 42 1068 colour 511 511 463
+polygon ce attributes 1f00c0 texture 523432ab palette f18
+vertex 179 75 uv 0 1071 colour 303 303 287
+vertex 178 71 uv 0 1071 colour 303 303 287
+vertex 177 74 uv 0 1123 colour 303 303 287
+polygon cf attributes 1f00c0 texture 523432ab palette f18
+vertex 97 76 uv 1024 1071 colour 191 191 175
+vertex 90 34 uv 1024 500 colour 191 191 175
+vertex 89 36 uv 1024 500 colour 191 191 175
+polygon d0 attributes 1f00c0 texture 50007700 palette 0
+vertex 90 34 uv 1024 500 colour 511 511 463
+vertex 97 76 uv 1024 1071 colour 511 511 463
+vertex 132 74 uv 574 1069 colour 511 511 463
+polygon d1 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 57 70 uv 8 2880 colour 47 47 0
+vertex 59 65 uv 8 2880 colour 207 207 0
+vertex 59 71 uv 8 2880 colour 207 207 0
+vertex 58 76 uv 8 2880 colour 47 47 0
+polygon d2 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 27 73 uv 8 2880 colour 47 47 0
+vertex 30 67 uv 8 2880 colour 207 207 0
+vertex 30 70 uv 8 2880 colour 207 207 0
+vertex 27 76 uv 8 2880 colour 47 47 0
+polygon d3 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 71 74 uv 8 2880 colour 47 47 0
+vertex 72 70 uv 8 2880 colour 207 207 0
+vertex 73 72 uv 8 2880 colour 207 207 0
+vertex 72 76 uv 8 2880 colour 47 47 0
+polygon d4 attributes 1f00c0 texture 50007700 palette 0
+vertex 174 71 uv 42 1068 colour 511 511 463
+vertex 149 73 uv 363 1069 colour 511 511 463
+vertex 150 76 uv 352 1120 colour 511 511 463
+polygon d5 attributes 1f00c0 texture 50007700 palette 0
+vertex 174 74 uv 42 1119 colour 511 511 463
+vertex 174 71 uv 42 1068 colour 511 511 463
+vertex 150 76 uv 352 1120 colour 511 511 463
+polygon d6 attributes 1f00c0 texture 523432ab palette f18
+vertex 178 32 uv 42 504 colour 511 511 463
+vertex 175 75 uv 42 1068 colour 511 511 463
+vertex 149 77 uv 363 1069 colour 511 511 463
+polygon d7 attributes 1f00c0 texture 523432ab palette f18
+vertex 148 34 uv 363 503 colour 511 511 463
+vertex 178 32 uv 42 504 colour 511 511 463
+vertex 149 77 uv 363 1069 colour 511 511 463
+polygon d8 attributes 1f00c0 texture 523432ab palette f18
+vertex 148 34 uv 363 503 colour 511 511 463
+vertex 149 77 uv 363 1069 colour 511 511 463
+vertex 146 74 uv 408 1023 colour 511 511 463
+polygon d9 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 68 77 uv 8 2880 colour 47 47 0
+vertex 69 73 uv 8 2880 colour 207 207 0
+vertex 69 68 uv 8 2880 colour 207 207 0
+vertex 67 72 uv 8 2880 colour 47 47 0
+polygon da attributes 1f00c0 texture 523432ab palette f18
+vertex 149 77 uv 363 1069 colour 303 303 287
+vertex 149 73 uv 363 1069 colour 303 303 287
+vertex 145 70 uv 408 1023 colour 303 303 287
+polygon db attributes 1f00c0 texture 523432ab palette f18
+vertex 146 74 uv 408 1023 colour 303 303 287
+vertex 149 77 uv 363 1069 colour 303 303 287
+vertex 145 70 uv 408 1023 colour 303 303 287
+polygon dc attributes 1f00c0 texture 523432ab palette f18
+vertex 132 78 uv 574 1069 colour 511 511 463
+vertex 129 35 uv 574 503 colour 511 511 463
+vertex 134 39 uv 527 555 colour 511 511 463
+polygon dd attributes 1f00c0 texture 523432ab palette f18
+vertex 136 74 uv 527 1023 colour 511 511 463
+vertex 132 78 uv 574 1069 colour 511 511 463
+vertex 134 39 uv 527 555 colour 511 511 463
+polygon de attributes 1f00c0 texture 523432ab palette f18
+vertex 132 78 uv 574 1069 colour 303 303 287
+vertex 132 74 uv 574 1069 colour 303 303 287
+vertex 131 77 uv 588 1120 colour 303 303 287
+polygon df attributes 1f00c0 texture 523432ab palette f18
+vertex 132 74 uv 574 1069 colour 303 303 287
+vertex 132 78 uv 574 1069 colour 303 303 287
+vertex 136 74 uv 527 1023 colour 303 303 287
+polygon e0 attributes 1f00c0 texture 50007700 palette 0
+vertex 174 78 uv 42 1170 colour 511 511 463
+vertex 177 78 uv 0 1174 colour 511 511 463
+vertex 177 74 uv 0 1123 colour 511 511 463
+polygon e1 attributes 1f00c0 texture 50007700 palette 0
+vertex 174 74 uv 42 1119 colour 511 511 463
+vertex 174 78 uv 42 1170 colour 511 511 463
+vertex 177 74 uv 0 1123 colour 511 511 463
+polygon e2 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 27 76 uv 8 2880 colour 47 47 0
+vertex 30 70 uv 8 2880 colour 207 207 0
+vertex 30 73 uv 8 2880 colour 207 207 0
+vertex 27 79 uv 8 2880 colour 47 47 0
+polygon e3 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 72 76 uv 8 2880 colour 47 47 0
+vertex 73 72 uv 8 2880 colour 207 207 0
+vertex 74 75 uv 8 2880 colour 207 207 0
+vertex 73 79 uv 8 2880 colour 47 47 0
+polygon e4 attributes 1f00c0 texture 523432ab palette f18
+vertex 177 74 uv 0 1123 colour 303 303 287
+vertex 177 78 uv 0 1174 colour 303 303 287
+vertex 179 79 uv 0 1123 colour 303 303 287
+polygon e5 attributes 1f00c0 texture 523432ab palette f18
+vertex 179 79 uv 0 1123 colour 303 303 287
+vertex 179 75 uv 0 1071 colour 303 303 287
+vertex 177 74 uv 0 1123 colour 303 303 287
+polygon e6 attributes 1f00c0 texture 50007700 palette 0
+vertex 132 74 uv 574 1069 colour 511 511 463
+vertex 97 76 uv 1024 1071 colour 511 511 463
+vertex 98 79 uv 1024 1123 colour 511 511 463
+polygon e7 attributes 1f00c0 texture 50007700 palette 0
+vertex 131 77 uv 588 1120 colour 511 511 463
+vertex 132 74 uv 574 1069 colour 511 511 463
+vertex 98 79 uv 1024 1123 colour 511 511 463
+polygon e8 attributes 1f00c0 texture 50007700 palette 0
+vertex 149 79 uv 363 1171 colour 511 511 463
+vertex 174 78 uv 42 1170 colour 511 511 463
+vertex 174 74 uv 42 1119 colour 511 511 463
+polygon e9 attributes 1f00c0 texture 50007700 palette 0
+vertex 150 76 uv 352 1120 colour 511 511 463
+vertex 149 79 uv 363 1171 colour 511 511 463
+vertex 174 74 uv 42 1119 colour 511 511 463
+polygon ea attributes 1f00c0 texture 523432ab palette f18
+vertex 149 77 uv 363 1069 colour 511 511 463
+vertex 175 75 uv 42 1068 colour 511 511 463
+vertex 175 79 uv 42 1119 colour 511 511 463
+polygon eb attributes 1f00c0 texture 523432ab palette f18
+vertex 175 75 uv 42 1068 colour 511 511 463
+vertex 179 75 uv 0 1071 colour 511 511 463
+vertex 179 79 uv 0 1123 colour 511 511 463
+polygon ec attributes 1f00c0 texture 523432ab palette f18
+vertex 175 79 uv 42 1119 colour 511 511 463
+vertex 175 75 uv 42 1068 colour 511 511 463
+vertex 179 79 uv 0 1123 colour 511 511 463
+polygon ed attributes 1f00c0 texture 523432ab palette f18
+vertex 97 80 uv 1024 1071 colour 511 511 463
+vertex 89 38 uv 1024 500 colour 511 511 463
+vertex 129 35 uv 574 503 colour 511 511 463
+polygon ee attributes 1f00c0 texture 523432ab palette f18
+vertex 132 78 uv 574 1069 colour 511 511 463
+vertex 97 80 uv 1024 1071 colour 511 511 463
+vertex 129 35 uv 574 503 colour 511 511 463
+polygon ef attributes 1f00c0 texture 523432ab palette f18
+vertex 97 80 uv 1024 1071 colour 191 191 175
+vertex 97 76 uv 1024 1071 colour 191 191 175
+vertex 89 36 uv 1024 500 colour 191 191 175
+polygon f0 attributes 1f00c0 texture 523432ab palette f18
+vertex 89 38 uv 1024 500 colour 191 191 175
+vertex 97 80 uv 1024 1071 colour 191 191 175
+vertex 89 36 uv 1024 500 colour 191 191 175
+polygon f1 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 41 80 uv 8 2880 colour 47 47 0
+vertex 43 74 uv 8 2880 colour 207 207 0
+vertex 43 68 uv 8 2880 colour 207 207 0
+vertex 41 74 uv 8 2880 colour 47 47 0
+polygon f2 attributes 1f00c0 texture 523432ab palette f18
+vertex 149 73 uv 363 1069 colour 303 303 287
+vertex 149 77 uv 363 1069 colour 303 303 287
+vertex 150 80 uv 352 1120 colour 303 303 287
+polygon f3 attributes 1f00c0 texture 523432ab palette f18
+vertex 150 76 uv 352 1120 colour 303 303 287
+vertex 149 73 uv 363 1069 colour 303 303 287
+vertex 150 80 uv 352 1120 colour 303 303 287
+polygon f4 attributes 1f00c0 texture 523432ab palette f18
+vertex 150 80 uv 352 1120 colour 511 511 463
+vertex 149 77 uv 363 1069 colour 511 511 463
+vertex 175 79 uv 42 1119 colour 511 511 463
+polygon f5 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 73 79 uv 8 2880 colour 47 47 0
+vertex 74 75 uv 8 2880 colour 207 207 0
+vertex 74 77 uv 8 2880 colour 207 207 0
+vertex 73 81 uv 8 2880 colour 47 47 0
+polygon f6 attributes 1f00c0 texture 523432ab palette f18
+vertex 131 81 uv 588 1120 colour 303 303 287
+vertex 132 78 uv 574 1069 colour 303 303 287
+vertex 131 77 uv 588 1120 colour 303 303 287
+polygon f7 attributes 1f00c0 texture 523432ab palette f18
+vertex 131 77 uv 588 1120 colour 303 303 287
+vertex 133 80 uv 574 1171 colour 303 303 287
+vertex 131 81 uv 588 1120 colour 303 303 287
+polygon f8 attributes 1f00c0 texture 523432ab palette f18
+vertex 97 80 uv 1024 1071 colour 511 511 463
+vertex 132 78 uv 574 1069 colour 511 511 463
+vertex 131 81 uv 588 1120 colour 511 511 463
+polygon f9 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 58 76 uv 8 2880 colour 47 47 0
+vertex 59 71 uv 8 2880 colour 207 207 0
+vertex 60 78 uv 8 2880 colour 207 207 0
+vertex 58 82 uv 8 2880 colour 47 47 0
+polygon fa attributes 3c1f00c0 texture 50007700 palette 0
+vertex 68 82 uv 8 2880 colour 47 47 0
+vertex 70 77 uv 8 2880 colour 207 207 0
+vertex 69 73 uv 8 2880 colour 207 207 0
+vertex 68 77 uv 8 2880 colour 47 47 0
+polygon fb attributes 1f00c0 texture 50007700 palette 0
+vertex 98 82 uv 1024 1174 colour 511 511 463
+vertex 133 80 uv 574 1171 colour 511 511 463
+vertex 131 77 uv 588 1120 colour 511 511 463
+polygon fc attributes 1f00c0 texture 50007700 palette 0
+vertex 98 79 uv 1024 1123 colour 511 511 463
+vertex 98 82 uv 1024 1174 colour 511 511 463
+vertex 131 77 uv 588 1120 colour 511 511 463
+polygon fd attributes 1f00c0 texture 523432ab palette f18
+vertex 177 78 uv 0 1174 colour 303 303 287
+vertex 178 82 uv 0 1174 colour 303 303 287
+vertex 179 79 uv 0 1123 colour 303 303 287
+polygon fe attributes 1f00c0 texture 523432ab palette f18
+vertex 178 82 uv 0 1174 colour 511 511 463
+vertex 175 82 uv 42 1170 colour 511 511 463
+vertex 175 79 uv 42 1119 colour 511 511 463
+polygon ff attributes 1f00c0 texture 523432ab palette f18
+vertex 179 79 uv 0 1123 colour 511 511 463
+vertex 178 82 uv 0 1174 colour 511 511 463
+vertex 175 79 uv 42 1119 colour 511 511 463
+polygon 100 attributes 1f00c0 texture 523432ab palette f18
+vertex 175 79 uv 42 1119 colour 511 511 463
+vertex 175 82 uv 42 1170 colour 511 511 463
+vertex 150 80 uv 352 1120 colour 511 511 463
+polygon 101 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 27 79 uv 8 2880 colour 47 47 0
+vertex 30 73 uv 8 2880 colour 207 207 0
+vertex 31 76 uv 8 2880 colour 207 207 0
+vertex 28 83 uv 8 2880 colour 47 47 0
+polygon 102 attributes 1f00c0 texture 523432ab palette f18
+vertex 97 76 uv 1024 1071 colour 191 191 175
+vertex 97 80 uv 1024 1071 colour 191 191 175
+vertex 97 83 uv 1024 1123 colour 191 191 175
+polygon 103 attributes 1f00c0 texture 523432ab palette f18
+vertex 98 79 uv 1024 1123 colour 191 191 175
+vertex 97 76 uv 1024 1071 colour 191 191 175
+vertex 97 83 uv 1024 1123 colour 191 191 175
+polygon 104 attributes 1f00c0 texture 523432ab palette f18
+vertex 149 83 uv 363 1171 colour 303 303 287
+vertex 149 79 uv 363 1171 colour 303 303 287
+vertex 150 76 uv 352 1120 colour 303 303 287
+polygon 105 attributes 1f00c0 texture 523432ab palette f18
+vertex 150 80 uv 352 1120 colour 303 303 287
+vertex 149 83 uv 363 1171 colour 303 303 287
+vertex 150 76 uv 352 1120 colour 303 303 287
+polygon 106 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 73 81 uv 8 2880 colour 47 47 0
+vertex 74 77 uv 8 2880 colour 207 207 0
+vertex 75 79 uv 8 2880 colour 207 207 0
+vertex 74 83 uv 8 2880 colour 47 47 0
+polygon 107 attributes 1f00c0 texture 523432ab palette f18
+vertex 175 82 uv 42 1170 colour 511 511 463
+vertex 149 83 uv 363 1171 colour 511 511 463
+vertex 150 80 uv 352 1120 colour 511 511 463
+polygon 108 attributes 1f00c0 texture 523432ab palette f18
+vertex 97 83 uv 1024 1123 colour 511 511 463
+vertex 97 80 uv 1024 1071 colour 511 511 463
+vertex 131 81 uv 588 1120 colour 511 511 463
+polygon 109 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 98 84 uv 8 2880 colour 47 47 0
+vertex 99 79 uv 8 2880 colour 207 207 0
+vertex 132 58 uv 8 2880 colour 207 207 0
+vertex 132 63 uv 8 2880 colour 47 47 0
+polygon 10a attributes 1f00c0 texture 523432ab palette f18
+vertex 133 84 uv 574 1171 colour 303 303 287
+vertex 133 80 uv 574 1171 colour 303 303 287
+vertex 137 83 uv 522 1227 colour 303 303 287
+polygon 10b attributes 1f00c0 texture 523432ab palette f18
+vertex 133 80 uv 574 1171 colour 303 303 287
+vertex 133 84 uv 574 1171 colour 303 303 287
+vertex 131 81 uv 588 1120 colour 303 303 287
+polygon 10c attributes 1f00c0 texture 523432ab palette f18
+vertex 131 81 uv 588 1120 colour 511 511 463
+vertex 133 84 uv 574 1171 colour 511 511 463
+vertex 97 83 uv 1024 1123 colour 511 511 463
+polygon 10d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 74 83 uv 8 2880 colour 47 47 0
+vertex 75 79 uv 8 2880 colour 207 207 0
+vertex 75 81 uv 8 2880 colour 207 207 0
+vertex 74 85 uv 8 2880 colour 47 47 0
+polygon 10e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 88 85 uv 8 2880 colour 47 47 0
+vertex 89 80 uv 8 2880 colour 207 207 0
+vertex 99 79 uv 8 2880 colour 207 207 0
+vertex 98 84 uv 8 2880 colour 47 47 0
+polygon 10f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 41 86 uv 8 2880 colour 47 47 0
+vertex 44 80 uv 8 2880 colour 207 207 0
+vertex 43 74 uv 8 2880 colour 207 207 0
+vertex 41 80 uv 8 2880 colour 47 47 0
+polygon 110 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 86 uv 8 2880 colour 47 47 0
+vertex 70 82 uv 8 2880 colour 207 207 0
+vertex 70 77 uv 8 2880 colour 207 207 0
+vertex 68 82 uv 8 2880 colour 47 47 0
+polygon 111 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 79 86 uv 8 2880 colour 47 47 0
+vertex 80 81 uv 8 2880 colour 207 207 0
+vertex 89 80 uv 8 2880 colour 207 207 0
+vertex 88 85 uv 8 2880 colour 47 47 0
+polygon 112 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 28 83 uv 8 2880 colour 47 47 0
+vertex 31 76 uv 8 2880 colour 207 207 0
+vertex 32 80 uv 8 2880 colour 207 207 0
+vertex 29 87 uv 8 2880 colour 47 47 0
+polygon 113 attributes 1f00c0 texture 523432ab palette f18
+vertex 98 87 uv 1024 1174 colour 191 191 175
+vertex 98 82 uv 1024 1174 colour 191 191 175
+vertex 98 79 uv 1024 1123 colour 191 191 175
+polygon 114 attributes 1f00c0 texture 523432ab palette f18
+vertex 97 83 uv 1024 1123 colour 191 191 175
+vertex 98 87 uv 1024 1174 colour 191 191 175
+vertex 98 79 uv 1024 1123 colour 191 191 175
+polygon 115 attributes 1f00c0 texture 523432ab palette f18
+vertex 149 79 uv 363 1171 colour 303 303 287
+vertex 149 83 uv 363 1171 colour 303 303 287
+vertex 145 87 uv 416 1227 colour 303 303 287
+polygon 116 attributes 1f00c0 texture 523432ab palette f18
+vertex 145 83 uv 416 1227 colour 303 303 287
+vertex 149 79 uv 363 1171 colour 303 303 287
+vertex 145 87 uv 416 1227 colour 303 303 287
+polygon 117 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 74 85 uv 8 2880 colour 47 47 0
+vertex 75 81 uv 8 2880 colour 207 207 0
+vertex 76 83 uv 8 2880 colour 207 207 0
+vertex 75 87 uv 8 2880 colour 47 47 0
+polygon 118 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 73 87 uv 8 2880 colour 47 47 0
+vertex 74 82 uv 8 2880 colour 207 207 0
+vertex 80 81 uv 8 2880 colour 207 207 0
+vertex 79 86 uv 8 2880 colour 47 47 0
+polygon 119 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 68 87 uv 8 2880 colour 47 47 0
+vertex 69 82 uv 8 2880 colour 207 207 0
+vertex 74 82 uv 8 2880 colour 207 207 0
+vertex 73 87 uv 8 2880 colour 47 47 0
+polygon 11a attributes 1f00c0 texture 523432ab palette f18
+vertex 133 84 uv 574 1171 colour 511 511 463
+vertex 98 87 uv 1024 1174 colour 511 511 463
+vertex 97 83 uv 1024 1123 colour 511 511 463
+polygon 11b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 64 88 uv 8 2880 colour 47 47 0
+vertex 66 83 uv 8 2880 colour 207 207 0
+vertex 69 82 uv 8 2880 colour 207 207 0
+vertex 68 87 uv 8 2880 colour 47 47 0
+polygon 11c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 63 88 uv 8 2880 colour 47 47 0
+vertex 64 83 uv 8 2880 colour 207 207 0
+vertex 66 83 uv 8 2880 colour 207 207 0
+vertex 64 88 uv 8 2880 colour 47 47 0
+polygon 11d attributes 1f00c0 texture 523432ab palette f18
+vertex 141 88 uv 469 1241 colour 303 303 287
+vertex 141 84 uv 469 1241 colour 303 303 287
+vertex 145 83 uv 416 1227 colour 303 303 287
+polygon 11e attributes 1f00c0 texture 523432ab palette f18
+vertex 145 87 uv 416 1227 colour 303 303 287
+vertex 141 88 uv 469 1241 colour 303 303 287
+vertex 145 83 uv 416 1227 colour 303 303 287
+polygon 11f attributes 1f00c0 texture 523432ab palette f18
+vertex 137 88 uv 522 1227 colour 303 303 287
+vertex 133 84 uv 574 1171 colour 303 303 287
+vertex 137 83 uv 522 1227 colour 303 303 287
+polygon 120 attributes 1f00c0 texture 523432ab palette f18
+vertex 137 83 uv 522 1227 colour 303 303 287
+vertex 141 84 uv 469 1241 colour 303 303 287
+vertex 137 88 uv 522 1227 colour 303 303 287
+polygon 121 attributes 1f00c0 texture 523432ab palette f18
+vertex 141 84 uv 469 1241 colour 303 303 287
+vertex 141 88 uv 469 1241 colour 303 303 287
+vertex 137 88 uv 522 1227 colour 303 303 287
+polygon 122 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 58 82 uv 8 2880 colour 47 47 0
+vertex 60 78 uv 8 2880 colour 207 207 0
+vertex 60 84 uv 8 2880 colour 207 207 0
+vertex 58 89 uv 8 2880 colour 47 47 0
+polygon 123 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 75 87 uv 8 2880 colour 47 47 0
+vertex 76 83 uv 8 2880 colour 207 207 0
+vertex 76 85 uv 8 2880 colour 207 207 0
+vertex 75 89 uv 8 2880 colour 47 47 0
+polygon 124 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 62 89 uv 8 2880 colour 47 47 0
+vertex 64 84 uv 8 2880 colour 207 207 0
+vertex 64 83 uv 8 2880 colour 207 207 0
+vertex 63 88 uv 8 2880 colour 47 47 0
+polygon 125 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 29 87 uv 8 2880 colour 47 47 0
+vertex 32 80 uv 8 2880 colour 207 207 0
+vertex 33 84 uv 8 2880 colour 207 207 0
+vertex 30 90 uv 8 2880 colour 47 47 0
+polygon 126 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 64 90 uv 8 2880 colour 47 47 0
+vertex 66 85 uv 8 2880 colour 207 207 0
+vertex 64 84 uv 8 2880 colour 207 207 0
+vertex 62 89 uv 8 2880 colour 47 47 0
+polygon 127 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 75 89 uv 8 2880 colour 47 47 0
+vertex 76 85 uv 8 2880 colour 207 207 0
+vertex 76 86 uv 8 2880 colour 207 207 0
+vertex 75 90 uv 8 2880 colour 47 47 0
+polygon 128 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 91 uv 8 2880 colour 47 47 0
+vertex 70 87 uv 8 2880 colour 207 207 0
+vertex 70 82 uv 8 2880 colour 207 207 0
+vertex 69 86 uv 8 2880 colour 47 47 0
+polygon 129 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 66 91 uv 8 2880 colour 47 47 0
+vertex 67 87 uv 8 2880 colour 207 207 0
+vertex 66 85 uv 8 2880 colour 207 207 0
+vertex 64 90 uv 8 2880 colour 47 47 0
+polygon 12a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 75 90 uv 8 2880 colour 47 47 0
+vertex 76 86 uv 8 2880 colour 207 207 0
+vertex 76 87 uv 8 2880 colour 207 207 0
+vertex 75 91 uv 8 2880 colour 47 47 0
+polygon 12b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 67 92 uv 8 2880 colour 47 47 0
+vertex 68 88 uv 8 2880 colour 207 207 0
+vertex 67 87 uv 8 2880 colour 207 207 0
+vertex 66 91 uv 8 2880 colour 47 47 0
+polygon 12c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 42 93 uv 8 2880 colour 47 47 0
+vertex 44 86 uv 8 2880 colour 207 207 0
+vertex 44 80 uv 8 2880 colour 207 207 0
+vertex 41 86 uv 8 2880 colour 47 47 0
+polygon 12d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 75 91 uv 8 2880 colour 47 47 0
+vertex 76 87 uv 8 2880 colour 207 207 0
+vertex 76 88 uv 8 2880 colour 207 207 0
+vertex 75 93 uv 8 2880 colour 47 47 0
+polygon 12e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 75 93 uv 8 2880 colour 47 47 0
+vertex 76 88 uv 8 2880 colour 207 207 0
+vertex 76 89 uv 8 2880 colour 207 207 0
+vertex 75 93 uv 8 2880 colour 47 47 0
+polygon 12f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 93 uv 8 2880 colour 47 47 0
+vertex 70 89 uv 8 2880 colour 207 207 0
+vertex 68 88 uv 8 2880 colour 207 207 0
+vertex 67 92 uv 8 2880 colour 47 47 0
+polygon 130 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 30 90 uv 8 2880 colour 47 47 0
+vertex 33 84 uv 8 2880 colour 207 207 0
+vertex 34 88 uv 8 2880 colour 207 207 0
+vertex 31 94 uv 8 2880 colour 47 47 0
+polygon 131 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 75 93 uv 8 2880 colour 47 47 0
+vertex 76 89 uv 8 2880 colour 207 207 0
+vertex 75 90 uv 8 2880 colour 207 207 0
+vertex 74 94 uv 8 2880 colour 47 47 0
+polygon 132 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 71 94 uv 8 2880 colour 47 47 0
+vertex 72 90 uv 8 2880 colour 207 207 0
+vertex 71 89 uv 8 2880 colour 207 207 0
+vertex 70 94 uv 8 2880 colour 47 47 0
+polygon 133 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 70 94 uv 8 2880 colour 47 47 0
+vertex 71 89 uv 8 2880 colour 207 207 0
+vertex 70 89 uv 8 2880 colour 207 207 0
+vertex 69 93 uv 8 2880 colour 47 47 0
+polygon 134 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 58 89 uv 8 2880 colour 47 47 0
+vertex 60 84 uv 8 2880 colour 207 207 0
+vertex 60 90 uv 8 2880 colour 207 207 0
+vertex 59 95 uv 8 2880 colour 47 47 0
+polygon 135 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 95 uv 8 2880 colour 47 47 0
+vertex 71 91 uv 8 2880 colour 207 207 0
+vertex 70 87 uv 8 2880 colour 207 207 0
+vertex 69 91 uv 8 2880 colour 47 47 0
+polygon 136 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 74 94 uv 8 2880 colour 47 47 0
+vertex 75 90 uv 8 2880 colour 207 207 0
+vertex 75 90 uv 8 2880 colour 207 207 0
+vertex 74 95 uv 8 2880 colour 47 47 0
+polygon 137 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 74 95 uv 8 2880 colour 47 47 0
+vertex 75 90 uv 8 2880 colour 207 207 0
+vertex 74 91 uv 8 2880 colour 207 207 0
+vertex 73 95 uv 8 2880 colour 47 47 0
+polygon 138 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 73 95 uv 8 2880 colour 47 47 0
+vertex 74 91 uv 8 2880 colour 207 207 0
+vertex 73 90 uv 8 2880 colour 207 207 0
+vertex 72 95 uv 8 2880 colour 47 47 0
+polygon 139 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 72 95 uv 8 2880 colour 47 47 0
+vertex 73 90 uv 8 2880 colour 207 207 0
+vertex 72 90 uv 8 2880 colour 207 207 0
+vertex 71 94 uv 8 2880 colour 47 47 0
+polygon 13a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 73 95 uv 8 2880 colour 47 47 0
+vertex 74 91 uv 8 2880 colour 207 207 0
+vertex 74 91 uv 8 2880 colour 207 207 0
+vertex 73 95 uv 8 2880 colour 47 47 0
+polygon 13b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 31 94 uv 8 2880 colour 47 47 0
+vertex 34 88 uv 8 2880 colour 207 207 0
+vertex 36 92 uv 8 2880 colour 207 207 0
+vertex 33 98 uv 8 2880 colour 47 47 0
+polygon 13c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 43 99 uv 8 2880 colour 47 47 0
+vertex 45 93 uv 8 2880 colour 207 207 0
+vertex 44 86 uv 8 2880 colour 207 207 0
+vertex 42 93 uv 8 2880 colour 47 47 0
+polygon 13d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 100 uv 8 2880 colour 47 47 0
+vertex 71 95 uv 8 2880 colour 207 207 0
+vertex 71 91 uv 8 2880 colour 207 207 0
+vertex 69 95 uv 8 2880 colour 47 47 0
+polygon 13e attributes 1f00c0 texture 523432ab palette f18
+vertex 177 78 uv 0 1174 colour 303 303 287
+vertex 176 101 uv 0 1558 colour 303 303 287
+vertex 178 82 uv 0 1174 colour 303 303 287
+polygon 13f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 59 95 uv 8 2880 colour 47 47 0
+vertex 60 90 uv 8 2880 colour 207 207 0
+vertex 61 96 uv 8 2880 colour 207 207 0
+vertex 59 101 uv 8 2880 colour 47 47 0
+polygon 140 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 33 98 uv 8 2880 colour 47 47 0
+vertex 36 92 uv 8 2880 colour 207 207 0
+vertex 38 95 uv 8 2880 colour 207 207 0
+vertex 35 102 uv 8 2880 colour 47 47 0
+polygon 141 attributes 1f00c0 texture 50007700 palette 0
+vertex 173 103 uv 42 1595 colour 511 511 463
+vertex 176 101 uv 0 1558 colour 511 511 463
+vertex 177 78 uv 0 1174 colour 511 511 463
+polygon 142 attributes 1f00c0 texture 50007700 palette 0
+vertex 174 78 uv 42 1170 colour 511 511 463
+vertex 173 103 uv 42 1595 colour 511 511 463
+vertex 177 78 uv 0 1174 colour 511 511 463
+polygon 143 attributes 1f00c0 texture 50007700 palette 0
+vertex 150 104 uv 363 1597 colour 511 511 463
+vertex 173 103 uv 42 1595 colour 511 511 463
+vertex 174 78 uv 42 1170 colour 511 511 463
+polygon 144 attributes 1f00c0 texture 50007700 palette 0
+vertex 149 79 uv 363 1171 colour 511 511 463
+vertex 150 104 uv 363 1597 colour 511 511 463
+vertex 174 78 uv 42 1170 colour 511 511 463
+polygon 145 attributes 1f00c0 texture 50007700 palette 0
+vertex 150 104 uv 363 1597 colour 511 511 463
+vertex 149 79 uv 363 1171 colour 511 511 463
+vertex 145 83 uv 416 1227 colour 511 511 463
+polygon 146 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 70 104 uv 8 2880 colour 47 47 0
+vertex 71 99 uv 8 2880 colour 207 207 0
+vertex 71 95 uv 8 2880 colour 207 207 0
+vertex 69 100 uv 8 2880 colour 47 47 0
+polygon 147 attributes 1f00c0 texture 50007700 palette 0
+vertex 133 80 uv 574 1171 colour 511 511 463
+vertex 98 82 uv 1024 1174 colour 511 511 463
+vertex 134 105 uv 574 1597 colour 511 511 463
+polygon 148 attributes 1f00c0 texture 50007700 palette 0
+vertex 133 80 uv 574 1171 colour 511 511 463
+vertex 134 105 uv 574 1597 colour 511 511 463
+vertex 138 105 uv 522 1597 colour 511 511 463
+polygon 149 attributes 1f00c0 texture 50007700 palette 0
+vertex 137 83 uv 522 1227 colour 511 511 463
+vertex 133 80 uv 574 1171 colour 511 511 463
+vertex 138 105 uv 522 1597 colour 511 511 463
+polygon 14a attributes 1f00c0 texture 523432ab palette f18
+vertex 178 82 uv 0 1174 colour 511 511 463
+vertex 177 105 uv 0 1558 colour 511 511 463
+vertex 175 82 uv 42 1170 colour 511 511 463
+polygon 14b attributes 1f00c0 texture 523432ab palette f18
+vertex 176 101 uv 0 1558 colour 303 303 287
+vertex 177 105 uv 0 1558 colour 303 303 287
+vertex 178 82 uv 0 1174 colour 303 303 287
+polygon 14c attributes 1f00c0 texture 50007700 palette 0
+vertex 146 105 uv 416 1597 colour 511 511 463
+vertex 150 104 uv 363 1597 colour 511 511 463
+vertex 145 83 uv 416 1227 colour 511 511 463
+polygon 14d attributes 1f00c0 texture 50007700 palette 0
+vertex 142 105 uv 469 1597 colour 511 511 463
+vertex 141 84 uv 469 1241 colour 511 511 463
+vertex 137 83 uv 522 1227 colour 511 511 463
+polygon 14e attributes 1f00c0 texture 50007700 palette 0
+vertex 138 105 uv 522 1597 colour 511 511 463
+vertex 142 105 uv 469 1597 colour 511 511 463
+vertex 137 83 uv 522 1227 colour 511 511 463
+polygon 14f attributes 1f00c0 texture 50007700 palette 0
+vertex 145 83 uv 416 1227 colour 511 511 463
+vertex 141 84 uv 469 1241 colour 511 511 463
+vertex 146 105 uv 416 1597 colour 511 511 463
+polygon 150 attributes 1f00c0 texture 50007700 palette 0
+vertex 141 84 uv 469 1241 colour 511 511 463
+vertex 142 105 uv 469 1597 colour 511 511 463
+vertex 146 105 uv 416 1597 colour 511 511 463
+polygon 151 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 43 105 uv 8 2880 colour 47 47 0
+vertex 46 99 uv 8 2880 colour 207 207 0
+vertex 45 93 uv 8 2880 colour 207 207 0
+vertex 43 99 uv 8 2880 colour 47 47 0
+polygon 152 attributes 1f00c0 texture 523432ab palette f18
+vertex 176 101 uv 0 1558 colour 303 303 287
+vertex 173 103 uv 42 1595 colour 207 207 191
+vertex 177 105 uv 0 1558 colour 303 303 287
+polygon 153 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 35 102 uv 8 2880 colour 47 47 0
+vertex 38 95 uv 8 2880 colour 207 207 0
+vertex 39 99 uv 8 2880 colour 207 207 0
+vertex 37 106 uv 8 2880 colour 47 47 0
+polygon 154 attributes 1f00c0 texture 50007700 palette 0
+vertex 98 82 uv 1024 1174 colour 511 511 463
+vertex 103 107 uv 1024 1600 colour 511 511 463
+vertex 134 105 uv 574 1597 colour 511 511 463
+polygon 155 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 107 uv 8 2880 colour 47 47 0
+vertex 71 103 uv 8 2880 colour 207 207 0
+vertex 71 99 uv 8 2880 colour 207 207 0
+vertex 70 104 uv 8 2880 colour 47 47 0
+polygon 156 attributes 1f00c0 texture 523432ab palette f18
+vertex 175 82 uv 42 1170 colour 511 511 463
+vertex 173 108 uv 42 1595 colour 511 511 463
+vertex 149 83 uv 363 1171 colour 511 511 463
+polygon 157 attributes 1f00c0 texture 523432ab palette f18
+vertex 177 105 uv 0 1558 colour 511 511 463
+vertex 173 108 uv 42 1595 colour 511 511 463
+vertex 175 82 uv 42 1170 colour 511 511 463
+polygon 158 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 59 101 uv 8 2880 colour 47 47 0
+vertex 61 96 uv 8 2880 colour 207 207 0
+vertex 61 102 uv 8 2880 colour 207 207 0
+vertex 60 108 uv 8 2880 colour 47 47 0
+polygon 159 attributes 1f00c0 texture 523432ab palette f18
+vertex 173 108 uv 42 1595 colour 207 207 191
+vertex 173 103 uv 42 1595 colour 207 207 191
+vertex 150 104 uv 363 1597 colour 207 207 191
+polygon 15a attributes 1f00c0 texture 523432ab palette f18
+vertex 173 103 uv 42 1595 colour 207 207 191
+vertex 173 108 uv 42 1595 colour 207 207 191
+vertex 177 105 uv 0 1558 colour 303 303 287
+polygon 15b attributes 1f00c0 texture 523432ab palette f18
+vertex 173 108 uv 42 1595 colour 511 511 463
+vertex 150 109 uv 363 1597 colour 511 511 463
+vertex 149 83 uv 363 1171 colour 511 511 463
+polygon 15c attributes 1f00c0 texture 523432ab palette f18
+vertex 149 83 uv 363 1171 colour 511 511 463
+vertex 150 109 uv 363 1597 colour 511 511 463
+vertex 146 109 uv 416 1597 colour 511 511 463
+polygon 15d attributes 1f00c0 texture 523432ab palette f18
+vertex 145 87 uv 416 1227 colour 511 511 463
+vertex 149 83 uv 363 1171 colour 511 511 463
+vertex 146 109 uv 416 1597 colour 511 511 463
+polygon 15e attributes 1f00c0 texture 523432ab palette f18
+vertex 135 109 uv 574 1597 colour 511 511 463
+vertex 133 84 uv 574 1171 colour 511 511 463
+vertex 137 88 uv 522 1227 colour 511 511 463
+polygon 15f attributes 1f00c0 texture 523432ab palette f18
+vertex 142 109 uv 469 1597 colour 511 511 463
+vertex 141 88 uv 469 1241 colour 511 511 463
+vertex 145 87 uv 416 1227 colour 511 511 463
+polygon 160 attributes 1f00c0 texture 523432ab palette f18
+vertex 146 109 uv 416 1597 colour 511 511 463
+vertex 142 109 uv 469 1597 colour 511 511 463
+vertex 145 87 uv 416 1227 colour 511 511 463
+polygon 161 attributes 1f00c0 texture 523432ab palette f18
+vertex 141 88 uv 469 1241 colour 511 511 463
+vertex 142 109 uv 469 1597 colour 511 511 463
+vertex 138 109 uv 522 1597 colour 511 511 463
+polygon 162 attributes 1f00c0 texture 523432ab palette f18
+vertex 137 88 uv 522 1227 colour 511 511 463
+vertex 141 88 uv 469 1241 colour 511 511 463
+vertex 138 109 uv 522 1597 colour 511 511 463
+polygon 163 attributes 1f00c0 texture 523432ab palette f18
+vertex 138 109 uv 522 1597 colour 511 511 463
+vertex 135 109 uv 574 1597 colour 511 511 463
+vertex 137 88 uv 522 1227 colour 511 511 463
+polygon 164 attributes 1f00c0 texture 523432ab palette f18
+vertex 150 109 uv 363 1597 colour 207 207 191
+vertex 173 108 uv 42 1595 colour 207 207 191
+vertex 150 104 uv 363 1597 colour 207 207 191
+polygon 165 attributes 1f00c0 texture 523432ab palette f18
+vertex 150 109 uv 363 1597 colour 207 207 191
+vertex 150 104 uv 363 1597 colour 207 207 191
+vertex 146 105 uv 416 1597 colour 207 207 191
+polygon 166 attributes 1f00c0 texture 523432ab palette f18
+vertex 134 105 uv 574 1597 colour 207 207 191
+vertex 103 107 uv 1024 1600 colour 79 79 79
+vertex 135 109 uv 574 1597 colour 207 207 191
+polygon 167 attributes 1f00c0 texture 523432ab palette f18
+vertex 134 105 uv 574 1597 colour 207 207 191
+vertex 135 109 uv 574 1597 colour 207 207 191
+vertex 138 109 uv 522 1597 colour 207 207 191
+polygon 168 attributes 1f00c0 texture 523432ab palette f18
+vertex 138 105 uv 522 1597 colour 207 207 191
+vertex 134 105 uv 574 1597 colour 207 207 191
+vertex 138 109 uv 522 1597 colour 207 207 191
+polygon 169 attributes 1f00c0 texture 523432ab palette f18
+vertex 142 105 uv 469 1597 colour 207 207 191
+vertex 142 109 uv 469 1597 colour 207 207 191
+vertex 146 109 uv 416 1597 colour 207 207 191
+polygon 16a attributes 1f00c0 texture 523432ab palette f18
+vertex 146 105 uv 416 1597 colour 207 207 191
+vertex 142 105 uv 469 1597 colour 207 207 191
+vertex 146 109 uv 416 1597 colour 207 207 191
+polygon 16b attributes 1f00c0 texture 523432ab palette f18
+vertex 146 109 uv 416 1597 colour 207 207 191
+vertex 150 109 uv 363 1597 colour 207 207 191
+vertex 146 105 uv 416 1597 colour 207 207 191
+polygon 16c attributes 1f00c0 texture 523432ab palette f18
+vertex 142 109 uv 469 1597 colour 207 207 191
+vertex 142 105 uv 469 1597 colour 207 207 191
+vertex 138 105 uv 522 1597 colour 207 207 191
+polygon 16d attributes 1f00c0 texture 523432ab palette f18
+vertex 138 109 uv 522 1597 colour 207 207 191
+vertex 142 109 uv 469 1597 colour 207 207 191
+vertex 138 105 uv 522 1597 colour 207 207 191
+polygon 16e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 37 106 uv 8 2880 colour 47 47 0
+vertex 39 99 uv 8 2880 colour 207 207 0
+vertex 41 103 uv 8 2880 colour 207 207 0
+vertex 39 110 uv 8 2880 colour 47 47 0
+polygon 16f attributes 1f00c0 texture 523432ab palette f18
+vertex 102 111 uv 1024 1600 colour 79 79 63
+vertex 103 107 uv 1024 1600 colour 79 79 63
+vertex 98 82 uv 1024 1174 colour 191 191 175
+polygon 170 attributes 1f00c0 texture 523432ab palette f18
+vertex 98 87 uv 1024 1174 colour 191 191 175
+vertex 102 111 uv 1024 1600 colour 79 79 63
+vertex 98 82 uv 1024 1174 colour 191 191 175
+polygon 171 attributes 1f00c0 texture 523432ab palette f18
+vertex 102 111 uv 1024 1600 colour 511 511 463
+vertex 98 87 uv 1024 1174 colour 511 511 463
+vertex 133 84 uv 574 1171 colour 511 511 463
+polygon 172 attributes 1f00c0 texture 523432ab palette f18
+vertex 135 109 uv 574 1597 colour 511 511 463
+vertex 102 111 uv 1024 1600 colour 511 511 463
+vertex 133 84 uv 574 1171 colour 511 511 463
+polygon 173 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 44 111 uv 8 2880 colour 47 47 0
+vertex 47 105 uv 8 2880 colour 207 207 0
+vertex 46 99 uv 8 2880 colour 207 207 0
+vertex 43 105 uv 8 2880 colour 47 47 0
+polygon 174 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 111 uv 8 2880 colour 47 47 0
+vertex 70 106 uv 8 2880 colour 207 207 0
+vertex 71 103 uv 8 2880 colour 207 207 0
+vertex 69 107 uv 8 2880 colour 47 47 0
+polygon 175 attributes 1f00c0 texture 523432ab palette f18
+vertex 103 107 uv 1024 1600 colour 79 79 79
+vertex 102 111 uv 1024 1600 colour 79 79 79
+vertex 135 109 uv 574 1597 colour 207 207 191
+polygon 176 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 108 uv 8 2880 colour 47 47 0
+vertex 61 102 uv 8 2880 colour 207 207 0
+vertex 62 108 uv 8 2880 colour 207 207 0
+vertex 60 113 uv 8 2880 colour 47 47 0
+polygon 177 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 39 110 uv 8 2880 colour 47 47 0
+vertex 41 103 uv 8 2880 colour 207 207 0
+vertex 43 107 uv 8 2880 colour 207 207 0
+vertex 41 114 uv 8 2880 colour 47 47 0
+polygon 178 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 114 uv 8 2880 colour 47 47 0
+vertex 70 109 uv 8 2880 colour 207 207 0
+vertex 70 106 uv 8 2880 colour 207 207 0
+vertex 69 111 uv 8 2880 colour 47 47 0
+polygon 179 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 45 117 uv 8 2880 colour 47 47 0
+vertex 48 111 uv 8 2880 colour 207 207 0
+vertex 47 105 uv 8 2880 colour 207 207 0
+vertex 44 111 uv 8 2880 colour 47 47 0
+polygon 17a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 41 114 uv 8 2880 colour 47 47 0
+vertex 43 107 uv 8 2880 colour 207 207 0
+vertex 45 110 uv 8 2880 colour 207 207 0
+vertex 43 117 uv 8 2880 colour 47 47 0
+polygon 17b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 69 118 uv 8 2880 colour 47 47 0
+vertex 70 112 uv 8 2880 colour 207 207 0
+vertex 70 109 uv 8 2880 colour 207 207 0
+vertex 69 114 uv 8 2880 colour 47 47 0
+polygon 17c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 113 uv 8 2880 colour 47 47 0
+vertex 62 108 uv 8 2880 colour 207 207 0
+vertex 62 113 uv 8 2880 colour 207 207 0
+vertex 60 119 uv 8 2880 colour 47 47 0
+polygon 17d attributes 3c1f00c0 texture 50007700 palette 0
+vertex 43 117 uv 8 2880 colour 47 47 0
+vertex 45 110 uv 8 2880 colour 207 207 0
+vertex 47 113 uv 8 2880 colour 207 207 0
+vertex 45 120 uv 8 2880 colour 47 47 0
+polygon 17e attributes 3c1f00c0 texture 50007700 palette 0
+vertex 68 120 uv 8 2880 colour 47 47 0
+vertex 69 115 uv 8 2880 colour 207 207 0
+vertex 70 112 uv 8 2880 colour 207 207 0
+vertex 69 118 uv 8 2880 colour 47 47 0
+polygon 17f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 47 123 uv 8 2880 colour 47 47 0
+vertex 49 116 uv 8 2880 colour 207 207 0
+vertex 48 111 uv 8 2880 colour 207 207 0
+vertex 45 117 uv 8 2880 colour 47 47 0
+polygon 180 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 45 120 uv 8 2880 colour 47 47 0
+vertex 47 113 uv 8 2880 colour 207 207 0
+vertex 49 116 uv 8 2880 colour 207 207 0
+vertex 47 123 uv 8 2880 colour 47 47 0
+polygon 181 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 68 123 uv 8 2880 colour 47 47 0
+vertex 69 118 uv 8 2880 colour 207 207 0
+vertex 69 115 uv 8 2880 colour 207 207 0
+vertex 68 120 uv 8 2880 colour 47 47 0
+polygon 182 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 119 uv 8 2880 colour 47 47 0
+vertex 62 113 uv 8 2880 colour 207 207 0
+vertex 62 119 uv 8 2880 colour 207 207 0
+vertex 61 125 uv 8 2880 colour 47 47 0
+polygon 183 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 47 123 uv 8 2880 colour 47 47 0
+vertex 49 116 uv 8 2880 colour 207 207 0
+vertex 51 118 uv 8 2880 colour 207 207 0
+vertex 49 125 uv 8 2880 colour 47 47 0
+polygon 184 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 67 125 uv 8 2880 colour 47 47 0
+vertex 68 120 uv 8 2880 colour 207 207 0
+vertex 69 118 uv 8 2880 colour 207 207 0
+vertex 68 123 uv 8 2880 colour 47 47 0
+polygon 185 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 142 126 uv 0 0 colour 143 143 143
+vertex 144 126 uv 0 0 colour 143 143 143
+polygon 186 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 49 125 uv 8 2880 colour 47 47 0
+vertex 51 118 uv 8 2880 colour 207 207 0
+vertex 53 120 uv 8 2880 colour 207 207 0
+vertex 51 127 uv 8 2880 colour 47 47 0
+polygon 187 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 66 127 uv 8 2880 colour 47 47 0
+vertex 67 121 uv 8 2880 colour 207 207 0
+vertex 68 120 uv 8 2880 colour 207 207 0
+vertex 67 125 uv 8 2880 colour 47 47 0
+polygon 188 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 146 127 uv 0 0 colour 143 143 143
+vertex 145 126 uv 0 0 colour 143 143 143
+polygon 189 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 145 126 uv 0 0 colour 143 143 143
+vertex 147 127 uv 0 0 colour 143 143 143
+polygon 18a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 127 uv 0 0 colour 143 143 143
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 144 126 uv 0 0 colour 143 143 143
+polygon 18b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 127 uv 0 0 colour 143 143 143
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 145 126 uv 0 0 colour 143 143 143
+polygon 18c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 127 uv 0 0 colour 143 143 143
+vertex 141 127 uv 0 0 colour 143 143 143
+vertex 142 126 uv 0 0 colour 143 143 143
+polygon 18d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 142 127 uv 0 0 colour 143 143 143
+vertex 142 126 uv 0 0 colour 143 143 143
+polygon 18e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 128 uv 0 0 colour 143 143 143
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 147 127 uv 0 0 colour 143 143 143
+polygon 18f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 128 uv 0 0 colour 143 143 143
+vertex 147 127 uv 0 0 colour 143 143 143
+vertex 148 127 uv 0 0 colour 143 143 143
+polygon 190 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 128 uv 0 0 colour 143 143 143
+vertex 140 128 uv 0 0 colour 143 143 143
+vertex 141 127 uv 0 0 colour 143 143 143
+polygon 191 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 127 uv 0 0 colour 143 143 143
+vertex 140 128 uv 0 0 colour 143 143 143
+vertex 141 127 uv 0 0 colour 143 143 143
+polygon 192 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 48 129 uv 8 2880 colour 47 47 0
+vertex 50 122 uv 8 2880 colour 207 207 0
+vertex 49 116 uv 8 2880 colour 207 207 0
+vertex 47 123 uv 8 2880 colour 47 47 0
+polygon 193 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 51 127 uv 8 2880 colour 47 47 0
+vertex 53 120 uv 8 2880 colour 207 207 0
+vertex 55 122 uv 8 2880 colour 207 207 0
+vertex 53 129 uv 8 2880 colour 47 47 0
+polygon 194 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 65 129 uv 8 2880 colour 47 47 0
+vertex 67 123 uv 8 2880 colour 207 207 0
+vertex 67 121 uv 8 2880 colour 207 207 0
+vertex 66 127 uv 8 2880 colour 47 47 0
+polygon 195 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 129 uv 0 0 colour 143 143 143
+vertex 150 128 uv 0 0 colour 143 143 143
+vertex 148 127 uv 0 0 colour 143 143 143
+polygon 196 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 129 uv 0 0 colour 143 143 143
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 149 128 uv 0 0 colour 143 143 143
+polygon 197 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 129 uv 0 0 colour 143 143 143
+vertex 139 129 uv 0 0 colour 143 143 143
+vertex 140 128 uv 0 0 colour 143 143 143
+polygon 198 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 128 uv 0 0 colour 143 143 143
+vertex 138 129 uv 0 0 colour 143 143 143
+vertex 140 128 uv 0 0 colour 143 143 143
+polygon 199 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 125 uv 8 2880 colour 47 47 0
+vertex 62 119 uv 8 2880 colour 207 207 0
+vertex 62 124 uv 8 2880 colour 207 207 0
+vertex 61 130 uv 8 2880 colour 47 47 0
+polygon 19a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 53 129 uv 8 2880 colour 47 47 0
+vertex 55 122 uv 8 2880 colour 207 207 0
+vertex 57 124 uv 8 2880 colour 207 207 0
+vertex 55 130 uv 8 2880 colour 47 47 0
+polygon 19b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 64 130 uv 8 2880 colour 47 47 0
+vertex 66 124 uv 8 2880 colour 207 207 0
+vertex 67 123 uv 8 2880 colour 207 207 0
+vertex 65 129 uv 8 2880 colour 47 47 0
+polygon 19c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 142 126 uv 0 0 colour 143 143 143
+vertex 141 127 uv 0 0 colour 143 143 143
+polygon 19d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 142 126 uv 0 0 colour 143 143 143
+polygon 19e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 145 126 uv 0 0 colour 143 143 143
+vertex 144 126 uv 0 0 colour 143 143 143
+polygon 19f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 147 127 uv 0 0 colour 143 143 143
+vertex 145 126 uv 0 0 colour 143 143 143
+polygon 1a0 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 141 127 uv 0 0 colour 143 143 143
+vertex 140 128 uv 0 0 colour 143 143 143
+polygon 1a1 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 147 127 uv 0 0 colour 143 143 143
+polygon 1a2 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 149 128 uv 0 0 colour 143 143 143
+vertex 148 127 uv 0 0 colour 143 143 143
+polygon 1a3 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 140 128 uv 0 0 colour 143 143 143
+vertex 139 129 uv 0 0 colour 143 143 143
+polygon 1a4 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 149 129 uv 0 0 colour 143 143 143
+vertex 149 128 uv 0 0 colour 143 143 143
+polygon 1a5 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 149 130 uv 0 0 colour 143 143 143
+vertex 149 129 uv 0 0 colour 143 143 143
+polygon 1a6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 139 129 uv 0 0 colour 143 143 143
+vertex 139 130 uv 0 0 colour 143 143 143
+polygon 1a7 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 130 uv 0 0 colour 143 143 143
+vertex 139 130 uv 0 0 colour 143 143 143
+vertex 139 129 uv 0 0 colour 143 143 143
+polygon 1a8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 129 uv 0 0 colour 143 143 143
+vertex 137 130 uv 0 0 colour 143 143 143
+vertex 139 129 uv 0 0 colour 143 143 143
+polygon 1a9 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 130 uv 8 2880 colour 47 47 0
+vertex 57 124 uv 8 2880 colour 207 207 0
+vertex 59 125 uv 8 2880 colour 207 207 0
+vertex 57 131 uv 8 2880 colour 47 47 0
+polygon 1aa attributes 3c1f00c0 texture 50007700 palette 0
+vertex 63 131 uv 8 2880 colour 47 47 0
+vertex 64 125 uv 8 2880 colour 207 207 0
+vertex 66 124 uv 8 2880 colour 207 207 0
+vertex 64 130 uv 8 2880 colour 47 47 0
+polygon 1ab attributes 3c1f00c0 texture 50007700 palette 0
+vertex 57 131 uv 8 2880 colour 47 47 0
+vertex 59 125 uv 8 2880 colour 207 207 0
+vertex 60 125 uv 8 2880 colour 207 207 0
+vertex 59 131 uv 8 2880 colour 47 47 0
+polygon 1ac attributes 3c1f00c0 texture 50007700 palette 0
+vertex 62 131 uv 8 2880 colour 47 47 0
+vertex 63 125 uv 8 2880 colour 207 207 0
+vertex 64 125 uv 8 2880 colour 207 207 0
+vertex 63 131 uv 8 2880 colour 47 47 0
+polygon 1ad attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 131 uv 0 0 colour 143 143 143
+vertex 151 129 uv 0 0 colour 143 143 143
+vertex 149 128 uv 0 0 colour 143 143 143
+polygon 1ae attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 131 uv 0 0 colour 143 143 143
+vertex 149 128 uv 0 0 colour 143 143 143
+vertex 149 129 uv 0 0 colour 143 143 143
+polygon 1af attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 148 131 uv 0 0 colour 143 143 143
+vertex 149 130 uv 0 0 colour 143 143 143
+polygon 1b0 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 139 130 uv 0 0 colour 143 143 143
+vertex 139 131 uv 0 0 colour 143 143 143
+polygon 1b1 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 59 131 uv 8 2880 colour 47 47 0
+vertex 60 125 uv 8 2880 colour 207 207 0
+vertex 62 125 uv 8 2880 colour 207 207 0
+vertex 60 132 uv 8 2880 colour 47 47 0
+polygon 1b2 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 132 uv 8 2880 colour 47 47 0
+vertex 62 125 uv 8 2880 colour 207 207 0
+vertex 63 125 uv 8 2880 colour 207 207 0
+vertex 62 131 uv 8 2880 colour 47 47 0
+polygon 1b3 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 132 uv 0 0 colour 143 143 143
+vertex 151 131 uv 0 0 colour 143 143 143
+vertex 149 129 uv 0 0 colour 143 143 143
+polygon 1b4 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 132 uv 0 0 colour 143 143 143
+vertex 149 129 uv 0 0 colour 143 143 143
+vertex 149 130 uv 0 0 colour 143 143 143
+polygon 1b5 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 147 132 uv 0 0 colour 143 143 143
+vertex 148 131 uv 0 0 colour 143 143 143
+polygon 1b6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 139 131 uv 0 0 colour 143 143 143
+vertex 140 132 uv 0 0 colour 143 143 143
+polygon 1b7 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 132 uv 0 0 colour 143 143 143
+vertex 139 131 uv 0 0 colour 143 143 143
+vertex 139 130 uv 0 0 colour 143 143 143
+polygon 1b8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 130 uv 0 0 colour 143 143 143
+vertex 137 132 uv 0 0 colour 143 143 143
+vertex 139 130 uv 0 0 colour 143 143 143
+polygon 1b9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 146 133 uv 0 0 colour 143 143 143
+vertex 147 132 uv 0 0 colour 143 143 143
+polygon 1ba attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 144 133 uv 0 0 colour 143 143 143
+vertex 146 133 uv 0 0 colour 143 143 143
+polygon 1bb attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 143 133 uv 0 0 colour 143 143 143
+vertex 144 133 uv 0 0 colour 143 143 143
+polygon 1bc attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 141 133 uv 0 0 colour 143 143 143
+vertex 143 133 uv 0 0 colour 143 143 143
+polygon 1bd attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 130 uv 0 0 colour 143 143 143
+vertex 140 132 uv 0 0 colour 143 143 143
+vertex 141 133 uv 0 0 colour 143 143 143
+polygon 1be attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 133 uv 0 0 colour 143 143 143
+vertex 140 132 uv 0 0 colour 143 143 143
+vertex 139 131 uv 0 0 colour 143 143 143
+polygon 1bf attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 132 uv 0 0 colour 143 143 143
+vertex 138 133 uv 0 0 colour 143 143 143
+vertex 139 131 uv 0 0 colour 143 143 143
+polygon 1c0 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 49 134 uv 8 2880 colour 47 47 0
+vertex 51 127 uv 8 2880 colour 207 207 0
+vertex 50 122 uv 8 2880 colour 207 207 0
+vertex 48 129 uv 8 2880 colour 47 47 0
+polygon 1c1 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 130 uv 8 2880 colour 47 47 0
+vertex 62 124 uv 8 2880 colour 207 207 0
+vertex 62 128 uv 8 2880 colour 207 207 0
+vertex 61 134 uv 8 2880 colour 47 47 0
+polygon 1c2 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 134 uv 0 0 colour 143 143 143
+vertex 151 132 uv 0 0 colour 143 143 143
+vertex 149 130 uv 0 0 colour 143 143 143
+polygon 1c3 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 134 uv 0 0 colour 143 143 143
+vertex 149 130 uv 0 0 colour 143 143 143
+vertex 148 131 uv 0 0 colour 143 143 143
+polygon 1c4 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 134 uv 0 0 colour 143 143 143
+vertex 141 133 uv 0 0 colour 143 143 143
+vertex 140 132 uv 0 0 colour 143 143 143
+polygon 1c5 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 133 uv 0 0 colour 143 143 143
+vertex 139 134 uv 0 0 colour 143 143 143
+vertex 140 132 uv 0 0 colour 143 143 143
+polygon 1c6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 135 uv 0 0 colour 143 143 143
+vertex 150 134 uv 0 0 colour 143 143 143
+vertex 148 131 uv 0 0 colour 143 143 143
+polygon 1c7 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 135 uv 0 0 colour 143 143 143
+vertex 148 131 uv 0 0 colour 143 143 143
+vertex 147 132 uv 0 0 colour 143 143 143
+polygon 1c8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 135 uv 0 0 colour 143 143 143
+vertex 143 133 uv 0 0 colour 143 143 143
+vertex 141 133 uv 0 0 colour 143 143 143
+polygon 1c9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 134 uv 0 0 colour 143 143 143
+vertex 140 135 uv 0 0 colour 143 143 143
+vertex 141 133 uv 0 0 colour 143 143 143
+polygon 1ca attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 146 127 uv 0 0 colour 143 143 143
+vertex 145 136 uv 0 0 colour 0 0 0
+polygon 1cb attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 136 uv 0 0 colour 143 143 143
+vertex 148 135 uv 0 0 colour 143 143 143
+vertex 147 132 uv 0 0 colour 143 143 143
+polygon 1cc attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 136 uv 0 0 colour 143 143 143
+vertex 147 132 uv 0 0 colour 143 143 143
+vertex 146 133 uv 0 0 colour 143 143 143
+polygon 1cd attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 136 uv 0 0 colour 143 143 143
+vertex 146 136 uv 0 0 colour 143 143 143
+vertex 146 133 uv 0 0 colour 143 143 143
+polygon 1ce attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 136 uv 0 0 colour 143 143 143
+vertex 146 133 uv 0 0 colour 143 143 143
+vertex 144 133 uv 0 0 colour 143 143 143
+polygon 1cf attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 136 uv 0 0 colour 143 143 143
+vertex 144 136 uv 0 0 colour 143 143 143
+vertex 144 133 uv 0 0 colour 143 143 143
+polygon 1d0 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 136 uv 0 0 colour 143 143 143
+vertex 144 133 uv 0 0 colour 143 143 143
+vertex 143 133 uv 0 0 colour 143 143 143
+polygon 1d1 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 135 uv 0 0 colour 143 143 143
+vertex 142 136 uv 0 0 colour 143 143 143
+vertex 143 133 uv 0 0 colour 143 143 143
+polygon 1d2 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 136 uv 0 0 colour 143 143 143
+vertex 145 136 uv 0 0 colour 143 143 143
+vertex 145 136 uv 0 0 colour 143 143 143
+polygon 1d3 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 145 136 uv 0 0 colour 0 0 0
+vertex 142 137 uv 0 0 colour 0 0 0
+polygon 1d4 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 127 uv 0 0 colour 143 143 143
+vertex 144 126 uv 0 0 colour 143 143 143
+vertex 142 137 uv 0 0 colour 0 0 0
+polygon 1d5 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 127 uv 0 0 colour 143 143 143
+vertex 147 137 uv 0 0 colour 0 0 0
+vertex 145 136 uv 0 0 colour 0 0 0
+polygon 1d6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 149 137 uv 0 0 colour 0 0 0
+vertex 147 137 uv 0 0 colour 0 0 0
+polygon 1d7 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 127 uv 0 0 colour 143 143 143
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 147 137 uv 0 0 colour 0 0 0
+polygon 1d8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 137 uv 0 0 colour 143 143 143
+vertex 148 136 uv 0 0 colour 143 143 143
+vertex 147 137 uv 0 0 colour 143 143 143
+polygon 1d9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 136 uv 0 0 colour 143 143 143
+vertex 145 136 uv 0 0 colour 143 143 143
+vertex 147 137 uv 0 0 colour 143 143 143
+polygon 1da attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 136 uv 0 0 colour 143 143 143
+vertex 142 137 uv 0 0 colour 143 143 143
+vertex 142 137 uv 0 0 colour 143 143 143
+polygon 1db attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 136 uv 0 0 colour 143 143 143
+vertex 142 137 uv 0 0 colour 143 143 143
+vertex 145 136 uv 0 0 colour 143 143 143
+polygon 1dc attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 137 uv 0 0 colour 143 143 143
+vertex 147 137 uv 0 0 colour 143 143 143
+vertex 149 137 uv 0 0 colour 143 143 143
+polygon 1dd attributes 3c1f00c0 texture 50007700 palette 0
+vertex 50 138 uv 8 2880 colour 47 47 0
+vertex 52 131 uv 8 2880 colour 207 207 0
+vertex 51 127 uv 8 2880 colour 207 207 0
+vertex 49 134 uv 8 2880 colour 47 47 0
+polygon 1de attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 127 uv 0 0 colour 143 143 143
+vertex 142 137 uv 0 0 colour 0 0 0
+vertex 140 138 uv 0 0 colour 0 0 0
+polygon 1df attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 128 uv 0 0 colour 143 143 143
+vertex 142 127 uv 0 0 colour 143 143 143
+vertex 140 138 uv 0 0 colour 0 0 0
+polygon 1e0 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 138 uv 0 0 colour 0 0 0
+vertex 149 137 uv 0 0 colour 0 0 0
+vertex 148 127 uv 0 0 colour 143 143 143
+polygon 1e1 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 138 uv 0 0 colour 0 0 0
+vertex 148 127 uv 0 0 colour 143 143 143
+vertex 150 128 uv 0 0 colour 143 143 143
+polygon 1e2 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 138 uv 0 0 colour 0 0 0
+vertex 138 129 uv 0 0 colour 143 143 143
+vertex 140 128 uv 0 0 colour 143 143 143
+polygon 1e3 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 153 138 uv 0 0 colour 143 143 143
+vertex 150 137 uv 0 0 colour 143 143 143
+vertex 149 137 uv 0 0 colour 143 143 143
+polygon 1e4 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 153 138 uv 0 0 colour 143 143 143
+vertex 149 137 uv 0 0 colour 143 143 143
+vertex 151 138 uv 0 0 colour 143 143 143
+polygon 1e5 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 137 uv 0 0 colour 143 143 143
+vertex 139 138 uv 0 0 colour 143 143 143
+vertex 140 138 uv 0 0 colour 143 143 143
+polygon 1e6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 137 uv 0 0 colour 143 143 143
+vertex 140 138 uv 0 0 colour 143 143 143
+vertex 142 137 uv 0 0 colour 143 143 143
+polygon 1e7 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 134 uv 8 2880 colour 47 47 0
+vertex 62 128 uv 8 2880 colour 207 207 0
+vertex 63 132 uv 8 2880 colour 207 207 0
+vertex 61 139 uv 8 2880 colour 47 47 0
+polygon 1e8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 138 uv 0 0 colour 0 0 0
+vertex 139 139 uv 0 0 colour 0 0 0
+vertex 138 129 uv 0 0 colour 143 143 143
+polygon 1e9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 139 uv 0 0 colour 0 0 0
+vertex 137 130 uv 0 0 colour 143 143 143
+vertex 138 129 uv 0 0 colour 143 143 143
+polygon 1ea attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 138 uv 0 0 colour 143 143 143
+vertex 137 139 uv 0 0 colour 143 143 143
+vertex 139 139 uv 0 0 colour 143 143 143
+polygon 1eb attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 138 uv 0 0 colour 143 143 143
+vertex 139 139 uv 0 0 colour 143 143 143
+vertex 140 138 uv 0 0 colour 143 143 143
+polygon 1ec attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 140 uv 0 0 colour 0 0 0
+vertex 151 138 uv 0 0 colour 0 0 0
+vertex 150 128 uv 0 0 colour 143 143 143
+polygon 1ed attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 140 uv 0 0 colour 0 0 0
+vertex 150 128 uv 0 0 colour 143 143 143
+vertex 151 129 uv 0 0 colour 143 143 143
+polygon 1ee attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 139 uv 0 0 colour 0 0 0
+vertex 138 140 uv 0 0 colour 0 0 0
+vertex 137 130 uv 0 0 colour 143 143 143
+polygon 1ef attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 140 uv 0 0 colour 0 0 0
+vertex 137 132 uv 0 0 colour 143 143 143
+vertex 137 130 uv 0 0 colour 143 143 143
+polygon 1f0 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 140 uv 0 0 colour 143 143 143
+vertex 153 138 uv 0 0 colour 143 143 143
+vertex 151 138 uv 0 0 colour 143 143 143
+polygon 1f1 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 140 uv 0 0 colour 143 143 143
+vertex 151 138 uv 0 0 colour 143 143 143
+vertex 152 140 uv 0 0 colour 143 143 143
+polygon 1f2 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 139 uv 0 0 colour 143 143 143
+vertex 138 140 uv 0 0 colour 143 143 143
+vertex 139 139 uv 0 0 colour 143 143 143
+polygon 1f3 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 141 uv 0 0 colour 0 0 0
+vertex 152 140 uv 0 0 colour 0 0 0
+vertex 151 129 uv 0 0 colour 143 143 143
+polygon 1f4 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 141 uv 0 0 colour 0 0 0
+vertex 151 129 uv 0 0 colour 143 143 143
+vertex 151 131 uv 0 0 colour 143 143 143
+polygon 1f5 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 139 uv 0 0 colour 143 143 143
+vertex 136 141 uv 0 0 colour 143 143 143
+vertex 138 140 uv 0 0 colour 143 143 143
+polygon 1f6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 142 uv 0 0 colour 0 0 0
+vertex 152 141 uv 0 0 colour 0 0 0
+vertex 151 131 uv 0 0 colour 143 143 143
+polygon 1f7 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 142 uv 0 0 colour 0 0 0
+vertex 151 131 uv 0 0 colour 143 143 143
+vertex 151 132 uv 0 0 colour 143 143 143
+polygon 1f8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 140 uv 0 0 colour 0 0 0
+vertex 138 142 uv 0 0 colour 0 0 0
+vertex 137 132 uv 0 0 colour 143 143 143
+polygon 1f9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 142 uv 0 0 colour 0 0 0
+vertex 138 133 uv 0 0 colour 143 143 143
+vertex 137 132 uv 0 0 colour 143 143 143
+polygon 1fa attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 142 uv 0 0 colour 143 143 143
+vertex 154 140 uv 0 0 colour 143 143 143
+vertex 152 140 uv 0 0 colour 143 143 143
+polygon 1fb attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 142 uv 0 0 colour 143 143 143
+vertex 152 140 uv 0 0 colour 143 143 143
+vertex 152 141 uv 0 0 colour 143 143 143
+polygon 1fc attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 141 uv 0 0 colour 143 143 143
+vertex 138 142 uv 0 0 colour 143 143 143
+vertex 138 140 uv 0 0 colour 143 143 143
+polygon 1fd attributes 3c1f00c0 texture 50007700 palette 0
+vertex 51 143 uv 8 2880 colour 47 47 0
+vertex 53 136 uv 8 2880 colour 207 207 0
+vertex 52 131 uv 8 2880 colour 207 207 0
+vertex 50 138 uv 8 2880 colour 47 47 0
+polygon 1fe attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 139 uv 8 2880 colour 47 47 0
+vertex 63 132 uv 8 2880 colour 207 207 0
+vertex 63 136 uv 8 2880 colour 207 207 0
+vertex 61 143 uv 8 2880 colour 47 47 0
+polygon 1ff attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 142 uv 0 0 colour 0 0 0
+vertex 138 143 uv 0 0 colour 0 0 0
+vertex 138 133 uv 0 0 colour 143 143 143
+polygon 200 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 143 uv 0 0 colour 0 0 0
+vertex 139 134 uv 0 0 colour 143 143 143
+vertex 138 133 uv 0 0 colour 143 143 143
+polygon 201 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 141 uv 0 0 colour 143 143 143
+vertex 135 143 uv 0 0 colour 143 143 143
+vertex 138 142 uv 0 0 colour 143 143 143
+polygon 202 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 135 143 uv 0 0 colour 143 143 143
+vertex 138 143 uv 0 0 colour 143 143 143
+vertex 138 142 uv 0 0 colour 143 143 143
+polygon 203 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 144 uv 0 0 colour 0 0 0
+vertex 152 142 uv 0 0 colour 0 0 0
+vertex 151 132 uv 0 0 colour 143 143 143
+polygon 204 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 144 uv 0 0 colour 0 0 0
+vertex 151 132 uv 0 0 colour 143 143 143
+vertex 150 134 uv 0 0 colour 143 143 143
+polygon 205 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 143 uv 0 0 colour 0 0 0
+vertex 139 144 uv 0 0 colour 0 0 0
+vertex 139 134 uv 0 0 colour 143 143 143
+polygon 206 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 144 uv 0 0 colour 0 0 0
+vertex 140 135 uv 0 0 colour 143 143 143
+vertex 139 134 uv 0 0 colour 143 143 143
+polygon 207 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 144 uv 0 0 colour 143 143 143
+vertex 154 142 uv 0 0 colour 143 143 143
+vertex 152 141 uv 0 0 colour 143 143 143
+polygon 208 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 144 uv 0 0 colour 143 143 143
+vertex 152 141 uv 0 0 colour 143 143 143
+vertex 152 142 uv 0 0 colour 143 143 143
+polygon 209 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 145 uv 0 0 colour 0 0 0
+vertex 151 144 uv 0 0 colour 0 0 0
+vertex 150 134 uv 0 0 colour 143 143 143
+polygon 20a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 145 uv 0 0 colour 0 0 0
+vertex 150 134 uv 0 0 colour 143 143 143
+vertex 148 135 uv 0 0 colour 143 143 143
+polygon 20b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 144 uv 0 0 colour 0 0 0
+vertex 141 145 uv 0 0 colour 0 0 0
+vertex 140 135 uv 0 0 colour 143 143 143
+polygon 20c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 135 uv 0 0 colour 143 143 143
+vertex 146 136 uv 0 0 colour 143 143 143
+vertex 149 145 uv 0 0 colour 0 0 0
+polygon 20d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 145 uv 0 0 colour 143 143 143
+vertex 139 144 uv 0 0 colour 143 143 143
+vertex 138 143 uv 0 0 colour 143 143 143
+polygon 20e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 135 143 uv 0 0 colour 143 143 143
+vertex 136 145 uv 0 0 colour 143 143 143
+vertex 138 143 uv 0 0 colour 143 143 143
+polygon 20f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 135 uv 0 0 colour 143 143 143
+vertex 141 145 uv 0 0 colour 0 0 0
+vertex 143 146 uv 0 0 colour 0 0 0
+polygon 210 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 136 uv 0 0 colour 143 143 143
+vertex 140 135 uv 0 0 colour 143 143 143
+vertex 143 146 uv 0 0 colour 0 0 0
+polygon 211 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 143 uv 8 2880 colour 47 47 0
+vertex 63 136 uv 8 2880 colour 207 207 0
+vertex 62 140 uv 8 2880 colour 207 207 0
+vertex 61 146 uv 8 2880 colour 47 47 0
+polygon 212 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 52 146 uv 8 2880 colour 47 47 0
+vertex 54 139 uv 8 2880 colour 207 207 0
+vertex 53 136 uv 8 2880 colour 207 207 0
+vertex 51 143 uv 8 2880 colour 47 47 0
+polygon 213 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 136 uv 0 0 colour 143 143 143
+vertex 143 146 uv 0 0 colour 0 0 0
+vertex 145 146 uv 0 0 colour 0 0 0
+polygon 214 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 136 uv 0 0 colour 143 143 143
+vertex 142 136 uv 0 0 colour 143 143 143
+vertex 145 146 uv 0 0 colour 0 0 0
+polygon 215 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 136 uv 0 0 colour 143 143 143
+vertex 145 146 uv 0 0 colour 0 0 0
+vertex 147 146 uv 0 0 colour 0 0 0
+polygon 216 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 136 uv 0 0 colour 143 143 143
+vertex 144 136 uv 0 0 colour 143 143 143
+vertex 147 146 uv 0 0 colour 0 0 0
+polygon 217 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 136 uv 0 0 colour 143 143 143
+vertex 147 146 uv 0 0 colour 0 0 0
+vertex 149 145 uv 0 0 colour 0 0 0
+polygon 218 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 153 146 uv 0 0 colour 143 143 143
+vertex 154 144 uv 0 0 colour 143 143 143
+vertex 152 142 uv 0 0 colour 143 143 143
+polygon 219 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 153 146 uv 0 0 colour 143 143 143
+vertex 152 142 uv 0 0 colour 143 143 143
+vertex 151 144 uv 0 0 colour 143 143 143
+polygon 21a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 146 uv 0 0 colour 143 143 143
+vertex 141 145 uv 0 0 colour 143 143 143
+vertex 139 144 uv 0 0 colour 143 143 143
+polygon 21b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 145 uv 0 0 colour 143 143 143
+vertex 137 146 uv 0 0 colour 143 143 143
+vertex 139 144 uv 0 0 colour 143 143 143
+polygon 21c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 147 uv 0 0 colour 143 143 143
+vertex 153 146 uv 0 0 colour 143 143 143
+vertex 151 144 uv 0 0 colour 143 143 143
+polygon 21d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 147 uv 0 0 colour 143 143 143
+vertex 151 144 uv 0 0 colour 143 143 143
+vertex 149 145 uv 0 0 colour 143 143 143
+polygon 21e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 148 uv 0 0 colour 143 143 143
+vertex 151 147 uv 0 0 colour 143 143 143
+vertex 149 145 uv 0 0 colour 143 143 143
+polygon 21f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 148 uv 0 0 colour 143 143 143
+vertex 149 145 uv 0 0 colour 143 143 143
+vertex 147 146 uv 0 0 colour 143 143 143
+polygon 220 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 148 uv 0 0 colour 143 143 143
+vertex 143 146 uv 0 0 colour 143 143 143
+vertex 141 145 uv 0 0 colour 143 143 143
+polygon 221 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 146 uv 0 0 colour 143 143 143
+vertex 140 148 uv 0 0 colour 143 143 143
+vertex 141 145 uv 0 0 colour 143 143 143
+polygon 222 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 148 uv 0 0 colour 143 143 143
+vertex 145 146 uv 0 0 colour 143 143 143
+vertex 143 146 uv 0 0 colour 143 143 143
+polygon 223 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 148 uv 0 0 colour 143 143 143
+vertex 142 148 uv 0 0 colour 143 143 143
+vertex 143 146 uv 0 0 colour 143 143 143
+polygon 224 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 53 149 uv 8 2880 colour 47 47 0
+vertex 55 142 uv 8 2880 colour 207 207 0
+vertex 54 139 uv 8 2880 colour 207 207 0
+vertex 52 146 uv 8 2880 colour 47 47 0
+polygon 225 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 146 uv 8 2880 colour 47 47 0
+vertex 62 140 uv 8 2880 colour 207 207 0
+vertex 62 143 uv 8 2880 colour 207 207 0
+vertex 61 149 uv 8 2880 colour 47 47 0
+polygon 226 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 149 uv 0 0 colour 143 143 143
+vertex 148 148 uv 0 0 colour 143 143 143
+vertex 147 146 uv 0 0 colour 143 143 143
+polygon 227 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 149 uv 0 0 colour 143 143 143
+vertex 147 146 uv 0 0 colour 143 143 143
+vertex 145 146 uv 0 0 colour 143 143 143
+polygon 228 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 148 uv 0 0 colour 143 143 143
+vertex 145 149 uv 0 0 colour 143 143 143
+vertex 145 146 uv 0 0 colour 143 143 143
+polygon 229 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 54 152 uv 8 2880 colour 47 47 0
+vertex 56 145 uv 8 2880 colour 207 207 0
+vertex 55 142 uv 8 2880 colour 207 207 0
+vertex 53 149 uv 8 2880 colour 47 47 0
+polygon 22a attributes 3c1f00c0 texture 50007700 palette 0
+vertex 61 149 uv 8 2880 colour 47 47 0
+vertex 62 143 uv 8 2880 colour 207 207 0
+vertex 62 145 uv 8 2880 colour 207 207 0
+vertex 60 152 uv 8 2880 colour 47 47 0
+polygon 22b attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 152 uv 8 2880 colour 47 47 0
+vertex 62 145 uv 8 2880 colour 207 207 0
+vertex 62 147 uv 8 2880 colour 207 207 0
+vertex 60 154 uv 8 2880 colour 47 47 0
+polygon 22c attributes 3c1f00c0 texture 50007700 palette 0
+vertex 55 154 uv 8 2880 colour 47 47 0
+vertex 57 147 uv 8 2880 colour 207 207 0
+vertex 56 145 uv 8 2880 colour 207 207 0
+vertex 54 152 uv 8 2880 colour 47 47 0
+polygon 22d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 155 uv 0 0 colour 143 143 143
+vertex 145 149 uv 0 0 colour 143 143 143
+vertex 142 148 uv 0 0 colour 143 143 143
+polygon 22e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 155 uv 0 0 colour 143 143 143
+vertex 146 155 uv 0 0 colour 143 143 143
+vertex 142 148 uv 0 0 colour 143 143 143
+polygon 22f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 155 uv 0 0 colour 143 143 143
+vertex 148 148 uv 0 0 colour 143 143 143
+vertex 145 149 uv 0 0 colour 143 143 143
+polygon 230 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 155 uv 0 0 colour 143 143 143
+vertex 148 155 uv 0 0 colour 143 143 143
+vertex 145 149 uv 0 0 colour 143 143 143
+polygon 231 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 154 uv 8 2880 colour 47 47 0
+vertex 62 147 uv 8 2880 colour 207 207 0
+vertex 61 149 uv 8 2880 colour 207 207 0
+vertex 60 156 uv 8 2880 colour 47 47 0
+polygon 232 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 56 156 uv 8 2880 colour 47 47 0
+vertex 58 149 uv 8 2880 colour 207 207 0
+vertex 57 147 uv 8 2880 colour 207 207 0
+vertex 55 154 uv 8 2880 colour 47 47 0
+polygon 233 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 154 uv 0 0 colour 0 0 0
+vertex 146 156 uv 0 0 colour 143 143 143
+vertex 143 156 uv 0 0 colour 143 143 143
+polygon 234 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 154 uv 0 0 colour 0 0 0
+vertex 145 154 uv 0 0 colour 0 0 0
+vertex 143 156 uv 0 0 colour 143 143 143
+polygon 235 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 154 uv 0 0 colour 0 0 0
+vertex 148 156 uv 0 0 colour 0 0 0
+vertex 146 156 uv 0 0 colour 143 143 143
+polygon 236 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 154 uv 0 0 colour 0 0 0
+vertex 150 154 uv 0 0 colour 0 0 0
+vertex 146 156 uv 0 0 colour 143 143 143
+polygon 237 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 154 uv 0 0 colour 0 0 0
+vertex 145 154 uv 0 0 colour 0 0 0
+vertex 145 156 uv 0 0 colour 143 143 143
+polygon 238 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 154 uv 0 0 colour 0 0 0
+vertex 145 156 uv 0 0 colour 143 143 143
+vertex 150 156 uv 0 0 colour 143 143 143
+polygon 239 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 154 uv 0 0 colour 0 0 0
+vertex 141 154 uv 0 0 colour 0 0 0
+vertex 141 156 uv 0 0 colour 143 143 143
+polygon 23a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 154 uv 0 0 colour 0 0 0
+vertex 141 156 uv 0 0 colour 143 143 143
+vertex 145 156 uv 0 0 colour 143 143 143
+polygon 23b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 155 uv 0 0 colour 143 143 143
+vertex 146 155 uv 0 0 colour 143 143 143
+vertex 146 156 uv 0 0 colour 143 143 143
+polygon 23c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 155 uv 0 0 colour 143 143 143
+vertex 146 156 uv 0 0 colour 143 143 143
+vertex 148 156 uv 0 0 colour 0 0 0
+polygon 23d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 155 uv 0 0 colour 143 143 143
+vertex 143 155 uv 0 0 colour 143 143 143
+vertex 143 156 uv 0 0 colour 143 143 143
+polygon 23e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 155 uv 0 0 colour 143 143 143
+vertex 143 156 uv 0 0 colour 143 143 143
+vertex 146 156 uv 0 0 colour 143 143 143
+polygon 23f attributes 3c1f00c0 texture 50007700 palette 0
+vertex 60 156 uv 8 2880 colour 47 47 0
+vertex 61 149 uv 8 2880 colour 207 207 0
+vertex 61 150 uv 8 2880 colour 207 207 0
+vertex 59 157 uv 8 2880 colour 47 47 0
+polygon 240 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 57 157 uv 8 2880 colour 47 47 0
+vertex 59 150 uv 8 2880 colour 207 207 0
+vertex 58 149 uv 8 2880 colour 207 207 0
+vertex 56 156 uv 8 2880 colour 47 47 0
+polygon 241 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 59 157 uv 8 2880 colour 47 47 0
+vertex 61 150 uv 8 2880 colour 207 207 0
+vertex 60 150 uv 8 2880 colour 207 207 0
+vertex 59 157 uv 8 2880 colour 47 47 0
+polygon 242 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 59 157 uv 8 2880 colour 47 47 0
+vertex 60 150 uv 8 2880 colour 207 207 0
+vertex 60 150 uv 8 2880 colour 207 207 0
+vertex 58 157 uv 8 2880 colour 47 47 0
+polygon 243 attributes 3c1f00c0 texture 50007700 palette 0
+vertex 58 157 uv 8 2880 colour 47 47 0
+vertex 60 150 uv 8 2880 colour 207 207 0
+vertex 59 150 uv 8 2880 colour 207 207 0
+vertex 57 157 uv 8 2880 colour 47 47 0
+polygon 244 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 136 uv 0 0 colour 143 143 143
+vertex 146 159 uv 0 0 colour 0 0 0
+vertex 143 159 uv 0 0 colour 0 0 0
+polygon 245 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 137 uv 0 0 colour 143 143 143
+vertex 145 136 uv 0 0 colour 143 143 143
+vertex 143 159 uv 0 0 colour 0 0 0
+polygon 246 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 136 uv 0 0 colour 143 143 143
+vertex 149 159 uv 0 0 colour 0 0 0
+vertex 146 159 uv 0 0 colour 0 0 0
+polygon 247 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 136 uv 0 0 colour 143 143 143
+vertex 148 136 uv 0 0 colour 143 143 143
+vertex 146 159 uv 0 0 colour 0 0 0
+polygon 248 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 136 uv 0 0 colour 143 143 143
+vertex 150 137 uv 0 0 colour 143 143 143
+vertex 149 159 uv 0 0 colour 0 0 0
+polygon 249 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 137 uv 0 0 colour 143 143 143
+vertex 143 159 uv 0 0 colour 0 0 0
+vertex 140 160 uv 0 0 colour 0 0 0
+polygon 24a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 138 uv 0 0 colour 143 143 143
+vertex 142 137 uv 0 0 colour 143 143 143
+vertex 140 160 uv 0 0 colour 0 0 0
+polygon 24b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 137 uv 0 0 colour 143 143 143
+vertex 152 160 uv 0 0 colour 0 0 0
+vertex 149 159 uv 0 0 colour 0 0 0
+polygon 24c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 161 uv 0 0 colour 0 0 0
+vertex 152 160 uv 0 0 colour 0 0 0
+vertex 150 137 uv 0 0 colour 143 143 143
+polygon 24d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 161 uv 0 0 colour 0 0 0
+vertex 150 137 uv 0 0 colour 143 143 143
+vertex 153 138 uv 0 0 colour 143 143 143
+polygon 24e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 161 uv 0 0 colour 143 143 143
+vertex 146 161 uv 0 0 colour 143 143 143
+vertex 146 159 uv 0 0 colour 0 0 0
+polygon 24f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 161 uv 0 0 colour 143 143 143
+vertex 146 159 uv 0 0 colour 0 0 0
+vertex 149 159 uv 0 0 colour 0 0 0
+polygon 250 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 161 uv 0 0 colour 143 143 143
+vertex 140 160 uv 0 0 colour 0 0 0
+vertex 143 159 uv 0 0 colour 0 0 0
+polygon 251 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 161 uv 0 0 colour 143 143 143
+vertex 143 161 uv 0 0 colour 143 143 143
+vertex 143 159 uv 0 0 colour 0 0 0
+polygon 252 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 161 uv 0 0 colour 143 143 143
+vertex 143 159 uv 0 0 colour 0 0 0
+vertex 146 159 uv 0 0 colour 0 0 0
+polygon 253 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 138 uv 0 0 colour 143 143 143
+vertex 140 160 uv 0 0 colour 0 0 0
+vertex 138 162 uv 0 0 colour 0 0 0
+polygon 254 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 139 uv 0 0 colour 143 143 143
+vertex 139 138 uv 0 0 colour 143 143 143
+vertex 138 162 uv 0 0 colour 0 0 0
+polygon 255 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 162 uv 0 0 colour 0 0 0
+vertex 136 141 uv 0 0 colour 143 143 143
+vertex 137 139 uv 0 0 colour 143 143 143
+polygon 256 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 162 uv 0 0 colour 143 143 143
+vertex 149 161 uv 0 0 colour 143 143 143
+vertex 149 159 uv 0 0 colour 0 0 0
+polygon 257 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 162 uv 0 0 colour 143 143 143
+vertex 149 159 uv 0 0 colour 0 0 0
+vertex 152 160 uv 0 0 colour 0 0 0
+polygon 258 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 162 uv 0 0 colour 143 143 143
+vertex 138 162 uv 0 0 colour 0 0 0
+vertex 140 160 uv 0 0 colour 0 0 0
+polygon 259 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 161 uv 0 0 colour 143 143 143
+vertex 141 162 uv 0 0 colour 143 143 143
+vertex 140 160 uv 0 0 colour 0 0 0
+polygon 25a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 156 163 uv 0 0 colour 0 0 0
+vertex 155 161 uv 0 0 colour 0 0 0
+vertex 153 138 uv 0 0 colour 143 143 143
+polygon 25b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 156 163 uv 0 0 colour 0 0 0
+vertex 153 138 uv 0 0 colour 143 143 143
+vertex 154 140 uv 0 0 colour 143 143 143
+polygon 25c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 163 uv 0 0 colour 143 143 143
+vertex 151 162 uv 0 0 colour 143 143 143
+vertex 152 160 uv 0 0 colour 0 0 0
+polygon 25d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 163 uv 0 0 colour 143 143 143
+vertex 152 160 uv 0 0 colour 0 0 0
+vertex 155 161 uv 0 0 colour 0 0 0
+polygon 25e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 162 uv 0 0 colour 0 0 0
+vertex 136 164 uv 0 0 colour 0 0 0
+vertex 136 141 uv 0 0 colour 143 143 143
+polygon 25f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 164 uv 0 0 colour 0 0 0
+vertex 135 143 uv 0 0 colour 143 143 143
+vertex 136 141 uv 0 0 colour 143 143 143
+polygon 260 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 148 uv 0 0 colour 143 143 143
+vertex 143 164 uv 0 0 colour 143 143 143
+vertex 143 155 uv 0 0 colour 143 143 143
+polygon 261 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 164 uv 0 0 colour 0 0 0
+vertex 148 155 uv 0 0 colour 143 143 143
+vertex 148 156 uv 0 0 colour 0 0 0
+polygon 262 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 164 uv 0 0 colour 143 143 143
+vertex 154 163 uv 0 0 colour 143 143 143
+vertex 155 161 uv 0 0 colour 0 0 0
+polygon 263 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 164 uv 0 0 colour 143 143 143
+vertex 155 161 uv 0 0 colour 0 0 0
+vertex 156 163 uv 0 0 colour 0 0 0
+polygon 264 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 164 uv 0 0 colour 143 143 143
+vertex 136 164 uv 0 0 colour 0 0 0
+vertex 138 162 uv 0 0 colour 0 0 0
+polygon 265 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 162 uv 0 0 colour 143 143 143
+vertex 139 164 uv 0 0 colour 143 143 143
+vertex 138 162 uv 0 0 colour 0 0 0
+polygon 266 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 157 165 uv 0 0 colour 0 0 0
+vertex 156 163 uv 0 0 colour 0 0 0
+vertex 154 140 uv 0 0 colour 143 143 143
+polygon 267 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 157 165 uv 0 0 colour 0 0 0
+vertex 154 140 uv 0 0 colour 143 143 143
+vertex 154 142 uv 0 0 colour 143 143 143
+polygon 268 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 154 uv 0 0 colour 0 0 0
+vertex 143 156 uv 0 0 colour 143 143 143
+vertex 143 165 uv 0 0 colour 0 0 0
+polygon 269 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 155 uv 0 0 colour 143 143 143
+vertex 143 164 uv 0 0 colour 143 143 143
+vertex 143 165 uv 0 0 colour 0 0 0
+polygon 26a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 155 uv 0 0 colour 143 143 143
+vertex 143 165 uv 0 0 colour 0 0 0
+vertex 143 156 uv 0 0 colour 143 143 143
+polygon 26b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 164 uv 0 0 colour 0 0 0
+vertex 148 156 uv 0 0 colour 0 0 0
+vertex 149 165 uv 0 0 colour 0 0 0
+polygon 26c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 164 uv 0 0 colour 143 143 143
+vertex 138 165 uv 0 0 colour 143 143 143
+vertex 136 164 uv 0 0 colour 0 0 0
+polygon 26d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 164 uv 0 0 colour 0 0 0
+vertex 149 164 uv 0 0 colour 0 0 0
+vertex 149 165 uv 0 0 colour 0 0 0
+polygon 26e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 164 uv 0 0 colour 0 0 0
+vertex 149 165 uv 0 0 colour 0 0 0
+vertex 146 165 uv 0 0 colour 0 0 0
+polygon 26f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 164 uv 0 0 colour 143 143 143
+vertex 146 164 uv 0 0 colour 0 0 0
+vertex 146 165 uv 0 0 colour 0 0 0
+polygon 270 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 164 uv 0 0 colour 143 143 143
+vertex 146 165 uv 0 0 colour 0 0 0
+vertex 143 165 uv 0 0 colour 0 0 0
+polygon 271 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 164 uv 0 0 colour 0 0 0
+vertex 136 166 uv 0 0 colour 0 0 0
+vertex 135 143 uv 0 0 colour 143 143 143
+polygon 272 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 166 uv 0 0 colour 0 0 0
+vertex 136 145 uv 0 0 colour 143 143 143
+vertex 135 143 uv 0 0 colour 143 143 143
+polygon 273 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 166 uv 0 0 colour 143 143 143
+vertex 155 164 uv 0 0 colour 143 143 143
+vertex 156 163 uv 0 0 colour 0 0 0
+polygon 274 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 166 uv 0 0 colour 143 143 143
+vertex 156 163 uv 0 0 colour 0 0 0
+vertex 157 165 uv 0 0 colour 0 0 0
+polygon 275 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 165 uv 0 0 colour 143 143 143
+vertex 136 166 uv 0 0 colour 0 0 0
+vertex 136 164 uv 0 0 colour 0 0 0
+polygon 276 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 156 167 uv 0 0 colour 0 0 0
+vertex 157 165 uv 0 0 colour 0 0 0
+vertex 154 142 uv 0 0 colour 143 143 143
+polygon 277 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 156 167 uv 0 0 colour 0 0 0
+vertex 154 142 uv 0 0 colour 143 143 143
+vertex 154 144 uv 0 0 colour 143 143 143
+polygon 278 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 165 uv 0 0 colour 143 143 143
+vertex 138 167 uv 0 0 colour 143 143 143
+vertex 136 166 uv 0 0 colour 0 0 0
+polygon 279 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 168 uv 0 0 colour 0 0 0
+vertex 156 167 uv 0 0 colour 0 0 0
+vertex 154 144 uv 0 0 colour 143 143 143
+polygon 27a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 168 uv 0 0 colour 0 0 0
+vertex 154 144 uv 0 0 colour 143 143 143
+vertex 153 146 uv 0 0 colour 143 143 143
+polygon 27b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 136 166 uv 0 0 colour 0 0 0
+vertex 137 168 uv 0 0 colour 0 0 0
+vertex 136 145 uv 0 0 colour 143 143 143
+polygon 27c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 168 uv 0 0 colour 0 0 0
+vertex 137 146 uv 0 0 colour 143 143 143
+vertex 136 145 uv 0 0 colour 143 143 143
+polygon 27d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 168 uv 0 0 colour 0 0 0
+vertex 141 154 uv 0 0 colour 0 0 0
+vertex 143 165 uv 0 0 colour 0 0 0
+polygon 27e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 154 uv 0 0 colour 0 0 0
+vertex 151 168 uv 0 0 colour 0 0 0
+vertex 148 156 uv 0 0 colour 0 0 0
+polygon 27f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 168 uv 0 0 colour 0 0 0
+vertex 150 154 uv 0 0 colour 0 0 0
+vertex 150 156 uv 0 0 colour 143 143 143
+polygon 280 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 168 uv 0 0 colour 0 0 0
+vertex 149 165 uv 0 0 colour 0 0 0
+vertex 148 156 uv 0 0 colour 0 0 0
+polygon 281 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 168 uv 0 0 colour 143 143 143
+vertex 155 166 uv 0 0 colour 143 143 143
+vertex 157 165 uv 0 0 colour 0 0 0
+polygon 282 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 155 168 uv 0 0 colour 143 143 143
+vertex 157 165 uv 0 0 colour 0 0 0
+vertex 156 167 uv 0 0 colour 0 0 0
+polygon 283 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 168 uv 0 0 colour 0 0 0
+vertex 143 165 uv 0 0 colour 0 0 0
+vertex 146 165 uv 0 0 colour 0 0 0
+polygon 284 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 168 uv 0 0 colour 0 0 0
+vertex 142 168 uv 0 0 colour 0 0 0
+vertex 146 165 uv 0 0 colour 0 0 0
+polygon 285 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 168 uv 0 0 colour 0 0 0
+vertex 146 165 uv 0 0 colour 0 0 0
+vertex 149 165 uv 0 0 colour 0 0 0
+polygon 286 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 168 uv 0 0 colour 0 0 0
+vertex 146 168 uv 0 0 colour 0 0 0
+vertex 149 165 uv 0 0 colour 0 0 0
+polygon 287 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 167 uv 0 0 colour 143 143 143
+vertex 137 168 uv 0 0 colour 0 0 0
+vertex 136 166 uv 0 0 colour 0 0 0
+polygon 288 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 167 uv 0 0 colour 143 143 143
+vertex 138 168 uv 0 0 colour 143 143 143
+vertex 137 168 uv 0 0 colour 0 0 0
+polygon 289 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 137 168 uv 0 0 colour 0 0 0
+vertex 138 169 uv 0 0 colour 0 0 0
+vertex 137 146 uv 0 0 colour 143 143 143
+polygon 28a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 169 uv 0 0 colour 0 0 0
+vertex 140 148 uv 0 0 colour 143 143 143
+vertex 137 146 uv 0 0 colour 143 143 143
+polygon 28b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 169 uv 0 0 colour 143 143 143
+vertex 155 168 uv 0 0 colour 143 143 143
+vertex 156 167 uv 0 0 colour 0 0 0
+polygon 28c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 154 169 uv 0 0 colour 143 143 143
+vertex 156 167 uv 0 0 colour 0 0 0
+vertex 155 168 uv 0 0 colour 0 0 0
+polygon 28d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 168 uv 0 0 colour 143 143 143
+vertex 138 169 uv 0 0 colour 0 0 0
+vertex 137 168 uv 0 0 colour 0 0 0
+polygon 28e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 170 uv 0 0 colour 0 0 0
+vertex 155 168 uv 0 0 colour 0 0 0
+vertex 153 146 uv 0 0 colour 143 143 143
+polygon 28f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 170 uv 0 0 colour 0 0 0
+vertex 153 146 uv 0 0 colour 143 143 143
+vertex 151 147 uv 0 0 colour 143 143 143
+polygon 290 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 147 uv 0 0 colour 143 143 143
+vertex 148 148 uv 0 0 colour 143 143 143
+vertex 152 170 uv 0 0 colour 0 0 0
+polygon 291 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 169 uv 0 0 colour 0 0 0
+vertex 141 170 uv 0 0 colour 0 0 0
+vertex 140 148 uv 0 0 colour 143 143 143
+polygon 292 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 154 uv 0 0 colour 0 0 0
+vertex 142 168 uv 0 0 colour 0 0 0
+vertex 142 170 uv 0 0 colour 143 143 143
+polygon 293 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 154 uv 0 0 colour 0 0 0
+vertex 142 170 uv 0 0 colour 143 143 143
+vertex 141 156 uv 0 0 colour 143 143 143
+polygon 294 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 156 uv 0 0 colour 143 143 143
+vertex 142 170 uv 0 0 colour 143 143 143
+vertex 146 170 uv 0 0 colour 143 143 143
+polygon 295 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 156 uv 0 0 colour 143 143 143
+vertex 141 156 uv 0 0 colour 143 143 143
+vertex 146 170 uv 0 0 colour 143 143 143
+polygon 296 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 156 uv 0 0 colour 143 143 143
+vertex 146 170 uv 0 0 colour 143 143 143
+vertex 151 170 uv 0 0 colour 143 143 143
+polygon 297 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 156 uv 0 0 colour 143 143 143
+vertex 145 156 uv 0 0 colour 143 143 143
+vertex 151 170 uv 0 0 colour 143 143 143
+polygon 298 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 168 uv 0 0 colour 0 0 0
+vertex 150 156 uv 0 0 colour 143 143 143
+vertex 151 170 uv 0 0 colour 143 143 143
+polygon 299 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 170 uv 0 0 colour 143 143 143
+vertex 154 169 uv 0 0 colour 143 143 143
+vertex 155 168 uv 0 0 colour 0 0 0
+polygon 29a attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 152 170 uv 0 0 colour 143 143 143
+vertex 155 168 uv 0 0 colour 0 0 0
+vertex 152 170 uv 0 0 colour 0 0 0
+polygon 29b attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 138 168 uv 0 0 colour 143 143 143
+vertex 139 170 uv 0 0 colour 143 143 143
+vertex 138 169 uv 0 0 colour 0 0 0
+polygon 29c attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 170 uv 0 0 colour 143 143 143
+vertex 141 170 uv 0 0 colour 0 0 0
+vertex 138 169 uv 0 0 colour 0 0 0
+polygon 29d attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 140 148 uv 0 0 colour 143 143 143
+vertex 141 170 uv 0 0 colour 0 0 0
+vertex 143 171 uv 0 0 colour 0 0 0
+polygon 29e attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 148 uv 0 0 colour 143 143 143
+vertex 140 148 uv 0 0 colour 143 143 143
+vertex 143 171 uv 0 0 colour 0 0 0
+polygon 29f attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 148 uv 0 0 colour 143 143 143
+vertex 150 171 uv 0 0 colour 0 0 0
+vertex 152 170 uv 0 0 colour 0 0 0
+polygon 2a0 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 148 uv 0 0 colour 143 143 143
+vertex 143 171 uv 0 0 colour 0 0 0
+vertex 143 164 uv 0 0 colour 143 143 143
+polygon 2a1 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 171 uv 0 0 colour 0 0 0
+vertex 148 148 uv 0 0 colour 351 351 351
+vertex 148 155 uv 0 0 colour 143 143 143
+polygon 2a2 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 171 uv 0 0 colour 0 0 0
+vertex 148 155 uv 0 0 colour 143 143 143
+vertex 149 164 uv 0 0 colour 0 0 0
+polygon 2a3 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 164 uv 0 0 colour 143 143 143
+vertex 143 171 uv 0 0 colour 0 0 0
+vertex 147 171 uv 0 0 colour 0 0 0
+polygon 2a4 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 164 uv 0 0 colour 0 0 0
+vertex 143 164 uv 0 0 colour 143 143 143
+vertex 147 171 uv 0 0 colour 0 0 0
+polygon 2a5 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 146 164 uv 0 0 colour 0 0 0
+vertex 147 171 uv 0 0 colour 0 0 0
+vertex 150 171 uv 0 0 colour 0 0 0
+polygon 2a6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 164 uv 0 0 colour 0 0 0
+vertex 146 164 uv 0 0 colour 0 0 0
+vertex 150 171 uv 0 0 colour 0 0 0
+polygon 2a7 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 171 uv 0 0 colour 143 143 143
+vertex 152 170 uv 0 0 colour 143 143 143
+vertex 152 170 uv 0 0 colour 0 0 0
+polygon 2a8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 149 171 uv 0 0 colour 143 143 143
+vertex 152 170 uv 0 0 colour 0 0 0
+vertex 150 171 uv 0 0 colour 0 0 0
+polygon 2a9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 171 uv 0 0 colour 143 143 143
+vertex 143 171 uv 0 0 colour 0 0 0
+vertex 141 170 uv 0 0 colour 0 0 0
+polygon 2aa attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 139 170 uv 0 0 colour 143 143 143
+vertex 141 171 uv 0 0 colour 143 143 143
+vertex 141 170 uv 0 0 colour 0 0 0
+polygon 2ab attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 171 uv 0 0 colour 143 143 143
+vertex 147 171 uv 0 0 colour 0 0 0
+vertex 143 171 uv 0 0 colour 0 0 0
+polygon 2ac attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 141 171 uv 0 0 colour 143 143 143
+vertex 144 171 uv 0 0 colour 143 143 143
+vertex 143 171 uv 0 0 colour 0 0 0
+polygon 2ad attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 147 172 uv 0 0 colour 143 143 143
+vertex 149 171 uv 0 0 colour 143 143 143
+vertex 150 171 uv 0 0 colour 0 0 0
+polygon 2ae attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 147 172 uv 0 0 colour 143 143 143
+vertex 150 171 uv 0 0 colour 0 0 0
+vertex 147 171 uv 0 0 colour 0 0 0
+polygon 2af attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 144 171 uv 0 0 colour 143 143 143
+vertex 147 172 uv 0 0 colour 143 143 143
+vertex 147 171 uv 0 0 colour 0 0 0
+polygon 2b0 attributes a1f00c0 texture 51b02e2b palette eb8
+vertex 91 89 uv 0 0 colour 511 511 511
+vertex 74 192 uv 0 656 colour 511 511 511
+vertex 0 192 uv 500 944 colour 511 511 511
+vertex 0 0 uv 775 663 colour 511 511 511
+vertex 73 0 uv 532 0 colour 511 511 511
+polygon 2b1 attributes 41f00c0 texture 7240282b palette e98
+vertex 0 0 uv 0 1 colour 511 511 511
+vertex 256 0 uv 2048 1 colour 511 511 511
+vertex 256 192 uv 2048 1535 colour 511 511 511
+vertex 0 192 uv 0 1535 colour 511 511 511
+polygon 2b2 attributes 1f00c0 texture 5220302b palette ed8
+vertex 146 161 uv 377 0 colour 511 511 511
+vertex 148 192 uv 377 365 colour 495 495 495
+vertex 148 192 uv 373 364 colour 495 495 495
+polygon 2b3 attributes 1f00c0 texture 5220302b palette ed8
+vertex 143 161 uv 357 0 colour 495 495 495
+vertex 146 161 uv 377 0 colour 511 511 511
+vertex 148 192 uv 373 364 colour 495 495 495
+vertex 145 192 uv 357 361 colour 479 479 479
+polygon 2b4 attributes 1f00c0 texture 5220302b palette ed8
+vertex 143 161 uv 357 0 colour 511 511 511
+vertex 145 192 uv 357 361 colour 495 495 495
+vertex 145 192 uv 353 360 colour 495 495 495
+polygon 2b5 attributes 1f00c0 texture 5220302b palette ed8
+vertex 141 162 uv 336 0 colour 495 495 495
+vertex 143 161 uv 357 0 colour 511 511 511
+vertex 145 192 uv 353 360 colour 495 495 495
+vertex 142 192 uv 336 352 colour 479 479 479
+polygon 2b6 attributes 1f00c0 texture 5220302b palette ed8
+vertex 149 161 uv 398 0 colour 495 495 495
+vertex 151 162 uv 419 0 colour 495 495 495
+vertex 153 192 uv 415 358 colour 479 479 479
+vertex 151 192 uv 398 364 colour 479 479 479
+polygon 2b7 attributes 1f00c0 texture 5220302b palette ed8
+vertex 149 161 uv 398 0 colour 511 511 511
+vertex 151 192 uv 398 364 colour 495 495 495
+vertex 151 192 uv 394 364 colour 495 495 495
+polygon 2b8 attributes 1f00c0 texture 5220302b palette ed8
+vertex 146 161 uv 377 0 colour 511 511 511
+vertex 149 161 uv 398 0 colour 511 511 511
+vertex 151 192 uv 394 364 colour 495 495 495
+vertex 148 192 uv 377 365 colour 495 495 495
+polygon 2b9 attributes 1f00c0 texture 5220302b palette ed8
+vertex 142 192 uv 336 352 colour 495 495 495
+vertex 140 192 uv 319 340 colour 495 495 495
+vertex 139 164 uv 315 0 colour 511 511 511
+vertex 141 162 uv 336 0 colour 511 511 511
+polygon 2ba attributes 1f00c0 texture 5220302b palette ed8
+vertex 154 192 uv 423 354 colour 495 495 495
+vertex 154 192 uv 419 357 colour 495 495 495
+vertex 151 162 uv 419 0 colour 511 511 511
+polygon 2bb attributes 1f00c0 texture 5220302b palette ed8
+vertex 154 163 uv 440 0 colour 511 511 511
+vertex 156 192 uv 440 344 colour 495 495 495
+vertex 154 192 uv 423 354 colour 495 495 495
+vertex 151 162 uv 419 0 colour 511 511 511
+polygon 2bc attributes 1f00c0 texture 5220302b palette ed8
+vertex 151 162 uv 419 0 colour 495 495 495
+vertex 154 192 uv 419 357 colour 479 479 479
+vertex 153 192 uv 415 358 colour 479 479 479
+polygon 2bd attributes 1f00c0 texture 5220302b palette ed8
+vertex 156 192 uv 444 342 colour 495 495 495
+vertex 156 192 uv 440 344 colour 495 495 495
+vertex 154 163 uv 440 0 colour 511 511 511
+polygon 2be attributes 1f00c0 texture 5220302b palette ed8
+vertex 157 192 uv 462 329 colour 495 495 495
+vertex 156 192 uv 444 342 colour 495 495 495
+vertex 154 163 uv 440 0 colour 511 511 511
+vertex 155 164 uv 462 0 colour 511 511 511
+polygon 2bf attributes 1f00c0 texture 5220302b palette ed8
+vertex 140 192 uv 319 340 colour 495 495 495
+vertex 140 192 uv 315 338 colour 495 495 495
+vertex 139 164 uv 315 0 colour 511 511 511
+polygon 2c0 attributes 1f00c0 texture 5220302b palette ed8
+vertex 140 192 uv 315 338 colour 495 495 495
+vertex 139 192 uv 297 324 colour 479 479 479
+vertex 138 165 uv 293 0 colour 495 495 495
+vertex 139 164 uv 315 0 colour 511 511 511
+polygon 2c1 attributes 1f00c0 texture 5220302b palette ed8
+vertex 157 192 uv 466 326 colour 479 479 479
+vertex 157 192 uv 462 329 colour 479 479 479
+vertex 155 164 uv 462 0 colour 495 495 495
+polygon 2c2 attributes 1f00c0 texture 5220302b palette ed8
+vertex 158 192 uv 486 311 colour 495 495 495
+vertex 157 192 uv 466 326 colour 479 479 479
+vertex 155 164 uv 462 0 colour 495 495 495
+vertex 155 166 uv 486 0 colour 511 511 511
+polygon 2c3 attributes 1f00c0 texture 5220302b palette ed8
+vertex 139 192 uv 297 324 colour 479 479 479
+vertex 139 192 uv 293 321 colour 479 479 479
+vertex 138 165 uv 293 0 colour 495 495 495
+polygon 2c4 attributes 1f00c0 texture 5220302b palette ed8
+vertex 139 192 uv 293 321 colour 495 495 495
+vertex 138 192 uv 273 306 colour 479 479 479
+vertex 138 167 uv 269 0 colour 495 495 495
+vertex 138 165 uv 293 0 colour 511 511 511
+polygon 2c5 attributes 1f00c0 texture 5220302b palette ed8
+vertex 158 192 uv 490 309 colour 479 479 479
+vertex 158 192 uv 486 311 colour 479 479 479
+vertex 155 166 uv 486 0 colour 495 495 495
+polygon 2c6 attributes 1f00c0 texture 5220302b palette ed8
+vertex 157 192 uv 512 293 colour 495 495 495
+vertex 158 192 uv 490 309 colour 479 479 479
+vertex 155 166 uv 486 0 colour 495 495 495
+vertex 155 168 uv 512 0 colour 511 511 511
+polygon 2c7 attributes 1f00c0 texture 5220302b palette ed8
+vertex 138 192 uv 273 306 colour 479 479 479
+vertex 138 192 uv 269 303 colour 479 479 479
+vertex 138 167 uv 269 0 colour 495 495 495
+polygon 2c8 attributes 1f00c0 texture 5220302b palette ed8
+vertex 138 192 uv 269 303 colour 479 479 479
+vertex 139 192 uv 247 288 colour 479 479 479
+vertex 138 168 uv 243 0 colour 495 495 495
+vertex 138 167 uv 269 0 colour 495 495 495
+polygon 2c9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 168 uv 0 0 colour 0 0 0
+vertex 151 170 uv 0 0 colour 143 143 143
+vertex 153 192 uv 0 0 colour 143 143 143
+vertex 153 192 uv 0 0 colour 79 79 79
+polygon 2ca attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 151 168 uv 0 0 colour 0 0 0
+vertex 153 192 uv 0 0 colour 79 79 79
+vertex 153 192 uv 0 0 colour 0 0 0
+polygon 2cb attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 192 uv 0 0 colour 0 0 0
+vertex 148 192 uv 0 0 colour 0 0 0
+vertex 146 168 uv 0 0 colour 0 0 0
+vertex 151 168 uv 0 0 colour 0 0 0
+polygon 2cc attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 153 192 uv 0 0 colour 0 0 0
+vertex 150 192 uv 0 0 colour 0 0 0
+vertex 151 168 uv 0 0 colour 0 0 0
+polygon 2cd attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 170 uv 0 0 colour 143 143 143
+vertex 142 168 uv 0 0 colour 0 0 0
+vertex 143 192 uv 0 0 colour 0 0 0
+vertex 143 192 uv 0 0 colour 95 95 95
+polygon 2ce attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 192 uv 0 0 colour 0 0 0
+vertex 143 192 uv 0 0 colour 0 0 0
+vertex 142 168 uv 0 0 colour 0 0 0
+vertex 146 168 uv 0 0 colour 0 0 0
+polygon 2cf attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 192 uv 0 0 colour 0 0 0
+vertex 145 192 uv 0 0 colour 0 0 0
+vertex 146 168 uv 0 0 colour 0 0 0
+polygon 2d0 attributes 1f00c0 texture 5220302b palette ed8
+vertex 139 192 uv 247 288 colour 479 479 479
+vertex 139 192 uv 243 286 colour 479 479 479
+vertex 138 168 uv 243 0 colour 495 495 495
+polygon 2d1 attributes 1f00c0 texture 5220302b palette ed8
+vertex 139 192 uv 243 286 colour 495 495 495
+vertex 140 192 uv 219 273 colour 495 495 495
+vertex 139 170 uv 215 0 colour 511 511 511
+vertex 138 168 uv 243 0 colour 511 511 511
+polygon 2d2 attributes 1f00c0 texture 5220302b palette ed8
+vertex 157 192 uv 516 291 colour 479 479 479
+vertex 157 192 uv 512 293 colour 479 479 479
+vertex 155 168 uv 512 0 colour 495 495 495
+polygon 2d3 attributes 1f00c0 texture 5220302b palette ed8
+vertex 156 192 uv 538 277 colour 479 479 479
+vertex 157 192 uv 516 291 colour 479 479 479
+vertex 155 168 uv 512 0 colour 495 495 495
+vertex 154 169 uv 538 0 colour 495 495 495
+polygon 2d4 attributes 1f00c0 texture 5220302b palette ed8
+vertex 155 192 uv 5 275 colour 479 479 479
+vertex 156 192 uv 0 277 colour 479 479 479
+vertex 154 169 uv 0 0 colour 495 495 495
+polygon 2d5 attributes 1f00c0 texture 5220302b palette ed8
+vertex 153 192 uv 32 263 colour 479 479 479
+vertex 155 192 uv 5 275 colour 479 479 479
+vertex 154 169 uv 0 0 colour 495 495 495
+vertex 152 170 uv 32 0 colour 495 495 495
+polygon 2d6 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 150 192 uv 0 0 colour 143 143 143
+vertex 153 192 uv 0 0 colour 143 143 143
+vertex 151 170 uv 0 0 colour 143 143 143
+vertex 146 170 uv 0 0 colour 143 143 143
+polygon 2d7 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 148 192 uv 0 0 colour 143 143 143
+vertex 150 192 uv 0 0 colour 143 143 143
+vertex 146 170 uv 0 0 colour 143 143 143
+polygon 2d8 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 142 170 uv 0 0 colour 143 143 143
+vertex 143 192 uv 0 0 colour 95 95 95
+vertex 143 192 uv 0 0 colour 143 143 143
+polygon 2d9 attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 145 192 uv 0 0 colour 143 143 143
+vertex 148 192 uv 0 0 colour 143 143 143
+vertex 146 170 uv 0 0 colour 143 143 143
+vertex 142 170 uv 0 0 colour 143 143 143
+polygon 2da attributes 1f00c0 texture 51b02e2b palette eb8
+vertex 143 192 uv 0 0 colour 143 143 143
+vertex 145 192 uv 0 0 colour 143 143 143
+vertex 142 170 uv 0 0 colour 143 143 143
+polygon 2db attributes 1f00c0 texture 5220302b palette ed8
+vertex 140 192 uv 219 273 colour 495 495 495
+vertex 140 192 uv 215 270 colour 495 495 495
+vertex 139 170 uv 215 0 colour 511 511 511
+polygon 2dc attributes 1f00c0 texture 5220302b palette ed8
+vertex 140 192 uv 215 270 colour 495 495 495
+vertex 142 192 uv 188 260 colour 495 495 495
+vertex 141 171 uv 183 0 colour 511 511 511
+vertex 139 170 uv 215 0 colour 511 511 511
+polygon 2dd attributes 1f00c0 texture 5220302b palette ed8
+vertex 152 170 uv 32 0 colour 511 511 511
+vertex 149 171 uv 68 0 colour 511 511 511
+vertex 151 192 uv 63 255 colour 495 495 495
+vertex 153 192 uv 32 263 colour 495 495 495
+polygon 2de attributes 1f00c0 texture 5220302b palette ed8
+vertex 142 192 uv 188 260 colour 495 495 495
+vertex 142 192 uv 183 258 colour 495 495 495
+vertex 141 171 uv 183 0 colour 511 511 511
+polygon 2df attributes 1f00c0 texture 5220302b palette ed8
+vertex 141 171 uv 183 0 colour 511 511 511
+vertex 142 192 uv 183 258 colour 495 495 495
+vertex 143 192 uv 178 257 colour 495 495 495
+polygon 2e0 attributes 1f00c0 texture 5220302b palette ed8
+vertex 144 171 uv 146 0 colour 495 495 495
+vertex 141 171 uv 183 0 colour 511 511 511
+vertex 143 192 uv 178 257 colour 495 495 495
+vertex 145 192 uv 146 251 colour 479 479 479
+polygon 2e1 attributes 1f00c0 texture 5220302b palette ed8
+vertex 144 171 uv 146 0 colour 495 495 495
+vertex 145 192 uv 146 251 colour 479 479 479
+vertex 145 192 uv 141 251 colour 479 479 479
+polygon 2e2 attributes 1f00c0 texture 5220302b palette ed8
+vertex 147 172 uv 107 0 colour 495 495 495
+vertex 144 171 uv 146 0 colour 495 495 495
+vertex 145 192 uv 141 251 colour 479 479 479
+vertex 148 192 uv 107 250 colour 479 479 479
+polygon 2e3 attributes 1f00c0 texture 5220302b palette ed8
+vertex 149 171 uv 68 0 colour 495 495 495
+vertex 147 172 uv 107 0 colour 495 495 495
+vertex 148 192 uv 102 250 colour 479 479 479
+vertex 151 192 uv 68 254 colour 479 479 479
+polygon 2e4 attributes 1f00c0 texture 5220302b palette ed8
+vertex 149 171 uv 68 0 colour 511 511 511
+vertex 151 192 uv 68 254 colour 495 495 495
+vertex 151 192 uv 63 255 colour 495 495 495
+polygon 2e5 attributes 1f00c0 texture 5220302b palette ed8
+vertex 147 172 uv 107 0 colour 495 495 495
+vertex 148 192 uv 107 250 colour 479 479 479
+vertex 148 192 uv 102 250 colour 479 479 479
+polygon 2e6 attributes 50f00c0 texture 7240282b palette e98
+vertex 1 0 uv 0 6 colour 511 511 511
+vertex 256 0 uv 2044 6 colour 511 511 511
+vertex 256 190 uv 2044 1536 colour 511 511 511
+vertex 1 190 uv 0 1536 colour 511 511 511
+polygon 2e7 attributes 3f1800c0 texture 452035cb palette f38
+vertex 122 137 uv 0 0 colour 511 511 511
+vertex 173 137 uv 512 0 colour 511 511 511
+vertex 173 188 uv 512 512 colour 511 511 511
+vertex 122 188 uv 0 512 colour 511 511 511

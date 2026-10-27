@@ -352,18 +352,19 @@ final class LayoutSnapshotTests: XCTestCase {
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
         XCTAssertNotNil(play.lobby)
         let size = CGSize(width: 768, height: 600)
+        let hingeManager = DuoHingeManager()
         func pages() -> some View {
             HStack {
                 ZStack {
                     Color.clear
-                    OriginalPlayPage(play: play, screen: 1)
+                    OriginalPlayPage(play: play, hingeManager: hingeManager, screen: 1)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 Group {
                     switch play.runner.phase {
                     case .choice(let choices): OriginalChoiceView(play: play, choices: choices)
                     case .questions(let topics): OriginalQuestionMenuView(play: play, topics: topics)
-                    default: OriginalPlayPage(play: play, screen: 0)
+                    default: OriginalPlayPage(play: play, hingeManager: hingeManager, screen: 0)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

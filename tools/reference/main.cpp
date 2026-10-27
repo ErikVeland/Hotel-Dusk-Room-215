@@ -93,6 +93,15 @@ int main(int argc,char**argv) { try {
                 throw std::runtime_error("Aligned main RAM write required");
             for(unsigned i=0;i<width;i++)nds.MainRAM[(address&nds.MainRAMMask)+i]=u8(value>>(8*i));
         }
+        else if(op=="peek8"||op=="peek16"||op=="peek32") {
+            u32 address;command>>std::hex>>address;
+            const unsigned width=op=="peek8"?1:op=="peek16"?2:4;
+            if(!command||address<0x02000000||address>0x02400000-width||address%width)
+                throw std::runtime_error("Aligned main RAM peek required");
+            u32 value=0;
+            memcpy(&value,nds.MainRAM+(address&nds.MainRAMMask),width);
+            std::cout<<op<<' '<<std::hex<<address<<' '<<value<<std::dec<<'\n';
+        }
         else if(op=="save") {std::string name;command>>name;Savestate state;nds.DoSavestate(&state);state.Finish();if(state.Error)throw std::runtime_error("State save failed");writeFile(output+"/"+name+".mln",state.Buffer(),state.Length());}
         else if(op=="load") {std::string path;std::getline(command>>std::ws,path);auto bytes=readFile(path);Savestate state(bytes.data(),bytes.size(),false);if(!nds.DoSavestate(&state)||state.Error)throw std::runtime_error("State load failed");}
         else if(op=="capture") {std::string name;command>>name;if(name.find('/')!=std::string::npos)throw std::runtime_error("Capture name must be a basename");void *top,*bottom;if(!nds.GPU.GetFramebuffers(&top,&bottom))throw std::runtime_error("Software framebuffers required");image(output+"/"+name+"-top.ppm",top);image(output+"/"+name+"-bottom.ppm",bottom);writeFile(output+"/"+name+"-ram.bin",nds.MainRAM,nds.MainRAMMask+1);std::cout<<"captured "<<name<<" frame "<<frames<<std::endl;}

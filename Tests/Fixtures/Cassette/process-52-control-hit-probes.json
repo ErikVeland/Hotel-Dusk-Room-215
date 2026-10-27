@@ -1,0 +1,890 @@
+{
+  "evidenceType": "isolated process fixtures",
+  "processID": 52,
+  "overlay": 28,
+  "variant": 6,
+  "update": "0x021FD888",
+  "injectedInputState": 103,
+  "controlBounds": {
+    "first": [
+      192,
+      16,
+      224,
+      80
+    ],
+    "second": [
+      192,
+      112,
+      224,
+      176
+    ]
+  },
+  "controlBoundsOrder": "[minimumTransformedX, minimumTransformedY, maximumTransformedX, maximumTransformedY]",
+  "orientationFlag": 0,
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "d93e9226d62ca739f148da56198aff5d1bcaa56adfa41606b73e58484f17545b",
+  "results": {
+    "first": {
+      "rawTouch": [
+        47,
+        47
+      ],
+      "inputStateAfter": 104,
+      "selectorAfter": 0,
+      "touchActive": true,
+      "commandsSHA256": "91b55d0658e80eda07dcc18aafbe62659fbdb681593a07543e2a1bf1e53ce13c",
+      "readyFrameSHA256": "9451f12f0d66fb09cf74bc9cd7a7a0c5626c060506748bd65a3e238047540751",
+      "selectedFrameSHA256": "342736448e429103f75a50ef2fd36e44f19dc8cdbdf1c744824772ecdf4756ff"
+    },
+    "second": {
+      "rawTouch": [
+        47,
+        143
+      ],
+      "inputStateAfter": 104,
+      "selectorAfter": 1,
+      "touchActive": true,
+      "commandsSHA256": "381d752e91971a2cc4059956503c1d49edd456104fe486b404c1a2f46355cbbc",
+      "readyFrameSHA256": "9451f12f0d66fb09cf74bc9cd7a7a0c5626c060506748bd65a3e238047540751",
+      "selectedFrameSHA256": "65bdfdddc90a0433cfed76a3a06ccce3a4764ab3b0b346c8dea3c343b7f748f4"
+    }
+  },
+  "normalInputPath": {
+    "commandsSHA256": "4e51dab1d0d739ff0aa44ef7793ec41220ec391a54f8ee4feab73f8f35a0e10e",
+    "states": {
+      "opening": {
+        "mainPhase": 1,
+        "inputState": 1,
+        "exitFlag": 0,
+        "selector": 0,
+        "renderState": {
+          "cameraFieldsFixed20_12": {
+            "positionAtCameraOffset3C": [
+              16794,
+              12288,
+              49971
+            ],
+            "vectorAtCameraOffset48": [
+              -4096,
+              0,
+              0
+            ],
+            "vectorAtCameraOffset54": [
+              2048,
+              6554,
+              0
+            ],
+            "vectorAtCameraOffset60": [
+              0,
+              4096,
+              0
+            ]
+          },
+          "models": {
+            "radio": {
+              "rotationFloat": [
+                0.0,
+                180.0,
+                0.0
+              ],
+              "translationFloat": [
+                3.549999952316284,
+                -1.0,
+                0.0
+              ]
+            },
+            "front": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "tape": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                1.4500000476837158,
+                0.8999999761581421,
+                -0.6499999761581421
+              ]
+            }
+          },
+          "modelOrder": [
+            "radio",
+            "front",
+            "tape"
+          ]
+        },
+        "ramSHA256": "9451f12f0d66fb09cf74bc9cd7a7a0c5626c060506748bd65a3e238047540751"
+      },
+      "controls-ready": {
+        "mainPhase": 1,
+        "inputState": 103,
+        "exitFlag": 0,
+        "selector": 0,
+        "renderState": {
+          "cameraFieldsFixed20_12": {
+            "positionAtCameraOffset3C": [
+              -5325,
+              22118,
+              15974
+            ],
+            "vectorAtCameraOffset48": [
+              -4096,
+              0,
+              0
+            ],
+            "vectorAtCameraOffset54": [
+              -5325,
+              6554,
+              0
+            ],
+            "vectorAtCameraOffset60": [
+              0,
+              4096,
+              0
+            ]
+          },
+          "models": {
+            "radio": {
+              "rotationFloat": [
+                0.0,
+                180.0,
+                179.67654418945312
+              ],
+              "translationFloat": [
+                3.549999952316284,
+                -1.0,
+                0.0
+              ]
+            },
+            "front": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "tape": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                1.4500000476837158,
+                0.8999999761581421,
+                -0.6499999761581421
+              ]
+            }
+          },
+          "modelOrder": [
+            "radio",
+            "front",
+            "tape"
+          ]
+        },
+        "ramSHA256": "fc95cbc3893f374274e2a0d48e3deaddaac0695bb67a4a1f8627f436c084b2cc"
+      },
+      "playback": {
+        "mainPhase": 2,
+        "inputState": 1,
+        "exitFlag": 0,
+        "selector": 0,
+        "renderState": {
+          "cameraFieldsFixed20_12": {
+            "positionAtCameraOffset3C": [
+              0,
+              0,
+              16384
+            ],
+            "vectorAtCameraOffset48": [
+              -4096,
+              0,
+              0
+            ],
+            "vectorAtCameraOffset54": [
+              0,
+              0,
+              0
+            ],
+            "vectorAtCameraOffset60": [
+              0,
+              4096,
+              0
+            ]
+          },
+          "models": {
+            "radio": {
+              "rotationFloat": [
+                0.0,
+                180.0,
+                179.67654418945312
+              ],
+              "translationFloat": [
+                3.549999952316284,
+                -1.0,
+                0.0
+              ]
+            },
+            "front": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "tape": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                1.4500000476837158,
+                0.8999999761581421,
+                -0.6499999761581421
+              ]
+            }
+          },
+          "modelOrder": [
+            "radio",
+            "front",
+            "tape"
+          ]
+        },
+        "ramSHA256": "02a2b445459258dbcc9c50dbcf8340bd4bfefcaeb4124dbb425ea6044be5bfc1"
+      },
+      "exit-requested": {
+        "mainPhase": 2,
+        "inputState": 1,
+        "exitFlag": 1,
+        "selector": 0,
+        "renderState": {
+          "cameraFieldsFixed20_12": {
+            "positionAtCameraOffset3C": [
+              0,
+              0,
+              16384
+            ],
+            "vectorAtCameraOffset48": [
+              -4096,
+              0,
+              0
+            ],
+            "vectorAtCameraOffset54": [
+              0,
+              0,
+              0
+            ],
+            "vectorAtCameraOffset60": [
+              0,
+              4096,
+              0
+            ]
+          },
+          "models": {
+            "radio": {
+              "rotationFloat": [
+                0.0,
+                180.0,
+                179.67654418945312
+              ],
+              "translationFloat": [
+                3.549999952316284,
+                -1.0,
+                0.0
+              ]
+            },
+            "front": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "tape": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                1.4500000476837158,
+                0.8999999761581421,
+                -0.6499999761581421
+              ]
+            }
+          },
+          "modelOrder": [
+            "radio",
+            "front",
+            "tape"
+          ]
+        },
+        "ramSHA256": "eb409c60036c0dc01c68bb7e5637d292f843e6fccfc4ad27250683e953b8428a"
+      },
+      "after-exit": {
+        "mainPhase": 1,
+        "inputState": 1,
+        "exitFlag": 0,
+        "selector": 0,
+        "renderState": {
+          "cameraFieldsFixed20_12": {
+            "positionAtCameraOffset3C": [
+              16794,
+              12288,
+              49971
+            ],
+            "vectorAtCameraOffset48": [
+              -4096,
+              0,
+              0
+            ],
+            "vectorAtCameraOffset54": [
+              2048,
+              6554,
+              0
+            ],
+            "vectorAtCameraOffset60": [
+              0,
+              4096,
+              0
+            ]
+          },
+          "models": {
+            "radio": {
+              "rotationFloat": [
+                0.0,
+                180.0,
+                0.0
+              ],
+              "translationFloat": [
+                3.549999952316284,
+                -1.0,
+                0.0
+              ]
+            },
+            "front": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "tape": {
+              "rotationFloat": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "translationFloat": [
+                1.4500000476837158,
+                0.8999999761581421,
+                -0.6499999761581421
+              ]
+            }
+          },
+          "modelOrder": [
+            "radio",
+            "front",
+            "tape"
+          ]
+        },
+        "ramSHA256": "439df06d5e4d5cac6b5174e3ee537bc40d1712dbeaee9073d00a44317d5478f5"
+      }
+    },
+    "controlsReadyRenderState": {
+      "captureFrame": 530,
+      "cameraFieldsFixed20_12": {
+        "positionAtCameraOffset3C": [
+          -5325,
+          22118,
+          15974
+        ],
+        "vectorAtCameraOffset48": [
+          -4096,
+          0,
+          0
+        ],
+        "vectorAtCameraOffset54": [
+          -5325,
+          6554,
+          0
+        ],
+        "vectorAtCameraOffset60": [
+          0,
+          4096,
+          0
+        ]
+      },
+      "models": {
+        "radio": {
+          "rotationFloat": [
+            0.0,
+            180.0,
+            179.67654418945312
+          ],
+          "translationFloat": [
+            3.549999952316284,
+            -1.0,
+            0.0
+          ]
+        },
+        "front": {
+          "rotationFloat": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "translationFloat": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "tape": {
+          "rotationFloat": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "translationFloat": [
+            1.4500000476837158,
+            0.8999999761581421,
+            -0.6499999761581421
+          ]
+        }
+      },
+      "modelOrder": [
+        "radio",
+        "front",
+        "tape"
+      ]
+    },
+    "audioCueLog": [
+      "frame,audioFrame,activeBGM,lastBGM,pauseCounter,musicMute,effectsMute",
+      "1,802,17,17,0,0,0",
+      "2,1604,-1,17,0,0,0"
+    ]
+  },
+  "sceneHitProbes": {
+    "commandsSHA256": "75d94eb80f6eea4841e6614e762f402bab40929699ada2fcb15bc2df7f69754a",
+    "points": [
+      {
+        "rawTouch": [
+          60,
+          96
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          60,
+          108
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          60,
+          120
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          60,
+          132
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          60,
+          144
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          60,
+          156
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          60,
+          168
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          68,
+          96
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          68,
+          108
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          68,
+          120
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          68,
+          132
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          68,
+          144
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          68,
+          156
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          68,
+          168
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          76,
+          96
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          76,
+          108
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          76,
+          120
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          76,
+          132
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          76,
+          144
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          76,
+          156
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          76,
+          168
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          84,
+          96
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          84,
+          108
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          84,
+          120
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          84,
+          132
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          84,
+          144
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          84,
+          156
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          84,
+          168
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          92,
+          96
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          92,
+          108
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          92,
+          120
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          92,
+          132
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          92,
+          144
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          92,
+          156
+        ],
+        "touchActive": true,
+        "inputStateAfter": 2,
+        "sceneHit": true
+      },
+      {
+        "rawTouch": [
+          92,
+          168
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          100,
+          96
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          100,
+          108
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          100,
+          120
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          100,
+          132
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          100,
+          144
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          100,
+          156
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      },
+      {
+        "rawTouch": [
+          100,
+          168
+        ],
+        "touchActive": true,
+        "inputStateAfter": 1,
+        "sceneHit": false
+      }
+    ]
+  },
+  "limitations": [
+    "The control-bound probes write the internal input state directly.",
+    "The normal-input trace injects process 52 from a walking checkpoint.",
+    "It does not verify the story route or parent state after process return.",
+    "It does not identify the visible object masks for the native view.",
+    "The audio cue log records BGM state, not cassette sound fidelity."
+  ]
+}
