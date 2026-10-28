@@ -80,15 +80,19 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         }
     }
 
-    func testProcess88TouchCompletesThenExposesUnresolvedStoryReturn() throws {
+    func testProcess88TouchCompletesAndRunsChapterTenEnding() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram("EP10_R102")
         let event = try XCTUnwrap(program.blocks.tables[2].first {
             $0.sourceOffset == 208
         })
-        XCTAssertThrowsError(try OriginalEventCompletion.stateOnlyExit(
+        let outcome = try OriginalEventCompletion.stateOnlyExit(
             event: event, conditions: program.conditions,
-            processReturn: OriginalVSSceneProcess.result))
+            processReturn: OriginalVSSceneProcess.result)
+        guard case .completed(let completion) = outcome else {
+            return XCTFail("The normal Process 88 result must complete its source event")
+        }
+        XCTAssertEqual(completion.transition?.eventID, 5)
 
         let play = try makeSession(program: "EP10_R102", sourceOffset: 208,
                                    processID: 88, mapID: 1)
@@ -103,10 +107,29 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         XCTAssertNil(play.vsScene)
         XCTAssertNil(play.vsSceneImage)
         XCTAssertNotEqual(play.runner.phase, .process(id: 88))
-        guard case .halted(let halt) = play.runner.phase else {
-            return XCTFail("The source event must keep its unresolved return visible")
+        XCTAssertEqual(play.runner.session.selection.modeID, 3)
+        XCTAssertEqual(play.runner.session.selection.eventID, 5)
+        if case .dialogue = play.runner.phase {
+            // Process 88 must return to the source event's Chapter 10 dialogue.
+        } else {
+            XCTFail("Process 88 did not resume the Chapter 10 story: \(play.runner.phase)")
+            return
         }
-        XCTAssertTrue(halt.reason.contains("return exceeds transition table"), halt.reason)
+
+        for _ in 0..<200 {
+            switch play.runner.phase {
+            case .dialogue, .itemNotice:
+                play.advanceDialogue()
+            case .waiting:
+                play.advanceFrame()
+            case .exploration:
+                break
+            default:
+                XCTFail("The Chapter 10 ending stopped at \(play.runner.phase)")
+                return
+            }
+        }
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 1))
     }
 
     private func makeSession(program name: String, sourceOffset: Int,
@@ -125,7 +148,8 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         selection.debugEventSelection = true
         let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
         let audio = AudioController()
-        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableMusic(true))
+        try audio.applyOriginalCommand(.disableNewEffects(true))
         return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
     }
 }

@@ -1,5 +1,6 @@
 import XCTest
 import Metal
+import simd
 @testable import HotelDuskDuoKit
 
 final class OriginalBagSearchRendererTests: XCTestCase {
@@ -75,7 +76,49 @@ final class OriginalBagSearchRendererTests: XCTestCase {
         defer { play.stop() }
 
         XCTAssertEqual(play.runner.phase, .process(id: 55))
-        XCTAssertNotNil(play.bagSearch)
+        let process = try XCTUnwrap(play.bagSearch)
+        let library = try OriginalModelLibrary.bundled()
+        let models = try ["p01", "p02", "p03", "kaban"].map {
+            try library.load(path: "trick/bag/\($0).mdf")
+        }
+        let projection = try OriginalBagSearchProjection(models: models)
+        let treeBox = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
+        let masks = try projection.objectMasks(process: process)
+        let treeBoxMask = try XCTUnwrap(masks.first { $0.0 == treeBox }?.1)
+        var startCandidate: (point: SIMD2<Float>, error: Int64)?
+        for y in stride(from: max(0, Int(treeBoxMask.bounds.minY)),
+                        to: min(256, Int(treeBoxMask.bounds.maxY.rounded(.up))), by: 2) {
+            for x in stride(from: max(0, Int(treeBoxMask.bounds.minX)),
+                            to: min(192, Int(treeBoxMask.bounds.maxX.rounded(.up))), by: 2) {
+                let point = SIMD2<Float>(Float(x), Float(y))
+                guard let depth = treeBoxMask.depth(at: point) else { continue }
+                let frontDepth = masks.compactMap { $0.1.depth(at: point) }.min() ?? .infinity
+                guard depth <= frontDepth, let plane = projection.planePointFixed(at: point) else { continue }
+                let dx = Int64(process.objects[treeBox].positionFixed.x - plane.x)
+                let dz = Int64(process.objects[treeBox].positionFixed.z - plane.y)
+                let error = dx * dx + dz * dz
+                if startCandidate == nil || error < startCandidate!.error {
+                    startCandidate = (point, error)
+                }
+            }
+        }
+        let start = try XCTUnwrap(startCandidate?.point)
+        let startPlane = try XCTUnwrap(projection.planePointFixed(at: start))
+        let startingPosition = process.objects[treeBox].positionFixed
+        let targetTouchPlane = SIMD2(startPlane.x - startingPosition.x,
+                                     startPlane.y - startingPosition.z)
+        let clip = projection.viewProjection * SIMD4(Float(targetTouchPlane.x) / 4_096, 0,
+                                                       Float(targetTouchPlane.y) / 4_096, 1)
+        let target = SIMD2((clip.x / clip.w + 1) * 96, (1 - clip.y / clip.w) * 128)
+        XCTAssertEqual(projection.planePointFixed(at: target), targetTouchPlane)
+        play.holdBagSearchTouch(x: start.x, y: start.y)
+        XCTAssertEqual(play.bagSearch?.draggedObject, treeBox)
+        play.holdBagSearchTouch(x: target.x, y: target.y)
+        XCTAssertEqual(play.bagSearch?.objects[treeBox].positionFixed.x, 0)
+        XCTAssertEqual(play.bagSearch?.objects[treeBox].positionFixed.z, 0)
+        play.releaseBagSearchTouch()
+        XCTAssertEqual(play.bagSearch?.phase, .found)
+
         play.openBagSearchMenu()
         for _ in 0..<65 where play.bagSearch != nil { play.advanceFrame() }
 

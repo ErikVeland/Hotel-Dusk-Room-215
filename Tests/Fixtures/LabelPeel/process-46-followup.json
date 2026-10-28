@@ -1,0 +1,420 @@
+{
+  "schemaVersion": 1,
+  "kind": "isolated process 46 input trace",
+  "note": "The source mask and follow-up drag are captured from an injected walking checkpoint. This does not verify a normal Chapter 6 route or a successful process return.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "walkingCheckpointSHA256": "d93e9226d62ca739f148da56198aff5d1bcaa56adfa41606b73e58484f17545b",
+  "commandsSHA256": "b88f4f0f5ad7194c884f617b080bd15ace7271b5836aade9e51546da7672502d",
+  "touchTransform": "pageX = rawY; pageY = 255 - rawX",
+  "sourceStateFields": "+0x478 follow-up flag, +0x2b8 drag timer, +0x2b4 phase timer",
+  "followupGesture": "Five repeated drags from raw (180,150) to (162,132).",
+  "states": {
+    "release-1": {
+      "processAddress": "0x2310020",
+      "state": [
+        1,
+        0,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": true,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        2724,
+        3457
+      ]
+    },
+    "release-2": {
+      "processAddress": "0x2310020",
+      "state": [
+        1,
+        0,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        2724,
+        3457
+      ]
+    },
+    "return-animation": {
+      "processAddress": "0x2310020",
+      "state": [
+        5,
+        1,
+        2
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        2724,
+        3457
+      ]
+    },
+    "animation-60": {
+      "processAddress": "0x2310020",
+      "state": [
+        5,
+        1,
+        2
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        2724,
+        3457
+      ]
+    },
+    "followup": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        1475,
+        1475
+      ]
+    },
+    "drag-1": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        1304,
+        1304
+      ]
+    },
+    "drag-2": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        1133,
+        1133
+      ]
+    },
+    "drag-3": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        962,
+        962
+      ]
+    },
+    "drag-4": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        791,
+        791
+      ]
+    },
+    "drag-5": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        108,
+        108
+      ]
+    }
+  },
+  "followupDirectionProbes": {
+    "raw-x-increase": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        1475,
+        1475
+      ]
+    },
+    "raw-x-decrease": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        1475,
+        1475
+      ]
+    },
+    "raw-y-increase": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        1475,
+        1475
+      ]
+    },
+    "raw-y-decrease": {
+      "processAddress": "0x2310020",
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "maskClearPixels": 20480,
+      "maskPixelCount": 20480,
+      "selected": false,
+      "selectedObject": 0,
+      "sourceFollowupFlag": 0,
+      "dragTimer": 0,
+      "followupTimer": 0,
+      "dragWorldCoordinates": [
+        0,
+        0,
+        620,
+        620
+      ]
+    }
+  },
+  "cornerSlowProbe": {
+    "gesture": "Start raw (195,160), then move one raw pixel per frame diagonally towards (180,145).",
+    "commandsSHA256": "344c65f610086679b84b33209675f00b4fdf1ac2b0ee51b42bbee099360c6146",
+    "states": {
+      "grabbed": {
+        "processAddress": "0x2310020",
+        "state": [
+          2,
+          1,
+          -1
+        ],
+        "maskClearPixels": 20480,
+        "maskPixelCount": 20480,
+        "selected": true,
+        "selectedObject": 0,
+        "sourceFollowupFlag": 0,
+        "dragTimer": 0,
+        "followupTimer": 0,
+        "dragWorldCoordinates": [
+          0,
+          0,
+          1475,
+          1475
+        ]
+      },
+      "step-2": {
+        "processAddress": "0x2310020",
+        "state": [
+          2,
+          1,
+          -1
+        ],
+        "maskClearPixels": 20480,
+        "maskPixelCount": 20480,
+        "selected": true,
+        "selectedObject": 0,
+        "sourceFollowupFlag": 0,
+        "dragTimer": 9,
+        "followupTimer": 0,
+        "dragWorldCoordinates": [
+          0,
+          0,
+          1304,
+          1304
+        ]
+      },
+      "step-6": {
+        "processAddress": "0x2310020",
+        "state": [
+          2,
+          1,
+          -1
+        ],
+        "maskClearPixels": 20480,
+        "maskPixelCount": 20480,
+        "selected": false,
+        "selectedObject": 0,
+        "sourceFollowupFlag": 0,
+        "dragTimer": 0,
+        "followupTimer": 0,
+        "dragWorldCoordinates": [
+          0,
+          0,
+          1304,
+          1304
+        ]
+      },
+      "step-15": {
+        "processAddress": "0x2310020",
+        "state": [
+          2,
+          1,
+          -1
+        ],
+        "maskClearPixels": 20480,
+        "maskPixelCount": 20480,
+        "selected": false,
+        "selectedObject": 0,
+        "sourceFollowupFlag": 0,
+        "dragTimer": 0,
+        "followupTimer": 0,
+        "dragWorldCoordinates": [
+          0,
+          0,
+          1304,
+          1304
+        ]
+      },
+      "released": {
+        "processAddress": "0x2310020",
+        "state": [
+          2,
+          1,
+          -1
+        ],
+        "maskClearPixels": 20480,
+        "maskPixelCount": 20480,
+        "selected": false,
+        "selectedObject": 0,
+        "sourceFollowupFlag": 0,
+        "dragTimer": 0,
+        "followupTimer": 0,
+        "dragWorldCoordinates": [
+          0,
+          0,
+          1304,
+          1304
+        ]
+      }
+    }
+  }
+}

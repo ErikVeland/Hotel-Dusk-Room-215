@@ -92,7 +92,7 @@ public struct OriginalChristmasTreeProcess: Equatable, Sendable {
         return arrangement.drop(decoration: decoration, at: position)
     }
 
-    /// The original overlay menu returns process result 2 after a 60-frame fade.
+    /// The original success path returns zero; leaving the process returns two.
     public mutating func openMenu() {
         if canOpenMenu { menuExitPending = true }
     }
@@ -107,8 +107,8 @@ public struct OriginalChristmasTreeProcess: Equatable, Sendable {
                 return [.fadeOut(60)]
             }
             if fadeComplete {
-                result = 2
-                return [.completed(2)]
+                result = 0
+                return [.completed(0)]
             }
             return []
         }

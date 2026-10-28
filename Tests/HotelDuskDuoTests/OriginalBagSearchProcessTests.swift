@@ -52,4 +52,19 @@ final class OriginalBagSearchProcessTests: XCTestCase {
         XCTAssertEqual(process.result, 2)
         XCTAssertEqual(process.phase, .exiting)
     }
+
+    func testFoundTreeBoxReturnsSuccessFromTheMenu() throws {
+        var process = OriginalBagSearchProcess()
+        let object = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
+        let start = SIMD2(process.objects[object].positionFixed.x, process.objects[object].positionFixed.z)
+        process.beginDrag(object: object, at: start)
+        process.drag(to: .zero)
+        XCTAssertTrue(process.endDrag())
+
+        process.openMenu()
+
+        XCTAssertEqual(process.update(), [.fadeOut(60)])
+        XCTAssertEqual(process.update(fadeComplete: true), [.completed(0)])
+        XCTAssertEqual(process.result, 0)
+    }
 }

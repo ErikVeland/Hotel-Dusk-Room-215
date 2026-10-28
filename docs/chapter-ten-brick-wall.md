@@ -73,6 +73,15 @@ forward vector and crossed camera axes. It uses the source 20-degree angle,
 aspect constant and 192×256 coordinate scaling. This replaces the
 projected-face approximation for hit tests.
 
+The source ray builder confirms the touch-ray scale directly. It uses a
+192-pixel width, 256-pixel height, their `192 / 256` ratio for the horizontal
+axis, an aspect multiplier of `1.33`, and a 20-degree angle. After the source
+axis conversion, both ray offsets reduce to a 128-pixel divisor:
+`horizontal = (x - 96) / 128 × 1.33 × tan(20°)` and
+`vertical = (128 - y) / 128 × 1.33 × tan(20°)`. The native touch-ray formula
+already matches this construction. The four shared-edge selection mismatches
+therefore remain in Q12 conversion, segment intersection, or face selection.
+
 The follow-up touch probes restored the same isolated save and tried bottom-
 screen points `(36, 18)` and `(50, 50)`. The selection field at process offset
 `0x448` remained `-1` in both captures. A full 2-pixel scan repeated exactly,
@@ -257,3 +266,10 @@ retained X value against a fresh ROM scan at disputed shared edges. The float
 mask remains diagnostic and must stay disconnected from Process 75 until that
 comparison matches. This evidence does not establish a normal Chapter 10 route
 or a completed end-to-end game.
+
+A trial removed the aspect multiplier from the ray's vertical component,
+following the renderer's conventional projection matrix. The four captured
+border touches then selected bricks 13, 18, 18 and 19 instead of the ROM's
+7, 7, 13 and 13. Restore the shared aspect multiplier in both ray axes; the
+focused `OriginalBrickWallHitMaskTests` pass with that formula. This rejects
+the projection-matrix shortcut but does not resolve the fixed-point mismatch.

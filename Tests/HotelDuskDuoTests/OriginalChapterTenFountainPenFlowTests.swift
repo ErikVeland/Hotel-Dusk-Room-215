@@ -1,9 +1,9 @@
 import XCTest
 @testable import HotelDuskDuoKit
 
-final class OriginalChapterTenFountainPenFlowTests: XCTestCase {
+final class OriginalChapterTenTypewriterFlowTests: XCTestCase {
     @MainActor
-    func testProcess74LoadsFountainPenAssetsFromItsFactoryGroup() throws {
+    func testProcess74LoadsTypewriterAssetsFromItsFactoryGroup() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram("EP10_R301")
         let event = try XCTUnwrap(program.blocks.tables[2].first {
@@ -23,9 +23,11 @@ final class OriginalChapterTenFountainPenFlowTests: XCTestCase {
         defer { play.stop() }
 
         XCTAssertEqual(play.runner.phase, .process(id: 74))
-        XCTAssertNotNil(play.fountainPen)
-        XCTAssertEqual(play.fountainPenImage?.width, 192)
-        XCTAssertEqual(play.fountainPenImage?.height, 256)
-        XCTAssertNil(play.typewriter)
+        XCTAssertNotNil(play.typewriter)
+        XCTAssertEqual(play.typewriterUpperImage?.width, 192)
+        XCTAssertEqual(play.typewriterUpperImage?.height, 256)
+        XCTAssertEqual(play.typewriterImage?.width, 192)
+        XCTAssertEqual(play.typewriterImage?.height, 256)
+        XCTAssertNil(play.fountainPen)
     }
 }

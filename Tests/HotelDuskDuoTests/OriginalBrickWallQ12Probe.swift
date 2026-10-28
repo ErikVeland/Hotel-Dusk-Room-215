@@ -99,9 +99,9 @@ enum OriginalBrickWallQ12Probe {
     }
 
     private static func vector(_ value: SIMD3<Float>) -> Vector {
-        Vector(Int64((value.x * Float(unit)).rounded()),
-               Int64((value.y * Float(unit)).rounded()),
-               Int64((value.z * Float(unit)).rounded()))
+        Vector(Int64(value.x * Float(unit)),
+               Int64(value.y * Float(unit)),
+               Int64(value.z * Float(unit)))
     }
 
     private static func add(_ lhs: Vector, _ rhs: Vector) -> Vector {

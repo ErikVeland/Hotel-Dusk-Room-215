@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "kind": "isolated process 46 re-grab search",
+  "note": "A generic Room 215 walking checkpoint received an injected process 46. A partial pull changed the source position to 1304. After a 15-frame release, a full-screen four-pixel scan found no selection hit. This checkpoint lacks the Chapter 6 kitchen scene context, so the scan is not evidence of normal Chapter 6 input behaviour.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "0c7672b6cf333f046158ecb5fb92060532176cd3638a8d22685b0e2bbb849d88",
+  "commandsSHA256": "0206a55d8a8d429e1b266d4a0c11c258a3fdc6c4e3fdd4fea822c2687dde3085",
+  "commandsPath": "extracted/reference/component-label-peel-regrab-fullscreen/commands.txt",
+  "logPath": "extracted/reference/component-label-peel-regrab-fullscreen/runner.log",
+  "processAddress": "0x2310020",
+  "stateBeforeSearch": [
+    2,
+    1,
+    -1
+  ],
+  "worldPositionBeforeSearch": 1304,
+  "selectedBeforeSearch": false,
+  "grid": {
+    "rawX": "0..252 step 4",
+    "rawY": "0..188 step 4",
+    "pointCount": 3072,
+    "selectionHits": 0
+  }
+}

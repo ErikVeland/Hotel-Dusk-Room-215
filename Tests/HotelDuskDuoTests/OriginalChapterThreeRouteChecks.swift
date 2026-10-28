@@ -620,9 +620,9 @@ enum OriginalChapterThreeRouteChecks {
         drain(play, interrupt: interrupt)
     }
 
-    /// Plays one jukebox record, then leaves process 59.
+    /// Plays one jukebox record, then leaves process 58.
     static func playJukebox(_ play: OriginalPlaySession, record: Int, interrupt: Bool = true) throws {
-        XCTAssertEqual(play.runner.phase, .process(id: 59))
+        XCTAssertEqual(play.runner.phase, .process(id: 58))
         play.advanceFrame()
         XCTAssertNotNil(play.jukebox)
         play.selectJukeboxRecord(record)

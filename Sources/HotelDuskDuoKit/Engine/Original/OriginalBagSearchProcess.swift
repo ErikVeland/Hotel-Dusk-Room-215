@@ -29,6 +29,7 @@ public struct OriginalBagSearchProcess: Equatable, Sendable {
     private var activeDrag: Drag?
     private var menuExitPending = false
     private var fadeOutStarted = false
+    private var foundTreeBox = false
 
     private struct Drag: Equatable, Sendable {
         let object: Int
@@ -95,6 +96,7 @@ public struct OriginalBagSearchProcess: Equatable, Sendable {
               object.positionFixed.z == targetPositionFixed.y else {
             return false
         }
+        foundTreeBox = true
         phase = .found
         return true
     }
@@ -115,7 +117,8 @@ public struct OriginalBagSearchProcess: Equatable, Sendable {
             return [.fadeOut(60)]
         }
         guard fadeComplete else { return [] }
-        result = 2
-        return [.completed(2)]
+        let returnValue: Int16 = foundTreeBox ? 0 : 2
+        result = returnValue
+        return [.completed(returnValue)]
     }
 }

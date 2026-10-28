@@ -4,7 +4,8 @@ import Foundation
  * Runs the captured Process 88 interaction and its source return delay.
  */
 public struct OriginalVSSceneProcess: Equatable, Sendable {
-    public static let result: Int16 = 1
+    /// The normal custom-interaction path returns zero from the overlay handler.
+    public static let result: Int16 = 0
     public static let fadeStartFrame = 100
     public static let fadeFrameCount = 60
     public static let completionFrameCount = 241
