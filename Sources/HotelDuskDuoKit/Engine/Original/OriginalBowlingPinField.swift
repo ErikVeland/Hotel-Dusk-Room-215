@@ -1,4 +1,5 @@
 import Foundation
+import simd
 
 /**
  * Records the initial pin positions and rotation values used by overlay 11.
@@ -15,10 +16,12 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
     public static let pinCollisionRadius = Float(bitPattern: 0x3ef83e0e)
     public static let ballPinCollisionRadius = Float(bitPattern: 0x3f783e0e)
     private static let fixedPointScale: Float = 4_096
+    private static let pinHeight = Float(bitPattern: 0x401b26c9)
     private static let laneHalfWidth = Float(bitPattern: 0x40466666)
     private static let laneBoundaryCorrection: Int32 = 410
     private static let pinLateralVelocityScale: Float = 0.1
     private static let ballVelocityResponse: Float = 0.15
+    private static let pinAngularResponse: Float = 0.1
 
     /**
      * Stores one pin's simulation fields from overlay 11's 0x60-byte record.
@@ -28,6 +31,7 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
         public var motionFixed20_12: SIMD3<Int32>
         public var rotation: Float
         public var angularVelocity: Float
+        public var directionAngle: Float
         public var isActive: Bool
         public var needsUpdate: Bool
 
@@ -36,11 +40,13 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
          */
         public init(positionFixed20_12: SIMD3<Int32>, motionFixed20_12: SIMD3<Int32> = .zero,
                     rotation: Float = 0, angularVelocity: Float = 0,
+                    directionAngle: Float = 0,
                     isActive: Bool = true, needsUpdate: Bool = false) {
             self.positionFixed20_12 = positionFixed20_12
             self.motionFixed20_12 = motionFixed20_12
             self.rotation = rotation
             self.angularVelocity = angularVelocity
+            self.directionAngle = directionAngle
             self.isActive = isActive
             self.needsUpdate = needsUpdate
         }
@@ -151,6 +157,85 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
     }
 
     /**
+     * Applies the pin-pair response from overlay 11's 0x0220368C.
+     */
+    public mutating func resolvePinContacts() {
+        for firstIndex in pins.indices where pins[firstIndex].isActive {
+            for secondIndex in pins.index(after: firstIndex)..<pins.endIndex where pins[secondIndex].isActive {
+                var first = pins[firstIndex]
+                var second = pins[secondIndex]
+                let deltaX = Float(second.positionFixed20_12.x &- first.positionFixed20_12.x)
+                    / Self.fixedPointScale
+                let deltaZ = Float(second.positionFixed20_12.z &- first.positionFixed20_12.z)
+                    / Self.fixedPointScale
+                let distance = (deltaX * deltaX + deltaZ * deltaZ).squareRoot()
+                let isMoving = first.motionFixed20_12.x != 0 || first.motionFixed20_12.z != 0
+                    || second.motionFixed20_12.x != 0 || second.motionFixed20_12.z != 0
+                guard isMoving, distance < Self.pinCollisionRadius else { continue }
+                let firstVelocityX = Float(first.motionFixed20_12.x) / Self.fixedPointScale
+                let firstVelocityZ = Float(first.motionFixed20_12.z) / Self.fixedPointScale
+                let secondVelocityX = Float(second.motionFixed20_12.x) / Self.fixedPointScale
+                let secondVelocityZ = Float(second.motionFixed20_12.z) / Self.fixedPointScale
+                let relativeX = firstVelocityX - secondVelocityX
+                let relativeZ = firstVelocityZ - secondVelocityZ
+                let relativeSpeed = (relativeX * relativeX + relativeZ * relativeZ).squareRoot()
+                let safeDistance = distance > 0 ? distance : 0.1
+                let impulseX = relativeSpeed * deltaX / safeDistance * 0.5
+                let impulseZ = relativeSpeed * deltaZ / safeDistance
+
+                if first.motionFixed20_12.x == 0, first.motionFixed20_12.z != 0 {
+                    first.directionAngle = Self.directionAngle(deltaX: deltaX, deltaZ: deltaZ)
+                }
+                if second.motionFixed20_12.x == 0, second.motionFixed20_12.z != 0 {
+                    second.directionAngle = Self.directionAngle(deltaX: -deltaX, deltaZ: -deltaZ)
+                }
+
+                first.motionFixed20_12.x = Self.fixedValue(firstVelocityX - impulseX)
+                first.motionFixed20_12.z = Self.fixedValue(firstVelocityZ - impulseZ)
+                second.motionFixed20_12.x = Self.fixedValue(secondVelocityX + impulseX)
+                second.motionFixed20_12.z = Self.fixedValue(secondVelocityZ + impulseZ)
+                first.angularVelocity = -relativeZ * .pi * Self.pinAngularResponse
+                second.angularVelocity = relativeZ * .pi * Self.pinAngularResponse
+                first.needsUpdate = true
+                second.needsUpdate = true
+                pins[firstIndex] = first
+                pins[secondIndex] = second
+            }
+        }
+    }
+
+    /**
+     * Applies overlay 11's sampled tilted-pin position correction from 0x02203DB8.
+     */
+    public mutating func resolvePinPositionalContacts() {
+        for firstIndex in pins.indices {
+            let firstStart = Self.positionSampleStart(pins[firstIndex])
+            let firstEnd = Self.positionSampleEnd(pins[firstIndex])
+            for secondIndex in pins.index(after: firstIndex)..<pins.endIndex {
+                let secondStart = Self.positionSampleStart(pins[secondIndex])
+                let secondEnd = Self.positionSampleEnd(pins[secondIndex])
+                for firstStep in 0...6 {
+                    let firstPoint = Self.interpolate(firstStart, firstEnd, step: firstStep)
+                    for secondStep in 0...6 {
+                        let secondPoint = Self.interpolate(secondStart, secondEnd, step: secondStep)
+                        let delta = firstPoint - secondPoint
+                        guard simd_length_squared(delta) < 0.25 * Self.pinCollisionRadius * Self.pinCollisionRadius else {
+                            continue
+                        }
+                        let firstPosition = pins[firstIndex].positionFixed20_12
+                        let secondPosition = pins[secondIndex].positionFixed20_12
+                        pins[firstIndex].positionFixed20_12.x = Self.correctedPosition(firstPosition.x, awayFrom: secondPosition.x)
+                        pins[firstIndex].positionFixed20_12.z = Self.correctedPosition(firstPosition.z, awayFrom: secondPosition.z)
+                        let correctedFirst = pins[firstIndex].positionFixed20_12
+                        pins[secondIndex].positionFixed20_12.x = Self.correctedPosition(secondPosition.x, awayFrom: correctedFirst.x)
+                        pins[secondIndex].positionFixed20_12.z = Self.correctedPosition(secondPosition.z, awayFrom: correctedFirst.z)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Returns active pins inside the source ball-contact radius.
      */
     public func ballContactCandidates(at ballPositionFixed20_12: SIMD3<Int32>) -> [Int] {
@@ -224,6 +309,33 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
     private static func velocitySquared(_ fixedValue: Int32) -> Float {
         let velocity = Float(fixedValue) / 4_096
         return velocity * velocity
+    }
+
+    private static func directionAngle(deltaX: Float, deltaZ: Float) -> Float {
+        let angle = atan2(-deltaX, deltaZ)
+        return angle < 0 ? angle + 2 * .pi : angle
+    }
+
+    private static func positionSampleStart(_ pin: Pin) -> SIMD2<Float> {
+        SIMD2(Float(pin.positionFixed20_12.x), Float(pin.positionFixed20_12.z)) / fixedPointScale
+    }
+
+    private static func positionSampleEnd(_ pin: Pin) -> SIMD2<Float> {
+        let start = positionSampleStart(pin)
+        let projectedTilt = pinHeight * sin(pin.rotation)
+        let offset = SIMD2(projectedTilt * sin(pin.directionAngle), -projectedTilt * cos(pin.directionAngle))
+        return start + offset
+    }
+
+    private static func interpolate(_ start: SIMD2<Float>, _ end: SIMD2<Float>, step: Int) -> SIMD2<Float> {
+        let startWeight = Float(step) / 6
+        let endWeight = 1 - startWeight
+        return start * startWeight + end * endWeight
+    }
+
+    private static func correctedPosition(_ position: Int32, awayFrom otherPosition: Int32) -> Int32 {
+        let corrected = Float(position) + Float(position &- otherPosition) * 0.01
+        return Int32(clamping: Int64(corrected.rounded(.towardZero)))
     }
 
     private static func advanceAngularMotion(_ pin: inout Pin) {

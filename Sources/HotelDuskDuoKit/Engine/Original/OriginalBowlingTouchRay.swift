@@ -138,8 +138,31 @@ public enum OriginalBowlingTouchRay {
     }
 
     /**
-     * Resolves the lane hit before the ball-plane hit, as overlay 11 does when
-     * it starts a held-touch drag.
+     * Applies the translation vector that overlay 11 adds to each template vertex.
+     */
+    public static func translatedVertices(
+        _ vertices: [SIMD3<Float>],
+        byFixed20_12 translation: SIMD3<Int32>
+    ) -> [SIMD3<Float>] {
+        let offset = SIMD3(Float(translation.x), Float(translation.y), Float(translation.z)) / 4_096
+        return vertices.map { $0 + offset }
+    }
+
+    /**
+     * Applies overlay 11's fixed-point vector subtraction to a held drag point.
+     */
+    public static func sourceDragDelta20_12(
+        touchPoint: SIMD3<Int32>,
+        ballTransform: SIMD3<Int32>
+    ) -> SIMD3<Int32> {
+        SIMD3(touchPoint.x &- ballTransform.x,
+              touchPoint.y &- ballTransform.y,
+              touchPoint.z &- ballTransform.z)
+    }
+
+    /**
+     * Resolves the ball selection hit, then the lane anchor, as overlay 11 does
+     * when a press starts a held-touch drag.
      */
     public static func dragAnchor(
         origin: SIMD3<Float>,
@@ -147,8 +170,8 @@ public enum OriginalBowlingTouchRay {
         laneVertices: [SIMD3<Float>],
         ballVertices: [SIMD3<Float>]
     ) -> DragAnchor? {
-        guard let lanePoint = firstHit(origin: origin, direction: direction, vertices: laneVertices),
-              let ballPoint = firstHit(origin: origin, direction: direction, vertices: ballVertices) else {
+        guard let ballPoint = firstHit(origin: origin, direction: direction, vertices: ballVertices),
+              let lanePoint = firstHit(origin: origin, direction: direction, vertices: laneVertices) else {
             return nil
         }
         return DragAnchor(lanePoint: lanePoint, ballPoint: ballPoint)

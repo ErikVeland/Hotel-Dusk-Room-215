@@ -2,6 +2,49 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalChristmasTreeProcessTests: XCTestCase {
+    @MainActor
+    func testCompletedArrangementPersistsItsSavedOrderThroughTheSession() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let program = try catalog.loadProgram("EP7_R122")
+        let event = try XCTUnwrap(program.blocks.tables[2].first {
+            try OriginalEventCompletion.embeddedProcessID(event: $0) == 43
+        })
+        let game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        var selection = OriginalEventSelectionContext(
+            sceneID: .max, blockID: 0, modeID: 15,
+            eventID: try OriginalBytes(event.raw).u16(4), nowTime: game.nowTime, mapID: game.mapID)
+        selection.debugEventSelection = true
+        let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
+        XCTAssertEqual(runner.phase, .process(id: 43))
+
+        let audio = AudioController()
+        audio.isMuted = true
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)))
+        defer { play.stop() }
+
+        for _ in 0..<70 { play.advanceFrame() }
+        let renderer = try OriginalChristmasTreeRenderer(library: .bundled())
+        for (slot, decoration) in try XCTUnwrap(play.christmasTree).decorationOrder.enumerated() {
+            let state = try XCTUnwrap(play.christmasTree)
+            let centreX = 9 + slot * 17
+            let start = try XCTUnwrap((232..<249).lazy.flatMap { y in
+                (max(0, centreX - 8)..<min(192, centreX + 9)).lazy.map { SIMD2<Float>(Float($0), Float(y)) }
+            }.first { renderer.decoration(at: $0, process: state) == decoration })
+            let destination = OriginalChristmasTreeLayout.pageDecorationTargets[slot]
+            play.holdChristmasTreeTouch(x: start.x, y: start.y)
+            play.releaseChristmasTreeTouch(x: destination.x, y: destination.y)
+        }
+
+        XCTAssertEqual(play.christmasTree?.arrangement.decorationAtTarget.compactMap { $0 }, Array(0..<11))
+
+        for _ in 0..<100 where play.christmasTree != nil { play.advanceFrame() }
+
+        XCTAssertNil(play.christmasTree)
+        XCTAssertEqual(play.runner.game.christmasTreeDecorationOrder, 0xE400)
+    }
+
     func testProcessUsesSavedDecorationOrder() {
         XCTAssertEqual(OriginalChristmasTreeProcess().decorationOrder, Array(0..<11))
         XCTAssertEqual(OriginalChristmasTreeProcess(savedOrder: 0x7207).decorationOrder,

@@ -44,6 +44,25 @@ public final class OriginalPlaySession: ObservableObject {
         public var quitEnabled: Bool
     }
     @Published public private(set) var sign: SignScene?
+    @Published public private(set) var codeNotice: OriginalCodeNoticeProcess?
+    @Published public private(set) var codeNoticeImage: CGImage?
+    @Published public private(set) var codeNoticeCaption: String?
+    @Published public private(set) var afterConfess: OriginalAfterConfessProcess?
+    @Published public private(set) var afterConfessTouchImage: CGImage?
+    @Published public private(set) var afterConfessUpperImage: CGImage?
+    private var afterConfessRenderer: OriginalAfterConfessRenderer?
+    @Published public private(set) var vsScene: OriginalVSSceneProcess?
+    @Published public private(set) var vsSceneImage: CGImage?
+    private var vsSceneRenderer: OriginalVSSceneRenderer?
+    @Published public private(set) var picturePeel: OriginalPicturePeelProcess?
+    @Published public private(set) var picturePeelImage: CGImage?
+    @Published public private(set) var picturePeelUpperImage: CGImage?
+    private var picturePeelRenderer: OriginalPicturePeelRenderer?
+    private var picturePeelTouch: SIMD2<Int>?
+    @Published public private(set) var typewriter: OriginalTypewriterProcess?
+    @Published public private(set) var typewriterUpperImage: CGImage?
+    @Published public private(set) var typewriterImage: CGImage?
+    private var typewriterRenderer: OriginalTypewriterRenderer?
     @Published public private(set) var jigsaw: OriginalJigsawProcess?
     @Published public private(set) var clock: OriginalClockProcess?
     @Published public private(set) var clockImage: CGImage?
@@ -64,6 +83,10 @@ public final class OriginalPlaySession: ObservableObject {
     private var applePaintingRenderer: OriginalApplePaintingRenderer?
     @Published public private(set) var pencilSharpener: OriginalPencilSharpenerProcess?
     @Published public private(set) var pencilSharpenerImage: CGImage?
+    @Published public private(set) var bowlingMatch: OriginalBowlingMatchProcess?
+    @Published public private(set) var bowlingImage: CGImage?
+    private var bowlingRenderer: OriginalBowlingRenderer?
+    private var bowlingTouch: SIMD2<Float>?
     private var applePaintingMask: OriginalApplePaintingMask?
     @Published public private(set) var cpr: OriginalCPRProcess?
     @Published public private(set) var appleWordEntry: OriginalAppleWordEntryProcess?
@@ -135,6 +158,11 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var searchShedScreenEffects = OriginalScreenEffects()
     private var searchShedRenderer: OriginalSearchShedRenderer?
     private var searchShedTouch: SIMD2<Float>?
+    @Published public private(set) var bagSearch: OriginalBagSearchProcess?
+    @Published public private(set) var bagSearchImage: CGImage?
+    @Published public private(set) var bagSearchScreenEffects = OriginalScreenEffects()
+    private var bagSearchRenderer: OriginalBagSearchRenderer?
+    private var bagSearchTouch: SIMD2<Float>?
     private var switchboardParent: OriginalEventRunner?
     @Published public private(set) var thinWire: OriginalThinWireProcess?
     @Published public private(set) var thinWireImage: CGImage?
@@ -215,6 +243,7 @@ public final class OriginalPlaySession: ObservableObject {
     private var signProcess: OriginalSignProcess?
     private var heldTouch: OriginalEntranceProcess.Touch?
     private let audio: AudioController
+    private let originalEffectPlayer: ((Int, Int) -> Void)?
     private let catalog: OriginalScriptCatalog
     private var pendingDoorOpen: Int16?
     private var handledMapRequests = 0
@@ -226,6 +255,7 @@ public final class OriginalPlaySession: ObservableObject {
     private var processReturn: Int16 = 2
     private var fadeRemaining: [Int: Int] = [:]
     private var pendingTouch: OriginalEntranceProcess.Touch?
+    private var pendingCodeNoticeTouch: SIMD2<Int>?
     private var timer: Timer?
     @Published private(set) var isPaused = false
     private var presentedPacketOffset: Int?
@@ -243,13 +273,15 @@ public final class OriginalPlaySession: ObservableObject {
 
     var canReviewConversations: Bool {
         guard !dialogueNotebook.ink.isEmpty, chapterTransition == nil, notebook == nil,
-              process == nil, bellProcess == nil, signProcess == nil, jigsaw == nil,
+              process == nil, bellProcess == nil, signProcess == nil, codeNotice == nil, picturePeel == nil, jigsaw == nil,
               clock == nil, suitcaseKey == nil, thinWire == nil, hanger == nil, switchboard == nil, fountainPen == nil, bookmarkBox == nil, dollRepair == nil, coinPuzzle == nil, matchsticks == nil, jukebox == nil, linenWagon == nil, differences == nil, toiletTank == nil,
               suitcaseContents == nil, memoPull == nil, cabinetDial == nil,
               crowbar == nil, memoDrawing == nil, paperclip == nil, labelPeel == nil, christmasTree == nil, searchShed == nil,
+              bagSearch == nil,
               cassetteBallpoint == nil, cassetteRewind == nil,
               applePainting == nil, appleWordEntry == nil,
               pencilSharpener == nil,
+              bowlingMatch == nil,
               cpr == nil,
               touchPicture == nil else { return false }
         switch runner.phase {
@@ -279,6 +311,7 @@ public final class OriginalPlaySession: ObservableObject {
                 puzzleSeed: @escaping () -> UInt32 = { UInt32.random(in: .min ... .max) },
                 saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
                 saveDate: @escaping () -> Date = Date.init,
+                originalEffectPlayer: ((Int, Int) -> Void)? = nil,
                 chapterTransition: OriginalChapterTransition? = nil,
                 restoredExploration: OriginalMapExploration? = nil,
                 mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
@@ -291,6 +324,7 @@ public final class OriginalPlaySession: ObservableObject {
                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) {
         self.runner = runner
         self.audio = audio
+        self.originalEffectPlayer = originalEffectPlayer
         self.catalog = catalog
         self.fixture = fixture
         self.jigsawSeed = jigsawSeed
@@ -566,6 +600,68 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     /**
+     * Sends a new touch-page press to the Chapter 10 code notice.
+     */
+    public func touchCodeNotice(pageX: Int, pageY: Int) {
+        guard !isPaused, case .process(let id) = runner.phase, id == 62 || id == 67,
+              (0..<192).contains(pageX), (0..<256).contains(pageY), codeNotice != nil else { return }
+        pendingCodeNoticeTouch = SIMD2(pageX, pageY)
+    }
+
+    /**
+     * Sends a touch-page press to the Chapter 10 VSScene interaction.
+     */
+    public func touchVSScene() {
+        guard !isPaused, case .process(88) = runner.phase, var process = vsScene else { return }
+        process.touch()
+        vsScene = process
+    }
+
+    /**
+     * Sends a tap from the touch page to the typewriter keyboard.
+     */
+    public func tapTypewriter(pageX: Int, pageY: Int) {
+        guard !isPaused, case .process(let id) = runner.phase,
+              [74, 86, 90, 91].contains(id), (0..<192).contains(pageX),
+              (0..<256).contains(pageY), var process = typewriter else { return }
+        let submission = process.tap(at: SIMD2(255 - pageY, pageX))
+        if submission == .accepted {
+            typewriter = nil
+            typewriterImage = nil
+            typewriterUpperImage = nil
+            typewriterRenderer = nil
+            stopTimer()
+            runner.finishProcess(returnValue: 0)
+            settle()
+        } else {
+            typewriter = process
+        }
+    }
+
+    /**
+     * Changes the typewriter cipher dial while the process is active.
+     */
+    public func adjustTypewriterShift(by amount: Int) {
+        guard !isPaused, typewriter != nil else { return }
+        typewriter?.adjustShift(by: amount)
+    }
+
+    /**
+     * Leaves the typewriter through its source exit path.
+     */
+    public func quitTypewriter() {
+        guard !isPaused, var process = typewriter,
+              let result = process.requestExit() else { return }
+        typewriter = nil
+        typewriterImage = nil
+        typewriterUpperImage = nil
+        typewriterRenderer = nil
+        stopTimer()
+        runner.finishProcess(returnValue: result)
+        settle()
+    }
+
+    /**
      * Sends a tap to the Chapter 10 pencil-sharpener exit mask.
      */
     public func tapPencilSharpener(pageX: Int, pageY: Int) {
@@ -582,6 +678,35 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func releaseTouch() { heldTouch = nil }
+
+    /**
+     * Forwards a held page touch to the bowling process.
+     */
+    public func holdBowlingTouch(pageX: Float, pageY: Float) {
+        guard !isPaused, case .process(44) = runner.phase,
+              pageX.isFinite, pageY.isFinite,
+              (0..<192).contains(pageX), (0..<256).contains(pageY),
+              var match = bowlingMatch else { return }
+        let touch = SIMD2(pageX, pageY)
+        if let previousTouch = bowlingTouch, match.phase == .ready,
+           previousTouch != touch,
+           let anchor = bowlingDragAnchor(pageX: previousTouch.x, pageY: previousTouch.y, match: match) {
+            _ = match.beginDrag(at: Self.fixedBowlingPoint(anchor.lanePoint), ballWasHit: true)
+        }
+        bowlingMatch = match
+        bowlingTouch = touch
+    }
+
+    /**
+     * Releases the active bowling drag.
+     */
+    public func releaseBowlingTouch() {
+        bowlingTouch = nil
+        guard !isPaused, case .process(44) = runner.phase,
+              var match = bowlingMatch else { return }
+        _ = match.endDrag()
+        bowlingMatch = match
+    }
 
     /**
      * Forwards a drag to the original jigsaw, retaining its first grab offset.
@@ -728,13 +853,13 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func holdFountainPenTouch(x: Float, y: Float) {
-        guard !isPaused, case .process(42) = runner.phase, x.isFinite, y.isFinite,
+        guard !isPaused, case .process(let id) = runner.phase, id == 42 || id == 74, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         fountainPenTouch = SIMD2(Int(x), Int(y))
     }
     public func releaseFountainPenTouch() { fountainPenTouch = nil }
     public func quitFountainPen() {
-        guard !isPaused, case .process(42) = runner.phase else { return }
+        guard !isPaused, case .process(let id) = runner.phase, id == 42 || id == 74 else { return }
         fountainPenTouch = nil
         fountainPen?.quit()
         puzzleMicrophone.stop()
@@ -887,6 +1012,29 @@ public final class OriginalPlaySession: ObservableObject {
 
     public func releaseLabelPeelTouch() { labelPeelTouch = nil }
 
+    public func holdPicturePeelTouch(x: Float, y: Float) {
+        guard !isPaused, case .process(61) = runner.phase,
+              x.isFinite, y.isFinite,
+              x >= 0, x < 192, y >= 0, y < 256 else { return }
+        picturePeelTouch = SIMD2(Int(x), Int(y))
+    }
+
+    public func releasePicturePeelTouch() { picturePeelTouch = nil }
+
+    public func quitPicturePeel() {
+        guard !isPaused, case .process(61) = runner.phase,
+              var process = picturePeel,
+              process.requestExit() != nil else { return }
+        picturePeel = nil
+        picturePeelImage = nil
+        picturePeelUpperImage = nil
+        picturePeelRenderer = nil
+        picturePeelTouch = nil
+        stopTimer()
+        runner.finishProcess(returnValue: 2)
+        settle()
+    }
+
     public func openChristmasTreeMenu() {
         guard !isPaused, case .process(43) = runner.phase,
               christmasTreeDraggedDecoration == nil else { return }
@@ -937,7 +1085,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func holdSearchShedTouch(x: Float, y: Float) {
-        guard !isPaused, case .process(55) = runner.phase, var process = searchShed,
+        guard !isPaused, case .process(79) = runner.phase, var process = searchShed,
               x.isFinite, y.isFinite, x >= 0, x < 192, y >= 0, y < 256,
               let renderer = searchShedRenderer else { return }
         let point = SIMD2(x, y)
@@ -964,15 +1112,54 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func openSearchShedMenu() {
-        guard !isPaused, case .process(55) = runner.phase else { return }
+        guard !isPaused, case .process(79) = runner.phase else { return }
         searchShed?.openMenu()
     }
 
     public func openSearchShedTreeBox() {
-        guard !isPaused, case .process(55) = runner.phase, var process = searchShed else { return }
+        guard !isPaused, case .process(79) = runner.phase, var process = searchShed else { return }
         let effects = process.openFoundBox()
         searchShed = process
         applySearchShed(effects)
+    }
+
+    public func holdBagSearchTouch(x: Float, y: Float) {
+        guard !isPaused, case .process(55) = runner.phase, var process = bagSearch,
+              x.isFinite, y.isFinite, x >= 0, x < 192, y >= 0, y < 256,
+              let renderer = bagSearchRenderer else { return }
+        let point = SIMD2(x, y)
+        if bagSearchTouch == nil,
+           let object = try? renderer.object(at: point, process: process),
+           let planePoint = renderer.planePointFixed(at: point) {
+            process.beginDrag(object: object, at: planePoint)
+        }
+        if process.draggedObject != nil, let planePoint = renderer.planePointFixed(at: point) {
+            process.drag(to: planePoint)
+        }
+        bagSearchTouch = point
+        bagSearch = process
+        do { bagSearchImage = try renderer.render(process) }
+        catch { runner.halt("The tree-box search could not be rendered: \(error)"); settle() }
+    }
+
+    public func releaseBagSearchTouch() {
+        bagSearchTouch = nil
+        guard var process = bagSearch else { return }
+        _ = process.endDrag()
+        bagSearch = process
+        if let renderer = bagSearchRenderer {
+            do { bagSearchImage = try renderer.render(process) }
+            catch { runner.halt("The tree-box search could not be rendered: \(error)"); settle() }
+        }
+    }
+
+    public func cancelBagSearchTouch() {
+        releaseBagSearchTouch()
+    }
+
+    public func openBagSearchMenu() {
+        guard !isPaused, case .process(55) = runner.phase else { return }
+        bagSearch?.openMenu()
     }
 
     public func releaseThinWireTouch() { thinWireTouch = nil }
@@ -1241,33 +1428,84 @@ public final class OriginalPlaySession: ObservableObject {
                 sign = SignScene(strokes: [0, 0, 0, 0], awaitingStroke: false, quitEnabled: false)
             }
             startTimer()
-        case .process(52):
-            if cassetteDeck == nil {
+        case .process(63):
+            cpr = OriginalCPRProcess()
+        case .process(62), .process(67):
+            if codeNotice == nil {
                 do {
-                    let renderer = try OriginalCassetteDeckRenderer()
-                    let process = OriginalCassetteDeckProcess()
-                    cassetteImage = try renderer.render(camera: process.camera, state: process.sceneState)
-                    cassetteDeckRenderer = renderer
-                    cassetteDeck = process
-                    cassetteTouch = nil
-                    cassettePress = nil
-                    cassetteOpacity = 1
+                    let renderer = try OriginalCodeNoticeRenderer()
+                    guard case .process(let processID) = runner.phase else { return settle() }
+                    let textIndex = Int(processID)
+                    guard runner.program.text.entries.indices.contains(textIndex) else {
+                        throw OriginalDataError.missing("Code notice text \(processID)")
+                    }
+                    codeNotice = OriginalCodeNoticeProcess(processID: textIndex)
+                    codeNoticeImage = renderer.pageBackground
+                    codeNoticeCaption = ""
                     processReturn = 2
+                    pendingCodeNoticeTouch = nil
                 } catch {
-                    runner.halt("The cassette deck could not be loaded: \(error)")
+                    runner.halt("The code notice could not be loaded: \(error)")
                     return settle()
                 }
             }
             startTimer()
-        case .process(59):
-            if pencilSharpener == nil {
+        case .process(75):
+            runner.halt("Process 75 loads overlay 40; its original interaction is not recovered")
+            return settle()
+        case .process(61):
+            if picturePeel == nil {
                 do {
-                    let renderer = try OriginalPencilSharpenerRenderer()
-                    pencilSharpenerImage = renderer.image
-                    pencilSharpener = OriginalPencilSharpenerProcess()
+                    let renderer = try OriginalPicturePeelRenderer(library: .bundled())
+                    let process = OriginalPicturePeelProcess(mask: renderer.initialMask)
+                    picturePeelRenderer = renderer
+                    picturePeelUpperImage = renderer.upperScreen
+                    picturePeelImage = try renderer.render(process)
+                    picturePeel = process
+                    processReturn = 2
+                    picturePeelTouch = nil
+                } catch {
+                    runner.halt("The picture peel could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(44), .process(52):
+            if bowlingMatch == nil {
+                do {
+                    let renderer = try OriginalBowlingRenderer()
+                    let match = OriginalBowlingMatchProcess()
+                    bowlingImage = try renderer.render(bowlingSceneState(match))
+                    bowlingRenderer = renderer
+                    bowlingMatch = match
                     processReturn = 2
                 } catch {
-                    runner.halt("The pencil-sharpener scene could not be loaded: \(error)")
+                    runner.halt("The bowling scene could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(74), .process(86), .process(90), .process(91):
+            if typewriter == nil {
+                do {
+                    let renderer = try OriginalTypewriterRenderer()
+                    guard case .process(let processID) = runner.phase else { return settle() }
+                    let variant: OriginalTypewriterCipher.Variant
+                    switch processID {
+                    case 86: variant = .opening
+                    case 90: variant = .memento
+                    case 91: variant = .final
+                    default: variant = .first
+                    }
+                    let cipher = OriginalTypewriterCipher(variant: variant,
+                        randomInfo: runner.memoRandomInfo(seed: puzzleSeed()))
+                    typewriterRenderer = renderer
+                    typewriterUpperImage = renderer.upperScreen
+                    typewriterImage = renderer.touchScreen
+                    typewriter = OriginalTypewriterProcess(cipher: cipher)
+                    processReturn = 2
+                } catch {
+                    runner.halt("The typewriter could not be loaded: \(error)")
                     return settle()
                 }
             }
@@ -1295,17 +1533,31 @@ public final class OriginalPlaySession: ObservableObject {
                 runner.halt("The apple painting could not be loaded: \(error)")
                 return settle()
             }
-        case .process(63):
-            if cpr == nil { cpr = OriginalCPRProcess() }
+        case .process(34):
+            if memoDrawing == nil {
+                do {
+                    let items = try runner.game.inventory.items
+                    let paper: OriginalMemoDrawing.Paper = items.contains(63) ? .whole : items.contains(13) ? .joined : .torn
+                    let renderer = try OriginalMemoDrawingImage(paper: paper, library: .bundled())
+                    let drawing = try OriginalMemoDrawing(paper: paper, randomInfo: runner.memoRandomInfo(seed: puzzleSeed()), mask: renderer.mask)
+                    memoDrawingRenderer = renderer
+                    memoDrawing = OriginalMemoDrawingProcess(drawing: drawing)
+                    memoDrawingImage = try renderer.render(drawing)
+                    memoDrawingScreenEffects = OriginalScreenEffects()
+                    runner.recordUnrenderedProcessCaption(processID: 34, caption: 39)
+                } catch {
+                    runner.halt("The memo drawing could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
         case .process(81):
-            guard appleWordEntry == nil,
-                  let invocation = runner.embeddedProcessInvocation,
-                  OriginalAlphabetProcessContext.mode(for: invocation) == .wordEntry,
-                  let process = OriginalAppleWordEntryProcess(foundMask: runner.game.applePaintingFoundMask) else {
-                runner.halt("The apple word-entry call context or five found letters could not be recovered")
+            guard let process = OriginalAppleWordEntryProcess(foundMask: runner.game.applePaintingFoundMask) else {
+                runner.halt("The apple word entry started before all five letters were found")
                 return settle()
             }
             appleWordEntry = process
+            startTimer()
         case .process(45):
             if cassetteBallpoint == nil {
                 do {
@@ -1429,6 +1681,19 @@ public final class OriginalPlaySession: ObservableObject {
                     return settle()
                 }
             }
+        case .process(59):
+            if pencilSharpener == nil {
+                do {
+                    let renderer = try OriginalPencilSharpenerRenderer()
+                    pencilSharpenerImage = renderer.image
+                    pencilSharpener = OriginalPencilSharpenerProcess()
+                    processReturn = 2
+                } catch {
+                    runner.halt("The pencil-sharpener scene could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
         case .process(51):
             if coinPuzzle == nil {
                 do {
@@ -1515,7 +1780,7 @@ public final class OriginalPlaySession: ObservableObject {
                 }
             }
             startTimer()
-        case .process(55):
+        case .process(79):
             if searchShed == nil {
                 do {
                     let process = OriginalSearchShedProcess()
@@ -1526,6 +1791,52 @@ public final class OriginalPlaySession: ObservableObject {
                     searchShed = process
                 } catch {
                     runner.halt("The search shed could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(55):
+            if bagSearch == nil {
+                do {
+                    let process = OriginalBagSearchProcess()
+                    let renderer = try OriginalBagSearchRenderer()
+                    bagSearchRenderer = renderer
+                    bagSearchImage = try renderer.render(process)
+                    bagSearchScreenEffects = OriginalScreenEffects()
+                    bagSearch = process
+                } catch {
+                    runner.halt("The tree-box search could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(88):
+            if vsScene == nil {
+                do {
+                    let renderer = try OriginalVSSceneRenderer()
+                    vsSceneRenderer = renderer
+                    vsSceneImage = renderer.image()
+                    vsScene = OriginalVSSceneProcess()
+                } catch {
+                    runner.halt("The VSScene ending layer could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(85):
+            if afterConfess == nil {
+                do {
+                    let renderer = try OriginalAfterConfessRenderer()
+                    let process = OriginalAfterConfessProcess()
+                    guard let pages = renderer.pages(for: process.phase) else {
+                        throw OriginalDataError.invalid("AfterConfess opening scene")
+                    }
+                    afterConfessRenderer = renderer
+                    afterConfessTouchImage = pages.touch
+                    afterConfessUpperImage = pages.upper
+                    afterConfess = process
+                } catch {
+                    runner.halt("The AfterConfess scene could not be loaded: \(error)")
                     return settle()
                 }
             }
@@ -1616,24 +1927,6 @@ public final class OriginalPlaySession: ObservableObject {
                     hanger = puzzle
                 } catch {
                     runner.halt("The hanger puzzle could not be loaded: \(error)")
-                    return settle()
-                }
-            }
-            startTimer()
-        case .process(34):
-            if memoDrawing == nil {
-                do {
-                    let items = try runner.game.inventory.items
-                    let paper: OriginalMemoDrawing.Paper = items.contains(63) ? .whole : items.contains(13) ? .joined : .torn
-                    let renderer = try OriginalMemoDrawingImage(paper: paper, library: .bundled())
-                    let drawing = try OriginalMemoDrawing(paper: paper, randomInfo: runner.memoRandomInfo(seed: puzzleSeed()), mask: renderer.mask)
-                    memoDrawingRenderer = renderer
-                    memoDrawing = OriginalMemoDrawingProcess(drawing: drawing)
-                    memoDrawingImage = try renderer.render(drawing)
-                    memoDrawingScreenEffects = OriginalScreenEffects()
-                    runner.recordUnrenderedProcessCaption(processID: 34, caption: 39)
-                } catch {
-                    runner.halt("The memo drawing could not be loaded: \(error)")
                     return settle()
                 }
             }
@@ -1984,6 +2277,10 @@ public final class OriginalPlaySession: ObservableObject {
             runner.advanceWait()
             return settle()
         }
+        if codeNotice != nil { return updateCodeNotice() }
+        if afterConfess != nil { return updateAfterConfess() }
+        if vsScene != nil { return updateVSScene() }
+        if picturePeel != nil { return updatePicturePeel() }
         if case .picture = runner.phase {
             touchPicture?.update()
             if touchPicture?.phase == .complete {
@@ -1995,6 +2292,7 @@ public final class OriginalPlaySession: ObservableObject {
         }
         if bellProcess != nil { return updateBell() }
         if pencilSharpener != nil { return updatePencilSharpener() }
+        if bowlingMatch != nil { return updateBowling() }
         if clock != nil { return updateClock() }
         if cassetteDeck != nil { return updateCassetteDeck() }
         if cassetteBallpoint != nil { return updateCassetteBallpoint() }
@@ -2010,6 +2308,7 @@ public final class OriginalPlaySession: ObservableObject {
         if labelPeel != nil { return updateLabelPeel() }
         if christmasTree != nil { return updateChristmasTree() }
         if searchShed != nil { return updateSearchShed() }
+        if bagSearch != nil { return updateBagSearch() }
         if toiletTank != nil { return updateToiletTank() }
         if switchboard != nil { return updateSwitchboard() }
         if fountainPen != nil { return updateFountainPen() }
@@ -2060,6 +2359,87 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
 
+    private static let bowlingCameraMatrixFixed20_12: [Int32] = [
+        0, 12_288, 21_709, 0, 2_048, -43_827, 0, 0,
+        0, -4_096, 0, 0, 0, 4_096, 0, 0
+    ]
+
+    private func bowlingSceneState(_ match: OriginalBowlingMatchProcess) throws -> OriginalBowlingRenderer.SceneState {
+        try OriginalBowlingRenderer.SceneState(
+            cameraMatrixFixed20_12: Self.bowlingCameraMatrixFixed20_12,
+            ballPositionFixed20_12: match.turn.ballPositionFixed20_12,
+            pins: match.turn.simulation.pins.pins)
+    }
+
+    private func bowlingDragAnchor(pageX: Float, pageY: Float,
+                                   match: OriginalBowlingMatchProcess) -> OriginalBowlingTouchRay.DragAnchor? {
+        guard let camera = OriginalBowlingCameraBasis(matrixFixed20_12: Self.bowlingCameraMatrixFixed20_12),
+              let ray = OriginalBowlingTouchRay.ray(pagePoint: SIMD2(pageX, pageY), camera: camera),
+              let anchor = OriginalBowlingTouchRay.dragAnchor(
+                origin: ray.origin, direction: ray.direction,
+                laneVertices: OriginalBowlingTouchRay.translatedVertices(
+                    OriginalBowlingTouchRay.lanePlaneVertices,
+                    byFixed20_12: SIMD3(0, 2_979, 0)),
+                ballVertices: OriginalBowlingTouchRay.translatedVertices(
+                    OriginalBowlingTouchRay.ballPlaneVertices,
+                    byFixed20_12: match.turn.ballPositionFixed20_12)) else { return nil }
+        return anchor
+    }
+
+    private func bowlingLanePoint(pageX: Float, pageY: Float) -> SIMD3<Int32>? {
+        guard let camera = OriginalBowlingCameraBasis(matrixFixed20_12: Self.bowlingCameraMatrixFixed20_12),
+              let ray = OriginalBowlingTouchRay.ray(pagePoint: SIMD2(pageX, pageY), camera: camera),
+              let point = OriginalBowlingTouchRay.firstHit(
+                origin: ray.origin, direction: ray.direction,
+                vertices: OriginalBowlingTouchRay.translatedVertices(
+                    OriginalBowlingTouchRay.lanePlaneVertices,
+                    byFixed20_12: SIMD3(0, 2_979, 0))) else { return nil }
+        return Self.fixedBowlingPoint(point)
+    }
+
+    private static func fixedBowlingPoint(_ point: SIMD3<Float>) -> SIMD3<Int32> {
+        SIMD3(Int32((point.x * 4_096).rounded()), Int32((point.y * 4_096).rounded()),
+              Int32((point.z * 4_096).rounded()))
+    }
+
+    private func updateBowling() {
+        guard var match = bowlingMatch, let renderer = bowlingRenderer else { return stopTimer() }
+        if match.phase == .dragging, let touch = bowlingTouch {
+            if let lanePoint = bowlingLanePoint(pageX: touch.x, pageY: touch.y) {
+                match.updateDrag(to: lanePoint)
+            }
+        }
+        switch match.phase {
+        case .rolling:
+            match.advanceOneUpdate()
+        case .betweenThrows:
+            _ = match.beginNextThrow()
+        case .completed:
+            bowlingMatch = nil
+            bowlingImage = nil
+            bowlingRenderer = nil
+            bowlingTouch = nil
+            stopTimer()
+            runner.finishProcess(returnValue: match.returnValue ?? processReturn)
+            settle()
+            return
+        case .unresolvedOutcome:
+            bowlingMatch = match
+            runner.halt("The bowling result has no recovered story return")
+            stopTimer()
+            return
+        case .ready, .dragging:
+            break
+        }
+        do {
+            bowlingImage = try renderer.render(bowlingSceneState(match))
+        } catch {
+            runner.halt("The bowling scene could not be drawn: \(error)")
+            stopTimer()
+        }
+        bowlingMatch = match
+    }
+
     private func updatePencilSharpener() {
         guard var current = pencilSharpener else { return stopTimer() }
         current.updateOneFrame()
@@ -2069,6 +2449,29 @@ public final class OriginalPlaySession: ObservableObject {
         pencilSharpenerImage = nil
         stopTimer()
         runner.finishProcess(returnValue: returnValue)
+        settle()
+    }
+
+    private func updateCodeNotice() {
+        guard var process = codeNotice else { return stopTimer() }
+        let controlFinished = process.phase == .waitingForExitControl
+        let effects = process.update(pageTouch: pendingCodeNoticeTouch,
+                                     exitControlFinished: controlFinished)
+        pendingCodeNoticeTouch = nil
+        for effect in effects {
+            switch effect {
+            case .returned:
+                break
+            }
+        }
+        codeNotice = process
+        guard let result = process.result else { return }
+        codeNotice = nil
+        codeNoticeImage = nil
+        codeNoticeCaption = nil
+        pendingCodeNoticeTouch = nil
+        stopTimer()
+        runner.finishProcess(returnValue: result)
         settle()
     }
 
@@ -2852,6 +3255,15 @@ public final class OriginalPlaySession: ObservableObject {
                 case .dragging(true): try? audio.ensureOriginalEffect(archiveID: 0, entryID: 44)
                 case .dragging(false):
                     _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 44, fadeFrames: 5))
+                case .followupInteractionRequired:
+                    labelPeel = nil
+                    labelPeelImage = nil
+                    labelPeelRenderer = nil
+                    labelPeelTouch = nil
+                    labelPeelScreenEffects = OriginalScreenEffects()
+                    stopTimer()
+                    runner.halt("The wine-label follow-up interaction is not recovered")
+                    return settle()
                 case .completed(let result):
                     labelPeel = nil
                     labelPeelImage = nil
@@ -2870,6 +3282,60 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
 
+    private func updateAfterConfess() {
+        guard var process = afterConfess else { return }
+        let previousPhase = process.phase
+        let completed = process.update()
+        afterConfess = process
+        if completed {
+            afterConfess = nil
+            afterConfessTouchImage = nil
+            afterConfessUpperImage = nil
+            afterConfessRenderer = nil
+            stopTimer()
+            runner.finishProcess(returnValue: process.resultValue ?? OriginalAfterConfessProcess.result)
+            settle()
+            return
+        }
+        if process.phase != previousPhase,
+           let pages = afterConfessRenderer?.pages(for: process.phase) {
+            afterConfessTouchImage = pages.touch
+            afterConfessUpperImage = pages.upper
+        }
+    }
+
+    private func updateVSScene() {
+        guard var process = vsScene else { return }
+        let completed = process.update()
+        vsScene = process
+        guard completed else { return }
+        vsScene = nil
+        vsSceneImage = nil
+        vsSceneRenderer = nil
+        stopTimer()
+        runner.finishProcess(returnValue: process.resultValue ?? OriginalVSSceneProcess.result)
+        settle()
+    }
+
+    private func updatePicturePeel() {
+        guard var process = picturePeel, let renderer = picturePeelRenderer else { return }
+        let previous = process
+        let effects = process.update(touch: picturePeelTouch)
+        picturePeel = process
+        do {
+            for effect in effects {
+                if case .sound(let archive, let entry) = effect {
+                    if let originalEffectPlayer { originalEffectPlayer(archive, entry) }
+                    else { try? audio.ensureOriginalEffect(archiveID: archive, entryID: entry) }
+                }
+            }
+            if previous != process { picturePeelImage = try renderer.render(process) }
+        } catch {
+            runner.halt("The picture peel could not be updated: \(error)")
+            settle()
+        }
+    }
+
     private func updateChristmasTree() {
         guard var process = christmasTree else { return }
         let fadeComplete = !christmasTreeScreenEffects.brightness[0].active
@@ -2884,13 +3350,14 @@ public final class OriginalPlaySession: ObservableObject {
                 case .fadeOut(let updates):
                     try christmasTreeScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
                 case .completed(let result):
+                    let decorationOrder = process.arrangement.encodedOrder
                     christmasTree = nil
                     christmasTreeImage = nil
                     christmasTreeRenderer = nil
                     christmasTreeDraggedDecoration = nil
                     christmasTreeScreenEffects = OriginalScreenEffects()
                     stopTimer()
-                    runner.finishChristmasTree(returnValue: result)
+                    runner.finishChristmasTree(returnValue: result, decorationOrder: decorationOrder)
                     return settle()
                 }
             }
@@ -2907,6 +3374,36 @@ public final class OriginalPlaySession: ObservableObject {
         let effects = process.update(fadeComplete: fadeComplete)
         searchShed = process
         applySearchShed(effects)
+    }
+
+    private func updateBagSearch() {
+        guard var process = bagSearch else { return }
+        let fadeComplete = !bagSearchScreenEffects.brightness[0].active
+        bagSearchScreenEffects.advanceOriginalFrame()
+        let effects = process.update(fadeComplete: fadeComplete)
+        bagSearch = process
+        do {
+            for effect in effects {
+                switch effect {
+                case .fadeOut(let updates):
+                    try bagSearchScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2,
+                                                               from: 0, frames: UInt16(updates))
+                case .completed(let result):
+                    bagSearch = nil
+                    bagSearchImage = nil
+                    bagSearchRenderer = nil
+                    bagSearchTouch = nil
+                    bagSearchScreenEffects = OriginalScreenEffects()
+                    stopTimer()
+                    runner.finishProcess(returnValue: result)
+                    return settle()
+                }
+            }
+            if let renderer = bagSearchRenderer { bagSearchImage = try renderer.render(process) }
+        } catch {
+            runner.halt("The tree-box search could not be updated: \(error)")
+            settle()
+        }
     }
 
     private func applySearchShed(_ effects: [OriginalSearchShedProcess.Effect]) {
@@ -3043,7 +3540,7 @@ public final class OriginalPlaySession: ObservableObject {
         settle()
     }
 
-    /// One update of process 25. Status 2 hands the result to the event runner.
+    /// Advances a sign-card process. Status 2 hands the result to the event runner.
     private func updateSign() {
         guard var current = signProcess else { return }
         let input = OriginalSignProcess.Input(heldTouch: heldTouch.map { .init(x: $0.x, y: $0.y) },

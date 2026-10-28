@@ -57,6 +57,79 @@ final class OriginalTextureTests: XCTestCase {
         }
     }
 
+    func testChapterTenPicturePeelAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        for name in ["bg1", "bg2", "pic", "pic_sample"] {
+            let texture = try library.loadTexture(path: "trick/picturepeel/\(name).bin")
+            XCTAssertGreaterThan(texture.logicalWidth, 0, name)
+            XCTAssertGreaterThan(texture.logicalHeight, 0, name)
+            XCTAssertFalse(texture.rgba.isEmpty, name)
+        }
+    }
+
+    func testChapterTenTypewriterAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        for name in ["bg_1", "bg_2", "dial"] {
+            let texture = try library.loadTexture(path: "trick/typewriter/\(name).bin")
+            XCTAssertEqual(texture.storedWidth, name == "dial" ? 1024 : 256, name)
+            XCTAssertEqual(texture.storedHeight, name == "dial" ? 32 : 192, name)
+            XCTAssertFalse(texture.rgba.isEmpty, name)
+        }
+    }
+
+    func testChapterTenBrickWallAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        let expectedDimensions = [
+            "bgrenga": (256, 192), "siku": (32, 16), "sita": (32, 16),
+            "soku": (32, 16), "soku2": (32, 16), "soku3": (32, 16), "soku4": (32, 16)
+        ]
+
+        for (name, expected) in expectedDimensions {
+            let texture = try library.loadTexture(path: "trick/brick/\(name).bin")
+            XCTAssertEqual(texture.logicalWidth, expected.0, name)
+            XCTAssertEqual(texture.logicalHeight, expected.1, name)
+            XCTAssertFalse(texture.rgba.isEmpty, name)
+        }
+    }
+
+    func testChapterTenAfterConfessAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        let dimensions = [
+            "AC_01L": (256, 256), "AC_01R1": (256, 96), "AC_01R2": (128, 256),
+            "AC_02L1": (256, 192), "AC_02L2": (128, 128), "AC_02R": (256, 192),
+            "AC_03L1": (256, 192), "AC_03L2": (128, 128)
+        ]
+
+        for (name, expected) in dimensions {
+            let texture = try library.loadTexture(path: "show/AfterConfess/\(name).bin")
+            XCTAssertEqual(texture.logicalWidth, expected.0, name)
+            XCTAssertEqual(texture.logicalHeight, expected.1, name)
+            XCTAssertFalse(texture.rgba.isEmpty, name)
+        }
+    }
+
+    func testChapterTenVSSceneAssetsDecodeAsOriginalTextures() throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        let dimensions = [
+            "ED02_01": (256, 171), "ED02_02": (256, 480), "ED02_03": (256, 108),
+            "ED04_01": (256, 192), "ED04_02": (256, 288), "ED05_01": (256, 256),
+            "ED06_1": (256, 192), "ED06_2": (256, 192),
+            "ED08_1": (256, 256), "ED08_2": (256, 256),
+            "ED08_3": (256, 256), "ED08_4": (256, 256),
+            "ED_A_01L": (256, 192), "ED_A_01L1": (256, 256), "ED_A_01L2": (256, 256),
+            "ED_A_03L": (256, 192), "ED_A_03R": (256, 192),
+            "ED_A_04L": (256, 192), "ED_A_04L2": (256, 192), "ED_A_04R": (256, 192),
+            "ED_A_05L": (256, 192), "ED_A_05R": (256, 192), "Reserve": (256, 128)
+        ]
+
+        for (name, expected) in dimensions {
+            let texture = try library.loadTexture(path: "show/VSScene/\(name).bin")
+            XCTAssertEqual(texture.storedWidth, expected.0, name)
+            XCTAssertEqual(texture.storedHeight, expected.1, name)
+            XCTAssertFalse(texture.rgba.isEmpty, name)
+        }
+    }
+
     func testChapterSevenChristmasTreeAssetsDecodeAsOriginalTextures() throws {
         let library = try OriginalBitmapLibrary.bundled()
         let names = ["tree", "tree_s"] + (1...11).map { String(format: "kazari%02d", $0) }

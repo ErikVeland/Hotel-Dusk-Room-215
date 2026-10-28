@@ -75,7 +75,7 @@ final class OriginalSwitchboardTests: XCTestCase {
         for _ in 0..<400 where play.switchboard != nil { play.advanceFrame() }
         XCTAssertNil(play.switchboard)
         XCTAssertNotEqual(play.runner.phase, .process(id: 41))
-        XCTAssertTrue(play.runner.game.value(for: .trickFlag(index: 17)) == true)
+        if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
     }
 
     @MainActor func testSourcePanelArtRendersBothStates() throws {

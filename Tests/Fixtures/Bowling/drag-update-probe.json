@@ -1,0 +1,972 @@
+{
+  "kind": "modified-checkpoint bowling held-drag helper trace",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "14654604720ea8dfb602d70e8bc28a0062fc1113545edeaf7d085f3938d6b697",
+  "commandsSHA256": "1ed8cb91d1715dbd2496194bace796d2702fb15206120b96e05c77a542285ef5",
+  "captureMethod": "Read-only ARM9 entry trace for 01FF8920 in the local MelonDS reference runner. R1 is the lane-plane point after projection and clamp; R2 is the live ball transform; the helper result is R1 minus R2.",
+  "initialBallTransformFixed20_12": [
+    0,
+    1556,
+    10240
+  ],
+  "initialPositionTargetFixed20_12": [
+    -427,
+    1556,
+    11117
+  ],
+  "touchPath": "Modified Chapter 8 ready checkpoint. Touch (15, 90), hold eight frames, then move in eight-pixel steps through X=119 at Y=90 and finally to X=125, holding each point for eight frames.",
+  "samples": [
+    {
+      "touchPointFixed20_12": [
+        -427,
+        3145,
+        11117
+      ],
+      "ballTransformBeforeFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "sourceDeltaFixed20_12": [
+        -427,
+        1589,
+        877
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -427,
+        3145,
+        11117
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -107,
+        1556,
+        10459
+      ],
+      "sourceDeltaFixed20_12": [
+        -320,
+        1589,
+        658
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -427,
+        3145,
+        11117
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -187,
+        1556,
+        10623
+      ],
+      "sourceDeltaFixed20_12": [
+        -240,
+        1589,
+        494
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -427,
+        3145,
+        11117
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -247,
+        1556,
+        10746
+      ],
+      "sourceDeltaFixed20_12": [
+        -180,
+        1589,
+        371
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -292,
+        1556,
+        10838
+      ],
+      "sourceDeltaFixed20_12": [
+        -173,
+        1339,
+        -815
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -326,
+        1556,
+        10907
+      ],
+      "sourceDeltaFixed20_12": [
+        -139,
+        1339,
+        -884
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -352,
+        1556,
+        10959
+      ],
+      "sourceDeltaFixed20_12": [
+        -113,
+        1339,
+        -936
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -381,
+        1556,
+        10725
+      ],
+      "sourceDeltaFixed20_12": [
+        -84,
+        1339,
+        -702
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -402,
+        1556,
+        10549
+      ],
+      "sourceDeltaFixed20_12": [
+        -63,
+        1339,
+        -526
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -418,
+        1556,
+        10417
+      ],
+      "sourceDeltaFixed20_12": [
+        -47,
+        1339,
+        -394
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -430,
+        1556,
+        10318
+      ],
+      "sourceDeltaFixed20_12": [
+        -35,
+        1339,
+        -295
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -465,
+        2895,
+        10023
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -439,
+        1556,
+        10244
+      ],
+      "sourceDeltaFixed20_12": [
+        -26,
+        1339,
+        -221
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -446,
+        1556,
+        10188
+      ],
+      "sourceDeltaFixed20_12": [
+        -62,
+        1181,
+        -1307
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -451,
+        1556,
+        10146
+      ],
+      "sourceDeltaFixed20_12": [
+        -57,
+        1181,
+        -1265
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -455,
+        1556,
+        10115
+      ],
+      "sourceDeltaFixed20_12": [
+        -53,
+        1181,
+        -1234
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -469,
+        1556,
+        9806
+      ],
+      "sourceDeltaFixed20_12": [
+        -39,
+        1181,
+        -925
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -479,
+        1556,
+        9574
+      ],
+      "sourceDeltaFixed20_12": [
+        -29,
+        1181,
+        -693
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -487,
+        1556,
+        9400
+      ],
+      "sourceDeltaFixed20_12": [
+        -21,
+        1181,
+        -519
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -493,
+        1556,
+        9270
+      ],
+      "sourceDeltaFixed20_12": [
+        -15,
+        1181,
+        -389
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -508,
+        2737,
+        8881
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -497,
+        1556,
+        9172
+      ],
+      "sourceDeltaFixed20_12": [
+        -11,
+        1181,
+        -291
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -500,
+        1556,
+        9099
+      ],
+      "sourceDeltaFixed20_12": [
+        -16,
+        1677,
+        -570
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -502,
+        1556,
+        9044
+      ],
+      "sourceDeltaFixed20_12": [
+        -14,
+        1677,
+        -515
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -504,
+        1556,
+        9003
+      ],
+      "sourceDeltaFixed20_12": [
+        -12,
+        1677,
+        -474
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -507,
+        1556,
+        8884
+      ],
+      "sourceDeltaFixed20_12": [
+        -9,
+        1677,
+        -355
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -510,
+        1556,
+        8795
+      ],
+      "sourceDeltaFixed20_12": [
+        -6,
+        1677,
+        -266
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -512,
+        1556,
+        8728
+      ],
+      "sourceDeltaFixed20_12": [
+        -4,
+        1677,
+        -199
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -513,
+        1556,
+        8678
+      ],
+      "sourceDeltaFixed20_12": [
+        -3,
+        1677,
+        -149
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -516,
+        3233,
+        8529
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -514,
+        1556,
+        8640
+      ],
+      "sourceDeltaFixed20_12": [
+        -2,
+        1677,
+        -111
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -515,
+        1556,
+        8612
+      ],
+      "sourceDeltaFixed20_12": [
+        -45,
+        1676,
+        -1276
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -516,
+        1556,
+        8591
+      ],
+      "sourceDeltaFixed20_12": [
+        -44,
+        1676,
+        -1255
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -516,
+        1556,
+        8575
+      ],
+      "sourceDeltaFixed20_12": [
+        -44,
+        1676,
+        -1239
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -527,
+        1556,
+        8265
+      ],
+      "sourceDeltaFixed20_12": [
+        -33,
+        1676,
+        -929
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -536,
+        1556,
+        8032
+      ],
+      "sourceDeltaFixed20_12": [
+        -24,
+        1676,
+        -696
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -542,
+        1556,
+        7858
+      ],
+      "sourceDeltaFixed20_12": [
+        -18,
+        1676,
+        -522
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -547,
+        1556,
+        7727
+      ],
+      "sourceDeltaFixed20_12": [
+        -13,
+        1676,
+        -391
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -560,
+        3232,
+        7336
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -551,
+        1556,
+        7629
+      ],
+      "sourceDeltaFixed20_12": [
+        -9,
+        1676,
+        -293
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -554,
+        1556,
+        7555
+      ],
+      "sourceDeltaFixed20_12": [
+        -81,
+        1283,
+        -2318
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -556,
+        1556,
+        7500
+      ],
+      "sourceDeltaFixed20_12": [
+        -79,
+        1283,
+        -2263
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -557,
+        1556,
+        7459
+      ],
+      "sourceDeltaFixed20_12": [
+        -78,
+        1283,
+        -2222
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -577,
+        1556,
+        6903
+      ],
+      "sourceDeltaFixed20_12": [
+        -58,
+        1283,
+        -1666
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -592,
+        1556,
+        6486
+      ],
+      "sourceDeltaFixed20_12": [
+        -43,
+        1283,
+        -1249
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -603,
+        1556,
+        6173
+      ],
+      "sourceDeltaFixed20_12": [
+        -32,
+        1283,
+        -936
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -611,
+        1556,
+        5939
+      ],
+      "sourceDeltaFixed20_12": [
+        -24,
+        1283,
+        -702
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -635,
+        2839,
+        5237
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -617,
+        1556,
+        5763
+      ],
+      "sourceDeltaFixed20_12": [
+        -18,
+        1283,
+        -526
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -622,
+        1556,
+        5631
+      ],
+      "sourceDeltaFixed20_12": [
+        -57,
+        1528,
+        -1666
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -626,
+        1556,
+        5532
+      ],
+      "sourceDeltaFixed20_12": [
+        -53,
+        1528,
+        -1567
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -629,
+        1556,
+        5458
+      ],
+      "sourceDeltaFixed20_12": [
+        -50,
+        1528,
+        -1493
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -642,
+        1556,
+        5084
+      ],
+      "sourceDeltaFixed20_12": [
+        -37,
+        1528,
+        -1119
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -652,
+        1556,
+        4804
+      ],
+      "sourceDeltaFixed20_12": [
+        -27,
+        1528,
+        -839
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -659,
+        1556,
+        4594
+      ],
+      "sourceDeltaFixed20_12": [
+        -20,
+        1528,
+        -629
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -664,
+        1556,
+        4436
+      ],
+      "sourceDeltaFixed20_12": [
+        -15,
+        1528,
+        -471
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -679,
+        3084,
+        3965
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -668,
+        1556,
+        4318
+      ],
+      "sourceDeltaFixed20_12": [
+        -11,
+        1528,
+        -353
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -757,
+        3023,
+        1772
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -671,
+        1556,
+        4229
+      ],
+      "sourceDeltaFixed20_12": [
+        -86,
+        1467,
+        -2457
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -757,
+        3023,
+        1772
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -673,
+        1556,
+        4163
+      ],
+      "sourceDeltaFixed20_12": [
+        -84,
+        1467,
+        -2391
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -757,
+        3023,
+        1772
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -675,
+        1556,
+        4113
+      ],
+      "sourceDeltaFixed20_12": [
+        -82,
+        1467,
+        -2341
+      ]
+    },
+    {
+      "touchPointFixed20_12": [
+        -757,
+        3023,
+        1772
+      ],
+      "ballTransformBeforeFixed20_12": [
+        -696,
+        1556,
+        3527
+      ],
+      "sourceDeltaFixed20_12": [
+        -61,
+        1467,
+        -1755
+      ]
+    }
+  ]
+}

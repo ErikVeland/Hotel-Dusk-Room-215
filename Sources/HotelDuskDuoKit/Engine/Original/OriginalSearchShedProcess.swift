@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 /**
- * Owns the recovered object positions and completion rule for overlay 30.
+ * Owns the recovered object positions and completion rule for overlay 40.
  * Touch projection and scene drawing stay at the renderer boundary.
  */
 public struct OriginalSearchShedProcess: Equatable, Sendable {
@@ -86,8 +86,8 @@ public struct OriginalSearchShedProcess: Equatable, Sendable {
     public mutating func openFoundBox() -> [Effect] {
         guard canOpenFoundBox else { return [] }
         phase = .exiting
-        result = 2
-        return [.completed(2)]
+        result = 0
+        return [.completed(0)]
     }
 
     public mutating func openMenu() {
@@ -97,7 +97,7 @@ public struct OriginalSearchShedProcess: Equatable, Sendable {
     }
 
     /**
-     * Advances the source fade and returns overlay result 2 after the menu exit.
+     * Advances the source fade and returns process result 0 after the menu exit.
      */
     public mutating func update(fadeComplete: Bool = false) -> [Effect] {
         guard result == nil else { return [] }
@@ -107,8 +107,8 @@ public struct OriginalSearchShedProcess: Equatable, Sendable {
                 return [.fadeOut(60)]
             }
             if fadeComplete {
-                result = 2
-                return [.completed(2)]
+                result = 0
+                return [.completed(0)]
             }
             return []
         }

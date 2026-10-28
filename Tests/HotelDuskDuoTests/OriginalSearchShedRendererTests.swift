@@ -23,4 +23,41 @@ final class OriginalSearchShedRendererTests: XCTestCase {
             XCTAssertTrue(CGImageDestinationFinalize(destination))
         }
     }
+
+    @MainActor func testVisibleBoxMeshesProvideObjectHitMasks() throws {
+        let model = try OriginalModelLibrary.bundled().load(path: "trick/searchshed/soko.mdf")
+        var process = OriginalSearchShedProcess()
+        _ = process.update()
+        var hitObjects = Set<Int>()
+        for y in stride(from: 4, to: 256, by: 8) {
+            for x in stride(from: 4, to: 192, by: 8) {
+                if let object = OriginalSearchShedRenderer.object(
+                    at: SIMD2(Float(x), Float(y)), process: process, model: model) {
+                    hitObjects.insert(object)
+                }
+            }
+        }
+
+        XCTAssertGreaterThan(hitObjects.count, 1)
+        XCTAssertTrue(hitObjects.allSatisfy(process.objects.indices.contains))
+
+        for index in process.objects.indices where index != 9 {
+            let position = process.objects[index].position
+            process.beginDrag(object: index, at: SIMD2(position.x, position.z))
+            process.drag(to: SIMD2(position.x + 100, position.z))
+            process.endDrag()
+        }
+        var targetIsSelectable = false
+        for y in stride(from: 4, to: 256, by: 8) {
+            for x in stride(from: 4, to: 192, by: 8) {
+                if OriginalSearchShedRenderer.object(
+                    at: SIMD2(Float(x), Float(y)), process: process, model: model) == 9 {
+                    targetIsSelectable = true
+                    break
+                }
+            }
+            if targetIsSelectable { break }
+        }
+        XCTAssertTrue(targetIsSelectable)
+    }
 }

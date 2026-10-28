@@ -43,7 +43,12 @@ final class OriginalBowlingRenderer {
         let textures = try OriginalTextureLibrary.bundled()
         let bitmaps = try OriginalBitmapLibrary.bundled()
         func texture(_ name: String) throws -> OriginalTexture {
-            try bitmaps.loadTexture(path: "trick/bowling/\(name).bin")
+            let archivedName = [
+                "R119_tenjyo01": "_tenjyo01",
+                "R119_yuka03": "_yuka03",
+                "R119_kabe02_S": "_kabe02_S"
+            ][name] ?? name
+            return try bitmaps.loadTexture(path: "trick/bowling/\(archivedName).bin")
         }
         lane = try OriginalModelMetalPreview(modelPath: "trick/bowling/2Frouka.mdf", models: models,
             textures: textures, device: device, textureLoader: texture)
@@ -58,7 +63,8 @@ final class OriginalBowlingRenderer {
         let view = Self.view(camera: state.camera)
         let camera = viewProjection * view
         let pinInstances = state.pins.filter(\.isActive).map { value in
-            Self.translation(Self.position(value.positionFixed20_12)) * Self.rotationX(value.rotation)
+            Self.translation(Self.position(value.positionFixed20_12)) * Self.rotationY(value.directionAngle)
+                * Self.rotationX(value.rotation)
         }
         let pinNodes = Dictionary(uniqueKeysWithValues: pin.model.nodes.indices.map { ($0, pinInstances) })
         let scene = try OriginalModelMetalPreview.render(width: 256, height: 192,
@@ -112,6 +118,10 @@ final class OriginalBowlingRenderer {
 
     private static func rotationX(_ angle: Float) -> simd_float4x4 {
         simd_float4x4(simd_quatf(angle: angle, axis: SIMD3(1, 0, 0)))
+    }
+
+    private static func rotationY(_ angle: Float) -> simd_float4x4 {
+        simd_float4x4(simd_quatf(angle: angle, axis: SIMD3(0, 1, 0)))
     }
 
     private static func view(camera: OriginalBowlingCameraBasis) -> simd_float4x4 {

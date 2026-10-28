@@ -105,6 +105,21 @@ final class OriginalEventCompletionTests: XCTestCase {
         XCTAssertNotNil(completion.transition)
     }
 
+    func testChapterSevenBagProcessResultTwoSelectsItsScriptTransition() throws {
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP7_R122")
+        let events = try program.blocks.tables[2].filter {
+            try OriginalEventCompletion.embeddedProcessID(event: $0) == 55
+        }
+        XCTAssertEqual(events.count, 1)
+        let event = try XCTUnwrap(events.first)
+
+        guard case .completed(let completion) = try OriginalEventCompletion.stateOnlyExit(
+            event: event, conditions: program.conditions, processReturn: 2) else {
+            return XCTFail("The bag process result must select its original event transition")
+        }
+        XCTAssertNotNil(completion.transition)
+    }
+
     func testChapterEightBowlingProcessHasRecoveredReturnTransitions() throws {
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP8_R119")
         let events = try program.blocks.tables[2].filter {
@@ -125,7 +140,7 @@ final class OriginalEventCompletionTests: XCTestCase {
         }
     }
 
-    func testChapterEightCassetteDeckProcessHasRecoveredReturnTransitions() throws {
+    func testChapterEightBowlingProcess52HasRecoveredReturnTransitions() throws {
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP8_R114")
         let events = try program.blocks.tables[2].filter {
             try OriginalEventCompletion.embeddedProcessID(event: $0) == 52
@@ -136,7 +151,7 @@ final class OriginalEventCompletionTests: XCTestCase {
         for (result, expectedEvent) in [(Int16(0), UInt16(16)), (1, 17), (2, 17), (3, 18)] {
             guard case .completed(let completion) = try OriginalEventCompletion.stateOnlyExit(
                 event: event, conditions: program.conditions, processReturn: result) else {
-                return XCTFail("Cassette deck result \(result) must select an original transition")
+                return XCTFail("Bowling result \(result) must select an original transition")
             }
             XCTAssertEqual(completion.transition?.sourceOffset, 832 + Int(result) * 16)
             XCTAssertEqual(completion.transition?.sceneID, UInt16.max - 1)

@@ -10,13 +10,14 @@ The cashbox shares overlay 10 wheel motion with process 31. Its source target is
 path returns without the office cabinet's drawer sequence. The host selects the
 original cashbox dial and cabinet textures.
 
-`tools/capture_cashbox_component.py` requests process 80 in an isolated original
-walking checkpoint, then turns each wheel with stylus input. It does not write a
-puzzle outcome or instance field. `Tests/Fixtures/Cashbox/source-trace.json` retains
+`tools/capture_cashbox_component.py` loads an isolated cashbox checkpoint, then
+turns each wheel with stylus input. It does not write a puzzle outcome or instance field. `Tests/Fixtures/Cashbox/source-trace.json` retains
 15 original states and the ROM/input hashes. The native test compares angles,
 positions, selections, return values and targets against these states. A separate
-native test enters the original Chapter 10 event and solves the wheels through the
-session's touch API, verifying puzzle flag 56 and the retained value.
+native test enters process 80 from `EP10_R301` and solves the wheels through the
+session's touch API, verifying puzzle flag 56 and the retained value. Its
+session check skips on hosts without Metal. Full route play and comparison with
+the original ending remain open.
 
 ## Coin cross, process 51
 

@@ -52,11 +52,10 @@ def snapshot(data, base):
         "roundIndex": struct.unpack_from("<h", data, base + 0x9AE)[0],
         "pinCollisionRadiusFloat": struct.unpack_from("<f", data, 0x02204D90 - 0x02000000)[0],
         "cameraMatrix": list(struct.unpack_from("<16i", data, base + 0x2B4)),
-        # 0x021FDA10 copies both blocks to a 24-word stack buffer immediately
-        # before calling 0x02202F88. Keep the source bytes intact while the
-        # decompiler's fifth-argument layout and vertex stride remain unclear.
-        "dragHitTestInputBlock498Words": list(struct.unpack_from("<24I", data, base + 0x498)),
-        "dragHitTestInputBlock4F8Words": list(struct.unpack_from("<24I", data, base + 0x4F8)),
+        # Preserve both live transform blocks used by the touch hit tests and
+        # held-drag calculation.
+        "sourceTransformBlock498Words": list(struct.unpack_from("<24I", data, base + 0x498)),
+        "sourceTransformBlock4F8Words": list(struct.unpack_from("<24I", data, base + 0x4F8)),
         "modelTransform468Words": list(struct.unpack_from("<6I", data, base + 0x468)),
         "modelTransform4A0Words": list(struct.unpack_from("<6I", data, base + 0x4A0)),
         "drawParameters448Words": list(struct.unpack_from("<8I", data, base + 0x448)),
@@ -74,6 +73,7 @@ def pin_state(data, base, index):
         "positionFixed20_12": list(position),
         "motionFixed20_12": list(motion),
         "rotationFloat": struct.unpack_from("<f", data, pin + 0x3C)[0],
+        "directionAngleFloat": struct.unpack_from("<f", data, pin + 0x44)[0],
         "angularVelocityFloat": struct.unpack_from("<f", data, pin + 0x48)[0],
         "needsUpdate": data[pin + 0x5C] != 0,
         "active": data[pin + 0x5D] != 0,
@@ -157,10 +157,16 @@ def capture_camera_input_trace(ready_checkpoint):
     states = {}
     names = ("ready", "down", "drag-47", "drag-79", "drag-111", "drag-119", "drag-125",
              "released", *(f"roll-{frame}" for frame in range(2, 41)), "roll-60", "roll-180")
+    raw_touch_points = {
+        "down": [15, 90], "drag-47": [47, 90], "drag-79": [79, 90],
+        "drag-111": [111, 90], "drag-119": [119, 90], "drag-125": [125, 90],
+        "released": [125, 90],
+    }
     for name in names:
         data = (trace / f"{name}-ram.bin").read_bytes()
         base = find_process(data, 0x021FD530)
         states[name] = {
+            "rawTouchPoint": raw_touch_points.get(name),
             "stage": struct.unpack_from("<h", data, base + 0x2AC)[0],
             "substage": struct.unpack_from("<h", data, base + 0x2AE)[0],
             "roundIndex": struct.unpack_from("<h", data, base + 0x9AE)[0],
@@ -172,6 +178,8 @@ def capture_camera_input_trace(ready_checkpoint):
             "drawParameters480Words": list(struct.unpack_from("<8I", data, base + 0x480)),
             "lanePlaneTemplate20_12": list(struct.unpack_from("<18i", data, base + 0x300)),
             "ballPlaneTemplate20_12": list(struct.unpack_from("<18i", data, base + 0x348)),
+            "laneHitTranslation20_12": list(struct.unpack_from("<3i", data, base + 0x498)),
+            "ballHitTranslation20_12": list(struct.unpack_from("<3i", data, base + 0x4F8)),
             "touchPoint918": list(struct.unpack_from("<3i", data, base + 0x918)),
             "previousTouchPoint924": list(struct.unpack_from("<3i", data, base + 0x924)),
             "dragDelta20_12": list(struct.unpack_from("<6i", data, base + 0x504)),
@@ -191,8 +199,110 @@ def capture_camera_input_trace(ready_checkpoint):
     }
 
 
+def capture_drag_delta_probe(ready_checkpoint):
+    """Capture process input and drag fields at every step of a centred roll."""
+    commands = [f"load {ready_checkpoint}", "capture ready", "touch 15 90", "frames 8", "capture down"]
+    samples = [("down", None)]
+    for x in range(23, 120, 8):
+        name = f"x-{x}"
+        commands += [f"touch {x} 90", "frames 8", f"capture {name}"]
+        samples.append((name, [x, 90]))
+    commands += ["touch 125 90", "frames 8", "capture x-125"]
+    samples.append(("x-125", [125, 90]))
+    trace = run("component-bowling-drag-delta-probe", commands)
+    states = {}
+    for name, raw_touch in samples:
+        data = (trace / f"{name}-ram.bin").read_bytes()
+        base = find_process(data, 0x021FD530)
+        states[name] = {
+            "rawTouchPoint": raw_touch,
+            "touchPoint918": list(struct.unpack_from("<3i", data, base + 0x918)),
+            "previousTouchPoint924": list(struct.unpack_from("<3i", data, base + 0x924)),
+            "ballPlaneTranslation20_12": list(struct.unpack_from("<3i", data, base + 0x4F8)),
+            "dragDelta20_12": list(struct.unpack_from("<6i", data, base + 0x504)),
+            "cameraMatrix": list(struct.unpack_from("<16i", data, base + 0x2B4)),
+        }
+    return {
+        "kind": "modified-checkpoint isolated bowling drag-delta probe",
+        "romSHA256": digest(ROM),
+        "checkpointSHA256": digest(ready_checkpoint),
+        "commandsSHA256": digest(trace / "commands.txt"),
+        "touchPath": "Press at (15, 90), then move in eight-pixel horizontal steps through (119, 90), then (125, 90), holding each point for eight frames.",
+        "states": states,
+    }
+
+
+def capture_projection_sweep(ready_checkpoint):
+    """Capture source touch state for isolated points on one horizontal drag."""
+    process_base = 0x02310020
+    fields = {
+        "cameraMatrix": (0x2B4, 16),
+        "processStageAndSubstage": (0x2AC, 1),
+        "touchFlagsAndSelection": (0x2F8, 2),
+        "ballTransformFixed20_12": (0x4F8, 3),
+        "laneTransformFixed20_12": (0x498, 3),
+        "dragDeltaFixed20_12": (0x504, 6),
+        "touchPointFixed20_12": (0x918, 3),
+        "previousTouchPointFixed20_12": (0x924, 3),
+    }
+    sample_xs = list(range(15, 80)) + [87]
+    commands = [f"load {ready_checkpoint}", "capture ready"]
+    for raw_x in sample_xs:
+        commands += [f"load {ready_checkpoint}", "touch 15 90", "frames 8"]
+        last_x = 15
+        for step_x in range(23, raw_x + 1, 8):
+            commands += [f"touch {step_x} 90", "frames 8"]
+            last_x = step_x
+        if last_x != raw_x:
+            commands += [f"touch {raw_x} 90", "frames 8"]
+        for offset, count in fields.values():
+            commands.extend(f"peek32 {process_base + offset + index * 4:08x}"
+                            for index in range(count))
+        commands.append("peek32 020fd864")
+
+    trace = run("component-bowling-projection-sweep", commands)
+    ready_data = (trace / "ready-ram.bin").read_bytes()
+    actual_base = find_process(ready_data, 0x021FD530)
+    if actual_base != process_base - 0x02000000:
+        raise ValueError(f"Bowling process moved from expected base: {actual_base:#x}")
+
+    peeks = []
+    for line in (trace / "runner.log").read_text().splitlines():
+        parts = line.split()
+        if len(parts) == 3 and parts[0] == "peek32":
+            value = int(parts[2], 16)
+            peeks.append(value - 0x1_0000_0000 if value >= 0x8000_0000 else value)
+    values_per_sample = sum(count for _, count in fields.values()) + 1
+    expected_peeks = len(sample_xs) * values_per_sample
+    if len(peeks) != expected_peeks:
+        raise ValueError(f"Expected {expected_peeks} process values, got {len(peeks)}")
+
+    samples = []
+    stride = values_per_sample
+    for sample_index, raw_x in enumerate(sample_xs):
+        values = peeks[sample_index * stride:(sample_index + 1) * stride]
+        cursor = 0
+        sample = {"rawTouchX": raw_x}
+        for name, (_, count) in fields.items():
+            sample[name] = values[cursor:cursor + count]
+            cursor += count
+        sample["touchInputWord"] = values[cursor]
+        samples.append(sample)
+
+    return {
+        "kind": "modified-checkpoint bowling isolated horizontal touch-path sweep",
+        "romSHA256": digest(ROM),
+        "checkpointSHA256": digest(ready_checkpoint),
+        "commandsSHA256": digest(trace / "commands.txt"),
+        "processBase": f"0x{process_base:08x}",
+        "rawTouchY": 90,
+        "captureMethod": "For each X from 15 through 79, plus 87, reload the ready checkpoint, press at (15, 90), and repeat the captured eight-frame drag steps through X. Read-only process fields; no memory writes.",
+        "samples": samples,
+    }
+
+
 def capture_turn_phase_probe(ready_checkpoint):
-    """Capture one isolated roll as the bowling controller changes phases."""
+    """Capture one isolated roll through the score dialogue and throw handoff."""
     frame_samples = [(180, "after-roll"), (1, "roll-plus-1"), (2, "roll-plus-3"),
                      (7, "roll-plus-10"), (20, "roll-plus-30"), (30, "roll-plus-60"),
                      (60, "roll-plus-120"), (120, "roll-plus-240"),
@@ -203,9 +313,39 @@ def capture_turn_phase_probe(ready_checkpoint):
     commands += ["touch 125 90", "frames 8", "release"]
     for frames, name in frame_samples:
         commands += [f"frames {frames}", f"capture {name}"]
-    commands += ["keys ffe", "frames 2", "keys fff", "frames 121",
-                 "capture player-dialogue-continued", "keys ffe", "frames 2", "keys fff",
-                 "frames 300", "capture louie-turn"]
+    dialogue_samples = [f"dialogue-advance-{index:02d}" for index in range(1, 4)]
+    for name in dialogue_samples:
+        commands += ["keys ffe", "frames 2", "keys fff", "frames 90", f"capture {name}"]
+    commands += ["frames 300", "capture next-throw-ready"]
+    dialogue_samples.append("next-throw-ready")
+    commands += ["touch 15 90", "frames 8"]
+    for x in range(23, 120, 8):
+        commands += [f"touch {x} 90", "frames 8"]
+    commands += ["touch 125 90", "frames 8", "release", "frames 300",
+                 "capture second-roll-300", "frames 480", "capture second-roll-780"]
+    second_dialogue_samples = [f"second-dialogue-advance-{index:02d}" for index in range(1, 4)]
+    for name in second_dialogue_samples:
+        commands += ["keys ffe", "frames 2", "keys fff", "frames 90", f"capture {name}"]
+    commands += ["frames 300", "capture after-throw-2"]
+    later_samples = ["after-throw-2"]
+    for throw_index in range(3, 6):
+        commands += ["touch 15 90", "frames 8"]
+        for x in range(23, 120, 8):
+            commands += [f"touch {x} 90", "frames 8"]
+        commands += ["touch 125 90", "frames 8", "release", "frames 780"]
+        roll_name = f"throw-{throw_index}-roll-end"
+        commands.append(f"capture {roll_name}")
+        later_samples.append(roll_name)
+        for advance in range(1, 4):
+            name = f"throw-{throw_index}-dialogue-advance-{advance:02d}"
+            commands += ["keys ffe", "frames 2", "keys fff", "frames 90", f"capture {name}"]
+            later_samples.append(name)
+        result_name = f"after-throw-{throw_index}"
+        commands += ["frames 300", f"capture {result_name}"]
+        later_samples.append(result_name)
+    commands += ["frames 180", "capture completed-process-stage",
+                 "frames 240", "capture after-result-phase"]
+    later_samples += ["completed-process-stage", "after-result-phase"]
 
     trace = run("component-bowling-turn-phase-probe", commands)
     states = {}
@@ -227,7 +367,8 @@ def capture_turn_phase_probe(ready_checkpoint):
             "pinRotations": [struct.unpack_from("<f", data, base + 0x594 + index * 0x60)[0]
                              for index in range(PIN_COUNT)],
         }
-    for name in ("player-dialogue-continued", "louie-turn"):
+    for name in (dialogue_samples + ["second-roll-300", "second-roll-780"]
+                 + second_dialogue_samples + later_samples):
         data = (trace / f"{name}-ram.bin").read_bytes()
         base = find_process(data, 0x021FD530)
         states[name] = {
@@ -247,12 +388,12 @@ def capture_turn_phase_probe(ready_checkpoint):
         }
     return {
         "schemaVersion": 1,
-        "kind": "modified-checkpoint one-roll phase trace",
-        "note": "This isolated process capture records controller phases after one ball roll. It does not establish a complete bowling turn or normal Chapter 8 route.",
+        "kind": "modified-checkpoint bowling early-finish trace",
+        "note": "This isolated process capture records five interleaved throws and the source early-finish condition. The decompiled overlay returns result 2 after its completion cue, but this trace does not capture that terminal return or establish the normal Chapter 8 route.",
         "romSHA256": digest(ROM),
         "checkpointSHA256": digest(ready_checkpoint),
         "commandsSHA256": digest(trace / "inputs.txt"),
-        "touchPath": "Press at (15,90), move in eight-pixel steps through X 119, touch (125,90), then release.",
+        "touchPath": "For each throw, press at (15,90), move in eight-pixel steps through X 119, touch (125,90), then release.",
         "states": states,
     }
 
@@ -412,7 +553,21 @@ def main():
     parser.add_argument("--reuse-walking-base", action="store_true")
     parser.add_argument("--pin-collision-only", action="store_true")
     parser.add_argument("--turn-phase-probe", action="store_true")
+    parser.add_argument("--drag-delta-probe", action="store_true")
+    parser.add_argument("--projection-sweep", action="store_true")
     args = parser.parse_args()
+    if args.projection_sweep:
+        checkpoint = ROOT / "extracted/reference/component-bowling/ready.mln"
+        fixture = ROOT / "Tests/Fixtures/Bowling/projection-sweep.json"
+        fixture.write_text(json.dumps(capture_projection_sweep(checkpoint), indent=2) + "\n")
+        print(f"Captured the isolated bowling projection sweep in {fixture}")
+        return
+    if args.drag_delta_probe:
+        checkpoint = ROOT / "extracted/reference/component-bowling/ready.mln"
+        fixture = ROOT / "Tests/Fixtures/Bowling/drag-delta-probe.json"
+        fixture.write_text(json.dumps(capture_drag_delta_probe(checkpoint), indent=2) + "\n")
+        print(f"Captured isolated bowling drag deltas in {fixture}")
+        return
     if args.turn_phase_probe:
         checkpoint = ROOT / "extracted/reference/component-bowling/ready.mln"
         fixture = ROOT / "Tests/Fixtures/Bowling/turn-phase-probe.json"

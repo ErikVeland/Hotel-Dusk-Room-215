@@ -1,10 +1,9 @@
 import Foundation
 
-/// Process 25, overlay 1 (`CSign`): Kyle signs the R102 registration card.
-/// The factory 0x0200B334 case 25 passes slot 0 to 0x0200B2D8; the table at
-/// 0x020E92A4 maps it to overlay 1, constructor 0x021FCB40. Update is
-/// 0x021FCFEC. Resources: `/data/trick/sign.wpf` members `signnote.bin` and
-/// `signnote02.bin`. One update is one DS update; offsets name object fields.
+/// Models the sign-card interaction in overlay 1 for story processes 62 and 63.
+/// Factory cases `0x27` and `0x28` call the sign overlay with variants 1 and 2.
+/// Its update is `0x021FCFEC`; the card art is in `/data/trick/sign.wpf`.
+/// One update is one DS update; offsets name object fields.
 public struct OriginalSignProcess: Equatable, Codable, Sendable {
     public typealias Touch = OriginalBellProcess.Touch
     public typealias Fade = OriginalBellProcess.Fade

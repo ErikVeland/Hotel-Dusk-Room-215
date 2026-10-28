@@ -33,7 +33,7 @@ final class OriginalSearchShedProcessTests: XCTestCase {
         XCTAssertEqual(process.phase, .found)
     }
 
-    func testOpeningTheFoundTreeBoxReturnsTheOriginalProcessResult() {
+    func testOpeningTheFoundTreeBoxReturnsTheOnlyStoryTransitionResult() {
         var process = OriginalSearchShedProcess()
         _ = process.update()
 
@@ -42,20 +42,20 @@ final class OriginalSearchShedProcessTests: XCTestCase {
         _ = process.select(object: 9, targetIsUnobstructed: true)
         XCTAssertTrue(process.canOpenFoundBox)
 
-        XCTAssertEqual(process.openFoundBox(), [.completed(2)])
-        XCTAssertEqual(process.result, 2)
+        XCTAssertEqual(process.openFoundBox(), [.completed(0)])
+        XCTAssertEqual(process.result, 0)
         XCTAssertFalse(process.canOpenFoundBox)
         XCTAssertTrue(process.openFoundBox().isEmpty)
     }
 
-    func testMenuExitReturnsTheOriginalProcessResult() {
+    func testMenuExitReturnsTheOnlyStoryTransitionResult() {
         var process = OriginalSearchShedProcess()
         _ = process.update()
         process.openMenu()
 
         XCTAssertEqual(process.update(), [.fadeOut(60)])
         XCTAssertTrue(process.update().isEmpty)
-        XCTAssertEqual(process.update(fadeComplete: true), [.completed(2)])
-        XCTAssertEqual(process.result, 2)
+        XCTAssertEqual(process.update(fadeComplete: true), [.completed(0)])
+        XCTAssertEqual(process.result, 0)
     }
 }

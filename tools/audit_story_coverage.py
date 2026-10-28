@@ -24,6 +24,8 @@ def audit():
     settle = host.split('private func settle()', 1)[1].split('private func applyAudioControls', 1)[0]
     handlers = {int(value) for match in re.findall(r'\.process\((\d+)\)|id == (\d+)', settle)
                 for value in match if value}
+    unsupported = {int(process) for process in re.findall(
+        r'case \.process\((\d+)\):\s*runner\.halt\(', settle)}
     references = defaultdict(list)
     modes = defaultdict(int)
     chapters = defaultdict(set)
@@ -51,12 +53,15 @@ def audit():
             references[process].append({'program': name[:-4], 'event': event['index'],
                                        'sourceOffset': event['byteOffset']})
     processes = [{'processID': process, 'hasNativeHandler': process in handlers,
+                  'explicitlyUnsupported': process in unsupported,
                   'references': events} for process, events in sorted(references.items())]
     return {'schemaVersion': 1, 'romSHA256': manifest['romSHA256'],
-            'scope': 'Static story process coverage. Does not establish route completion, presentation fidelity, conditions, input fidelity, or optional inventory processes.',
+            'scope': 'Static story process coverage checks handler IDs only. It does not establish factory-resource matching, route completion, presentation fidelity, input fidelity, or optional inventory processes.',
             'nativeHostProcessIDs': sorted(handlers), 'processes': processes,
             'chapters': [{'chapter': chapter, 'requiredProcesses': sorted(ids),
-                          'missingProcesses': sorted(ids - handlers)} for chapter, ids in sorted(chapters.items())],
+                          'missingProcesses': sorted(ids - handlers),
+                          'unsupportedProcesses': sorted(ids & unsupported)}
+                         for chapter, ids in sorted(chapters.items())],
             'eventModeCounts': {str(k): v for k, v in sorted(modes.items())}}
 
 
@@ -66,12 +71,19 @@ def markdown(report):
     lines = ['# Story process coverage', '', report['scope'], '',
              f"The original chapter scripts reference {len(required)} distinct embedded processes. "
              f"{len(missing)} still have no native host handler.", '',
-             '| Chapter | Required process IDs | Missing handlers |', '| --- | --- | --- |']
+             '| Chapter | Required process IDs | Missing handlers | Explicitly unsupported |',
+             '| --- | --- | --- | --- |']
     for chapter in report['chapters']:
         ids = lambda values: ', '.join(map(str, values)) or 'None'
-        lines.append(f"| {chapter['chapter']} | {ids(chapter['requiredProcesses'])} | {ids(chapter['missingProcesses'])} |")
+        lines.append(f"| {chapter['chapter']} | {ids(chapter['requiredProcesses'])} | "
+                     f"{ids(chapter['missingProcesses'])} | {ids(chapter['unsupportedProcesses'])} |")
     lines += ['', '## Missing handlers', '', '| Process | Original references |', '| --- | --- |']
     for process in missing:
+        refs = ', '.join(f"{r['program']} event {r['event']}" for r in process['references'])
+        lines.append(f"| {process['processID']} | {refs} |")
+    unsupported = [p for p in required if p['explicitlyUnsupported']]
+    lines += ['', '## Explicitly unsupported processes', '', '| Process | Original references |', '| --- | --- |']
+    for process in unsupported:
         refs = ', '.join(f"{r['program']} event {r['event']}" for r in process['references'])
         lines.append(f"| {process['processID']} | {refs} |")
     lines += ['', 'Regenerate with `python3 tools/audit_story_coverage.py`.',

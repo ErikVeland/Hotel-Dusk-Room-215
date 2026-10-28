@@ -333,7 +333,6 @@ enum OriginalChapterThreeRouteChecks {
             case .process(38): try repairDoll(play)
             case .process(60): try searchLinenWagon(play)
             case .process(51): try solveCoins(play)
-            case .process(58): try playJukebox(play, record: 25)
             case .process(53), .process(54): try solveMatchsticks(play)
             case .exploration: return
             default: throw OriginalDataError.invalid("Conversation stopped: \(play.runner.phase)")
@@ -435,8 +434,10 @@ enum OriginalChapterThreeRouteChecks {
     static func search(_ play: OriginalPlaySession, node: String, closeupEvent: Int16? = nil, interrupt: Bool = false) throws {
         play.inspectLobbyCounter()
         let counter = try XCTUnwrap(play.lobby)
+        let visible = counter.objectVisibility.visibleNodes(in: counter.counter, map: counter.mapID,
+            area: counter.searchAreaID, game: play.runner.game)
         let points = stride(from: 8, to: 248, by: 4).flatMap { y in stride(from: 8, to: 184, by: 4).map { SIMD2<Float>(Float($0), Float(y)) } }
-        let object = try XCTUnwrap(try points.first { try counter.pickedCounterNode(page: $0) == node }, "No visible \(node)")
+        let object = try XCTUnwrap(try points.first { try counter.pickedCounterNode(page: $0, visibleNodes: visible) == node }, "No visible \(node)")
         play.selectLobbyObject(x: object.x, y: object.y, confirmImmediately: true)
         drain(play, interrupt: interrupt)
         guard let closeupEvent else { return }
@@ -447,8 +448,10 @@ enum OriginalChapterThreeRouteChecks {
     static func useItem(_ play: OriginalPlaySession, _ item: UInt8, on node: String, interrupt: Bool = false) throws {
         if play.lobby?.mode != .counter { play.inspectLobbyCounter() }
         let counter = try XCTUnwrap(play.lobby)
+        let visible = counter.objectVisibility.visibleNodes(in: counter.counter, map: counter.mapID,
+            area: counter.searchAreaID, game: play.runner.game)
         let points = stride(from: 8, to: 248, by: 4).flatMap { y in stride(from: 8, to: 184, by: 4).map { SIMD2<Float>(Float($0), Float(y)) } }
-        let object = try XCTUnwrap(try points.first { try counter.pickedCounterNode(page: $0) == node }, "No visible \(node)")
+        let object = try XCTUnwrap(try points.first { try counter.pickedCounterNode(page: $0, visibleNodes: visible) == node }, "No visible \(node)")
         play.useItemInSearchView(item)
         play.selectLobbyObject(x: object.x, y: object.y, confirmImmediately: true)
         drain(play, interrupt: interrupt)
@@ -617,9 +620,9 @@ enum OriginalChapterThreeRouteChecks {
         drain(play, interrupt: interrupt)
     }
 
-    /// Plays one jukebox record, then leaves the jukebox (process 58).
+    /// Plays one jukebox record, then leaves process 59.
     static func playJukebox(_ play: OriginalPlaySession, record: Int, interrupt: Bool = true) throws {
-        XCTAssertEqual(play.runner.phase, .process(id: 58))
+        XCTAssertEqual(play.runner.phase, .process(id: 59))
         play.advanceFrame()
         XCTAssertNotNil(play.jukebox)
         play.selectJukeboxRecord(record)

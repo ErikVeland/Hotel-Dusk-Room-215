@@ -47,6 +47,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -63,6 +64,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -81,6 +83,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -97,6 +100,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -146,6 +150,7 @@
               200
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -162,6 +167,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -180,6 +186,7 @@
               180
             ],
             "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 4.712388038635254,
             "angularVelocityFloat": 0.03466019034385681,
             "needsUpdate": true,
             "active": true
@@ -196,6 +203,7 @@
               0
             ],
             "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.06533981114625931,
             "needsUpdate": true,
             "active": true
@@ -245,6 +253,7 @@
               160
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -261,6 +270,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -279,6 +289,7 @@
               144
             ],
             "rotationFloat": 6.270913600921631,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.03772815316915512,
             "needsUpdate": true,
             "active": true
@@ -295,6 +306,7 @@
               0
             ],
             "rotationFloat": 0.012271846644580364,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.062271848320961,
             "needsUpdate": true,
             "active": true
@@ -344,6 +356,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -360,6 +373,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -378,6 +392,7 @@
               -180
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -394,6 +409,7 @@
               180
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -443,6 +459,7 @@
               200
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -459,6 +476,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -477,6 +495,7 @@
               0
             ],
             "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.03466019034385681,
             "needsUpdate": true,
             "active": true
@@ -493,6 +512,7 @@
               180
             ],
             "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.06533981114625931,
             "needsUpdate": true,
             "active": true
@@ -542,6 +562,7 @@
               160
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -558,6 +579,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -576,6 +598,7 @@
               0
             ],
             "rotationFloat": 6.270913600921631,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.03772815316915512,
             "needsUpdate": true,
             "active": true
@@ -592,6 +615,7 @@
               180
             ],
             "rotationFloat": 0.012271846644580364,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.062271848320961,
             "needsUpdate": true,
             "active": true
@@ -641,6 +665,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -657,6 +682,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -675,6 +701,7 @@
               -144
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -691,6 +718,7 @@
               144
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -740,6 +768,7 @@
               200
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -756,6 +785,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -774,6 +804,7 @@
               0
             ],
             "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 5.639683723449707,
             "angularVelocityFloat": 0.03466019034385681,
             "needsUpdate": true,
             "active": true
@@ -790,6 +821,7 @@
               144
             ],
             "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.06533981114625931,
             "needsUpdate": true,
             "active": true
@@ -839,6 +871,7 @@
               160
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -855,6 +888,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -873,6 +907,7 @@
               0
             ],
             "rotationFloat": 6.270913600921631,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.03772815316915512,
             "needsUpdate": true,
             "active": true
@@ -889,6 +924,7 @@
               144
             ],
             "rotationFloat": 0.012271846644580364,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.062271848320961,
             "needsUpdate": true,
             "active": true
@@ -938,6 +974,7 @@
               -160
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -954,6 +991,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -972,6 +1010,7 @@
               0
             ],
             "rotationFloat": 0.012271846644580364,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.062271848320961,
             "needsUpdate": true,
             "active": true
@@ -988,6 +1027,7 @@
               -144
             ],
             "rotationFloat": 6.270913600921631,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.03772815316915512,
             "needsUpdate": true,
             "active": true
@@ -1037,6 +1077,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -1053,6 +1094,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -1071,6 +1113,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -1087,6 +1130,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.05000000074505806,
             "needsUpdate": true,
             "active": true
@@ -1136,6 +1180,7 @@
               -200
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -1152,6 +1197,7 @@
               0
             ],
             "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.0,
             "needsUpdate": true,
             "active": true
@@ -1170,6 +1216,7 @@
               0
             ],
             "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 3.1415927410125732,
             "angularVelocityFloat": 0.06533981114625931,
             "needsUpdate": true,
             "active": true
@@ -1186,6 +1233,7 @@
               -180
             ],
             "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
             "angularVelocityFloat": 0.03466019034385681,
             "needsUpdate": true,
             "active": true

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "kind": "modified-checkpoint one-roll phase trace",
-  "note": "This isolated process capture records controller phases after one ball roll. It does not establish a complete bowling turn or normal Chapter 8 route.",
+  "kind": "modified-checkpoint bowling early-finish trace",
+  "note": "This isolated process capture records five interleaved throws and the source early-finish condition. The decompiled overlay returns result 2 after its completion cue, but this trace does not capture that terminal return or establish the normal Chapter 8 route.",
   "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
   "checkpointSHA256": "14654604720ea8dfb602d70e8bc28a0062fc1113545edeaf7d085f3938d6b697",
-  "commandsSHA256": "252ad75474b9314e9f3e1c1a7dedb026ad42f5222bcf9941edcb000f3ea10e6a",
-  "touchPath": "Press at (15,90), move in eight-pixel steps through X 119, touch (125,90), then release.",
+  "commandsSHA256": "e4443fe8119f1d2484c13a1bfaa313907dd6d5ae8cdddfb2ffd3d08976e3f9da",
+  "touchPath": "For each throw, press at (15,90), move in eight-pixel steps through X 119, touch (125,90), then release.",
   "states": {
     "after-roll": {
       "processStage": 2,
@@ -403,7 +403,7 @@
         0.0
       ]
     },
-    "player-dialogue-continued": {
+    "dialogue-advance-01": {
       "processStage": 2,
       "processSubstage": 2,
       "bowlingState": 7,
@@ -447,7 +447,7 @@
         0.0
       ]
     },
-    "louie-turn": {
+    "dialogue-advance-02": {
       "processStage": 2,
       "processSubstage": 2,
       "bowlingState": 7,
@@ -487,6 +487,1106 @@
         0.0,
         1.5707963705062866,
         1.5707963705062866,
+        0.0,
+        0.0
+      ]
+    },
+    "dialogue-advance-03": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 3,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 1,
+      "scores": [
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        0,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "next-throw-ready": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 1,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 1,
+      "scores": [
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        0,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -1740,
+        1556,
+        -10640
+      ],
+      "ballVelocityFixed20_12": [
+        -60,
+        0,
+        -655
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "second-roll-300": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 5,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 1,
+      "scores": [
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        0,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9706,
+        1556,
+        -51798
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "second-roll-780": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 5,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 1,
+      "scores": [
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        0,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9706,
+        1556,
+        -51798
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "second-dialogue-advance-01": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 1,
+      "scores": [
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        0,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9706,
+        1556,
+        -51798
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "second-dialogue-advance-02": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 1,
+      "scores": [
+        6,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        0,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9706,
+        1556,
+        -51798
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "second-dialogue-advance-03": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 3,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 2,
+      "scores": [
+        6,
+        -1,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "after-throw-2": {
+      "processStage": 2,
+      "processSubstage": 1,
+      "bowlingState": 0,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 2,
+      "scores": [
+        6,
+        -1,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-3-roll-end": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 5,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 2,
+      "scores": [
+        6,
+        -1,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9700,
+        1556,
+        -50551
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-3-dialogue-advance-01": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 2,
+      "scores": [
+        6,
+        -1,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9700,
+        1556,
+        -50551
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-3-dialogue-advance-02": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 2,
+      "scores": [
+        6,
+        -1,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9700,
+        1556,
+        -50551
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-3-dialogue-advance-03": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 3,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 3,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "after-throw-3": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 1,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 3,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        1740,
+        1556,
+        -14100
+      ],
+      "ballVelocityFixed20_12": [
+        60,
+        0,
+        -778
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-4-roll-end": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 5,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 3,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        9702,
+        1556,
+        -50556
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0,
+        0.0,
+        1.5707963705062866
+      ]
+    },
+    "throw-4-dialogue-advance-01": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 3,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        9702,
+        1556,
+        -50556
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0,
+        0.0,
+        1.5707963705062866
+      ]
+    },
+    "throw-4-dialogue-advance-02": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 3,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        9702,
+        1556,
+        -50556
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0,
+        0.0,
+        1.5707963705062866
+      ]
+    },
+    "throw-4-dialogue-advance-03": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 3,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 4,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "after-throw-4": {
+      "processStage": 2,
+      "processSubstage": 1,
+      "bowlingState": 0,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 4,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-5-roll-end": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 5,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 4,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9700,
+        1556,
+        -50551
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-5-dialogue-advance-01": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 4,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9700,
+        1556,
+        -50551
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-5-dialogue-advance-02": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 7,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 4,
+      "scores": [
+        6,
+        6,
+        -1,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        -9700,
+        1556,
+        -50551
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        1.5707963705062866,
+        1.5707963705062866,
+        0.0,
+        0.0
+      ]
+    },
+    "throw-5-dialogue-advance-03": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 3,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 5,
+      "scores": [
+        6,
+        6,
+        6,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "after-throw-5": {
+      "processStage": 2,
+      "processSubstage": 2,
+      "bowlingState": 10,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 5,
+      "scores": [
+        6,
+        6,
+        6,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        20091
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "completed-process-stage": {
+      "processStage": 3,
+      "processSubstage": 1,
+      "bowlingState": 0,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": false,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 5,
+      "scores": [
+        6,
+        6,
+        6,
+        5,
+        5,
+        -1
+      ],
+      "roundStatuses": [
+        1,
+        1,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        20091
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "after-result-phase": {
+      "processStage": 1,
+      "processSubstage": 1,
+      "bowlingState": 0,
+      "dialogueRequestId": 0,
+      "dialogueCallbackPending": true,
+      "dialogueCallbackDelay": 0,
+      "throwIndex": 0,
+      "scores": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "roundStatuses": [
+        0,
+        0,
+        0
+      ],
+      "ballPositionFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "ballVelocityFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "pinRotations": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
         0.0,
         0.0
       ]

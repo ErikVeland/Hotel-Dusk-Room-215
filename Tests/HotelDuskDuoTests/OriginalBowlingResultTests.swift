@@ -2,6 +2,18 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalBowlingResultTests: XCTestCase {
+    private struct TurnTrace: Decodable {
+        struct State: Decodable {
+            let processStage: Int16
+            let processSubstage: Int16
+            let bowlingState: Int16
+            let throwIndex: Int16
+            let scores: [Int32]
+            let roundStatuses: [Int16]
+        }
+        let states: [String: State]
+    }
+
     func testThrowSlotsInterleaveTwoPlayersAcrossThreeRounds() {
         let slots = (0..<OriginalBowlingResult.throwCount).compactMap(OriginalBowlingResult.slot(for:))
 
@@ -63,5 +75,66 @@ final class OriginalBowlingResultTests: XCTestCase {
         [4, 9, 3, 8, 6, 6].forEach { _ = result.record(Int32($0)) }
         XCTAssertEqual(result.roundStatuses, [2, 2, 3])
         XCTAssertFalse(result.shouldFinish)
+    }
+
+    func testSourceCanFinishAfterPlayerZeroRecordsTheirThirdScore() {
+        var result = OriginalBowlingResult()
+        [6, 5, 6, 5, 6].forEach { _ = result.record(Int32($0)) }
+
+        XCTAssertEqual(result.nextThrow, 5)
+        XCTAssertEqual(result.roundStatuses, [1, 1, nil])
+        XCTAssertTrue(result.shouldFinish)
+    }
+
+    func testSourceContinuesAfterPlayerZeroLosesTwoRounds() {
+        var result = OriginalBowlingResult()
+        [5, 6, 5, 6, 6].forEach { _ = result.record(Int32($0)) }
+
+        XCTAssertEqual(result.roundStatuses, [2, 2, nil])
+        XCTAssertFalse(result.shouldFinish)
+    }
+
+    func testEarlyFinishMatchesTheOriginalFifthThrowCapture() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let trace = try JSONDecoder().decode(TurnTrace.self, from: Data(contentsOf:
+            root.appendingPathComponent("Fixtures/Bowling/turn-phase-probe.json")))
+        let source = try XCTUnwrap(trace.states["after-throw-5"])
+        let finish = try XCTUnwrap(trace.states["completed-process-stage"])
+        let reset = try XCTUnwrap(trace.states["after-result-phase"])
+
+        XCTAssertEqual(source.bowlingState, 10)
+        XCTAssertEqual(source.throwIndex, 5)
+        XCTAssertEqual(source.scores, [6, 6, 6, 5, 5, -1])
+        XCTAssertEqual(source.roundStatuses, [1, 1, 0])
+        XCTAssertEqual(finish.processStage, 3)
+        XCTAssertEqual(finish.processSubstage, 1)
+        XCTAssertEqual(reset.processStage, 1)
+        XCTAssertEqual(reset.throwIndex, 0)
+        XCTAssertEqual(reset.scores, Array(repeating: -1, count: OriginalBowlingResult.throwCount))
+
+        var result = OriginalBowlingResult()
+        [6, 5, 6, 5, 6].forEach { _ = result.record(Int32($0)) }
+        XCTAssertEqual(result.roundStatuses.map { $0 ?? 0 }, source.roundStatuses)
+        XCTAssertTrue(result.shouldFinish)
+    }
+
+    func testResultModelMatchesTwoInterleavedThrowsFromTheOriginalProcess() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let trace = try JSONDecoder().decode(TurnTrace.self, from: Data(contentsOf:
+            root.appendingPathComponent("Fixtures/Bowling/turn-phase-probe.json")))
+        let firstThrow = try XCTUnwrap(trace.states["dialogue-advance-03"])
+        let secondThrow = try XCTUnwrap(trace.states["second-dialogue-advance-03"])
+
+        XCTAssertEqual(firstThrow.throwIndex, 1)
+        XCTAssertEqual(firstThrow.scores, [6, -1, -1, -1, -1, -1])
+        XCTAssertEqual(secondThrow.throwIndex, 2)
+        XCTAssertEqual(secondThrow.scores, [6, -1, -1, 5, -1, -1])
+        XCTAssertEqual(secondThrow.roundStatuses, [1, 0, 0])
+
+        var result = OriginalBowlingResult()
+        XCTAssertEqual(result.record(6)?.scoreOffset, 0)
+        XCTAssertEqual(result.record(5)?.scoreOffset, 12)
+        XCTAssertEqual(result.roundStatuses, [1, nil, nil])
+        XCTAssertEqual(result.roundStatuses[0], secondThrow.roundStatuses[0])
     }
 }

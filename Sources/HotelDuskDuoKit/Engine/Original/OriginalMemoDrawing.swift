@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Overlay 14 scratchpad, symbol positions and clipped ink for process 34.
+ * Overlay 15 scratchpad, symbol positions and clipped ink for Chapter 2 process 34.
  */
 public struct OriginalMemoDrawing: Equatable, Sendable {
     public enum Paper: Int, Sendable { case torn, joined, whole }

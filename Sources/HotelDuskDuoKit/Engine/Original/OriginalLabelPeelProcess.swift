@@ -6,18 +6,22 @@ public struct OriginalLabelPeelProcess: Equatable, Sendable {
     public enum Effect: Equatable, Sendable {
         case fadeIn(Int), fadeOut(Int)
         case dragging(Bool)
+        case followupInteractionRequired
         case completed(Int16)
     }
 
     public static let width = 128
     public static let height = 160
     public static let completionFraction = 0.995
+    public static let brushRadius = 10
+    private static let strokeSampleCount = 3
 
     public private(set) var phase = 0
     public private(set) var mask: [UInt8]
     public private(set) var result: Int16?
     private var previousTouch: SIMD2<Int>?
     private var finishing = false
+    private var followupInteractionReported = false
 
     public init(mask: [UInt8]) {
         self.mask = Array(mask.prefix(Self.width * Self.height))
@@ -33,7 +37,10 @@ public struct OriginalLabelPeelProcess: Equatable, Sendable {
     public mutating func update(pageTouch: SIMD2<Int>? = nil, fadeComplete: Bool = false) -> [Effect] {
         guard result == nil else { return [] }
         if finishing {
-            if fadeComplete { result = 2; return [.completed(2)] }
+            if fadeComplete && !followupInteractionReported {
+                followupInteractionReported = true
+                return [.followupInteractionRequired]
+            }
             return []
         }
         if phase == 0 {
@@ -47,17 +54,11 @@ public struct OriginalLabelPeelProcess: Equatable, Sendable {
         var effects: [Effect] = []
         if let point = touch {
             if let previousTouch {
-                let dx = point.x - previousTouch.x
-                let dy = point.y - previousTouch.y
-                let distance = max(abs(dx), abs(dy))
-                let steps = max(1, distance / 2)
-                for step in 0...steps {
-                    let x = previousTouch.x + dx * step / steps
-                    let y = previousTouch.y + dy * step / steps
+                for sample in 0..<Self.strokeSampleCount {
+                    let x = point.x + (previousTouch.x - point.x) * sample / Self.strokeSampleCount
+                    let y = point.y + (previousTouch.y - point.y) * sample / Self.strokeSampleCount
                     erase(at: SIMD2(x - 32, y - 48))
                 }
-            } else {
-                erase(at: SIMD2(point.x - 32, point.y - 48))
             }
             if previousTouch == nil { effects.append(.dragging(true)) }
         } else if previousTouch != nil {
@@ -74,9 +75,7 @@ public struct OriginalLabelPeelProcess: Equatable, Sendable {
     }
 
     private mutating func erase(at point: SIMD2<Int>) {
-        // The source brush is circular. Its radius is approximately five
-        // texture pixels after mapping the rotated touch page to the mask.
-        let radius = 5
+        let radius = Self.brushRadius
         for y in max(0, point.y - radius)...min(Self.height - 1, point.y + radius) {
             for x in max(0, point.x - radius)...min(Self.width - 1, point.x + radius) {
                 let dx = x - point.x, dy = y - point.y

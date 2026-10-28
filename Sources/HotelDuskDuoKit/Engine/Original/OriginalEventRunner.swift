@@ -485,10 +485,13 @@ public struct OriginalEventRunner: Sendable {
     }
 
     /**
-     * Overlay 13 returns process result 2 after its terminal fade.
+     * Overlay 13 returns 2 after its terminal fade and stores completed arrangements.
      */
-    public mutating func finishChristmasTree(returnValue: Int16) {
+    public mutating func finishChristmasTree(returnValue: Int16, decorationOrder: UInt16?) {
         guard case .process(43) = phase else { return }
+        if returnValue == 2, let decorationOrder {
+            game.storeChristmasTreeDecorationOrder(decorationOrder)
+        }
         finishProcess(returnValue: returnValue)
     }
 

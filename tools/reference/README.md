@@ -28,6 +28,7 @@ Commands:
 - `until-nonzero32 ADDRESS LIMIT`: advance until the word becomes nonzero.
 - `write8 ADDRESS VALUE`, `write16 ADDRESS VALUE`, `write32 ADDRESS VALUE`: write an aligned main-RAM diagnostic fixture (hexadecimal address and value). Every write is recorded in `inputs.txt`. A modified run is an isolated component test, not evidence of a normal story path. Keep its output separate from unmodified playthrough captures.
 - `peek8 ADDRESS`, `peek16 ADDRESS`, `peek32 ADDRESS`: read an aligned main-RAM value to `runner.log` without changing game memory.
+- `peek-code32 ADDRESS`: read one aligned ARM9 virtual-memory word without changing game memory. Use this for loaded code outside main RAM.
 - `trace-cinematic ADDRESS`: log the original queue's active object, handler and first state fields each frame in `cinematic-frames.csv`; hexadecimal ADDRESS is the controller base (opening: `022543f4`). Use `0` to stop tracing. This reads game memory without modifying it.
 - `trace-clock ADDRESS`: log process 126 counters, hand values and numeric time each frame in `clock-frames.csv`. ADDRESS is the hexadecimal process base. Use `0` to stop. This reads game memory without modifying it.
 - `quit`: stop the run.

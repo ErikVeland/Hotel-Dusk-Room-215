@@ -1,0 +1,1657 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint isolated bowling pin-pair separation sweep",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "384eff59872b036344257421f50326981fa9962342b5d050a0c6f2d820ddecfe",
+  "note": "The ball is parked far from the two active pins. Each case advances one original process update.",
+  "cases": {
+    "x-100": {
+      "commandsSHA256": "0a96492454c23e72570bf2b8f8ffe55e2d242d5642258b184db55cb596633f6e",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            100,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              100,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              -8,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              265,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "x-300": {
+      "commandsSHA256": "fbe957718db16af05d63cb899a15d479b57deb356f3d0a216a9f37130ce1c4be",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            300,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              300,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              -143,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              623,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "x-600": {
+      "commandsSHA256": "278a0fc592b5f95080a5a5ab618be55da43777d80c61bb40137c12801d3b5f1c",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            600,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              600,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              -374,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1166,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "x-900": {
+      "commandsSHA256": "b354e40ea558af4f5277c610b9d7742f317f0a57906db4d6bc46d1a1ef56d751",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            900,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              900,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              -614,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1712,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "x-1000": {
+      "commandsSHA256": "75196758ccea0adf95571178ca30804b41707ed59d785f770f2295619a4db909",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1000,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1000,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              100,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1100,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "x-1100": {
+      "commandsSHA256": "8d2c96fbec18a4251f89ffd659d6a19d1c987ac11135a44fda29bc840433d7fa",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1100,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1100,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              100,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1200,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "x-1200": {
+      "commandsSHA256": "328a4bd388fe1727af05f1cc4706ffb347bce545308399236905d7abcb48d73f",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1200,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1200,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              100,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1300,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "x-1500": {
+      "commandsSHA256": "207a99b387aac39686560535086902a558a6221cd21792592a1e6f18292467f8",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            1500,
+            0,
+            0
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            200,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              200,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1500,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              100,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              1600,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              90,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.05000000074505806,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-100": {
+      "commandsSHA256": "ebb0c119f638a2c5638ab1a22b97e88b62feab4bf25be851a213fd52a0977b2f",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            100
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              100
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              -208
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              510
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-300": {
+      "commandsSHA256": "8b158d17001d50a95d84c39cae2645823d003d6f082cdf922c9d05e5b128e77f",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            300
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              300
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              -373
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              877
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-600": {
+      "commandsSHA256": "cdab4f52432cdb8ef3c214ecbfee02d3d4a85c8e734fd2f419e0922d66658b08",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            600
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              600
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              -618
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1425
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-900": {
+      "commandsSHA256": "cf64ef497eb8340a1754354ac47bbc74adf335c8a4162bd3a3a3088a7a2c04af",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            900
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              900
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              -506
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1609
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-1000": {
+      "commandsSHA256": "c8f1a35f6c35dc529d6e824df2520e0537dd087dfd00753ef4377cec8f598001",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1000
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1000
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              -126
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1328
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-1100": {
+      "commandsSHA256": "1ea11051b0093a3790476af4c41ea50523ee5d4e9fb75d339f7c9889642a6019",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1100
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1100
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1300
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-1200": {
+      "commandsSHA256": "736dc1a53d13ed22cdfd3d7d3250e413b51454c5b312cafb5efc637a78c3ea93",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1200
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1200
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1400
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    },
+    "z-1500": {
+      "commandsSHA256": "fd78e95ed039ce9bac54ed5b81034f0c096b5e2b5d0b25273dea249d51dd6921",
+      "input": {
+        "positionsFixed20_12": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            1500
+          ]
+        ],
+        "motionsFixed20_12": [
+          [
+            0,
+            0,
+            200
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ]
+      },
+      "states": {
+        "before": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              200
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1500
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 0.0,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.0,
+            "needsUpdate": true,
+            "active": true
+          }
+        ],
+        "after": [
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              0
+            ],
+            "rotationFloat": 6.267845630645752,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.03466019034385681,
+            "needsUpdate": true,
+            "active": true
+          },
+          {
+            "positionFixed20_12": [
+              0,
+              0,
+              1700
+            ],
+            "motionFixed20_12": [
+              0,
+              0,
+              180
+            ],
+            "rotationFloat": 0.015339808538556099,
+            "directionAngleFloat": 0.0,
+            "angularVelocityFloat": 0.06533981114625931,
+            "needsUpdate": true,
+            "active": true
+          }
+        ]
+      }
+    }
+  }
+}

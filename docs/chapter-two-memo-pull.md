@@ -1,6 +1,6 @@
 # Chapter 2 trapped memo
 
-Process 27 now has a native drag controller and renderer. It uses the original cabinet, wall and paper assets. The office route can select the trapped paper, pull it until it tears and receive item 7. The following memo-drawing process, process 34, is connected. See [Memo drawing](chapter-two-memo-drawing.md).
+Process 27 now has a native drag controller and renderer. It uses the original cabinet, wall and paper assets. The office route can select the trapped paper, pull it until it tears and receive item 7. The following Chapter 2 process 34 opens the `pointtie` memo drawing scene. See [Memo drawing](chapter-two-memo-drawing.md).
 
 ## Route and source evidence
 
@@ -15,7 +15,7 @@ The reference scripts start from the completed office records and calendar route
 | `chapter-two-memo-pull-entry` | `chapter-two-memo-pull-ready` | Select event 121 and start process 27. |
 | `chapter-two-memo-pull-drag` | Same name | A large drag loses contact with the paper. |
 | `chapter-two-memo-pull-wiggle` | Same name | Small sideways movements reach the tear threshold. |
-| `chapter-two-memo-torn-return` | Same name | Torn-paper dialogue, item acquisition and memo-drawing entry. |
+| `chapter-two-memo-torn-return` | Same name | Torn-paper dialogue and item acquisition, followed by process 34 memo drawing. |
 | `chapter-two-memo-quit`, `chapter-two-memo-partial-quit` | Same names | Untouched and partial-pull quit responses. |
 
 Scripts are under `tools/reference`. Captures remain local under `extracted/reference`.

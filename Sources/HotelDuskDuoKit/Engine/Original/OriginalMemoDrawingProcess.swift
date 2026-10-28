@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Process 34 drawing, toolbar entry and exit from overlay 14.
+ * Point-tie drawing, toolbar entry and exit from overlay 14.
  */
 public struct OriginalMemoDrawingProcess: Equatable, Sendable {
     public enum Effect: Equatable, Sendable {

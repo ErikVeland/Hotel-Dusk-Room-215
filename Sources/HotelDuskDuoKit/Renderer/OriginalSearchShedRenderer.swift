@@ -32,13 +32,20 @@ final class OriginalSearchShedRenderer {
      * Returns the nearest projected box whose recovered hit triangles contain the touch.
      */
     func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess) -> Int? {
-        let modelData = model.model
+        Self.object(at: point, process: process, model: model.model)
+    }
+
+    /**
+     * Resolves a touch against the model mesh without requiring a Metal device.
+     */
+    static func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess,
+                       model modelData: OriginalModel) -> Int? {
         var closest: (object: Int, distance: Float)?
         for (objectIndex, object) in process.objects.enumerated() {
             let transform = Self.translation(object.position) * Self.scale(object.scale)
             let world = transform * Self.nodeWorld(modelData.nodes[2].worldFixed)
             for group in modelData.groups where group.node == 2 {
-                guard let hit = group.hit else { continue }
+                guard let hit = group.hit ?? group.render else { continue }
                 for triangle in 0..<hit.triangleCount {
                     let indices = (0..<3).map { Self.index(hit.indexData, triangle * 3 + $0) }
                     let vertices = indices.map { Self.vertex(hit.vertexData, Int($0)) }

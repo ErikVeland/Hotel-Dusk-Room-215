@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Process 58, overlay 20 (`CJukeBox`): the Seven Stars bar jukebox.
+ * Process 59, overlay 20 (`CJukeBox`): the Seven Stars bar jukebox.
  *
  * Record selection follows 0x021FDBF0. Selecting the playing record stops the music and
  * stores -1 at game offset 0x13BC (0x020989D4). Another record plays its sequence and

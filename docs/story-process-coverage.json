@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
-  "scope": "Static story process coverage. Does not establish route completion, presentation fidelity, conditions, input fidelity, or optional inventory processes.",
+  "scope": "Static story process coverage checks handler IDs only. It does not establish factory-resource matching, route completion, presentation fidelity, input fidelity, or optional inventory processes.",
   "nativeHostProcessIDs": [
     24,
     25,
@@ -22,6 +22,7 @@
     41,
     42,
     43,
+    44,
     45,
     46,
     47,
@@ -35,21 +36,33 @@
     58,
     59,
     60,
+    61,
+    62,
     63,
     64,
+    67,
     73,
+    74,
+    75,
     76,
     77,
     78,
+    79,
     80,
     81,
     84,
+    85,
+    86,
+    88,
+    90,
+    91,
     126
   ],
   "processes": [
     {
       "processID": 24,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP1_R102",
@@ -66,6 +79,7 @@
     {
       "processID": 25,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP1_R102",
@@ -77,6 +91,7 @@
     {
       "processID": 26,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP1_R117",
@@ -88,6 +103,7 @@
     {
       "processID": 27,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP2_R115",
@@ -99,6 +115,7 @@
     {
       "processID": 30,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP2_R115",
@@ -110,6 +127,7 @@
     {
       "processID": 31,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP2_R115",
@@ -121,6 +139,7 @@
     {
       "processID": 34,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP2_R115",
@@ -132,6 +151,7 @@
     {
       "processID": 37,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP1_R205",
@@ -143,6 +163,7 @@
     {
       "processID": 38,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP5_R205",
@@ -154,6 +175,7 @@
     {
       "processID": 39,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP3_R209",
@@ -165,6 +187,7 @@
     {
       "processID": 40,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP3_R209",
@@ -176,6 +199,7 @@
     {
       "processID": 41,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP3_R109",
@@ -187,6 +211,7 @@
     {
       "processID": 42,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP3_R106",
@@ -208,6 +233,7 @@
     {
       "processID": 43,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP7_R122",
@@ -218,7 +244,8 @@
     },
     {
       "processID": 44,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP8_R119",
@@ -230,6 +257,7 @@
     {
       "processID": 45,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP8_R114",
@@ -241,6 +269,7 @@
     {
       "processID": 46,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP6_R106",
@@ -252,6 +281,7 @@
     {
       "processID": 47,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP3_R205",
@@ -268,6 +298,7 @@
     {
       "processID": 48,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP4_R205",
@@ -279,6 +310,7 @@
     {
       "processID": 51,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP6_R105",
@@ -290,6 +322,7 @@
     {
       "processID": 52,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP8_R114",
@@ -301,6 +334,7 @@
     {
       "processID": 53,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP6_R105",
@@ -317,6 +351,7 @@
     {
       "processID": 54,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP6_R105",
@@ -333,6 +368,7 @@
     {
       "processID": 55,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP7_R122",
@@ -344,6 +380,7 @@
     {
       "processID": 56,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP1_R102",
@@ -355,6 +392,7 @@
     {
       "processID": 58,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP6_R105",
@@ -371,6 +409,7 @@
     {
       "processID": 59,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -382,6 +421,7 @@
     {
       "processID": 60,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP5_R111",
@@ -392,7 +432,8 @@
     },
     {
       "processID": 61,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R302",
@@ -403,7 +444,8 @@
     },
     {
       "processID": 62,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -415,6 +457,7 @@
     {
       "processID": 63,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP9_R116",
@@ -426,6 +469,7 @@
     {
       "processID": 64,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP9_R117",
@@ -456,7 +500,8 @@
     },
     {
       "processID": 67,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -468,6 +513,7 @@
     {
       "processID": 73,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP4_R201",
@@ -478,7 +524,8 @@
     },
     {
       "processID": 74,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -489,7 +536,8 @@
     },
     {
       "processID": 75,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": true,
       "references": [
         {
           "program": "EP10_R304",
@@ -501,6 +549,7 @@
     {
       "processID": 76,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP8_R114",
@@ -512,6 +561,7 @@
     {
       "processID": 77,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP3_R213",
@@ -522,7 +572,8 @@
     },
     {
       "processID": 79,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R304",
@@ -534,6 +585,7 @@
     {
       "processID": 80,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -550,6 +602,7 @@
     {
       "processID": 81,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP9_R125",
@@ -561,6 +614,7 @@
     {
       "processID": 84,
       "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP3_R209",
@@ -571,7 +625,8 @@
     },
     {
       "processID": 85,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R305",
@@ -582,7 +637,8 @@
     },
     {
       "processID": 86,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -593,7 +649,8 @@
     },
     {
       "processID": 88,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": true,
       "references": [
         {
           "program": "EP10_R102",
@@ -604,7 +661,8 @@
     },
     {
       "processID": 90,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -615,7 +673,8 @@
     },
     {
       "processID": 91,
-      "hasNativeHandler": false,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R301",
@@ -635,7 +694,8 @@
         37,
         56
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 2,
@@ -645,7 +705,8 @@
         31,
         34
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 3,
@@ -658,7 +719,8 @@
         77,
         84
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 4,
@@ -666,7 +728,8 @@
         48,
         73
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 5,
@@ -674,7 +737,8 @@
         38,
         60
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 6,
@@ -685,7 +749,8 @@
         54,
         58
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 7,
@@ -693,7 +758,8 @@
         43,
         55
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 8,
@@ -703,9 +769,8 @@
         52,
         76
       ],
-      "missingProcesses": [
-        44
-      ]
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 9,
@@ -714,7 +779,8 @@
         64,
         81
       ],
-      "missingProcesses": []
+      "missingProcesses": [],
+      "unsupportedProcesses": []
     },
     {
       "chapter": 10,
@@ -733,18 +799,10 @@
         90,
         91
       ],
-      "missingProcesses": [
-        61,
-        62,
-        67,
-        74,
+      "missingProcesses": [],
+      "unsupportedProcesses": [
         75,
-        79,
-        85,
-        86,
-        88,
-        90,
-        91
+        88
       ]
     }
   ],

@@ -80,8 +80,22 @@ struct OriginalPlayPage: View {
                 retainedNotes
             }
         case .process:
-            if play.pencilSharpener != nil {
+            if play.vsScene != nil {
+                OriginalVSScenePageView(play: play, screen: screen)
+            } else if play.afterConfess != nil {
+                OriginalAfterConfessPageView(play: play, screen: screen)
+            } else if play.picturePeel != nil {
+                OriginalPicturePeelPageView(play: play, screen: screen)
+            } else if play.typewriter != nil {
+                OriginalTypewriterPageView(play: play, screen: screen)
+            } else if play.codeNotice != nil {
+                if screen == 0 { OriginalCodeNoticePageView(play: play) }
+                else { retainedNotes }
+            } else if play.pencilSharpener != nil {
                 if screen == 0 { OriginalPencilSharpenerView(play: play) }
+                else { retainedNotes }
+            } else if play.bowlingMatch != nil {
+                if screen == 0 { OriginalBowlingView(play: play) }
                 else { retainedNotes }
             } else if play.cpr != nil {
                 OriginalCPRView(hingeManager: hingeManager, screen: screen)
@@ -150,6 +164,9 @@ struct OriginalPlayPage: View {
                 else { retainedNotes }
             } else if play.searchShed != nil {
                 if screen == 0 { OriginalSearchShedView(play: play) }
+                else { retainedNotes }
+            } else if play.bagSearch != nil {
+                if screen == 0 { OriginalBagSearchView(play: play) }
                 else { retainedNotes }
             } else if play.thinWire != nil {
                 if screen == 0 { OriginalThinWireView(play: play) }

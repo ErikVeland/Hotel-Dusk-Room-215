@@ -39,15 +39,14 @@ public struct OriginalBowlingResult: Equatable, Sendable {
     }
 
     /**
-     * Mirrors the original game's result check after all six scores are recorded.
+     * Mirrors the original result check after player zero records three scores.
      */
     public var shouldFinish: Bool {
-        guard nextThrow == nil,
-              roundStatuses.allSatisfy({ $0 != nil }) else { return false }
         let playerZeroScores = (0..<Self.roundCount).compactMap { throwScores[$0 * Self.playerCount] }
+        guard playerZeroScores.count == Self.roundCount else { return false }
         return Self.shouldFinish(
             playerZeroScores: playerZeroScores,
-            roundStatuses: roundStatuses.compactMap { $0 })
+            roundStatuses: roundStatuses.map { $0 ?? 0 })
     }
 
     /**

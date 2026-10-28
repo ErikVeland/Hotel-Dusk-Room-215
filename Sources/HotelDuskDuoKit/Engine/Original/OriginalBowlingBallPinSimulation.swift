@@ -27,8 +27,10 @@ public struct OriginalBowlingBallPinSimulation: Equatable, Sendable {
                 ballVelocityFixed20_12: &velocity)
             ballMotion.setVelocityFixed20_12(velocity)
         }
+        pins.resolvePinContacts()
         pins.advanceMotion()
         pins.resolveLaneBoundary()
+        pins.resolvePinPositionalContacts()
 
         resolvedContactsThisUpdate = contacts
         ballMotion.applySourceFrameVelocityResponse()

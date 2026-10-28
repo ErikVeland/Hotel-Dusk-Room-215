@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Handles one bowling drag and roll using overlay 11's captured input path.
+ * Advances one source bowling throw from a selected ball through its roll.
  */
 public struct OriginalBowlingTurnProcess: Equatable, Sendable {
     public enum Phase: Equatable, Sendable {
@@ -11,71 +11,61 @@ public struct OriginalBowlingTurnProcess: Equatable, Sendable {
         case complete
     }
 
+    public static let automaticRollPositionZ: Int32 = 0x0c7b
     public private(set) var simulation: OriginalBowlingBallPinSimulation
     public private(set) var phase = Phase.ready
     public private(set) var score: Int32?
-    private var previousDragDelta: SIMD3<Int32>?
-    private var currentDragDelta: SIMD3<Int32>?
 
-    var latestDragDeltas: [SIMD3<Int32>] {
-        [previousDragDelta, currentDragDelta].compactMap { $0 }
+    private var drag: OriginalBowlingDrag
+
+    public var ballPositionFixed20_12: SIMD3<Int32> {
+        drag.ballTransformFixed20_12
     }
 
     public init(ballPositionFixed20_12: SIMD3<Int32>, pins: OriginalBowlingPinField = .init()) {
+        drag = OriginalBowlingDrag(ballTransformFixed20_12: ballPositionFixed20_12)
         simulation = OriginalBowlingBallPinSimulation(
             ballState: .init(positionFixed20_12: ballPositionFixed20_12, velocityFixed20_12: .zero),
             pins: pins)
     }
 
     /**
-     * Starts a drag only when the rendered ball mask and source drag planes both hit.
+     * Starts the held drag after the caller confirms the ball mask was hit.
      */
     @discardableResult
-    public mutating func beginDrag(pagePoint: SIMD2<Float>, camera: OriginalBowlingCameraBasis,
-                                   ballHit: Bool) -> Bool {
-        guard phase == .ready, ballHit,
-              let delta = Self.dragDelta(pagePoint: pagePoint, camera: camera,
-                                         ballPositionFixed20_12: simulation.ballMotion.state.positionFixed20_12) else {
-            return false
-        }
-        previousDragDelta = delta
-        currentDragDelta = delta
+    public mutating func beginDrag(at lanePointFixed20_12: SIMD3<Int32>, ballWasHit: Bool) -> Bool {
+        guard phase == .ready, ballWasHit else { return false }
+        drag.begin(at: lanePointFixed20_12)
         phase = .dragging
         return true
     }
 
     /**
-     * Moves the live drag across the source lane and ball touch planes.
+     * Applies one source held update and starts the roll at the automatic forward limit.
      */
-    public mutating func moveDrag(pagePoint: SIMD2<Float>, camera: OriginalBowlingCameraBasis) {
-        guard phase == .dragging,
-              let delta = Self.dragDelta(pagePoint: pagePoint, camera: camera,
-                                         ballPositionFixed20_12: simulation.ballMotion.state.positionFixed20_12) else { return }
-        previousDragDelta = currentDragDelta
-        currentDragDelta = delta
+    public mutating func updateDrag(to lanePointFixed20_12: SIMD3<Int32>) {
+        guard phase == .dragging else { return }
+        drag.update(touchPointFixed20_12: lanePointFixed20_12)
+        guard drag.ballTransformFixed20_12.z < Self.automaticRollPositionZ else { return }
+        startRoll(velocity: drag.end() ?? SIMD3(0, 0, OriginalBowlingLaunch.minimumForwardDelta))
     }
 
     /**
-     * Launches when the two latest source drag deltas pass the forward threshold.
+     * Starts a roll when the final two drag deltas pass the source launch threshold.
      */
     @discardableResult
     public mutating func endDrag() -> Bool {
-        guard phase == .dragging, let currentDragDelta, let previousDragDelta,
-              let velocity = OriginalBowlingLaunch.velocity(currentDelta: currentDragDelta,
-                                                           previousDelta: previousDragDelta) else {
+        guard phase == .dragging else { return false }
+        guard let velocity = drag.end() else {
             phase = .ready
             return false
         }
-        simulation = OriginalBowlingBallPinSimulation(
-            ballState: .init(positionFixed20_12: simulation.ballMotion.state.positionFixed20_12,
-                             velocityFixed20_12: velocity),
-            pins: simulation.pins)
-        phase = .rolling
+        startRoll(velocity: velocity)
         return true
     }
 
     /**
-     * Advances one source bowling update and records its toppled-pin score at rest.
+     * Advances the source roll and records the pin count after all motion stops.
      */
     public mutating func advanceOneUpdate() {
         guard phase == .rolling else { return }
@@ -90,22 +80,11 @@ public struct OriginalBowlingTurnProcess: Equatable, Sendable {
         phase = .complete
     }
 
-    private static func dragDelta(pagePoint: SIMD2<Float>, camera: OriginalBowlingCameraBasis,
-                                  ballPositionFixed20_12: SIMD3<Int32>) -> SIMD3<Int32>? {
-        guard let ray = OriginalBowlingTouchRay.ray(pagePoint: pagePoint, camera: camera) else { return nil }
-        let ballPosition = SIMD3(Float(ballPositionFixed20_12.x), Float(ballPositionFixed20_12.y),
-                                 Float(ballPositionFixed20_12.z)) / 4_096
-        let ballVertices = OriginalBowlingTouchRay.ballPlaneVertices.map { $0 + ballPosition }
-        guard let anchor = OriginalBowlingTouchRay.dragAnchor(
-            origin: ray.origin, direction: ray.direction,
-            laneVertices: OriginalBowlingTouchRay.lanePlaneVertices,
-            ballVertices: ballVertices) else { return nil }
-        let delta = anchor.lanePoint - anchor.ballPoint
-        return SIMD3(Self.fixed(delta.x), Self.fixed(delta.y), Self.fixed(delta.z))
-    }
-
-    private static func fixed(_ value: Float) -> Int32 {
-        guard value.isFinite else { return 0 }
-        return Int32(clamping: Int64((value * 4_096).rounded(.toNearestOrAwayFromZero)))
+    private mutating func startRoll(velocity: SIMD3<Int32>) {
+        simulation = OriginalBowlingBallPinSimulation(
+            ballState: .init(positionFixed20_12: drag.ballTransformFixed20_12,
+                             velocityFixed20_12: velocity),
+            pins: simulation.pins)
+        phase = .rolling
     }
 }

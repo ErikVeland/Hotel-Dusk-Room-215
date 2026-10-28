@@ -2,6 +2,36 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalBowlingTouchRayTests: XCTestCase {
+    private struct CameraTrace: Decodable {
+        struct State: Decodable {
+            let rawTouchPoint: [Int]?
+            let cameraMatrix: [Int32]
+            let lanePlaneTemplate20_12: [Int32]
+            let laneHitTranslation20_12: [Int32]
+            let touchPoint918: [Int32]
+        }
+
+        let states: [String: State]
+    }
+
+    private struct ProjectionSweep: Decodable {
+        struct Sample: Decodable {
+            let rawTouchX: Int
+            let cameraMatrix: [Int32]
+            let processStageAndSubstage: [Int32]
+            let touchFlagsAndSelection: [Int32]
+            let touchInputWord: Int32
+            let ballTransformFixed20_12: [Int32]
+            let laneTransformFixed20_12: [Int32]
+            let dragDeltaFixed20_12: [Int32]
+            let touchPointFixed20_12: [Int32]
+            let previousTouchPointFixed20_12: [Int32]
+        }
+
+        let rawTouchY: Int
+        let samples: [Sample]
+    }
+
     func testCameraBasisUsesProcessFixedPointPositionTargetAndHints() throws {
         let camera = try XCTUnwrap(OriginalBowlingCameraBasis(matrixFixed20_12: [
             0, 12_288, 21_709, 0, 2_048, -43_827, 0, 0,
@@ -141,7 +171,105 @@ final class OriginalBowlingTouchRayTests: XCTestCase {
         XCTAssertEqual(ballHit?.z ?? 9, 0, accuracy: 0.0001)
     }
 
-    func testDragAnchorRequiresLaneThenBallPlaneHits() throws {
+    func testPlaneTemplatesUseTheLive20_12Translation() {
+        let lane = OriginalBowlingTouchRay.translatedVertices(
+            OriginalBowlingTouchRay.lanePlaneVertices, byFixed20_12: SIMD3(0, 2_979, 0))
+        let ball = OriginalBowlingTouchRay.translatedVertices(
+            OriginalBowlingTouchRay.ballPlaneVertices, byFixed20_12: SIMD3(0, 1_556, 10_240))
+
+        XCTAssertEqual(lane[0].y, Float(2_979) / 4_096, accuracy: 0.0001)
+        XCTAssertEqual(ball[0].y, Float(1_556) / 4_096 - Float(1_229) / 4_096, accuracy: 0.0001)
+        XCTAssertEqual(ball[0].z, 2.5, accuracy: 0.0001)
+    }
+
+    func testHeldDragDeltaSubtractsTheBallTransformWithSourceIntegerSemantics() {
+        let delta = OriginalBowlingTouchRay.sourceDragDelta20_12(
+            touchPoint: SIMD3(-427, 3_145, 11_117),
+            ballTransform: SIMD3(0, 1_556, 10_240))
+
+        XCTAssertEqual(delta, SIMD3(-427, 1_589, 877))
+        XCTAssertEqual(OriginalBowlingTouchRay.sourceDragDelta20_12(
+            touchPoint: SIMD3(Int32.min, 0, 0),
+            ballTransform: SIMD3(1, 0, 0)).x, Int32.max)
+    }
+
+    func testCapturedTouchRaysReachTheOriginalLaneHitPoints() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let trace = try JSONDecoder().decode(CameraTrace.self, from: Data(contentsOf:
+            root.appendingPathComponent("Fixtures/Bowling/camera-input-trace.json")))
+
+        for name in ["drag-47", "drag-79"] {
+            let source = try XCTUnwrap(trace.states[name])
+            let rawTouch = try XCTUnwrap(source.rawTouchPoint)
+            let camera = try XCTUnwrap(OriginalBowlingCameraBasis(matrixFixed20_12: source.cameraMatrix))
+            let pagePoint = try XCTUnwrap(OriginalBowlingTouchRay.pagePoint(
+                touchPoint: SIMD2(rawTouch[0], rawTouch[1]), orientation: .unrotated))
+            let ray = try XCTUnwrap(OriginalBowlingTouchRay.ray(pagePoint: pagePoint, camera: camera))
+            let vertices = OriginalBowlingTouchRay.translatedVertices(
+                Self.vertices20_12(source.lanePlaneTemplate20_12),
+                byFixed20_12: SIMD3(source.laneHitTranslation20_12[0],
+                                    source.laneHitTranslation20_12[1],
+                                    source.laneHitTranslation20_12[2]))
+            let hit = try XCTUnwrap(OriginalBowlingTouchRay.firstHit(
+                origin: ray.origin, direction: ray.direction, vertices: vertices))
+
+            XCTAssertEqual(hit.x, Float(source.touchPoint918[0]) / 4_096, accuracy: 0.1, name)
+            XCTAssertEqual(hit.z, Float(source.touchPoint918[2]) / 4_096, accuracy: 0.1, name)
+        }
+    }
+
+    func testCapturedProjectionSweepRecordsDragAndRollTransition() throws {
+        let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+        let trace = try JSONDecoder().decode(ProjectionSweep.self, from: Data(contentsOf:
+            root.appendingPathComponent("Fixtures/Bowling/projection-sweep.json")))
+
+        XCTAssertEqual(trace.rawTouchY, 90)
+        XCTAssertEqual(trace.samples.count, 66)
+        XCTAssertEqual(trace.samples.map(\.rawTouchX), Array(15..<80) + [87])
+        XCTAssertTrue(trace.samples.allSatisfy {
+            $0.cameraMatrix.count == 16 &&
+                $0.processStageAndSubstage.count == 1 &&
+                $0.touchFlagsAndSelection.count == 2 &&
+                $0.touchInputWord >= 0 &&
+                $0.ballTransformFixed20_12.count == 3 &&
+                $0.laneTransformFixed20_12.count == 3 &&
+                $0.dragDeltaFixed20_12.count == 6 &&
+                $0.previousTouchPointFixed20_12.count == 3
+        })
+        let initialCamera = try XCTUnwrap(trace.samples.first?.cameraMatrix)
+        XCTAssertTrue(trace.samples.allSatisfy { $0.cameraMatrix == initialCamera })
+        for rawX in [23, 31, 39, 47, 55, 63, 71] {
+            let sample = try XCTUnwrap(trace.samples.first { $0.rawTouchX == rawX })
+            XCTAssertEqual(sample.processStageAndSubstage, [65_538])
+            let camera = try XCTUnwrap(OriginalBowlingCameraBasis(
+                matrixFixed20_12: sample.cameraMatrix))
+            let pagePoint = try XCTUnwrap(OriginalBowlingTouchRay.pagePoint(
+                touchPoint: SIMD2(rawX, trace.rawTouchY), orientation: .unrotated))
+            let ray = try XCTUnwrap(OriginalBowlingTouchRay.ray(
+                pagePoint: pagePoint, camera: camera))
+            let vertices = OriginalBowlingTouchRay.translatedVertices(
+                OriginalBowlingTouchRay.lanePlaneVertices,
+                byFixed20_12: SIMD3(sample.laneTransformFixed20_12[0],
+                                    sample.laneTransformFixed20_12[1],
+                                    sample.laneTransformFixed20_12[2]))
+            let hit = try XCTUnwrap(OriginalBowlingTouchRay.firstHit(
+                origin: ray.origin, direction: ray.direction, vertices: vertices))
+
+            XCTAssertEqual(hit.x, Float(sample.touchPointFixed20_12[0]) / 4_096,
+                           accuracy: 0.1, "raw X \(rawX)")
+            XCTAssertEqual(hit.z, Float(sample.touchPointFixed20_12[2]) / 4_096,
+                           accuracy: 0.1, "raw X \(rawX)")
+        }
+        let drag47 = try XCTUnwrap(trace.samples.first { $0.rawTouchX == 47 })
+        let roll79 = try XCTUnwrap(trace.samples.first { $0.rawTouchX == 79 })
+        let roll87 = try XCTUnwrap(trace.samples.first { $0.rawTouchX == 87 })
+        XCTAssertEqual(drag47.touchPointFixed20_12, [-516, 1_556, 8_529])
+        XCTAssertEqual(roll79.processStageAndSubstage, [131_074])
+        XCTAssertEqual(roll87.processStageAndSubstage, [131_074])
+        XCTAssertEqual(roll87.touchPointFixed20_12, roll79.touchPointFixed20_12)
+    }
+
+    func testDragAnchorRequiresBallSelectionThenLaneAnchor() throws {
         let lane: [SIMD3<Float>] = [
             SIMD3(-1, 0, 0), SIMD3(1, 0, 0), SIMD3(-1, 0, 1),
             SIMD3(1, 0, 0), SIMD3(-1, 0, 1), SIMD3(1, 0, 1)
@@ -172,5 +300,11 @@ final class OriginalBowlingTouchRayTests: XCTestCase {
         XCTAssertNil(OriginalBowlingTouchRay.dragAnchor(
             origin: SIMD3(20, 2, 2), direction: SIMD3(0, -1, -1),
             laneVertices: lane, ballVertices: ball))
+    }
+
+    private static func vertices20_12(_ values: [Int32]) -> [SIMD3<Float>] {
+        stride(from: 0, to: values.count, by: 3).map { index in
+            SIMD3(Float(values[index]), Float(values[index + 1]), Float(values[index + 2])) / 4_096
+        }
     }
 }

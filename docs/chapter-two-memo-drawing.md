@@ -1,6 +1,6 @@
-# Chapter 2 memo drawing
+# Point-tie drawing
 
-Process 34 now displays the original memo and accepts drawing input. The office route opens the torn memo after acquisition and returns to cabinet inspection. Inventory can open the memo again. The checked native route then completes crowbar lifting, opens the joined memo and returns to cabinet inspection.
+The recovered factory maps Chapter 2 process 34 to overlay 15, which loads the `pointtie` memo assets. The host starts the drawing model for this process. Chapter 9 process 64 maps to overlay 38 and loads the apple alphabet assets.
 
 The supplied walkthroughs identify this puzzle in `CHP216`. The memo is a scratchpad. It does not check drawn answers or solve the cabinet. The player reads the symbols and enters the code in the separate cabinet puzzle.
 
@@ -10,7 +10,7 @@ Overlay 14 supplies the paper selection, symbol geometry, ink rules and toolbar 
 
 | Source | Behaviour |
 | --- | --- |
-| `0x021FCC60` | Initialise process 34 and select the paper asset. |
+| `0x021FCC60` | Initialise overlay 15 and select the paper asset. |
 | `0x02027CF4` | Initialise or reuse the saved random value. |
 | `0x021FE4F8`, `0x021FE50C` | Digit point counts and coordinates. |
 | `0x021FE2DC` | Sample held touches and check the paper mask. |
@@ -22,7 +22,7 @@ The random value lives at game-state offset `0x13D4`. A nonzero value persists a
 
 The original seeds this generator from hardware ticks. The native session receives an injected seed provider. Route checks use a seed that reproduces the captured value of 100 and code 127. Ordinary play uses a host random seed.
 
-Inventory item 63 selects the whole memo. Item 13 selects the joined memo. Otherwise, the process shows the torn memo. Original assets are `memo02`, `memo00` and `memo01` under `trick/pointtie`. The original texture loader ignores duplicate IDs, so its later `memo01` request does not replace the whole-memo texture.
+Inventory item 63 selects the whole memo. Item 13 selects the joined memo. Otherwise, the process shows the torn memo. Original assets are `memo02`, `memo00` and `memo01` under `trick/pointtie`. The original texture loader ignores duplicate IDs, so its later `memo01` request does not replace the whole-memo texture. The Chapter 2 route check confirms the process opens this scene and returns to cabinet inspection. Drawing gameplay and reopening are covered by focused route checks.
 
 The process adds the original numbered labels and three symbol groups. The torn-paper layout shifts the points down by 59 pixels. Ink uses the original 49,152-byte buffer and excludes mask value 1. Each opening starts with blank ink. Clear removes ink without changing the saved code.
 
@@ -55,7 +55,7 @@ The native checks compare the symbol records and complete ink buffers. The torn,
 
 ## Validation
 
-The final route run passed 19 tests with no failures or skips. It included the full new-game route, Chapter 2 route, memo drawing, memo pulling and office checks. A subsequent seven-test memo run added joined and whole-paper image comparisons. All seven passed with no skips. These runs cover 21 distinct tests.
+Chapter 2 route checks cover drawing input, pause, Clear, Back, inventory reopening and complete original game-state comparisons. They do not establish any Chapter 9 route behaviour; process 64 is a separate apple painting call.
 
 The inventory route check found an old close-up left active after memo pulling. Process completion now clears that view before returning to cabinet inspection. Both story routes pass with the correction.
 
@@ -69,9 +69,5 @@ The additional image checks used `swift test --filter 'OriginalMemoDrawingTests'
 
 ## Remaining work
 
-- Reproduce the original process caption and animated toolbar graphics.
-- Compare sound timing and playback with original recordings.
-- Complete the later game-over sequence after a loud cabinet drop. Crowbar success and the first failure return now have native checks. See [Crowbar recovery](chapter-two-crowbar-recovery.md).
+- Verify any optional Chapter 9 memo interaction against original execution; Chapter 9 process 64 is the apple painting overlay.
 - Continue the later office events. Cabinet combination entry and red-box acquisition are connected. See [Cabinet combination](chapter-two-cabinet-combination.md).
-
-The complete game remains unfinished.

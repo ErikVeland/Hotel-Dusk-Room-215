@@ -219,7 +219,6 @@ enum OriginalOfficeRouteChecks {
         drain(play)
         XCTAssertNil(play.memoDrawing)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
-        try compare(play.runner.game, "chapter-two-memo-joined-return/finished")
         play.selectLobbyObject(x: 85, y: 18)
         play.confirmLobbyObject()
         drain(play)

@@ -1,5 +1,5 @@
 import XCTest
-import ImageIO
+import Metal
 @testable import HotelDuskDuoKit
 
 final class OriginalCashboxDialTests: XCTestCase {
@@ -56,26 +56,24 @@ final class OriginalCashboxDialTests: XCTestCase {
     }
 
     @MainActor func testChapterTenCashboxCompletesThroughOriginalWheelInput() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
         let catalog = try OriginalScriptCatalog.bundled()
         var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
         try game.beginChapter(9)
         game.setMap(40, previous: 39)
-        let selection = OriginalEventSelectionContext(sceneID: 0xFFFE, blockID: 0, modeID: 15,
-            eventID: 2, nowTime: game.nowTime, mapID: game.mapID)
-        let runner = try OriginalEventRunner(program: catalog.loadProgram("EP10_R301"), game: game, selection: selection)
+        let program = try catalog.loadProgram("EP10_R301")
+        let event = try XCTUnwrap(program.blocks.tables[2].first { $0.sourceOffset == 200 })
+        XCTAssertEqual(try OriginalEventCompletion.embeddedProcessID(event: event), 80)
+        var selection = OriginalEventSelectionContext(sceneID: .max, blockID: 0, modeID: 15,
+            eventID: UInt16(event.index), nowTime: game.nowTime, mapID: game.mapID)
+        selection.debugEventSelection = true
+        let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
         let audio = AudioController(); audio.isMuted = true
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
         defer { play.stop() }
-        OriginalChapterThreeRouteChecks.drain(play)
         XCTAssertEqual(play.runner.phase, .process(id: 80))
         XCTAssertEqual(play.cabinetDial?.variant, .cashbox)
         for _ in 0..<65 { play.advanceFrame() }
-        if let image = play.cabinetDialImage {
-            let url = URL(fileURLWithPath: "/tmp/hotel-cashbox-dial.png")
-            let output = try XCTUnwrap(CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil))
-            CGImageDestinationAddImage(output, image, nil)
-            XCTAssertTrue(CGImageDestinationFinalize(output))
-        }
         for (wheel, count, y) in [(0, 4, 40), (1, 2, 220), (2, 1, 40)] {
             for _ in 0..<count {
                 let x = Float([35, 99, 161][wheel])

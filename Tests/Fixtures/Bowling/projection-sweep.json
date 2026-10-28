@@ -1,0 +1,3773 @@
+{
+  "kind": "modified-checkpoint bowling isolated horizontal touch-path sweep",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "14654604720ea8dfb602d70e8bc28a0062fc1113545edeaf7d085f3938d6b697",
+  "commandsSHA256": "e9b6fba137bf82d63d2ce00b9cb5a440d0133b50234b0dfeb727f0e50d1ae6dd",
+  "processBase": "0x02310020",
+  "rawTouchY": 90,
+  "captureMethod": "For each X from 15 through 79, plus 87, reload the ready checkpoint, press at (15, 90), and repeat the captured eight-frame drag steps through X. Read-only process fields; no memory writes.",
+  "samples": [
+    {
+      "rawTouchX": 15,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131073
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "touchPointFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "previousTouchPointFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 16,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -286,
+        1556,
+        11025
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -175,
+        1278,
+        486,
+        -234,
+        1278,
+        648
+      ],
+      "touchPointFixed20_12": [
+        -417,
+        1556,
+        11390
+      ],
+      "previousTouchPointFixed20_12": [
+        -417,
+        1556,
+        11390
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 17,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        0,
+        1556,
+        10240
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "touchPointFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "previousTouchPointFixed20_12": [
+        0,
+        0,
+        0
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 18,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -288,
+        1556,
+        10973
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -177,
+        1363,
+        455,
+        -236,
+        1363,
+        606
+      ],
+      "touchPointFixed20_12": [
+        -420,
+        1556,
+        11315
+      ],
+      "previousTouchPointFixed20_12": [
+        -420,
+        1556,
+        11315
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 19,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -288,
+        1556,
+        10946
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -177,
+        1411,
+        437,
+        -236,
+        1411,
+        582
+      ],
+      "touchPointFixed20_12": [
+        -420,
+        1556,
+        11274
+      ],
+      "previousTouchPointFixed20_12": [
+        -420,
+        1556,
+        11274
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 20,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -291,
+        1556,
+        10920
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -178,
+        1452,
+        421,
+        -238,
+        1452,
+        561
+      ],
+      "touchPointFixed20_12": [
+        -424,
+        1556,
+        11236
+      ],
+      "previousTouchPointFixed20_12": [
+        -424,
+        1556,
+        11236
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 21,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -291,
+        1556,
+        10892
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -178,
+        1497,
+        404,
+        -238,
+        1497,
+        538
+      ],
+      "touchPointFixed20_12": [
+        -424,
+        1556,
+        11195
+      ],
+      "previousTouchPointFixed20_12": [
+        -424,
+        1556,
+        11195
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 22,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -291,
+        1556,
+        10863
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -178,
+        1545,
+        387,
+        -238,
+        1545,
+        515
+      ],
+      "touchPointFixed20_12": [
+        -424,
+        1556,
+        11154
+      ],
+      "previousTouchPointFixed20_12": [
+        -424,
+        1556,
+        11154
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 23,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -292,
+        1556,
+        10838
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -180,
+        1589,
+        371,
+        -240,
+        1589,
+        494
+      ],
+      "touchPointFixed20_12": [
+        -427,
+        1556,
+        11117
+      ],
+      "previousTouchPointFixed20_12": [
+        -427,
+        1556,
+        11117
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 24,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -415,
+        1556,
+        11054
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -17,
+        1633,
+        29,
+        -23,
+        1633,
+        38
+      ],
+      "touchPointFixed20_12": [
+        -427,
+        1556,
+        11076
+      ],
+      "previousTouchPointFixed20_12": [
+        -427,
+        1556,
+        11076
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 25,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -415,
+        1556,
+        11023
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -17,
+        1681,
+        20,
+        -23,
+        1681,
+        26
+      ],
+      "touchPointFixed20_12": [
+        -427,
+        1556,
+        11038
+      ],
+      "previousTouchPointFixed20_12": [
+        -427,
+        1556,
+        11038
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 26,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -418,
+        1556,
+        10989
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -18,
+        1729,
+        10,
+        -24,
+        1729,
+        13
+      ],
+      "touchPointFixed20_12": [
+        -431,
+        1556,
+        10997
+      ],
+      "previousTouchPointFixed20_12": [
+        -431,
+        1556,
+        10997
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 27,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -443,
+        1556,
+        10327
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -24,
+        1134,
+        -181,
+        -33,
+        1134,
+        -242
+      ],
+      "touchPointFixed20_12": [
+        -461,
+        1556,
+        10192
+      ],
+      "previousTouchPointFixed20_12": [
+        -461,
+        1556,
+        10192
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 28,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -443,
+        1556,
+        10292
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -24,
+        1185,
+        -192,
+        -33,
+        1185,
+        -256
+      ],
+      "touchPointFixed20_12": [
+        -461,
+        1556,
+        10148
+      ],
+      "previousTouchPointFixed20_12": [
+        -461,
+        1556,
+        10148
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 29,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -446,
+        1556,
+        10257
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -26,
+        1236,
+        -201,
+        -35,
+        1236,
+        -269
+      ],
+      "touchPointFixed20_12": [
+        -465,
+        1556,
+        10107
+      ],
+      "previousTouchPointFixed20_12": [
+        -465,
+        1556,
+        10107
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 30,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -446,
+        1556,
+        10222
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -26,
+        1287,
+        -212,
+        -35,
+        1287,
+        -283
+      ],
+      "touchPointFixed20_12": [
+        -465,
+        1556,
+        10063
+      ],
+      "previousTouchPointFixed20_12": [
+        -465,
+        1556,
+        10063
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 31,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -446,
+        1556,
+        10188
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -26,
+        1339,
+        -221,
+        -35,
+        1339,
+        -295
+      ],
+      "touchPointFixed20_12": [
+        -465,
+        1556,
+        10023
+      ],
+      "previousTouchPointFixed20_12": [
+        -465,
+        1556,
+        10023
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 32,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -468,
+        1556,
+        10002
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1394,
+        -31,
+        -3,
+        1394,
+        -42
+      ],
+      "touchPointFixed20_12": [
+        -469,
+        1556,
+        9979
+      ],
+      "previousTouchPointFixed20_12": [
+        -469,
+        1556,
+        9979
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 33,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -468,
+        1556,
+        9969
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1449,
+        -41,
+        -3,
+        1449,
+        -55
+      ],
+      "touchPointFixed20_12": [
+        -469,
+        1556,
+        9939
+      ],
+      "previousTouchPointFixed20_12": [
+        -469,
+        1556,
+        9939
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 34,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -468,
+        1556,
+        9933
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1503,
+        -51,
+        -3,
+        1503,
+        -69
+      ],
+      "touchPointFixed20_12": [
+        -469,
+        1556,
+        9895
+      ],
+      "previousTouchPointFixed20_12": [
+        -469,
+        1556,
+        9895
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 35,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -470,
+        1556,
+        9897
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -3,
+        1558,
+        -62,
+        -4,
+        1558,
+        -83
+      ],
+      "touchPointFixed20_12": [
+        -472,
+        1556,
+        9851
+      ],
+      "previousTouchPointFixed20_12": [
+        -472,
+        1556,
+        9851
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 36,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -470,
+        1556,
+        9865
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -3,
+        1610,
+        -72,
+        -4,
+        1610,
+        -96
+      ],
+      "touchPointFixed20_12": [
+        -472,
+        1556,
+        9811
+      ],
+      "previousTouchPointFixed20_12": [
+        -472,
+        1556,
+        9811
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 37,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -470,
+        1556,
+        9831
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -3,
+        1665,
+        -81,
+        -4,
+        1665,
+        -108
+      ],
+      "touchPointFixed20_12": [
+        -472,
+        1556,
+        9771
+      ],
+      "previousTouchPointFixed20_12": [
+        -472,
+        1556,
+        9771
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 38,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -473,
+        1556,
+        9795
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -4,
+        1723,
+        -91,
+        -6,
+        1723,
+        -122
+      ],
+      "touchPointFixed20_12": [
+        -476,
+        1556,
+        9727
+      ],
+      "previousTouchPointFixed20_12": [
+        -476,
+        1556,
+        9727
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 39,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -500,
+        1556,
+        9099
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -11,
+        1181,
+        -291,
+        -15,
+        1181,
+        -389
+      ],
+      "touchPointFixed20_12": [
+        -508,
+        1556,
+        8881
+      ],
+      "previousTouchPointFixed20_12": [
+        -508,
+        1556,
+        8881
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 40,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -508,
+        1556,
+        8866
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        0,
+        1244,
+        -38,
+        0,
+        1244,
+        -51
+      ],
+      "touchPointFixed20_12": [
+        -508,
+        1556,
+        8838
+      ],
+      "previousTouchPointFixed20_12": [
+        -508,
+        1556,
+        8838
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 41,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -512,
+        1556,
+        8831
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -1,
+        1302,
+        -48,
+        -2,
+        1302,
+        -65
+      ],
+      "touchPointFixed20_12": [
+        -512,
+        1556,
+        8795
+      ],
+      "previousTouchPointFixed20_12": [
+        -512,
+        1556,
+        8795
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 42,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -512,
+        1556,
+        8795
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -1,
+        1365,
+        -58,
+        -2,
+        1365,
+        -78
+      ],
+      "touchPointFixed20_12": [
+        -512,
+        1556,
+        8752
+      ],
+      "previousTouchPointFixed20_12": [
+        -512,
+        1556,
+        8752
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 43,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -512,
+        1556,
+        8756
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -1,
+        1427,
+        -69,
+        -2,
+        1427,
+        -93
+      ],
+      "touchPointFixed20_12": [
+        -512,
+        1556,
+        8705
+      ],
+      "previousTouchPointFixed20_12": [
+        -512,
+        1556,
+        8705
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 44,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -515,
+        1556,
+        8722
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1486,
+        -80,
+        -3,
+        1486,
+        -107
+      ],
+      "touchPointFixed20_12": [
+        -516,
+        1556,
+        8662
+      ],
+      "previousTouchPointFixed20_12": [
+        -516,
+        1556,
+        8662
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 45,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -515,
+        1556,
+        8683
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1552,
+        -91,
+        -3,
+        1552,
+        -122
+      ],
+      "touchPointFixed20_12": [
+        -516,
+        1556,
+        8615
+      ],
+      "previousTouchPointFixed20_12": [
+        -516,
+        1556,
+        8615
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 46,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -515,
+        1556,
+        8647
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1615,
+        -101,
+        -3,
+        1615,
+        -135
+      ],
+      "touchPointFixed20_12": [
+        -516,
+        1556,
+        8572
+      ],
+      "previousTouchPointFixed20_12": [
+        -516,
+        1556,
+        8572
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 47,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -515,
+        1556,
+        8612
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1677,
+        -111,
+        -3,
+        1677,
+        -149
+      ],
+      "touchPointFixed20_12": [
+        -516,
+        1556,
+        8529
+      ],
+      "previousTouchPointFixed20_12": [
+        -516,
+        1556,
+        8529
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 48,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -546,
+        1556,
+        7818
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -8,
+        1182,
+        -217,
+        -11,
+        1182,
+        -290
+      ],
+      "touchPointFixed20_12": [
+        -552,
+        1556,
+        7656
+      ],
+      "previousTouchPointFixed20_12": [
+        -552,
+        1556,
+        7656
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 49,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -546,
+        1556,
+        7781
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -8,
+        1253,
+        -228,
+        -11,
+        1253,
+        -304
+      ],
+      "touchPointFixed20_12": [
+        -552,
+        1556,
+        7610
+      ],
+      "previousTouchPointFixed20_12": [
+        -552,
+        1556,
+        7610
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 50,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -546,
+        1556,
+        7740
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -8,
+        1323,
+        -240,
+        -11,
+        1323,
+        -320
+      ],
+      "touchPointFixed20_12": [
+        -552,
+        1556,
+        7560
+      ],
+      "previousTouchPointFixed20_12": [
+        -552,
+        1556,
+        7560
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 51,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -550,
+        1556,
+        7705
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1389,
+        -249,
+        -12,
+        1389,
+        -333
+      ],
+      "touchPointFixed20_12": [
+        -556,
+        1556,
+        7519
+      ],
+      "previousTouchPointFixed20_12": [
+        -556,
+        1556,
+        7519
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 52,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -550,
+        1556,
+        7664
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1460,
+        -261,
+        -12,
+        1460,
+        -348
+      ],
+      "touchPointFixed20_12": [
+        -556,
+        1556,
+        7469
+      ],
+      "previousTouchPointFixed20_12": [
+        -556,
+        1556,
+        7469
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 53,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -550,
+        1556,
+        7627
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1531,
+        -273,
+        -12,
+        1531,
+        -364
+      ],
+      "touchPointFixed20_12": [
+        -556,
+        1556,
+        7423
+      ],
+      "previousTouchPointFixed20_12": [
+        -556,
+        1556,
+        7423
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 54,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -554,
+        1556,
+        7593
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1605,
+        -282,
+        -13,
+        1605,
+        -376
+      ],
+      "touchPointFixed20_12": [
+        -560,
+        1556,
+        7382
+      ],
+      "previousTouchPointFixed20_12": [
+        -560,
+        1556,
+        7382
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 55,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -554,
+        1556,
+        7555
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1676,
+        -293,
+        -13,
+        1676,
+        -391
+      ],
+      "touchPointFixed20_12": [
+        -560,
+        1556,
+        7336
+      ],
+      "previousTouchPointFixed20_12": [
+        -560,
+        1556,
+        7336
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 56,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -587,
+        1556,
+        6618
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -8,
+        1222,
+        -240,
+        -11,
+        1222,
+        -321
+      ],
+      "touchPointFixed20_12": [
+        -593,
+        1556,
+        6438
+      ],
+      "previousTouchPointFixed20_12": [
+        -593,
+        1556,
+        6438
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 57,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -592,
+        1556,
+        6579
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1301,
+        -252,
+        -12,
+        1301,
+        -337
+      ],
+      "touchPointFixed20_12": [
+        -598,
+        1556,
+        6390
+      ],
+      "previousTouchPointFixed20_12": [
+        -598,
+        1556,
+        6390
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 58,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -592,
+        1556,
+        6543
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1376,
+        -263,
+        -12,
+        1376,
+        -351
+      ],
+      "touchPointFixed20_12": [
+        -598,
+        1556,
+        6346
+      ],
+      "previousTouchPointFixed20_12": [
+        -598,
+        1556,
+        6346
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 59,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -592,
+        1556,
+        6500
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1460,
+        -276,
+        -12,
+        1460,
+        -368
+      ],
+      "touchPointFixed20_12": [
+        -598,
+        1556,
+        6293
+      ],
+      "previousTouchPointFixed20_12": [
+        -598,
+        1556,
+        6293
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 60,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -592,
+        1556,
+        6463
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1534,
+        -286,
+        -12,
+        1534,
+        -382
+      ],
+      "touchPointFixed20_12": [
+        -598,
+        1556,
+        6249
+      ],
+      "previousTouchPointFixed20_12": [
+        -598,
+        1556,
+        6249
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 61,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -596,
+        1556,
+        6423
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1618,
+        -297,
+        -13,
+        1618,
+        -397
+      ],
+      "touchPointFixed20_12": [
+        -602,
+        1556,
+        6201
+      ],
+      "previousTouchPointFixed20_12": [
+        -602,
+        1556,
+        6201
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 62,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -622,
+        1556,
+        5673
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -18,
+        1195,
+        -514,
+        -24,
+        1195,
+        -686
+      ],
+      "touchPointFixed20_12": [
+        -635,
+        1556,
+        5288
+      ],
+      "previousTouchPointFixed20_12": [
+        -635,
+        1556,
+        5288
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 63,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -622,
+        1556,
+        5631
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -18,
+        1283,
+        -526,
+        -24,
+        1283,
+        -702
+      ],
+      "touchPointFixed20_12": [
+        -635,
+        1556,
+        5237
+      ],
+      "previousTouchPointFixed20_12": [
+        -635,
+        1556,
+        5237
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 64,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -635,
+        1556,
+        5240
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        0,
+        1362,
+        -61,
+        -1,
+        1362,
+        -82
+      ],
+      "touchPointFixed20_12": [
+        -635,
+        1556,
+        5195
+      ],
+      "previousTouchPointFixed20_12": [
+        -635,
+        1556,
+        5195
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 65,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -639,
+        1556,
+        5195
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1455,
+        -74,
+        -3,
+        1455,
+        -99
+      ],
+      "touchPointFixed20_12": [
+        -640,
+        1556,
+        5140
+      ],
+      "previousTouchPointFixed20_12": [
+        -640,
+        1556,
+        5140
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 66,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -639,
+        1556,
+        5156
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1543,
+        -85,
+        -3,
+        1543,
+        -114
+      ],
+      "touchPointFixed20_12": [
+        -640,
+        1556,
+        5093
+      ],
+      "previousTouchPointFixed20_12": [
+        -640,
+        1556,
+        5093
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 67,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -639,
+        1556,
+        5115
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -2,
+        1631,
+        -98,
+        -3,
+        1631,
+        -131
+      ],
+      "touchPointFixed20_12": [
+        -640,
+        1556,
+        5042
+      ],
+      "previousTouchPointFixed20_12": [
+        -640,
+        1556,
+        5042
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 68,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -668,
+        1556,
+        4358
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1245,
+        -316,
+        -13,
+        1245,
+        -422
+      ],
+      "touchPointFixed20_12": [
+        -674,
+        1556,
+        4121
+      ],
+      "previousTouchPointFixed20_12": [
+        -674,
+        1556,
+        4121
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 69,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -671,
+        1556,
+        4313
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -11,
+        1337,
+        -329,
+        -15,
+        1337,
+        -439
+      ],
+      "touchPointFixed20_12": [
+        -679,
+        1556,
+        4067
+      ],
+      "previousTouchPointFixed20_12": [
+        -679,
+        1556,
+        4067
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 70,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -671,
+        1556,
+        4270
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -11,
+        1435,
+        -342,
+        -15,
+        1435,
+        -456
+      ],
+      "touchPointFixed20_12": [
+        -679,
+        1556,
+        4014
+      ],
+      "previousTouchPointFixed20_12": [
+        -679,
+        1556,
+        4014
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 71,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -671,
+        1556,
+        4229
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -11,
+        1528,
+        -353,
+        -15,
+        1528,
+        -471
+      ],
+      "touchPointFixed20_12": [
+        -679,
+        1556,
+        3965
+      ],
+      "previousTouchPointFixed20_12": [
+        -679,
+        1556,
+        3965
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 72,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        65538
+      ],
+      "touchFlagsAndSelection": [
+        16842751,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -684,
+        1556,
+        3949
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -1,
+        1626,
+        -45,
+        -2,
+        1626,
+        -61
+      ],
+      "touchPointFixed20_12": [
+        -684,
+        1556,
+        3916
+      ],
+      "previousTouchPointFixed20_12": [
+        -684,
+        1556,
+        3916
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 73,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -722,
+        1556,
+        2856
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1273,
+        -269,
+        -13,
+        1273,
+        -359
+      ],
+      "touchPointFixed20_12": [
+        -718,
+        1556,
+        2975
+      ],
+      "previousTouchPointFixed20_12": [
+        -718,
+        1556,
+        2975
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 74,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -722,
+        1556,
+        2804
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -9,
+        1375,
+        -281,
+        -13,
+        1375,
+        -375
+      ],
+      "touchPointFixed20_12": [
+        -718,
+        1556,
+        2924
+      ],
+      "previousTouchPointFixed20_12": [
+        -718,
+        1556,
+        2924
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 75,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -719,
+        1556,
+        2710
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -13,
+        1473,
+        -390,
+        -18,
+        1473,
+        -520
+      ],
+      "touchPointFixed20_12": [
+        -718,
+        1556,
+        2878
+      ],
+      "previousTouchPointFixed20_12": [
+        -718,
+        1556,
+        2878
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 76,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -719,
+        1556,
+        2650
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -13,
+        1580,
+        -406,
+        -18,
+        1580,
+        -542
+      ],
+      "touchPointFixed20_12": [
+        -718,
+        1556,
+        2826
+      ],
+      "previousTouchPointFixed20_12": [
+        -718,
+        1556,
+        2826
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 77,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -852,
+        1556,
+        1493
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -61,
+        1252,
+        -1679,
+        -82,
+        1252,
+        -2239
+      ],
+      "touchPointFixed20_12": [
+        -757,
+        1556,
+        1874
+      ],
+      "previousTouchPointFixed20_12": [
+        -757,
+        1556,
+        1874
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 78,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -852,
+        1556,
+        1469
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -61,
+        1359,
+        -1719,
+        -82,
+        1359,
+        -2293
+      ],
+      "touchPointFixed20_12": [
+        -757,
+        1556,
+        1820
+      ],
+      "previousTouchPointFixed20_12": [
+        -757,
+        1556,
+        1820
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 79,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -852,
+        1556,
+        1448
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -61,
+        1467,
+        -1755,
+        -82,
+        1467,
+        -2341
+      ],
+      "touchPointFixed20_12": [
+        -757,
+        1556,
+        1772
+      ],
+      "previousTouchPointFixed20_12": [
+        -757,
+        1556,
+        1772
+      ],
+      "touchInputWord": 65626
+    },
+    {
+      "rawTouchX": 87,
+      "cameraMatrix": [
+        0,
+        12288,
+        21709,
+        0,
+        2048,
+        -43827,
+        0,
+        0,
+        0,
+        -4096,
+        0,
+        0,
+        0,
+        4096,
+        0,
+        0
+      ],
+      "processStageAndSubstage": [
+        131074
+      ],
+      "touchFlagsAndSelection": [
+        65535,
+        0
+      ],
+      "ballTransformFixed20_12": [
+        -1062,
+        1556,
+        -999
+      ],
+      "laneTransformFixed20_12": [
+        0,
+        2979,
+        0
+      ],
+      "dragDeltaFixed20_12": [
+        -61,
+        1467,
+        -1755,
+        -82,
+        1467,
+        -2341
+      ],
+      "touchPointFixed20_12": [
+        -757,
+        1556,
+        1772
+      ],
+      "previousTouchPointFixed20_12": [
+        -757,
+        1556,
+        1772
+      ],
+      "touchInputWord": 65626
+    }
+  ]
+}

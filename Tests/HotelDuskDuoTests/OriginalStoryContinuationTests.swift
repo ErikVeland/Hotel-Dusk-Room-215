@@ -21,6 +21,16 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertEqual(play.runner.program.name, "EP6_R205")
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
 
+        // The first exit attempt starts the Chapter 6 phone event and cancels
+        // departure. Answer the ringing phone in Room 215, then try the door again.
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true, expectArrival: false)
+        try OriginalChapterThreeRouteChecks.walk(play, to: .init(-16687, 7450), interrupt: true)
+        play.inspectLobbyCounter()
+        play.selectLobbyObject(x: 86, y: 165, confirmImmediately: true)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        if play.lobby?.mode == .counter { play.leaveLobbyCounter() }
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+
         for destination: Int16 in [39, 17, 26, 4] {
             try OriginalChapterThreeRouteChecks.exit(play, to: destination, interrupt: true)
             XCTAssertEqual(play.runner.game.mapID, destination)

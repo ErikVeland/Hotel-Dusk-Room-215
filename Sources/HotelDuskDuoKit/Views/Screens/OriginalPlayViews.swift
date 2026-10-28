@@ -176,6 +176,151 @@ struct OriginalBellPageView: View {
 
 }
 
+/**
+ * Chapter 10 code notice. The exit target stays invisible on the paper.
+ */
+struct OriginalCodeNoticePageView: View {
+    @ObservedObject var play: OriginalPlaySession
+
+    var body: some View {
+        if let process = play.codeNotice,
+           let image = play.codeNoticeImage,
+           let caption = play.codeNoticeCaption {
+            GeometryReader { proxy in
+                let scale = max(0, min((proxy.size.width - 16) / 192,
+                                      (proxy.size.height - 36) / 256))
+                let size = CGSize(width: 192 * scale, height: 256 * scale)
+                ZStack {
+                    Image(decorative: image, scale: 1)
+                        .resizable()
+                        .interpolation(.none)
+                        .frame(width: size.width, height: size.height)
+                    if !caption.isEmpty {
+                        Text(caption)
+                            .font(NovelStyle.body)
+                            .multilineTextAlignment(.center)
+                            .frame(width: size.width * 0.66)
+                            .position(x: size.width * 0.51, y: size.height * 0.51)
+                    }
+                }
+                .frame(width: size.width, height: size.height)
+                .opacity(process.opacity)
+                .contentShape(Rectangle())
+                .onPageTap { point in
+                    guard scale > 0 else { return }
+                    play.touchCodeNotice(pageX: Int(point.x / scale),
+                                         pageY: Int(point.y / scale))
+                }
+                .notebookPhotograph()
+                .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+            }
+        }
+    }
+}
+
+/**
+ * Presents both original screens for the Chapter 10 picture peel.
+ */
+struct OriginalPicturePeelPageView: View {
+    @ObservedObject var play: OriginalPlaySession
+    let screen: UInt8
+
+    var body: some View {
+        GeometryReader { proxy in
+            let isTouchScreen = screen == 0
+            let image = isTouchScreen ? play.picturePeelImage : play.picturePeelUpperImage
+            let reservedHeight: CGFloat = isTouchScreen ? 48 : 16
+            let scale = max(0, min((proxy.size.width - 16) / 192,
+                                  (proxy.size.height - reservedHeight) / 256))
+            VStack(spacing: 8) {
+                if isTouchScreen {
+                    HStack {
+                        Button("Back") { play.quitPicturePeel() }
+                            .buttonStyle(BookTextButtonStyle())
+                        Spacer()
+                    }
+                }
+                Spacer(minLength: 0)
+                ZStack {
+                    Color.black
+                    if let image {
+                        Image(decorative: image, scale: 1).interpolation(.none)
+                    }
+                }
+                .frame(width: 192, height: 256)
+                .contentShape(Rectangle())
+                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                    .onChanged { value in
+                        if isTouchScreen {
+                            play.holdPicturePeelTouch(x: Float(value.location.x), y: Float(value.location.y))
+                        }
+                    }
+                    .onEnded { _ in if isTouchScreen { play.releasePicturePeelTouch() } })
+                .scaleEffect(scale)
+                .frame(width: 192 * scale, height: 256 * scale)
+                .notebookPhotograph()
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .accessibilityLabel(isTouchScreen ? "Peel the picture" : "Picture peel upper screen")
+        }
+        .onDisappear { play.releasePicturePeelTouch() }
+    }
+}
+
+/**
+ * Presents the recovered typewriter artwork and its keyboard interaction.
+ */
+struct OriginalTypewriterPageView: View {
+    @ObservedObject var play: OriginalPlaySession
+    let screen: UInt8
+
+    var body: some View {
+        GeometryReader { proxy in
+            let isTouchScreen = screen == 0
+            let image = isTouchScreen ? play.typewriterImage : play.typewriterUpperImage
+            let scale = max(0, min((proxy.size.width - 16) / 192,
+                                  (proxy.size.height - (isTouchScreen ? 112 : 16)) / 256))
+            VStack(spacing: 8) {
+                if isTouchScreen {
+                    HStack {
+                        Button("Back") { play.quitTypewriter() }
+                            .buttonStyle(BookTextButtonStyle())
+                        Spacer()
+                        Button("−") { play.adjustTypewriterShift(by: -1) }
+                            .buttonStyle(BookTextButtonStyle())
+                        Text("Shift \(play.typewriter?.shift ?? 0)")
+                            .font(NovelStyle.body)
+                        Button("+") { play.adjustTypewriterShift(by: 1) }
+                            .buttonStyle(BookTextButtonStyle())
+                    }
+                    Text("\(play.typewriter?.keyboard.text(on: 0) ?? "")  /  \(play.typewriter?.keyboard.text(on: 1) ?? "")")
+                        .font(NovelStyle.body)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+                Spacer(minLength: 0)
+                if let image {
+                    Image(decorative: image, scale: 1)
+                        .resizable()
+                        .interpolation(.none)
+                        .frame(width: 192 * scale, height: 256 * scale)
+                        .contentShape(Rectangle())
+                        .onPageTap { point in
+                            guard isTouchScreen, scale > 0 else { return }
+                            play.tapTypewriter(pageX: Int(point.x / scale),
+                                               pageY: Int(point.y / scale))
+                        }
+                        .notebookPhotograph()
+                }
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .accessibilityLabel(isTouchScreen ? "Typewriter keyboard" : "Typewriter upper screen")
+        }
+    }
+}
+
 /// Shown where the recovered game ends or a system is missing.
 struct OriginalPlayStatusView: View {
     @ObservedObject var session: GameSession

@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 /**
- * Runs the recovered scene-to-controls-to-playback path for process 52.
+ * Runs the recovered cassette scene-to-controls-to-playback path.
  */
 public struct OriginalCassetteDeckProcess: Equatable, Sendable {
     public enum Phase: Equatable, Sendable {
