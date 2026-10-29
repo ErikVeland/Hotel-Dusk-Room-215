@@ -1795,6 +1795,7 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
         XCTAssertEqual(play.runner.game.chapter, 7)
         try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        XCTFail("R117 exits \(play.lobby?.room.nodes.map(\.name).filter { $0.hasPrefix(\"in_\") } ?? [])")
         try OriginalChapterThreeRouteChecks.exit(play, to: 18, interrupt: true)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 18))
         XCTAssertEqual(play.runner.program.name, "EP8_R118")
