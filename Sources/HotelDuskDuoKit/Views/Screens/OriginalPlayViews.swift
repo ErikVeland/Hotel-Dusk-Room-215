@@ -343,7 +343,7 @@ struct OriginalPlayStatusView: View {
                 EmptyView()
             }
             if session.resumeSave != nil {
-                Button("Return to last checkpoint") { session.continueSavedGame() }
+                Button("Return to saved place") { session.continueSavedGame() }
                     .buttonStyle(BookTextButtonStyle())
             }
             if let error = session.saveError { Text(error).font(NovelStyle.caption) }

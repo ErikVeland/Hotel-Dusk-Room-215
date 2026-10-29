@@ -54,22 +54,18 @@ struct NotebookDialogueSpread: View {
                 if let layout = notebook.layout {
                     #if canImport(UIKit)
                     NativeNotebookCurl(play: play, notebook: notebook, layout: layout,
-                                       metrics: metrics, fontSize: fontSize, reduceMotion: reduceMotion)
+                                       metrics: metrics, fontSize: fontSize, reduceMotion: reduceMotion,
+                                       gesturesEnabled: isVisible && (!play.isPaused || notebook.isReviewing))
                     #else
                     DesktopNotebookSpread(play: play, notebook: notebook, layout: layout,
-                                          metrics: metrics, reduceMotion: reduceMotion)
+                                          metrics: metrics, reduceMotion: reduceMotion,
+                                          gesturesEnabled: isVisible && (!play.isPaused || notebook.isReviewing))
                     #endif
                 } else {
                     HStack(spacing: 0) { PaperSurface(); PaperSurface(side: .right) }
                 }
             }
             .environment(\.layoutDirection, .leftToRight)
-            .simultaneousGesture(DragGesture(minimumDistance: 40).onEnded { value in
-                guard isVisible, !play.isPaused || notebook.isReviewing,
-                      abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
-                if value.translation.width > 60, play.canReviewConversations { notebook.turnBack() }
-                else if value.translation.width < -60 { notebook.turnForward() }
-            })
             .onChange(of: key, initial: true) { _, value in
                 guard value.visible else { return }
                 notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font))
@@ -85,7 +81,20 @@ struct NotebookDialogueSpread: View {
                     notebook.write()
                 }
             }
-            .onDisappear { notebook.finishTurn(revision: notebook.turnRevision) }
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active, notebook.isTurning {
+                    notebook.finishTurn(revision: notebook.turnRevision, completed: false)
+                }
+            }
+            .onChange(of: isVisible) { _, visible in
+                if !visible, notebook.isTurning {
+                    notebook.finishTurn(revision: notebook.turnRevision, completed: false)
+                }
+            }
+            .onDisappear {
+                notebook.finishTurn(revision: notebook.turnRevision,
+                    completed: notebook.isHoldingTurn ? false : nil)
+            }
         }
     }
 }

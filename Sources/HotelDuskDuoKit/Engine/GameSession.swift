@@ -2,13 +2,14 @@ import Foundation
 import Combine
 
 /// Owns native game data and book state above the display lifecycle.
-/// Owns saves, pause reasons and the supported Chapter 1–2 route.
+/// Owns resumable progress, chapter saves and pause reasons.
 @MainActor
 public final class GameSession: ObservableObject {
     @Published public private(set) var chapterSaves: [OriginalChapterSave?] = Array(repeating: nil, count: 3)
     @Published public private(set) var saveError: String?
     private let saveStore: any OriginalChapterSaveStore
     private let resumeStore: any OriginalResumeSaveStore
+    private let mapRendererFactory: OriginalMapRendererFactory
     @Published public private(set) var resumeSave: OriginalResumeSave?
     @Published public private(set) var isPauseMenuOpen = false
     @Published public private(set) var isReviewingConversations = false
@@ -44,9 +45,11 @@ public final class GameSession: ObservableObject {
                 audioController: AudioController = AudioController(),
                 jigsawPuzzleManager: JigsawPuzzleManager? = nil,
                 saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
-                resumeStore: any OriginalResumeSaveStore = OriginalResumeFileStore.application) {
+                resumeStore: any OriginalResumeSaveStore = OriginalResumeFileStore.application,
+                mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) }) {
         self.saveStore = saveStore
         self.resumeStore = resumeStore
+        self.mapRendererFactory = mapRendererFactory
         self.hingeManager = hingeManager ?? DuoHingeManager()
         self.audioController = audioController
         self.jigsawPuzzleManager = jigsawPuzzleManager ?? JigsawPuzzleManager()
@@ -96,7 +99,8 @@ public final class GameSession: ObservableObject {
     public func startOriginalGame() {
         play?.stop()
         do {
-            let next = try OriginalPlaySession.chapterOne(audio: audioController, saveStore: saveStore)
+            let next = try OriginalPlaySession.chapterOne(audio: audioController, saveStore: saveStore,
+                mapRendererFactory: mapRendererFactory)
             attachPlay(next)
         } catch {
             sourceError = String(describing: error)
@@ -104,7 +108,11 @@ public final class GameSession: ObservableObject {
     }
 
     public func endOriginalGame() {
-        saveWalkingProgress()
+        play?.pause()
+        guard saveCurrentPlace() else {
+            isPauseMenuOpen = true
+            return
+        }
         play?.stop()
         playCancellable = nil
         play = nil
@@ -126,25 +134,31 @@ public final class GameSession: ObservableObject {
     public func loadChapterSave(slot: Int) {
         do {
             guard let checkpoint = try saveStore.load(slot: slot) else { return }
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore,
+                mapRendererFactory: mapRendererFactory)
             play?.stop()
-            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore)
             saveError = nil
             attachPlay(next)
         } catch { saveError = "The saved game could not be loaded: \(error)" }
     }
 
     private func attachPlay(_ next: OriginalPlaySession) {
+        next.enableInstantSaves()
         isPauseMenuOpen = false
-        isReviewingConversations = false
+        isReviewingConversations = next.dialogueNotebook.isReviewing
         playCancellable = next.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
-        next.onWalkingCheckpoint = { [weak self] checkpoint in self?.persist(checkpoint) }
+        next.onProgressCheckpoint = { [weak self] checkpoint in self?.persist(checkpoint) }
+        next.onProgressSaveError = { [weak self] error in self?.saveError = "Progress could not be saved: \(error)" }
         play = next
-        saveWalkingProgress()
+        saveCurrentPlace()
         updatePlayActivity()
     }
 
     private func persist(_ checkpoint: OriginalResumeSave) {
-        guard checkpoint.state != resumeSave?.state || checkpoint.checkpointFacing != resumeSave?.checkpointFacing else { return }
+        guard checkpoint.state != resumeSave?.state || checkpoint.checkpointFacing != resumeSave?.checkpointFacing ||
+              checkpoint.conditionGlobalByte != resumeSave?.conditionGlobalByte ||
+              checkpoint.musicSequenceID != resumeSave?.musicSequenceID ||
+              checkpoint.progress != resumeSave?.progress || saveError != nil else { return }
         do {
             try resumeStore.save(checkpoint)
             resumeSave = checkpoint
@@ -152,16 +166,29 @@ public final class GameSession: ObservableObject {
         } catch { saveError = "Progress could not be saved: \(error)" }
     }
 
-    public func saveWalkingProgress() {
-        guard let checkpoint = try? play?.walkingCheckpoint() else { return }
-        persist(checkpoint)
+    @discardableResult
+    public func saveCurrentPlace() -> Bool {
+        guard let play else { return true }
+        if case .halted = play.runner.phase, resumeSave != nil { return true }
+        do {
+            persist(try play.progressCheckpoint())
+            return saveError == nil
+        } catch {
+            saveError = "Progress could not be saved: \(error)"
+            return false
+        }
     }
+
+    @discardableResult
+    public func saveWalkingProgress() -> Bool { saveCurrentPlace() }
 
     public func continueSavedGame() {
         do {
             guard let checkpoint = try resumeStore.load() else { return }
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore,
+                mapRendererFactory: mapRendererFactory)
             play?.stop()
-            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore)
+            if let sequence = checkpoint.musicSequenceID { try? audioController.playOriginalSequence(id: sequence) }
             saveError = nil
             attachPlay(next)
             if let sequence = checkpoint.musicSequenceID { try? audioController.playOriginalSequence(id: sequence) }
@@ -196,6 +223,7 @@ public final class GameSession: ObservableObject {
     public func setApplicationActive(_ active: Bool) {
         isAppActive = active
         updatePlayActivity()
+        if !active { saveCurrentPlace() }
     }
 
     private func updatePlayActivity(bookClosed: Bool? = nil) {

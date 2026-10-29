@@ -37,6 +37,7 @@ public final class AudioController: ObservableObject {
     private var playingSequenceID: Int?
     private var recordings: RecordedMusicLibrary?
     private var musicOutputFactory: MusicOutputFactory?
+    var isRestoringProgress = false
     private var preferences: UserDefaults?
     private var effects: OriginalEffectPlayback?
     private var library: OriginalAudioLibrary?
@@ -137,6 +138,7 @@ public final class AudioController: ObservableObject {
 
     private func makeMusicOutput(source: MusicSource, library: OriginalAudioLibrary,
                                  sequence: OriginalAudioLibrary.Sequence) throws -> any OriginalMusicOutput {
+        if isRestoringProgress { return ProgressMusicOutput() }
         if let musicOutputFactory { return try musicOutputFactory(source, library, sequence) }
         switch source {
         case .native: return try OriginalMusicPlayback(library: library, sequence: sequence)
@@ -604,4 +606,15 @@ final class OriginalMusicPlayback: OriginalMusicOutput {
         engine.stop()
         pausedPosition = nil
     }
+}
+
+@MainActor
+final class ProgressMusicOutput: OriginalMusicOutput {
+    var outputVolume: Float = 0
+    var isActive = true
+    var position: TimeInterval = 0
+    func seek(to seconds: TimeInterval) throws { position = seconds }
+    func resume() throws { isActive = true }
+    func pause() { isActive = false }
+    func stop() { isActive = false }
 }

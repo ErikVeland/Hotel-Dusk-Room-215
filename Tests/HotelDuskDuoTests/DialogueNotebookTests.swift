@@ -354,6 +354,72 @@ final class DialogueNotebookTests: XCTestCase {
             XCTAssertFalse(end.facesFront)
         }
         XCTAssertGreaterThan(NotebookCurlGeometry.point(u: 1, v: 0, progress: 0.5, pageSize: size).depth, 0)
+        let lifted = NotebookCurlGeometry.point(u: 1, v: 0, progress: 0.5, pageSize: size)
+        XCTAssertLessThan(lifted.position.y, 0, "Raised paper must project towards the reader, rather than shrink into the book")
+    }
+
+    func testHeldTurnStopsWritingAndCancellationRestoresTheBookmark() {
+        let book = DialogueNotebook()
+        book.record(phase(String(repeating: "A room at Hotel Dusk. ", count: 70)), program: "opening")
+        let pagination = layout(book, width: 140, height: 115)
+        book.configure(pagination)
+        book.finishWriting()
+        let before = book.reader
+        XCTAssertTrue(book.beginInteractiveTurn(backward: false))
+        let revision = book.turnRevision
+        book.updateInteractiveTurn(progress: 0.37)
+        XCTAssertTrue(book.isHoldingTurn)
+        XCTAssertEqual(book.turnProgress, 0.37)
+        book.write(count: 100)
+        book.finishWriting()
+        XCTAssertEqual(book.reader.revealedEnd, before.revealedEnd)
+        XCTAssertFalse(book.consumeTap())
+        XCTAssertFalse(book.beginInteractiveTurn(backward: true))
+        book.releaseInteractiveTurn(commit: false)
+        XCTAssertFalse(book.isHoldingTurn)
+        XCTAssertTrue(book.isTurning, "Input stays locked while the page settles back")
+        book.finishTurn(revision: revision)
+        XCTAssertEqual(book.reader, before)
+        book.configure(pagination)
+        XCTAssertEqual(book.reader, before, "Cancellation must restore the source bookmark as well as the spread")
+        XCTAssertTrue(book.beginInteractiveTurn(backward: false))
+        book.releaseInteractiveTurn(commit: true)
+        book.finishTurn(revision: book.turnRevision)
+        XCTAssertEqual(book.reader.spreadIndex, 1)
+        XCTAssertTrue(book.reader.isWriting)
+        book.write(count: 12)
+        let unfinished = book.reader
+        XCTAssertTrue(book.beginInteractiveTurn(backward: true))
+        book.finishTurn(revision: book.turnRevision, completed: false)
+        XCTAssertEqual(book.reader, unfinished)
+    }
+
+    func testReflowCancelsHeldTurnWithoutSkippingUnwrittenPages() {
+        let book = DialogueNotebook()
+        book.record(phase(String(repeating: "A room at Hotel Dusk. ", count: 70)), program: "opening")
+        book.configure(layout(book, width: 140, height: 115))
+        book.finishWriting()
+        let end = book.reader.revealedEnd
+        XCTAssertTrue(book.beginInteractiveTurn(backward: false))
+        let revision = book.turnRevision
+        book.configure(layout(book, width: 180, height: 160))
+        XCTAssertFalse(book.isTurning)
+        XCTAssertFalse(book.isHoldingTurn)
+        XCTAssertEqual(book.reader.spreadIndex, 0)
+        XCTAssertEqual(book.reader.revealedEnd, end)
+        book.finishTurn(revision: revision)
+        XCTAssertEqual(book.reader.spreadIndex, 0)
+    }
+
+    func testDragTracksBothDirectionsAndUsesReleaseIntent() {
+        XCTAssertEqual(NotebookPageDrag.progress(translation: -240, pageWidth: 300, backward: false), 0.4)
+        XCTAssertEqual(NotebookPageDrag.progress(translation: 240, pageWidth: 300, backward: true), 0.4)
+        XCTAssertEqual(NotebookPageDrag.progress(translation: 240, pageWidth: 300, backward: false), 0)
+        XCTAssertEqual(NotebookPageDrag.progress(translation: -900, pageWidth: 300, backward: false), 1)
+        XCTAssertFalse(NotebookPageDrag.shouldComplete(translation: -120, predicted: -120, pageWidth: 300, backward: false))
+        XCTAssertTrue(NotebookPageDrag.shouldComplete(translation: -120, predicted: -350, pageWidth: 300, backward: false))
+        XCTAssertTrue(NotebookPageDrag.shouldComplete(translation: 350, predicted: 350, pageWidth: 300, backward: true))
+        XCTAssertFalse(NotebookPageDrag.shouldComplete(translation: -350, predicted: -240, pageWidth: 300, backward: false))
     }
 
     func testSessionRecordsBeforeRenderingAndDoesNotSkipUnwrittenDialogue() throws {

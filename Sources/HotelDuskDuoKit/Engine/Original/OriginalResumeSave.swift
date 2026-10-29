@@ -1,7 +1,6 @@
 import Foundation
 
-/// A native checkpoint taken only after control returns to walking.
-/// It does not serialize a partially executed conversation or puzzle.
+/// A walking checkpoint, optionally extended with resumable interaction inputs.
 public struct OriginalResumeSave: Codable, Equatable, Sendable {
     public let version: Int
     public let savedAt: Date
@@ -10,20 +9,34 @@ public struct OriginalResumeSave: Codable, Equatable, Sendable {
     public let conditionGlobalByte: UInt8?
     public let checkpointFacing: Float
     public let musicSequenceID: Int?
+    let progress: OriginalPlayProgress?
+    let progressSHA256: String?
 
-    init(game: OriginalGameState, checkpointFacing: Float, musicSequenceID: Int?, savedAt: Date) throws {
-        version = 1
+    init(game: OriginalGameState, checkpointFacing: Float, musicSequenceID: Int?, savedAt: Date,
+         progress: OriginalPlayProgress? = nil) throws {
+        version = progress == nil ? 1 : 2
         self.savedAt = savedAt
         state = Data(game.bytes)
         stateSHA256 = OriginalScriptCatalog.digest(state)
         conditionGlobalByte = game.conditionGlobalByte
         self.checkpointFacing = checkpointFacing
         self.musicSequenceID = musicSequenceID
+        self.progress = progress
+        progressSHA256 = try progress.map { OriginalScriptCatalog.digest(try $0.encoded()) }
         _ = try gameState()
     }
 
     public func gameState() throws -> OriginalGameState {
-        guard version == 1 else { throw OriginalDataError.unsupported("Resume save version") }
+        guard version == 1 || version == 2 else { throw OriginalDataError.unsupported("Resume save version") }
+        if version == 2 {
+            guard let progress, let progressSHA256,
+                  OriginalScriptCatalog.digest(try progress.encoded()) == progressSHA256 else {
+                throw OriginalDataError.checksum("Interaction progress")
+            }
+            try progress.validate()
+        } else if progress != nil {
+            throw OriginalDataError.invalid("Unexpected interaction progress")
+        }
         guard OriginalScriptCatalog.digest(state) == stateSHA256 else {
             throw OriginalDataError.checksum("Resume save")
         }
@@ -46,24 +59,19 @@ public protocol OriginalResumeSaveStore {
 
 public struct OriginalResumeFileStore: OriginalResumeSaveStore {
     public let directory: URL
-    public init(directory: URL) { self.directory = directory }
+    private let instantLog: OriginalInstantSaveLog
+
+    public init(directory: URL) {
+        self.directory = directory
+        instantLog = OriginalInstantSaveLog(directory: directory)
+    }
 
     public static var application: Self {
         Self(directory: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("HotelDuskDuo/Resume", isDirectory: true))
     }
 
-    public func load() throws -> OriginalResumeSave? {
-        let file = directory.appendingPathComponent("resume.json")
-        guard FileManager.default.fileExists(atPath: file.path) else { return nil }
-        let checkpoint = try JSONDecoder().decode(OriginalResumeSave.self, from: Data(contentsOf: file))
-        _ = try checkpoint.gameState()
-        return checkpoint
-    }
+    public func load() throws -> OriginalResumeSave? { try instantLog.load() }
 
-    public func save(_ checkpoint: OriginalResumeSave) throws {
-        _ = try checkpoint.gameState()
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        try JSONEncoder().encode(checkpoint).write(to: directory.appendingPathComponent("resume.json"), options: .atomic)
-    }
+    public func save(_ checkpoint: OriginalResumeSave) throws { try instantLog.save(checkpoint) }
 }

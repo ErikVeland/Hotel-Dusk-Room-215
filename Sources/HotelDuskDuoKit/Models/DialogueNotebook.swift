@@ -4,6 +4,36 @@ import Combine
 /// One transcript and one reading cursor for the physical book spread.
 @MainActor
 final class DialogueNotebook: ObservableObject {
+    struct SavedState: Codable, Equatable, Sendable {
+        struct Ink: Codable, Equatable, Sendable {
+            let text: String
+            let colour: UInt8
+            let person: Int32?
+        }
+        let ink: [Ink]
+        let readingAnchor: Int
+        let revealedEnd: Int
+        var reviewAnchor: Int? = nil
+    }
+
+    var onSaveProgress: ((Bool) -> Void)?
+
+    func savedState() -> SavedState {
+        SavedState(ink: ink.map { .init(text: $0.text, colour: $0.colour, person: $0.person) },
+            readingAnchor: isTurning && (isHoldingTurn || !turnWillComplete) ? turnAnchor : readingAnchor,
+            revealedEnd: reader.revealedEnd, reviewAnchor: reviewAnchor)
+    }
+
+    func restore(_ saved: SavedState) {
+        ink = saved.ink.map { .init(text: $0.text, colour: $0.colour, person: $0.person) }
+        readingAnchor = saved.readingAnchor
+        reader = Reader(revealedEnd: saved.revealedEnd)
+        layout = nil
+        pendingLayout = !ink.isEmpty
+        isHoldingTurn = false
+        isTurning = false
+        reviewAnchor = saved.reviewAnchor
+    }
     struct Reader: Equatable {
         var pages: [NSRange] = []
         var spreadIndex = 0
@@ -21,6 +51,10 @@ final class DialogueNotebook: ObservableObject {
     @Published private(set) var reader = Reader()
     @Published private(set) var layout: DialogueNotebookLayout?
     @Published private(set) var isTurning = false
+    @Published private(set) var isHoldingTurn = false
+    @Published private(set) var turnProgress = 0.0
+    private(set) var turnWillComplete = true
+    private var turnAnchor = 0
     private(set) var turnRevision = 0
     private var lastPhase: OriginalEventRunner.Phase?
     private var lastProgram: String?
@@ -53,6 +87,7 @@ final class DialogueNotebook: ObservableObject {
         if isTurning {
             turnRevision += 1
             isTurning = false
+            isHoldingTurn = false
         }
         readingAnchor = anchor
         if let layout { configure(layout) }
@@ -69,11 +104,33 @@ final class DialogueNotebook: ObservableObject {
     }
 
     private func turn(to spread: Int) {
+        turnAnchor = readingAnchor
+        turnProgress = 0
+        turnWillComplete = true
         turnFromSpread = reader.spreadIndex
         turnRevision += 1
         isTurning = true
         reader.spreadIndex = spread
         readingAnchor = reader.page(at: reader.leftIndex).location
+    }
+
+    @discardableResult
+    func beginInteractiveTurn(backward: Bool) -> Bool {
+        guard backward ? canTurnBack : canTurnForward else { return false }
+        isHoldingTurn = true
+        turn(to: reader.spreadIndex + (backward ? -1 : 1))
+        return true
+    }
+
+    func updateInteractiveTurn(progress: Double) {
+        guard isTurning, isHoldingTurn else { return }
+        turnProgress = min(1, max(0, progress))
+    }
+
+    func releaseInteractiveTurn(commit: Bool) {
+        guard isTurning, isHoldingTurn else { return }
+        turnWillComplete = commit
+        isHoldingTurn = false
     }
 
     func endPresentation() { lastPhase = nil }
@@ -126,8 +183,13 @@ final class DialogueNotebook: ObservableObject {
         let anchorPage = layout.pages.firstIndex { NSLocationInRange(anchor, $0) } ?? max(0, layout.pages.count - 1)
         next.spreadIndex = anchorPage / 2
         if isTurning, next.pages != reader.pages {
+            let sourceAnchor = isHoldingTurn || !turnWillComplete ? turnAnchor : readingAnchor
+            let sourcePage = layout.pages.firstIndex { NSLocationInRange(sourceAnchor, $0) } ?? max(0, layout.pages.count - 1)
+            next.spreadIndex = sourcePage / 2
+            readingAnchor = sourceAnchor
             turnRevision += 1
             isTurning = false
+            isHoldingTurn = false
         }
         self.layout = layout
         reader = next
@@ -137,16 +199,24 @@ final class DialogueNotebook: ObservableObject {
     func write(count: Int = 2) {
         guard !isTurning, !pendingLayout, reader.isWriting else { return }
         reader.revealedEnd = min(reader.spreadEnd, reader.revealedEnd + max(0, count))
+        onSaveProgress?(false)
     }
 
     func finishWriting() {
         guard !isTurning, !pendingLayout, reader.isWriting else { return }
         reader.revealedEnd = reader.spreadEnd
+        onSaveProgress?(true)
     }
 
-    func finishTurn(revision: Int) {
+    func finishTurn(revision: Int, completed: Bool? = nil) {
         guard revision == turnRevision else { return }
+        if isTurning, !(completed ?? turnWillComplete) {
+            reader.spreadIndex = turnFromSpread
+            readingAnchor = turnAnchor
+        }
+        isHoldingTurn = false
         isTurning = false
+        onSaveProgress?(true)
     }
 
     var tapLabel: String {

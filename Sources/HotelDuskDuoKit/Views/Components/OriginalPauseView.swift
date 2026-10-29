@@ -2,8 +2,6 @@ import SwiftUI
 
 struct OriginalPauseView: View {
     @ObservedObject var session: GameSession
-    @State private var confirmsReturn = false
-    @State private var confirmsRestore = false
 
     var body: some View {
         ScrollView {
@@ -11,15 +9,15 @@ struct OriginalPauseView: View {
                 Text("Paused").font(NovelStyle.title)
                 Button("Resume") { session.closePauseMenu() }
                 if let save = session.resumeSave {
-                    Text("Chapter \(save.chapterNumber) checkpoint · \(save.savedAt.formatted(date: .abbreviated, time: .shortened))")
+                    Text("Chapter \(save.chapterNumber) · \(save.savedAt.formatted(date: .abbreviated, time: .shortened))")
                         .font(NovelStyle.caption)
-                    Button("Reload checkpoint") { confirmsRestore = true }
+                    Button("Recall saved place") { session.continueSavedGame() }
                 }
                 if let error = session.saveError {
                     Text(error).font(NovelStyle.caption).foregroundStyle(NovelStyle.redInk)
-                    Button("Retry save") { session.saveWalkingProgress() }
+                    Button("Retry save") { session.saveCurrentPlace() }
                 }
-                Text("Progress saves when you return to walking. A conversation or puzzle resumes from the preceding checkpoint after you quit.")
+                Text("Every step saves immediately. Recall returns to your exact conversation, choice, puzzle or notebook page. There are no manual save points.")
                     .font(NovelStyle.caption)
                 Toggle("Mute sound", isOn: Binding(get: { session.audioController.isMuted },
                     set: { session.audioController.isMuted = $0 }))
@@ -33,7 +31,7 @@ struct OriginalPauseView: View {
                     Text("Sound could not play: \(error)")
                         .font(NovelStyle.caption).foregroundStyle(NovelStyle.redInk)
                 }
-                Button("Return to title") { confirmsReturn = true }
+                Button("Return to title") { session.endOriginalGame() }
                 Divider()
                 Text("How to play").font(NovelStyle.title)
                 Text("Drag the 3D view to look around and hold its pad to move. You can also hold a point on the floor plan to walk. Face a person, door or object to enable Talk, Door or Inspect. Tap an object once to interact. Choose an item first, then tap its target. Tap to finish the writing, then tap to continue or turn the spread. Use the speech-bubble button to interrupt.")
@@ -43,12 +41,7 @@ struct OriginalPauseView: View {
             .multilineTextAlignment(.center)
             .padding(.vertical, 16)
         }
-        .confirmationDialog("Return to the title? Unsaved conversation or puzzle progress will be lost.", isPresented: $confirmsReturn, titleVisibility: .visible) {
-            Button("Return to title", role: .destructive) { session.endOriginalGame() }
-        }
-        .confirmationDialog("Reload the last walking checkpoint?", isPresented: $confirmsRestore, titleVisibility: .visible) {
-            Button("Reload checkpoint", role: .destructive) { session.continueSavedGame() }
-        }
+
     }
 }
 

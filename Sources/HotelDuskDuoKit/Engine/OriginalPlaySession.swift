@@ -269,6 +269,17 @@ public final class OriginalPlaySession: ObservableObject {
     private var presentedPacketOffset: Int?
     /// Called at stable walking boundaries, never while an event is suspended.
     var onWalkingCheckpoint: ((OriginalResumeSave) -> Void)?
+    var onProgressCheckpoint: ((OriginalResumeSave) -> Void)?
+    var onProgressSaveError: ((Error) -> Void)?
+    private var progressJournal: OriginalPlayProgress?
+    private var progressInputActive = false
+    private var isReplayingProgress = false
+    private var replaySeedIndex = [0, 0]
+    private var replaySlotIndex = 0
+    private var replayWriteIndex = 0
+    private var replayInvalid = false
+    var replayMicrophoneEnergy: UInt32 = 0
+    private(set) var usesInstantSaves = false
 
     public var canSaveWalkingCheckpoint: Bool {
         guard case .exploration(let map) = runner.phase else { return false }
@@ -367,7 +378,7 @@ public final class OriginalPlaySession: ObservableObject {
         settle()
     }
 
-    public static func chapterOne(audio: AudioController, saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
+    public static func chapterOne(audio: AudioController, timestamp: Int64? = nil, saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
                                   mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
                                   suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
                                   hangerRendererFactory: @escaping OriginalHangerRendererFactory = { try OriginalHangerRenderer() },
@@ -377,8 +388,9 @@ public final class OriginalPlaySession: ObservableObject {
                                   crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
                                   cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) throws -> OriginalPlaySession {
         let catalog = try OriginalScriptCatalog.bundled()
+        let startTime = timestamp ?? Int64(Date().timeIntervalSince1970)
         var runner = try OriginalEventRunner.chapterOneArrival(catalog: catalog, defaults: .bundled(),
-            timestamp: Int64(Date().timeIntervalSince1970))
+            timestamp: startTime)
         var fixture: String?
         #if DEBUG
         fixture = ProcessInfo.processInfo.environment["HOTEL_DUSK_FIXTURE"]
@@ -390,7 +402,7 @@ public final class OriginalPlaySession: ObservableObject {
             fixture = nil
         }
         #endif
-        return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, fixture: fixture, saveStore: saveStore,
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, fixture: fixture, saveStore: saveStore,
                                    mapRendererFactory: mapRendererFactory, suitcaseRendererFactory: suitcaseRendererFactory,
                                    hangerRendererFactory: hangerRendererFactory,
                                    thinWireRendererFactory: thinWireRendererFactory,
@@ -398,6 +410,8 @@ public final class OriginalPlaySession: ObservableObject {
                                    memoPullRendererFactory: memoPullRendererFactory,
                                    crowbarRendererFactory: crowbarRendererFactory,
                                    cabinetDialRendererFactory: cabinetDialRendererFactory)
+        play.prepareProgress(OriginalPlayProgress(origin: .arrival, base: Data(), timestamp: startTime))
+        return play
     }
 
     #if DEBUG
@@ -437,6 +451,8 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// A tap on either page while text is shown.
     public func advanceDialogue() {
+        let recordsProgress = beginProgressInput(.advanceDialogue)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         switch runner.phase {
         case .dialogue, .itemNotice: break
@@ -458,6 +474,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     func beginInventoryBrowsing() {
+        let recordsProgress = beginProgressInput(.beginInventoryBrowsing)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil else { return }
         switch runner.phase {
         case .exploration, .questions: break
@@ -469,11 +487,15 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     func endInventoryBrowsing() {
+        let recordsProgress = beginProgressInput(.endInventoryBrowsing)
+        defer { endProgressInput(recordsProgress) }
         if isBrowsingInventory { isBrowsingInventory = false }
     }
 
     /// The player picked an option of an original choice prompt.
     public func choose(_ id: UInt16) {
+        let recordsProgress = beginProgressInput(.choose(id: id))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .choice(let choices) = runner.phase,
               let choice = choices.first(where: { $0.id == id }) else { return }
         dialogueNotebook.followNextPassage()
@@ -496,6 +518,8 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// The player pressed the pulsing interrupt icon during an armed page.
     public func interrupt() {
+        let recordsProgress = beginProgressInput(.interrupt)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, runner.interruptAvailable else { return }
         runner.pressInterrupt()
         settle()
@@ -503,6 +527,8 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// The player asked the partner about a keyword in the question menu.
     public func ask(_ keyword: Int16) {
+        let recordsProgress = beginProgressInput(.ask(keyword: keyword))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, case .questions = runner.phase else { return }
         dialogueNotebook.followNextPassage()
         runner.ask(keyword)
@@ -511,6 +537,8 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// The player closed the question menu.
     public func leaveConversation() {
+        let recordsProgress = beginProgressInput(.leaveConversation)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, case .questions = runner.phase else { return }
         runner.leave()
         settle()
@@ -520,6 +548,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Shows an inventory item to the current conversation partner.
      */
     public func showItemInConversation(_ item: UInt8) {
+        let recordsProgress = beginProgressInput(.showItemInConversation(item: item))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, case .questions = runner.phase else { return }
         runner.showItem(item)
         settle()
@@ -529,6 +559,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Opens the original memo editor while retaining the map or conversation.
      */
     public func openNotebook() {
+        let recordsProgress = beginProgressInput(.openNotebook)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil else { return }
         switch runner.phase {
         case .questions: break
@@ -547,6 +579,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func closeNotebook() {
+        let recordsProgress = beginProgressInput(.closeNotebook)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, notebook != nil else { return }
         releaseNotebook()
         notebook?.storePage()
@@ -567,6 +601,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func turnNotebookPage(forward: Bool) {
+        let recordsProgress = beginProgressInput(.turnNotebookPage(forward: forward))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, notebook != nil else { return }
         releaseNotebook()
         notebook?.turnPage(forward: forward)
@@ -575,6 +611,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func clearNotebookPage() {
+        let recordsProgress = beginProgressInput(.clearNotebookPage)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         releaseNotebook()
         notebook?.clear()
@@ -582,6 +620,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func undoNotebookEdit() {
+        let recordsProgress = beginProgressInput(.undoNotebookEdit)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         releaseNotebook()
         notebook?.undo()
@@ -589,17 +629,23 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func toggleNotebookEraser() {
+        let recordsProgress = beginProgressInput(.toggleNotebookEraser)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         releaseNotebook()
         notebook?.toggleEraser()
     }
 
     public func holdNotebookTouch(x: Int, y: Int) {
+        let recordsProgress = beginProgressInput(.holdNotebookTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, notebook != nil else { return }
         notebookTouch = SIMD2(x, y)
     }
 
     public func releaseNotebook() {
+        let recordsProgress = beginProgressInput(.releaseNotebook)
+        defer { endProgressInput(recordsProgress) }
         notebookTouch = nil
         notebook?.release()
     }
@@ -610,6 +656,8 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// A new press on the touch page, in rotated page pixels (192 × 256).
     public func touchEntrance(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.touchEntrance(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, process != nil || bellProcess != nil || signProcess != nil,
               (0..<192).contains(pageX), (0..<256).contains(pageY) else { return }
         pendingTouch = OriginalEntranceProcess.Touch(x: 255 - pageY, y: pageX)
@@ -619,6 +667,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Sends a new touch-page press to the Chapter 10 code notice.
      */
     public func touchCodeNotice(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.touchCodeNotice(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase, id == 62 || id == 67,
               (0..<192).contains(pageX), (0..<256).contains(pageY), codeNotice != nil else { return }
         pendingCodeNoticeTouch = SIMD2(pageX, pageY)
@@ -628,6 +678,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Sends a touch-page press to the Chapter 10 VSScene interaction.
      */
     public func touchVSScene() {
+        let recordsProgress = beginProgressInput(.touchVSScene)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(88) = runner.phase, var process = vsScene else { return }
         process.touch()
         vsScene = process
@@ -637,6 +689,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Sends a tap from the touch page to the typewriter keyboard.
      */
     public func tapTypewriter(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.tapTypewriter(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase,
               [74, 86, 90, 91].contains(id), (0..<192).contains(pageX),
               (0..<256).contains(pageY), var process = typewriter else { return }
@@ -658,6 +712,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Changes the typewriter cipher dial while the process is active.
      */
     public func adjustTypewriterShift(by amount: Int) {
+        let recordsProgress = beginProgressInput(.adjustTypewriterShift(amount: amount))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, typewriter != nil else { return }
         typewriter?.adjustShift(by: amount)
     }
@@ -666,6 +722,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Leaves the typewriter through its source exit path.
      */
     public func quitTypewriter() {
+        let recordsProgress = beginProgressInput(.quitTypewriter)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, var process = typewriter,
               let result = process.requestExit() else { return }
         typewriter = nil
@@ -681,6 +739,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Sends a tap to the Chapter 10 pencil-sharpener exit mask.
      */
     public func tapPencilSharpener(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.tapPencilSharpener(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(59) = runner.phase,
               var process = pencilSharpener else { return }
         process.tap(pageX: pageX, pageY: pageY)
@@ -689,16 +749,24 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// The held touch on the touch page, in rotated page pixels; nil on release.
     public func holdTouch(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.holdTouch(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard signProcess != nil else { return }
         heldTouch = OriginalEntranceProcess.Touch(x: 255 - min(max(pageY, 0), 255), y: min(max(pageX, 0), 191))
     }
 
-    public func releaseTouch() { heldTouch = nil }
+    public func releaseTouch() {
+        let recordsProgress = beginProgressInput(.releaseTouch)
+        defer { endProgressInput(recordsProgress) }
+        heldTouch = nil
+    }
 
     /**
      * Selects and drags a Chapter 10 brick with the Hammer.
      */
     public func holdBrickWallTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdBrickWallTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(75) = runner.phase, var process = brickWall,
               x.isFinite, y.isFinite, (0..<192).contains(x), (0..<256).contains(y) else { return }
         let point = SIMD2(x, y)
@@ -715,6 +783,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Releases the selected brick and returns to the Chapter 10 event when the doorway is clear.
      */
     public func releaseBrickWallTouch() {
+        let recordsProgress = beginProgressInput(.releaseBrickWallTouch)
+        defer { endProgressInput(recordsProgress) }
         brickWallTouch = nil
         guard !isPaused, case .process(75) = runner.phase, var process = brickWall else { return }
         let effects = process.endDrag()
@@ -726,6 +796,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func leaveBrickWall() {
+        let recordsProgress = beginProgressInput(.leaveBrickWall)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(75) = runner.phase, var process = brickWall,
               let result = process.leave() else { return }
         brickWall = nil
@@ -738,6 +810,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Forwards a held page touch to the bowling process.
      */
     public func holdBowlingTouch(pageX: Float, pageY: Float) {
+        let recordsProgress = beginProgressInput(.holdBowlingTouch(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(44) = runner.phase,
               pageX.isFinite, pageY.isFinite,
               (0..<192).contains(pageX), (0..<256).contains(pageY),
@@ -756,6 +830,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Releases the active bowling drag.
      */
     public func releaseBowlingTouch() {
+        let recordsProgress = beginProgressInput(.releaseBowlingTouch)
+        defer { endProgressInput(recordsProgress) }
         bowlingTouch = nil
         guard !isPaused, case .process(44) = runner.phase,
               var match = bowlingMatch else { return }
@@ -766,10 +842,20 @@ public final class OriginalPlaySession: ObservableObject {
     /**
      * Forwards a drag to the original jigsaw, retaining its first grab offset.
      */
-    func receiveJigsawFold(isClosed: Bool) { jigsaw?.receiveFold(isClosed: isClosed) }
-    func cancelPendingJigsawFold() { jigsaw?.cancelPendingFold() }
+    func receiveJigsawFold(isClosed: Bool) {
+        let recordsProgress = beginProgressInput(.receiveJigsawFold(isClosed: isClosed))
+        defer { endProgressInput(recordsProgress) }
+        jigsaw?.receiveFold(isClosed: isClosed)
+    }
+    func cancelPendingJigsawFold() {
+        let recordsProgress = beginProgressInput(.cancelPendingJigsawFold)
+        defer { endProgressInput(recordsProgress) }
+        jigsaw?.cancelPendingFold()
+    }
 
     public func dragJigsaw(pageX: Float, pageY: Float) {
+        let recordsProgress = beginProgressInput(.dragJigsaw(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase, jigsaw?.processID == id, pageX.isFinite, pageY.isFinite else { return }
         let point = OriginalJigsawProjection.world(pageX: max(-192, min(384, pageX)),
                                                    pageY: max(-256, min(512, pageY)))
@@ -778,39 +864,59 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func releaseJigsaw() {
+        let recordsProgress = beginProgressInput(.releaseJigsaw)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase, jigsaw?.processID == id else { return }
         applyJigsawEffects(jigsaw?.endTouch() ?? [])
     }
 
     public func rotateJigsaw(increasing: Bool) {
+        let recordsProgress = beginProgressInput(.rotateJigsaw(increasing: increasing))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase, jigsaw?.processID == id else { return }
         applyJigsawEffects(jigsaw?.rotate(increasing: increasing) ?? [])
     }
 
     public func quitJigsaw() {
+        let recordsProgress = beginProgressInput(.quitJigsaw)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase, jigsaw?.processID == id else { return }
         jigsaw?.quit()
     }
 
     public func holdSuitcaseTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdSuitcaseTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, suitcaseKey != nil else { return }
         suitcaseTouch = SIMD2(x, y)
     }
 
-    public func releaseSuitcaseTouch() { suitcaseTouch = nil }
+    public func releaseSuitcaseTouch() {
+        let recordsProgress = beginProgressInput(.releaseSuitcaseTouch)
+        defer { endProgressInput(recordsProgress) }
+        suitcaseTouch = nil
+    }
 
     public func holdCassetteTouch(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.holdCassetteTouch(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, (cassetteRewind != nil || cassetteBallpoint != nil || cassetteDeck != nil),
               (0..<192).contains(pageX), (0..<256).contains(pageY) else { return }
         captureCassetteTouch(pageX: pageX, pageY: pageY)
     }
 
-    public func releaseCassetteTouch() { cassetteTouch = nil }
+    public func releaseCassetteTouch() {
+        let recordsProgress = beginProgressInput(.releaseCassetteTouch)
+        defer { endProgressInput(recordsProgress) }
+        cassetteTouch = nil
+    }
 
     /**
      * Selects the hidden letter through overlay 38's camera and artwork mask.
      */
     public func touchApplePainting(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.touchApplePainting(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(64) = runner.phase,
               (0..<OriginalApplePaintingRenderer.pageWidth).contains(pageX),
               (0..<OriginalApplePaintingRenderer.pageHeight).contains(pageY),
@@ -826,6 +932,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Applies camera movement from a drag across the apple painting.
      */
     public func moveApplePaintingCamera(horizontalSteps: Int, verticalSteps: Int) {
+        let recordsProgress = beginProgressInput(.moveApplePaintingCamera(horizontalSteps: horizontalSteps, verticalSteps: verticalSteps))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(64) = runner.phase,
               var process = applePainting, process.phase == .looking,
               let renderer = applePaintingRenderer else { return }
@@ -840,6 +948,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Completes process 63 after the player closes and fully reopens the Duo.
      */
     func receiveCPRFold(isClosed: Bool, isFullyOpen: Bool) {
+        let recordsProgress = beginProgressInput(.receiveCPRFold(isClosed: isClosed, isFullyOpen: isFullyOpen))
+        defer { endProgressInput(recordsProgress) }
         guard case .process(63) = runner.phase, var process = cpr else { return }
         let result = process.receiveFold(isClosed: isClosed, isFullyOpen: isFullyOpen)
         if let result {
@@ -855,6 +965,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Returns process 64's source result after the letter is acknowledged.
      */
     public func acknowledgeApplePaintingLetter() {
+        let recordsProgress = beginProgressInput(.acknowledgeApplePaintingLetter)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(64) = runner.phase, var process = applePainting,
               process.acknowledgeLetter() != nil,
               let invocation = runner.embeddedProcessInvocation,
@@ -873,6 +985,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Records one letter tap and returns process 81 after the ordered word is complete.
      */
     public func selectAppleWordLetter(at index: Int) {
+        let recordsProgress = beginProgressInput(.selectAppleWordLetter(index: index))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(81) = runner.phase,
               var process = appleWordEntry else { return }
         if process.selectLetter(at: index) != nil {
@@ -890,11 +1004,15 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func activateCassetteDeckControl() {
+        let recordsProgress = beginProgressInput(.activateCassetteDeckControl)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, cassetteDeck != nil else { return }
         cassetteDeck?.activateSelectedControl()
     }
 
     public func exitCassetteDeck() {
+        let recordsProgress = beginProgressInput(.exitCassetteDeck)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, cassetteDeck != nil else { return }
         cassetteDeck?.requestExit()
     }
@@ -906,23 +1024,35 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func quitSuitcaseKey() {
+        let recordsProgress = beginProgressInput(.quitSuitcaseKey)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         suitcaseTouch = nil
         suitcaseKey?.quit()
     }
 
     public func holdThinWireTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdThinWireTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, thinWire != nil, x.isFinite, y.isFinite else { return }
         thinWireTouch = SIMD2(x, y)
     }
 
     public func holdFountainPenTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdFountainPenTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase, id == 42 || id == 74, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         fountainPenTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseFountainPenTouch() { fountainPenTouch = nil }
+    public func releaseFountainPenTouch() {
+        let recordsProgress = beginProgressInput(.releaseFountainPenTouch)
+        defer { endProgressInput(recordsProgress) }
+        fountainPenTouch = nil
+    }
     public func quitFountainPen() {
+        let recordsProgress = beginProgressInput(.quitFountainPen)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(let id) = runner.phase, id == 42 || id == 74 else { return }
         fountainPenTouch = nil
         fountainPen?.quit()
@@ -935,67 +1065,111 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func holdDifferencesTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdDifferencesTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(73) = runner.phase, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         differencesTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseDifferencesTouch() { differencesTouch = nil }
+    public func releaseDifferencesTouch() {
+        let recordsProgress = beginProgressInput(.releaseDifferencesTouch)
+        defer { endProgressInput(recordsProgress) }
+        differencesTouch = nil
+    }
     public func clearDifferences() {
+        let recordsProgress = beginProgressInput(.clearDifferences)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(73) = runner.phase else { return }
         differencesTouch = nil; differences?.clear()
         if let differences { differencesImage = try? differencesRenderer?.render(differences) }
     }
     public func quitDifferences() {
+        let recordsProgress = beginProgressInput(.quitDifferences)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(73) = runner.phase else { return }
         differencesTouch = nil; differences?.quit()
     }
 
     public func holdToiletTankTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdToiletTankTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(48) = runner.phase, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         toiletTankTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseToiletTankTouch() { toiletTankTouch = nil }
+    public func releaseToiletTankTouch() {
+        let recordsProgress = beginProgressInput(.releaseToiletTankTouch)
+        defer { endProgressInput(recordsProgress) }
+        toiletTankTouch = nil
+    }
     public func quitToiletTank() {
+        let recordsProgress = beginProgressInput(.quitToiletTank)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(48) = runner.phase else { return }
         toiletTankTouch = nil
         toiletTank?.quit()
     }
     public func holdLinenWagonTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdLinenWagonTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(60) = runner.phase, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         linenWagonTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseLinenWagonTouch() { linenWagonTouch = nil }
+    public func releaseLinenWagonTouch() {
+        let recordsProgress = beginProgressInput(.releaseLinenWagonTouch)
+        defer { endProgressInput(recordsProgress) }
+        linenWagonTouch = nil
+    }
     public func quitLinenWagon() {
+        let recordsProgress = beginProgressInput(.quitLinenWagon)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(60) = runner.phase else { return }
         linenWagonTouch = nil
         linenWagon?.quit()
     }
 
     public func holdMatchsticksTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdMatchsticksTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, let matchsticks, runner.phase == .process(id: matchsticks.variant.rawValue), x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         matchsticksTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseMatchsticksTouch() { matchsticksTouch = nil }
+    public func releaseMatchsticksTouch() {
+        let recordsProgress = beginProgressInput(.releaseMatchsticksTouch)
+        defer { endProgressInput(recordsProgress) }
+        matchsticksTouch = nil
+    }
     public func quitMatchsticks() {
+        let recordsProgress = beginProgressInput(.quitMatchsticks)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, let matchsticks, runner.phase == .process(id: matchsticks.variant.rawValue) else { return }
         matchsticksTouch = nil
         self.matchsticks?.quit()
     }
 
     public func resetMatchsticks() {
+        let recordsProgress = beginProgressInput(.resetMatchsticks)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         matchsticksTouch = nil; matchsticks?.reset()
     }
     public func holdCoinPuzzleTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdCoinPuzzleTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(51) = runner.phase, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         coinPuzzleTouch = SIMD2(x, y)
     }
-    public func releaseCoinPuzzleTouch() { coinPuzzleTouch = nil }
+    public func releaseCoinPuzzleTouch() {
+        let recordsProgress = beginProgressInput(.releaseCoinPuzzleTouch)
+        defer { endProgressInput(recordsProgress) }
+        coinPuzzleTouch = nil
+    }
     public func quitCoinPuzzle() {
+        let recordsProgress = beginProgressInput(.quitCoinPuzzle)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(51) = runner.phase else { return }
         coinPuzzleTouch = nil
         coinPuzzle?.quit()
@@ -1003,6 +1177,8 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// Plays a jukebox record, or stops it when it is already playing.
     public func selectJukeboxRecord(_ record: Int) {
+        let recordsProgress = beginProgressInput(.selectJukeboxRecord(record: record))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(58) = runner.phase, var jukebox else { return }
         let effects = jukebox.select(record)
         self.jukebox = jukebox
@@ -1020,6 +1196,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func quitJukebox() {
+        let recordsProgress = beginProgressInput(.quitJukebox)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(58) = runner.phase, var jukebox else { return }
         for case .completed(let result) in jukebox.quit() {
             self.jukebox = nil
@@ -1029,63 +1207,103 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func checkCoinPuzzle() {
+        let recordsProgress = beginProgressInput(.checkCoinPuzzle)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         coinPuzzleTouch = nil; coinPuzzle?.check()
     }
     public func holdDollRepairTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdDollRepairTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(38) = runner.phase, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         dollRepairTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseDollRepairTouch() { dollRepairTouch = nil }
+    public func releaseDollRepairTouch() {
+        let recordsProgress = beginProgressInput(.releaseDollRepairTouch)
+        defer { endProgressInput(recordsProgress) }
+        dollRepairTouch = nil
+    }
     public func quitDollRepair() {
+        let recordsProgress = beginProgressInput(.quitDollRepair)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(38) = runner.phase else { return }
         dollRepairTouch = nil
         dollRepair?.quit()
     }
 
     public func holdBookmarkBoxTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdBookmarkBoxTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(47) = runner.phase, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         bookmarkBoxTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseBookmarkBoxTouch() { bookmarkBoxTouch = nil }
+    public func releaseBookmarkBoxTouch() {
+        let recordsProgress = beginProgressInput(.releaseBookmarkBoxTouch)
+        defer { endProgressInput(recordsProgress) }
+        bookmarkBoxTouch = nil
+    }
     public func quitBookmarkBox() {
+        let recordsProgress = beginProgressInput(.quitBookmarkBox)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(47) = runner.phase else { return }
         bookmarkBoxTouch = nil
         bookmarkBox?.quit()
     }
 
     public func holdSwitchboardTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdSwitchboardTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(41) = runner.phase, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         switchboardTouch = SIMD2(Int(x), Int(y))
     }
-    public func releaseSwitchboardTouch() { switchboardTouch = nil }
+    public func releaseSwitchboardTouch() {
+        let recordsProgress = beginProgressInput(.releaseSwitchboardTouch)
+        defer { endProgressInput(recordsProgress) }
+        switchboardTouch = nil
+    }
     public func quitSwitchboard() {
+        let recordsProgress = beginProgressInput(.quitSwitchboard)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(41) = runner.phase else { return }
         switchboardTouch = nil
         switchboard?.quit()
     }
 
     public func holdLabelPeelTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdLabelPeelTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(46) = runner.phase, x.isFinite, y.isFinite,
               x >= 32, x < 160, y >= 48, y < 208 else { return }
         labelPeelTouch = SIMD2(Int(x), Int(y))
     }
 
-    public func releaseLabelPeelTouch() { labelPeelTouch = nil }
+    public func releaseLabelPeelTouch() {
+        let recordsProgress = beginProgressInput(.releaseLabelPeelTouch)
+        defer { endProgressInput(recordsProgress) }
+        labelPeelTouch = nil
+    }
 
     public func holdPicturePeelTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdPicturePeelTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(61) = runner.phase,
               x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         picturePeelTouch = SIMD2(Int(x), Int(y))
     }
 
-    public func releasePicturePeelTouch() { picturePeelTouch = nil }
+    public func releasePicturePeelTouch() {
+        let recordsProgress = beginProgressInput(.releasePicturePeelTouch)
+        defer { endProgressInput(recordsProgress) }
+        picturePeelTouch = nil
+    }
 
     public func quitPicturePeel() {
+        let recordsProgress = beginProgressInput(.quitPicturePeel)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(61) = runner.phase,
               var process = picturePeel,
               process.requestExit() != nil else { return }
@@ -1100,12 +1318,16 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func openChristmasTreeMenu() {
+        let recordsProgress = beginProgressInput(.openChristmasTreeMenu)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(43) = runner.phase,
               christmasTreeDraggedDecoration == nil else { return }
         christmasTree?.openMenu()
     }
 
     public func holdChristmasTreeTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdChristmasTreeTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(43) = runner.phase, let process = christmasTree,
               let renderer = christmasTreeRenderer, x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256, process.canPlaceDecoration else { return }
@@ -1125,6 +1347,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func releaseChristmasTreeTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.releaseChristmasTreeTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(43) = runner.phase, var process = christmasTree,
               let renderer = christmasTreeRenderer, let decoration = christmasTreeDraggedDecoration,
               x.isFinite, y.isFinite else { return cancelChristmasTreeTouch() }
@@ -1142,6 +1366,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func cancelChristmasTreeTouch() {
+        let recordsProgress = beginProgressInput(.cancelChristmasTreeTouch)
+        defer { endProgressInput(recordsProgress) }
         christmasTreeDraggedDecoration = nil
         guard let christmasTree, let christmasTreeRenderer else { return }
         do { christmasTreeImage = try christmasTreeRenderer.render(christmasTree) }
@@ -1149,6 +1375,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func holdSearchShedTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdSearchShedTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(79) = runner.phase, var process = searchShed,
               x.isFinite, y.isFinite, x >= 0, x < 192, y >= 0, y < 256,
               let renderer = searchShedRenderer else { return }
@@ -1171,16 +1399,22 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func releaseSearchShedTouch() {
+        let recordsProgress = beginProgressInput(.releaseSearchShedTouch)
+        defer { endProgressInput(recordsProgress) }
         searchShedTouch = nil
         searchShed?.endDrag()
     }
 
     public func openSearchShedMenu() {
+        let recordsProgress = beginProgressInput(.openSearchShedMenu)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(79) = runner.phase else { return }
         searchShed?.openMenu()
     }
 
     public func openSearchShedTreeBox() {
+        let recordsProgress = beginProgressInput(.openSearchShedTreeBox)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(79) = runner.phase, var process = searchShed else { return }
         let effects = process.openFoundBox()
         searchShed = process
@@ -1188,6 +1422,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func holdBagSearchTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdBagSearchTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(55) = runner.phase, var process = bagSearch,
               x.isFinite, y.isFinite, x >= 0, x < 192, y >= 0, y < 256,
               let renderer = bagSearchRenderer else { return }
@@ -1207,6 +1443,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func releaseBagSearchTouch() {
+        let recordsProgress = beginProgressInput(.releaseBagSearchTouch)
+        defer { endProgressInput(recordsProgress) }
         bagSearchTouch = nil
         guard var process = bagSearch else { return }
         _ = process.endDrag()
@@ -1218,97 +1456,159 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func cancelBagSearchTouch() {
+        let recordsProgress = beginProgressInput(.cancelBagSearchTouch)
+        defer { endProgressInput(recordsProgress) }
         releaseBagSearchTouch()
     }
 
     public func openBagSearchMenu() {
+        let recordsProgress = beginProgressInput(.openBagSearchMenu)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(55) = runner.phase else { return }
         bagSearch?.openMenu()
     }
 
-    public func releaseThinWireTouch() { thinWireTouch = nil }
+    public func releaseThinWireTouch() {
+        let recordsProgress = beginProgressInput(.releaseThinWireTouch)
+        defer { endProgressInput(recordsProgress) }
+        thinWireTouch = nil
+    }
 
     public func quitThinWire() {
+        let recordsProgress = beginProgressInput(.quitThinWire)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         thinWireTouch = nil
         thinWire?.quit()
     }
 
     public func holdPaperclipTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdPaperclipTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, paperclip != nil, x.isFinite, y.isFinite else { return }
         paperclipTouch = SIMD2(x, y)
     }
 
     public func holdHangerTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdHangerTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, hanger != nil, x.isFinite, y.isFinite else { return }
         hangerTouch = SIMD2(x, y)
     }
 
-    public func releaseHangerTouch() { hangerTouch = nil }
+    public func releaseHangerTouch() {
+        let recordsProgress = beginProgressInput(.releaseHangerTouch)
+        defer { endProgressInput(recordsProgress) }
+        hangerTouch = nil
+    }
 
     public func holdSuitcaseContentsTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdSuitcaseContentsTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, runner.phase == .process(id: 35), x.isFinite, y.isFinite else { return }
         suitcaseContentsTouch = SIMD2(x, y)
     }
 
-    public func releaseSuitcaseContentsTouch() { suitcaseContentsTouch = nil }
+    public func releaseSuitcaseContentsTouch() {
+        let recordsProgress = beginProgressInput(.releaseSuitcaseContentsTouch)
+        defer { endProgressInput(recordsProgress) }
+        suitcaseContentsTouch = nil
+    }
 
     public func leaveSuitcaseContents() {
+        let recordsProgress = beginProgressInput(.leaveSuitcaseContents)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, runner.phase == .process(id: 35) else { return }
         suitcaseContentsTouch = nil
         suitcaseContents?.goBack()
     }
 
     public func quitHanger() {
+        let recordsProgress = beginProgressInput(.quitHanger)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         hangerTouch = nil
         hanger?.quit()
     }
 
-    public func releasePaperclipTouch() { paperclipTouch = nil }
+    public func releasePaperclipTouch() {
+        let recordsProgress = beginProgressInput(.releasePaperclipTouch)
+        defer { endProgressInput(recordsProgress) }
+        paperclipTouch = nil
+    }
 
     public func holdCabinetDialTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdCabinetDialTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, cabinetDial != nil, x.isFinite, y.isFinite else { return }
         cabinetDialTouch = SIMD2(x, y)
     }
 
-    public func releaseCabinetDialTouch() { cabinetDialTouch = nil }
+    public func releaseCabinetDialTouch() {
+        let recordsProgress = beginProgressInput(.releaseCabinetDialTouch)
+        defer { endProgressInput(recordsProgress) }
+        cabinetDialTouch = nil
+    }
 
     public func quitCabinetDial() {
+        let recordsProgress = beginProgressInput(.quitCabinetDial)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         cabinetDialTouch = nil
         cabinetDial?.quit()
     }
 
     public func holdCrowbarTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdCrowbarTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, crowbar != nil, x.isFinite, y.isFinite else { return }
         crowbarTouch = SIMD2(x, y)
     }
 
-    public func releaseCrowbarTouch() { crowbarTouch = nil }
+    public func releaseCrowbarTouch() {
+        let recordsProgress = beginProgressInput(.releaseCrowbarTouch)
+        defer { endProgressInput(recordsProgress) }
+        crowbarTouch = nil
+    }
 
     public func quitCrowbar() {
+        let recordsProgress = beginProgressInput(.quitCrowbar)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         crowbarTouch = nil
         crowbar?.quit()
     }
 
     public func holdMemoPullTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdMemoPullTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, memoPull != nil, x.isFinite, y.isFinite else { return }
         memoPullTouch = SIMD2(x, y)
     }
 
-    public func releaseMemoPullTouch() { memoPullTouch = nil }
+    public func releaseMemoPullTouch() {
+        let recordsProgress = beginProgressInput(.releaseMemoPullTouch)
+        defer { endProgressInput(recordsProgress) }
+        memoPullTouch = nil
+    }
 
     public func holdMemoDrawingTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdMemoDrawingTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, memoDrawing != nil, x.isFinite, y.isFinite,
               (0...191).contains(x), (0...255).contains(y) else { return }
         memoDrawingTouch = SIMD2(Int(x), Int(y))
     }
 
-    public func releaseMemoDrawingTouch() { memoDrawingTouch = nil }
+    public func releaseMemoDrawingTouch() {
+        let recordsProgress = beginProgressInput(.releaseMemoDrawingTouch)
+        defer { endProgressInput(recordsProgress) }
+        memoDrawingTouch = nil
+    }
 
     public func clearMemoDrawing() {
+        let recordsProgress = beginProgressInput(.clearMemoDrawing)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         memoDrawing?.clear()
         do {
@@ -1320,18 +1620,24 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func quitMemoDrawing() {
+        let recordsProgress = beginProgressInput(.quitMemoDrawing)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         memoDrawingTouch = nil
         memoDrawing?.quit()
     }
 
     public func quitMemoPull() {
+        let recordsProgress = beginProgressInput(.quitMemoPull)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         memoPullTouch = nil
         memoPull?.quit()
     }
 
     public func quitPaperclip() {
+        let recordsProgress = beginProgressInput(.quitPaperclip)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused else { return }
         paperclipTouch = nil
         paperclip?.quit()
@@ -1341,6 +1647,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Forwards held picture input. Releasing the touch permits the second press.
      */
     public func touchPicture(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.touchPicture(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .picture = runner.phase else { return }
         let effects = touchPicture?.touch(pageX: pageX, pageY: pageY) ?? []
         for effect in effects {
@@ -1349,14 +1657,22 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func activatePicture(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.activatePicture(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .picture = runner.phase else { return }
         let effects = touchPicture?.activate(pageX: pageX, pageY: pageY) ?? []
         if effects.contains(.confirmSound) { try? audio.playOriginalEffect(archiveID: 8, entryID: 0) }
     }
 
-    public func releasePicture() { touchPicture?.release() }
+    public func releasePicture() {
+        let recordsProgress = beginProgressInput(.releasePicture)
+        defer { endProgressInput(recordsProgress) }
+        touchPicture?.release()
+    }
 
     public func pause() {
+        let recordsProgress = beginProgressInput(.pause)
+        defer { endProgressInput(recordsProgress) }
         checkpointWalking()
         isPaused = true
         heldTouch = nil
@@ -1388,6 +1704,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func resume() {
+        let recordsProgress = beginProgressInput(.resume)
+        defer { endProgressInput(recordsProgress) }
         guard isPaused else { return }
         isPaused = false
         audio.resume()
@@ -1397,6 +1715,9 @@ public final class OriginalPlaySession: ObservableObject {
     public func stop() {
         isPaused = true
         onWalkingCheckpoint = nil
+        onProgressCheckpoint = nil
+        onProgressSaveError = nil
+        dialogueNotebook.onSaveProgress = nil
         lobbyTouch = nil
         firstPersonMovement = nil
         suitcaseTouch = nil
@@ -1583,7 +1904,7 @@ public final class OriginalPlaySession: ObservableObject {
                     default: variant = .first
                     }
                     let cipher = OriginalTypewriterCipher(variant: variant,
-                        randomInfo: runner.memoRandomInfo(seed: puzzleSeed()))
+                        randomInfo: runner.memoRandomInfo(seed: nextProgressSeed(jigsaw: false)))
                     typewriterRenderer = renderer
                     typewriterUpperImage = renderer.upperScreen
                     typewriterImage = renderer.touchScreen
@@ -1624,7 +1945,7 @@ public final class OriginalPlaySession: ObservableObject {
                     let items = try runner.game.inventory.items
                     let paper: OriginalMemoDrawing.Paper = items.contains(63) ? .whole : items.contains(13) ? .joined : .torn
                     let renderer = try OriginalMemoDrawingImage(paper: paper, library: .bundled())
-                    let drawing = try OriginalMemoDrawing(paper: paper, randomInfo: runner.memoRandomInfo(seed: puzzleSeed()), mask: renderer.mask)
+                    let drawing = try OriginalMemoDrawing(paper: paper, randomInfo: runner.memoRandomInfo(seed: nextProgressSeed(jigsaw: false)), mask: renderer.mask)
                     memoDrawingRenderer = renderer
                     memoDrawing = OriginalMemoDrawingProcess(drawing: drawing)
                     memoDrawingImage = try renderer.render(drawing)
@@ -1680,14 +2001,14 @@ public final class OriginalPlaySession: ObservableObject {
         case .process(26), .process(39), .process(40), .process(84):
             if jigsaw == nil, case .process(let id) = runner.phase,
                let variant = OriginalJigsawProcess.Variant(rawValue: id) {
-                jigsaw = OriginalJigsawProcess(seed: jigsawSeed(), savedLooseMask: runner.game.jigsawMask(for: variant), variant: variant)
+                jigsaw = OriginalJigsawProcess(seed: nextProgressSeed(jigsaw: true), savedLooseMask: runner.game.jigsawMask(for: variant), variant: variant)
             }
             startTimer()
         case .process(42):
             if fountainPen == nil {
                 do {
                     let renderer = try OriginalFountainPenRenderer()
-                    let puzzle = try renderer.makeProcess(seed: jigsawSeed())
+                    let puzzle = try renderer.makeProcess(seed: nextProgressSeed(jigsaw: true))
                     fountainPenRenderer = renderer
                     fountainPenImage = try renderer.render(puzzle)
                     fountainPenScreenEffects = OriginalScreenEffects()
@@ -1730,7 +2051,7 @@ public final class OriginalPlaySession: ObservableObject {
         case .process(60):
             if linenWagon == nil {
                 do {
-                    let puzzle = OriginalLinenWagonProcess(seed: puzzleSeed())
+                    let puzzle = OriginalLinenWagonProcess(seed: nextProgressSeed(jigsaw: false))
                     linenWagonRenderer = try OriginalLinenWagonRenderer()
                     linenWagonImage = try linenWagonRenderer?.render(puzzle)
                     linenWagonScreenEffects = OriginalScreenEffects()
@@ -1991,7 +2312,7 @@ public final class OriginalPlaySession: ObservableObject {
                 do {
                     let variant: OriginalCabinetDialProcess.Variant = runner.phase == .process(id: 80) ? .cashbox : .cabinet
                     let renderer = try cabinetDialRendererFactory(variant)
-                    let puzzle = OriginalCabinetDialProcess(randomValue: variant == .cabinet ? runner.memoRandomInfo(seed: puzzleSeed()) : 0,
+                    let puzzle = OriginalCabinetDialProcess(randomValue: variant == .cabinet ? runner.memoRandomInfo(seed: nextProgressSeed(jigsaw: false)) : 0,
                         retainedValue: variant == .cabinet ? runner.game.cabinetDialRetainedValue : runner.game.cashboxDialRetainedValue,
                         variant: variant)
                     cabinetDialRenderer = renderer
@@ -2184,6 +2505,7 @@ public final class OriginalPlaySession: ObservableObject {
                     firstPersonMovement = nil
                     self.lobby?.leaveCounter()
                     chapterTransition = OriginalChapterTransition()
+                    if usesInstantSaves { showChapterTitle() }
                 } catch { runner.halt("The chapter transition could not start: \(error)") }
                 return
             }
@@ -2302,7 +2624,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func startTimer() {
-        guard timer == nil, !isPaused else { return }
+        guard timer == nil, !isPaused, !isReplayingProgress else { return }
         let timer = Timer(timeInterval: 1 / Self.updatesPerSecond, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.advanceFrame() }
         }
@@ -2320,6 +2642,9 @@ public final class OriginalPlaySession: ObservableObject {
      */
     func advanceFrame() {
         guard !isPaused else { return }
+        let recordsProgress = shouldRecordProgressFrame && beginProgressInput(
+            .frames(count: 1, microphone: puzzleMicrophone.energy))
+        defer { endProgressInput(recordsProgress) }
         // Music and effect fades continue while reading, browsing and choosing.
         audio.advanceOriginalFrame()
         guard !isBrowsingInventory, chapterTransition == nil else { return }
@@ -3012,7 +3337,7 @@ public final class OriginalPlaySession: ObservableObject {
         let complete = !fountainPenScreenEffects.brightness[0].active
         fountainPenScreenEffects.advanceOriginalFrame()
         let previous = puzzle
-        let effects = puzzle.update(pageTouch: fountainPenTouch, microphoneEnergy: puzzleMicrophone.energy, fadeComplete: complete)
+        let effects = puzzle.update(pageTouch: fountainPenTouch, microphoneEnergy: isReplayingProgress ? replayMicrophoneEnergy : puzzleMicrophone.energy, fadeComplete: complete)
         fountainPen = puzzle
         do {
             for effect in effects {
@@ -3677,6 +4002,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func holdLobbyTouch(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.holdLobbyTouch(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, !isBrowsingInventory, chapterTransition == nil, notebook == nil, closeup == nil, door == nil, case .exploration = runner.phase, lobby?.mode == .walking,
               x.isFinite, y.isFinite, x >= 0, x < 192, y >= 0, y < 256 else { return }
         firstPersonMovement = nil
@@ -3685,20 +4012,30 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// Camera-relative movement uses the same walls, people and event regions as map walking.
     public func holdFirstPersonMovement(strafe: Float, forward: Float) {
+        let recordsProgress = beginProgressInput(.holdFirstPersonMovement(strafe: strafe, forward: forward))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, !isBrowsingInventory, canSaveWalkingCheckpoint, strafe.isFinite, forward.isFinite else { return }
         lobbyTouch = nil
         firstPersonMovement = SIMD2(strafe, forward)
     }
 
     public func turnFirstPerson(by radians: Float) {
+        let recordsProgress = beginProgressInput(.turnFirstPerson(radians: radians))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, !isBrowsingInventory, canSaveWalkingCheckpoint, radians.isFinite else { return }
         lobby?.turnView(by: radians)
         redrawLobby()
     }
 
-    public func finishFirstPersonLook() { checkpointWalking() }
+    public func finishFirstPersonLook() {
+        let recordsProgress = beginProgressInput(.finishFirstPersonLook)
+        defer { endProgressInput(recordsProgress) }
+        checkpointWalking()
+    }
 
     public func releaseLobbyTouch() {
+        let recordsProgress = beginProgressInput(.releaseLobbyTouch)
+        defer { endProgressInput(recordsProgress) }
         lobbyTouch = nil
         firstPersonMovement = nil
         if case .exploration = runner.phase { lobby?.update(heldPageTouch: nil) }
@@ -3711,6 +4048,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func inspectNearbyDoor() {
+        let recordsProgress = beginProgressInput(.inspectNearbyDoor)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, closeup == nil, door == nil, case .exploration = runner.phase,
               let destination = nearbyDoor, let lobby, let doorTable else { return }
         if doorTable.departsDirectly(from: lobby.mapID, to: destination, game: runner.game) {
@@ -3741,18 +4080,24 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func selectDoorComponent(x: Int, y: Int, confirmImmediately: Bool = false) {
+        let recordsProgress = beginProgressInput(.selectDoorComponent(x: x, y: y, confirmImmediately: confirmImmediately))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, door != nil else { return }
         let repeated = door?.select(doorImage?.hit(pageX: x, pageY: y)) == true
         if repeated || (confirmImmediately && door?.selected != nil) { confirmDoorComponent() }
     }
 
     public func useItemAtDoor(_ item: UInt8?) {
+        let recordsProgress = beginProgressInput(.useItemAtDoor(item: item))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, door != nil else { return }
         if let item, (try? runner.game.inventory.items.contains(item)) != true { return }
         door?.use(item)
     }
 
     public func confirmDoorComponent() {
+        let recordsProgress = beginProgressInput(.confirmDoorComponent)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, let door, let selected = door.selected else { return }
         self.door?.clearSelection()
         let opensDoor = door.item == nil && selected == 2
@@ -3780,6 +4125,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func leaveDoor() {
+        let recordsProgress = beginProgressInput(.leaveDoor)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase else { return }
         door = nil
         doorImage = nil
@@ -3788,6 +4135,8 @@ public final class OriginalPlaySession: ObservableObject {
 
 
     public func talkToNearbyPerson() {
+        let recordsProgress = beginProgressInput(.talkToNearbyPerson)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, closeup == nil, door == nil, case .exploration = runner.phase,
               let person = lobby?.nearbyPerson(in: runner.game) else { return }
         lobbyTouch = nil
@@ -3797,6 +4146,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func inspectLobbyCounter() {
+        let recordsProgress = beginProgressInput(.inspectLobbyCounter)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, closeup == nil, door == nil, case .exploration = runner.phase,
               var lobby, lobby.canInspectCounter(in: runner.game), let area = lobby.nearbySearchArea else { return }
         do {
@@ -3817,12 +4168,16 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func panLobbyCounter(_ value: Float) {
+        let recordsProgress = beginProgressInput(.panLobbyCounter(value: value))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup == nil, lobby?.mode == .counter else { return }
         lobby?.setPan(value)
         redrawLobby()
     }
 
     public func leaveLobbyCounter() {
+        let recordsProgress = beginProgressInput(.leaveLobbyCounter)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase else { return }
         lobby?.leaveCounter()
         searchItem = nil
@@ -3830,6 +4185,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func selectLobbyObject(x: Float, y: Float, confirmImmediately: Bool = false) {
+        let recordsProgress = beginProgressInput(.selectLobbyObject(x: x, y: y, confirmImmediately: confirmImmediately))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup == nil, lobby?.mode == .counter else { return }
         do {
             let visible = lobby.map { $0.objectVisibility.visibleNodes(in: $0.counter, map: $0.mapID,
@@ -3843,6 +4200,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Starts the search response for a room object selected with its visible hit mesh.
      */
     public func selectLobbyRoomObject(x: Float, y: Float) {
+        let recordsProgress = beginProgressInput(.selectLobbyRoomObject(x: x, y: y))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase,
               closeup == nil, let lobby, lobby.mode == .walking,
               let area = lobby.nearbySearchArea else { return }
@@ -3862,6 +4221,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func useItemInSearchView(_ item: UInt8?) {
+        let recordsProgress = beginProgressInput(.useItemInSearchView(item: item))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup == nil, lobby?.mode == .counter else { return }
         if let item, (try? runner.game.inventory.items.contains(item)) != true { return }
         if let item, startInventoryProcess(item) { return }
@@ -3870,6 +4231,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func confirmLobbyObject() {
+        let recordsProgress = beginProgressInput(.confirmLobbyObject)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup == nil, lobby?.mode == .counter,
               let node = lobby?.selectedNode, let subarea = OriginalMapExploration.subarea(node: node) else { return }
         do {
@@ -3925,6 +4288,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func selectCloseupComponent(x: Int, y: Int, confirmImmediately: Bool = false) {
+        let recordsProgress = beginProgressInput(.selectCloseupComponent(x: x, y: y, confirmImmediately: confirmImmediately))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup != nil else { return }
         let repeated = closeup?.select(closeupImage?.hit(pageX: x, pageY: y)) == true
         if repeated || (confirmImmediately && closeup?.selected != nil) { confirmCloseupComponent() }
@@ -3934,6 +4299,8 @@ public final class OriginalPlaySession: ObservableObject {
      * Close-up inventory uses the same trick table as the surrounding search view.
      */
     public func useItemInCloseup(_ item: UInt8?) {
+        let recordsProgress = beginProgressInput(.useItemInCloseup(item: item))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup != nil else { return }
         if let item {
             guard (try? runner.game.inventory.items.contains(item)) == true else { return }
@@ -3958,6 +4325,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func confirmCloseupComponent() {
+        let recordsProgress = beginProgressInput(.confirmCloseupComponent)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, let closeup, let event = closeup.selectedEvent else { return }
         self.closeup?.clearSelection()
         if let searchItem {
@@ -3976,6 +4345,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func leaveSearchCloseup() {
+        let recordsProgress = beginProgressInput(.leaveSearchCloseup)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup != nil else { return }
         searchItem = nil
         if let parent = closeupParents.popLast() {
@@ -4034,6 +4405,97 @@ public final class OriginalPlaySession: ObservableObject {
                                  cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
                                  cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
                                  bowlingRendererFactory: OriginalBowlingRendererFactory? = nil) throws -> OriginalPlaySession {
+        if let journal = checkpoint.progress {
+            _ = try checkpoint.gameState()
+            let wasMuted = audio.isMuted
+            let wasRestoring = audio.isRestoringProgress
+            var restored = false
+            audio.isMuted = true
+            audio.isRestoringProgress = true
+            defer {
+                audio.stopAll()
+                audio.isRestoringProgress = wasRestoring
+                audio.isMuted = wasMuted
+                if restored, let sequence = checkpoint.musicSequenceID {
+                    try? audio.playOriginalSequence(id: sequence)
+                }
+            }
+            let play: OriginalPlaySession
+            switch journal.origin {
+            case .arrival:
+                play = try chapterOne(audio: audio, timestamp: journal.timestamp, saveStore: saveStore,
+                mapRendererFactory: mapRendererFactory,
+                suitcaseRendererFactory: suitcaseRendererFactory,
+                hangerRendererFactory: hangerRendererFactory,
+                thinWireRendererFactory: thinWireRendererFactory,
+                suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
+                memoPullRendererFactory: memoPullRendererFactory,
+                crowbarRendererFactory: crowbarRendererFactory,
+                cabinetDialRendererFactory: cabinetDialRendererFactory)
+            case .walking:
+                let base = try JSONDecoder().decode(OriginalResumeSave.self, from: journal.base)
+                play = try restoring(base, audio: audio, saveStore: saveStore,
+                mapRendererFactory: mapRendererFactory,
+                suitcaseRendererFactory: suitcaseRendererFactory,
+                hangerRendererFactory: hangerRendererFactory,
+                thinWireRendererFactory: thinWireRendererFactory,
+                suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
+                memoPullRendererFactory: memoPullRendererFactory,
+                crowbarRendererFactory: crowbarRendererFactory,
+                cabinetDialRendererFactory: cabinetDialRendererFactory,
+                cassetteRendererFactory: cassetteRendererFactory,
+                cassetteDeckRendererFactory: cassetteDeckRendererFactory,
+                bowlingRendererFactory: bowlingRendererFactory)
+            case .chapter:
+                let base = try JSONDecoder().decode(OriginalChapterSave.self, from: journal.base)
+                play = try restoring(base, audio: audio, saveStore: saveStore,
+                mapRendererFactory: mapRendererFactory,
+                suitcaseRendererFactory: suitcaseRendererFactory,
+                hangerRendererFactory: hangerRendererFactory,
+                thinWireRendererFactory: thinWireRendererFactory,
+                suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
+                memoPullRendererFactory: memoPullRendererFactory,
+                crowbarRendererFactory: crowbarRendererFactory,
+                cabinetDialRendererFactory: cabinetDialRendererFactory,
+                cassetteRendererFactory: cassetteRendererFactory,
+                cassetteDeckRendererFactory: cassetteDeckRendererFactory,
+                bowlingRendererFactory: bowlingRendererFactory)
+            }
+            play.stopTimer()
+            if journal.origin == .walking, let session = journal.baseSession {
+                try play.runner.restoreWalkingSession(session)
+            }
+            if journal.origin == .walking, !journal.inputs.isEmpty,
+               let position = journal.baseRuntimePosition, let facing = journal.baseRuntimeFacing {
+                guard position.x.isFinite, position.y.isFinite, position.z.isFinite, facing.isFinite else {
+                    throw OriginalDataError.invalid("Saved walking position")
+                }
+                play.runner.setMapPosition(position, facing: facing)
+            }
+            play.prepareProgress(journal)
+            play.isReplayingProgress = true
+            for input in journal.inputs { play.applyProgressInput(input) }
+            var restoredGame = play.runner.game
+            if play.canSaveWalkingCheckpoint, let lobby = play.lobby {
+                restoredGame.setMapPosition(lobby.position, facing: lobby.facing)
+            }
+            guard !play.replayInvalid, Data(restoredGame.bytes) == checkpoint.state,
+                  restoredGame.conditionGlobalByte == checkpoint.conditionGlobalByte,
+                  play.runner.program.name == journal.program, play.runner.eventIndex == journal.eventIndex,
+                  play.progressPhase == journal.phase,
+                  play.canSaveWalkingCheckpoint || play.runner.session == journal.session,
+                  play.replaySeedIndex == [journal.jigsawSeeds.count, journal.puzzleSeeds.count],
+                  play.replaySlotIndex == journal.chapterSlotReads.count,
+                  play.replayWriteIndex == journal.chapterWrites.count else {
+                play.stop()
+                throw OriginalDataError.invalid("Saved interaction could not be restored accurately")
+            }
+            if let notebook = journal.notebook { play.dialogueNotebook.restore(notebook) }
+            play.isReplayingProgress = false
+            play.pause()
+            restored = true
+            return play
+        }
         let game = try checkpoint.gameState()
         let catalog = try OriginalScriptCatalog.bundled()
         guard let map = OriginalMapExploration.supportedMaps[game.mapID] else {
@@ -4066,6 +4528,7 @@ public final class OriginalPlaySession: ObservableObject {
         play.lobbyMap = renderer.map
         try play.renderLobby()
         if let sequence = checkpoint.musicSequenceID { try? audio.playOriginalSequence(id: sequence) }
+        play.prepareProgress(OriginalPlayProgress(origin: .walking, base: try JSONEncoder().encode(checkpoint)))
         return play
     }
 
@@ -4096,7 +4559,7 @@ public final class OriginalPlaySession: ObservableObject {
         try runner.beginChapterTitle()
         var transition = OriginalChapterTransition()
         transition.stage = .title
-        return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
                                    puzzleSeed: puzzleSeed, saveStore: saveStore, chapterTransition: transition,
                                    mapRendererFactory: mapRendererFactory,
                                    suitcaseRendererFactory: suitcaseRendererFactory,
@@ -4109,28 +4572,36 @@ public final class OriginalPlaySession: ObservableObject {
                                    cassetteRendererFactory: cassetteRendererFactory,
                                    cassetteDeckRendererFactory: cassetteDeckRendererFactory,
                                    bowlingRendererFactory: bowlingRendererFactory)
+        play.prepareProgress(OriginalPlayProgress(origin: .chapter, base: try JSONEncoder().encode(checkpoint)))
+        return play
     }
 
     /**
      * The chapter save decision precedes the title on both branches.
      */
     public func answerChapterSave(_ save: Bool) {
+        let recordsProgress = beginProgressInput(.answerChapterSave(save: save))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition?.stage == .prompt else { return }
         if !save { return showChapterTitle() }
         do {
-            chapterTransition?.slots = try (0..<3).map { try saveStore.load(slot: $0) }
+            chapterTransition?.slots = try progressChapterSlots()
             chapterTransition?.error = nil
             chapterTransition?.stage = .slots
         } catch { chapterTransition?.error = "The save slots could not be read: \(error)" }
     }
 
     public func selectChapterSaveSlot(_ slot: Int) {
+        let recordsProgress = beginProgressInput(.selectChapterSaveSlot(slot: slot))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition?.stage == .slots, (0..<3).contains(slot) else { return }
         chapterTransition?.selectedSlot = slot
         chapterTransition?.error = nil
     }
 
     public func confirmChapterSaveSlot() {
+        let recordsProgress = beginProgressInput(.confirmChapterSaveSlot)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition?.stage == .slots,
               let slot = chapterTransition?.selectedSlot else { return }
         if chapterTransition?.slots[slot] != nil { chapterTransition?.stage = .overwrite }
@@ -4138,12 +4609,16 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func confirmChapterOverwrite(_ overwrite: Bool) {
+        let recordsProgress = beginProgressInput(.confirmChapterOverwrite(overwrite: overwrite))
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition?.stage == .overwrite else { return }
         if overwrite { writeChapterSave() }
         else { chapterTransition?.stage = .slots }
     }
 
     public func cancelChapterSave() {
+        let recordsProgress = beginProgressInput(.cancelChapterSave)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition?.stage == .slots else { return }
         if chapterTransition?.selectedSlot != nil {
             chapterTransition?.selectedSlot = nil
@@ -4154,8 +4629,7 @@ public final class OriginalPlaySession: ObservableObject {
     private func writeChapterSave() {
         guard let slot = chapterTransition?.selectedSlot else { return }
         do {
-            let checkpoint = try OriginalChapterSave(game: runner.game, savedAt: saveDate())
-            try saveStore.save(checkpoint, slot: slot)
+            let checkpoint = try progressChapterWrite(slot: slot)
             chapterTransition?.slots[slot] = checkpoint
             chapterTransition?.error = nil
             showChapterTitle()
@@ -4178,6 +4652,8 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func continueChapterTitle() {
+        let recordsProgress = beginProgressInput(.continueChapterTitle)
+        defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition?.stage == .title else { return }
         do {
             guard OriginalMapExploration.supportedMaps[runner.game.mapID] != nil else {
@@ -4203,5 +4679,155 @@ public final class OriginalPlaySession: ObservableObject {
     private func redrawLobby() {
         do { try renderLobby() }
         catch { runner.halt("The map could not be drawn: \(error)"); stopTimer() }
+    }
+}
+
+extension OriginalPlaySession {
+    func enableInstantSaves() {
+        usesInstantSaves = true
+        progressJournal?.usesInstantSaves = true
+        if let transition = chapterTransition, transition.stage != .title { showChapterTitle() }
+    }
+
+    private func prepareProgress(_ journal: OriginalPlayProgress) {
+        progressJournal = journal
+        usesInstantSaves = journal.usesInstantSaves
+        dialogueNotebook.onSaveProgress = { [weak self] _ in self?.notifyProgress() }
+    }
+
+    private var progressPhase: String {
+        switch runner.phase {
+        case .dialogue: return "dialogue"
+        case .itemNotice(let item, _): return "item-\(item)"
+        case .process(let id): return "process-\(id)"
+        case .waiting(let updates): return "waiting-\(updates)"
+        case .exploration(let map): return "map-\(map)"
+        case .choice(let choices): return "choice-\(choices.map(\.id))"
+        case .questions(let topics): return "topics-\(topics.map(\.keyword))"
+        case .picture(let id): return "picture-\(id)"
+        case .halted(let halt): return "halted-\(halt.reason)"
+        }
+    }
+
+    private var shouldRecordProgressFrame: Bool {
+        guard !isBrowsingInventory, chapterTransition == nil else { return false }
+        if notebook != nil { return notebookTouch != nil }
+        switch runner.phase {
+        case .dialogue, .itemNotice, .questions, .choice, .halted: return false
+        case .exploration where lobby != nil: return lobbyTouch != nil || firstPersonMovement != nil
+        default: return true
+        }
+    }
+
+    private func beginProgressInput(_ input: OriginalProgressInput) -> Bool {
+        guard progressJournal != nil, !isReplayingProgress, !progressInputActive else { return false }
+        progressInputActive = true
+        if case let .frames(count, microphone) = input,
+           let last = progressJournal?.inputs.last,
+           case let .frames(previous, energy) = last, energy == microphone {
+            let index = progressJournal!.inputs.count - 1
+            progressJournal?.inputs[index] = .frames(count: previous + count, microphone: energy)
+        } else {
+            progressJournal?.inputs.append(input)
+        }
+        return true
+    }
+
+    private func endProgressInput(_ recorded: Bool) {
+        guard recorded else { return }
+        progressInputActive = false
+        if canSaveWalkingCheckpoint, lobbyTouch == nil, firstPersonMovement == nil {
+            do {
+                let checkpoint = try walkingCheckpoint()
+                let previous = progressJournal?.origin == .walking
+                    ? try progressJournal.map { try JSONDecoder().decode(OriginalResumeSave.self, from: $0.base) } : nil
+                let unchanged = previous?.state == checkpoint.state &&
+                    previous?.conditionGlobalByte == checkpoint.conditionGlobalByte &&
+                    previous?.checkpointFacing == checkpoint.checkpointFacing &&
+                    previous?.musicSequenceID == checkpoint.musicSequenceID
+                let base = unchanged ? progressJournal!.base : try JSONEncoder().encode(checkpoint)
+                progressJournal = OriginalPlayProgress(origin: .walking, base: base, baseSession: runner.session,
+                    baseRuntimePosition: runner.game.mapPosition, baseRuntimeFacing: runner.game.facing, usesInstantSaves: usesInstantSaves)
+            } catch { onProgressSaveError?(error) }
+        }
+        notifyProgress()
+    }
+
+    func progressCheckpoint() throws -> OriginalResumeSave {
+        guard var journal = progressJournal else { return try walkingCheckpoint() }
+        journal.notebook = dialogueNotebook.savedState()
+        journal.program = runner.program.name
+        journal.eventIndex = runner.eventIndex
+        journal.phase = progressPhase
+        journal.session = runner.session
+        var game = runner.game
+        if canSaveWalkingCheckpoint, let lobby { game.setMapPosition(lobby.position, facing: lobby.facing) }
+        return try OriginalResumeSave(game: game, checkpointFacing: lobby?.checkpointFacing ?? game.facing,
+            musicSequenceID: audio.currentSequenceID, savedAt: saveDate(), progress: journal)
+    }
+
+    private func notifyProgress() {
+        guard onProgressCheckpoint != nil, !isReplayingProgress, !progressInputActive else { return }
+        if case .halted = runner.phase { return }
+        do {
+            let checkpoint = try progressCheckpoint()
+            onProgressCheckpoint?(checkpoint)
+        } catch { onProgressSaveError?(error) }
+    }
+
+    private func nextProgressSeed(jigsaw: Bool) -> UInt32 {
+        if isReplayingProgress {
+            let slot = jigsaw ? 0 : 1
+            let seeds = jigsaw ? progressJournal?.jigsawSeeds : progressJournal?.puzzleSeeds
+            let index = replaySeedIndex[slot]
+            guard let seeds, seeds.indices.contains(index) else { replayInvalid = true; return 0 }
+            replaySeedIndex[slot] += 1
+            return seeds[index]
+        }
+        let seed = jigsaw ? jigsawSeed() : puzzleSeed()
+        if jigsaw { progressJournal?.jigsawSeeds.append(seed) }
+        else { progressJournal?.puzzleSeeds.append(seed) }
+        return seed
+    }
+
+    private func progressChapterSlots() throws -> [OriginalChapterSave?] {
+        if isReplayingProgress {
+            guard let reads = progressJournal?.chapterSlotReads, reads.indices.contains(replaySlotIndex) else {
+                replayInvalid = true
+                throw OriginalDataError.invalid("Missing chapter slot state")
+            }
+            defer { replaySlotIndex += 1 }
+            return reads[replaySlotIndex]
+        }
+        let slots = try (0..<3).map { try saveStore.load(slot: $0) }
+        progressJournal?.chapterSlotReads.append(slots)
+        return slots
+    }
+
+    private struct SavedChapterWriteError: Error, CustomStringConvertible {
+        let description: String
+    }
+
+    private func progressChapterWrite(slot: Int) throws -> OriginalChapterSave {
+        if isReplayingProgress {
+            guard let writes = progressJournal?.chapterWrites, writes.indices.contains(replayWriteIndex) else {
+                replayInvalid = true
+                throw OriginalDataError.invalid("Missing chapter save result")
+            }
+            let write = writes[replayWriteIndex]
+            replayWriteIndex += 1
+            if let failure = write.failure { throw SavedChapterWriteError(description: failure) }
+            return try OriginalChapterSave(game: runner.game, savedAt: write.date)
+        }
+        let date = saveDate()
+        do {
+            let checkpoint = try OriginalChapterSave(game: runner.game, savedAt: date)
+            try saveStore.save(checkpoint, slot: slot)
+            progressJournal?.chapterWrites.append(.init(date: date, failure: nil))
+            return checkpoint
+        } catch {
+            progressJournal?.chapterWrites.append(.init(date: date, failure: String(describing: error)))
+            throw error
+        }
     }
 }

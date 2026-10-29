@@ -1,7 +1,7 @@
 import SwiftUI
 
 /**
- * Forwards save and chapter-title actions to the session.
+ * Shows chapter titles without the original manual save prompts.
  */
 struct OriginalChapterTransitionView: View {
     @ObservedObject var play: OriginalPlaySession
@@ -12,38 +12,9 @@ struct OriginalChapterTransitionView: View {
             if transition.stage == .title {
                 titlePage
             } else if screen == 0 {
-                VStack(spacing: 16) {
-                    switch transition.stage {
-                    case .prompt:
-                        Text("Save your game?").font(NovelStyle.title)
-                        Button("Yes") { play.answerChapterSave(true) }
-                        Button("No") { play.answerChapterSave(false) }
-                    case .slots:
-                        Text("Save").font(NovelStyle.title)
-                        ForEach(0..<3, id: \.self) { slot in
-                            Button {
-                                play.selectChapterSaveSlot(slot)
-                            } label: {
-                                HStack {
-                                    Text("\(slot + 1)")
-                                    Text(transition.slots[slot].map { "Chapter \($0.chapterNumber)" } ?? "There is no data.")
-                                    Spacer()
-                                    if transition.selectedSlot == slot { Image(systemName: "checkmark") }
-                                }
-                            }
-                        }
-                        Button("Confirm") { play.confirmChapterSaveSlot() }
-                            .disabled(transition.selectedSlot == nil)
-                        Button(transition.selectedSlot == nil ? "Back" : "Cancel") { play.cancelChapterSave() }
-                    case .overwrite:
-                        Text("Replace this saved game?")
-                        Button("Yes") { play.confirmChapterOverwrite(true) }
-                        Button("No") { play.confirmChapterOverwrite(false) }
-                    case .title: EmptyView()
-                    }
-                    if let error = transition.error { Text(error).font(NovelStyle.caption) }
-                }
-                .buttonStyle(BookTextButtonStyle())
+                Text("Your progress saves automatically.")
+                    .font(NovelStyle.caption)
+                    .task { play.enableInstantSaves() }
             } else { Color.clear }
         }
     }

@@ -1294,3 +1294,10 @@ public struct OriginalEventRunner: Sendable {
         }
     }
 }
+
+extension OriginalEventRunner {
+    mutating func restoreWalkingSession(_ saved: OriginalEventSession) throws {
+        guard case .exploration = phase else { throw OriginalDataError.invalid("Walking session state") }
+        session = saved
+    }
+}

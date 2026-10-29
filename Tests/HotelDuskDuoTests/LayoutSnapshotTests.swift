@@ -290,7 +290,9 @@ final class LayoutSnapshotTests: XCTestCase {
     func testPlayableTitleAndPauseMenuFitDuoPages() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
-        let session = GameSession(saveStore: OriginalChapterFileStore(directory: root),
+        let audio = AudioController(musicOutputFactory: { _, _, _ in SimulatedMusicOutput() })
+        audio.isMuted = true
+        let session = GameSession(audioController: audio, saveStore: OriginalChapterFileStore(directory: root),
                                   resumeStore: OriginalResumeFileStore(directory: root))
         for size in [CGSize(width: 768, height: 600), CGSize(width: 640, height: 800)] {
             _ = try capture(DuoBookContainerView(session: session).frame(width: size.width, height: size.height),

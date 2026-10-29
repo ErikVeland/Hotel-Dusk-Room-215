@@ -22,10 +22,25 @@ struct NotebookCurlGeometry {
             x = Double(pageSize.width) / bend * (sin(tangent) - sin(angle))
             z = Double(pageSize.width) / bend * (cos(angle) - cos(tangent))
         }
-        let perspective = 1 / (1 + z / max(1, Double(pageSize.width * 4)))
+        let perspective = 1 / (1 - z / max(1, Double(pageSize.width * 4)))
         return Point(position: CGPoint(x: pageSize.width + x * perspective,
                                        y: pageSize.height / 2 + (v - 0.5) * pageSize.height * perspective),
                      depth: z, facesFront: cos(tangent) >= 0)
+    }
+}
+
+struct NotebookPageDrag {
+    static func progress(translation: CGFloat, pageWidth: CGFloat, backward: Bool) -> Double {
+        let distance = backward ? translation : -translation
+        return min(1, max(0, Double(distance / max(1, pageWidth * 2))))
+    }
+
+    static func shouldComplete(translation: CGFloat, predicted: CGFloat, pageWidth: CGFloat, backward: Bool) -> Bool {
+        let current = progress(translation: translation, pageWidth: pageWidth, backward: backward)
+        let projected = progress(translation: predicted, pageWidth: pageWidth, backward: backward)
+        let direction: CGFloat = backward ? 1 : -1
+        if (predicted - translation) * direction < -pageWidth * 0.12 { return false }
+        return current >= 0.5 || projected >= 0.5
     }
 }
 
@@ -35,8 +50,7 @@ struct NotebookCurlImages {
     let reverse: CGImage
 }
 
-/// A textured curved sheet for desktop, where UIKit's page-curl controller is
-/// unavailable. The reverse settles over the old left page without a crossfade.
+/// A sheet raised towards the reader, with its reverse crossing the spine.
 struct DesktopNotebookCurl: View, Animatable {
     let images: NotebookCurlImages
     let pageSize: CGSize
@@ -130,9 +144,17 @@ struct DesktopNotebookSpread: View {
     let layout: DialogueNotebookLayout
     let metrics: DialogueSpreadMetrics
     let reduceMotion: Bool
+    var gesturesEnabled = true
     @State private var images: NotebookCurlImages?
     @State private var progress = 0.0
     @State private var backward = false
+    @State private var imageRevision: Int?
+    @GestureState private var dragging = false
+
+    private struct TurnKey: Equatable {
+        let revision: Int
+        let holding: Bool
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -142,25 +164,67 @@ struct DesktopNotebookSpread: View {
         .overlay(alignment: .topLeading) {
             if let images { DesktopNotebookCurl(images: images, pageSize: metrics.pageSize, progress: progress, backward: backward) }
         }
-        .task(id: notebook.turnRevision) {
+        .contentShape(Rectangle())
+        .simultaneousGesture(DragGesture(minimumDistance: 6)
+            .updating($dragging) { _, active, _ in active = true }
+            .onChanged { value in
+                guard gesturesEnabled,
+                      abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
+                if !notebook.isTurning {
+                    let back = value.startLocation.x < metrics.pageSize.width
+                    guard back ? value.translation.width > 0 : value.translation.width < 0,
+                          !back || play.canReviewConversations,
+                          notebook.beginInteractiveTurn(backward: back) else { return }
+                }
+                guard notebook.isHoldingTurn else { return }
+                notebook.updateInteractiveTurn(progress: NotebookPageDrag.progress(
+                    translation: value.translation.width, pageWidth: metrics.pageSize.width,
+                    backward: notebook.turnsBackward))
+            }
+            .onEnded { value in
+                guard notebook.isHoldingTurn else { return }
+                notebook.releaseInteractiveTurn(commit: NotebookPageDrag.shouldComplete(
+                    translation: value.translation.width, predicted: value.predictedEndTranslation.width,
+                    pageWidth: metrics.pageSize.width, backward: notebook.turnsBackward))
+            })
+        .onChange(of: dragging) { _, active in
+            if !active, notebook.isHoldingTurn { notebook.releaseInteractiveTurn(commit: false) }
+        }
+        .onChange(of: gesturesEnabled) { _, enabled in
+            if !enabled, notebook.isHoldingTurn { notebook.releaseInteractiveTurn(commit: false) }
+        }
+        .onChange(of: notebook.turnProgress) { _, value in
+            if notebook.isHoldingTurn { progress = value }
+        }
+        .task(id: TurnKey(revision: notebook.turnRevision, holding: notebook.isHoldingTurn)) {
             let revision = notebook.turnRevision
             guard notebook.isTurning else { images = nil; return }
             let previousLeft = notebook.turnFromSpread * 2
             backward = notebook.turnsBackward
-            guard !reduceMotion,
+            guard !reduceMotion else {
+                images = nil
+                if !notebook.isHoldingTurn { notebook.finishTurn(revision: revision) }
+                return
+            }
+            if imageRevision != revision {
+                guard
                   let left = snapshot(previousLeft + (backward ? 1 : 0)),
                   let front = snapshot(previousLeft + (backward ? 0 : 1)),
                   let reverse = snapshot(notebook.reader.leftIndex + (backward ? 1 : 0)) else {
-                images = nil
-                notebook.finishTurn(revision: revision)
-                return
+                    images = nil
+                    notebook.finishTurn(revision: revision, completed: false)
+                    return
+                }
+                progress = notebook.turnProgress
+                images = NotebookCurlImages(left: left, front: front, reverse: reverse)
+                imageRevision = revision
             }
-            progress = 0
-            images = NotebookCurlImages(left: left, front: front, reverse: reverse)
-            // Let the first flat frame mount before moving the sheet.
+            guard !notebook.isHoldingTurn else { return }
             await Task.yield()
-            withAnimation(.easeInOut(duration: 0.75)) { progress = 1 }
-            do { try await Task.sleep(for: .milliseconds(800)) }
+            let target = notebook.turnWillComplete ? 1.0 : 0.0
+            let duration = max(0.16, 0.6 * abs(target - progress))
+            withAnimation(.easeOut(duration: duration)) { progress = target }
+            do { try await Task.sleep(for: .seconds(duration)) }
             catch { return }
             guard revision == notebook.turnRevision else { return }
             images = nil
