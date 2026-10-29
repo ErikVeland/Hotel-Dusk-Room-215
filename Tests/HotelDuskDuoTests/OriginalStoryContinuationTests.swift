@@ -1783,6 +1783,15 @@ final class OriginalStoryContinuationTests: XCTestCase {
             play.advanceFrame()
         }
         XCTAssertEqual(play.bowlingMatch?.results.throwScores[scoreIndex], 4)
+        for _ in 0..<40 {
+            guard play.bowlingMatch?.nextCommentaryRequest != nil else { return }
+            if case .process(id: 44) = play.runner.phase { play.advanceFrame() }
+            switch play.runner.phase {
+            case .dialogue, .itemNotice: play.advanceDialogue()
+            default: throw OriginalDataError.invalid("Bowling commentary did not start its recovered response")
+            }
+        }
+        throw OriginalDataError.invalid("Bowling commentary did not return to the match")
     }
 
     @MainActor func testChapterThreeFromPlayedCheckpoint() throws {

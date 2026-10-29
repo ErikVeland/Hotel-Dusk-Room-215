@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "kind": "isolated bowling parent status callback probe",
+  "scope": "Injected process 44 from the valid component-walking checkpoint; not a normal EP8_R119 route.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "14654604720ea8dfb602d70e8bc28a0062fc1113545edeaf7d085f3938d6b697",
+  "traceCommandsSHA256": "b04f4f25bb49ce7f799368493523110638ee19b7e19c1d6a4d0ccc5f14a8c694",
+  "statusStateCommandsSHA256": "555fbcbe74e7df73e873d927286644420d5a3f3b5380f738433b9b58e320ea6b",
+  "statusMethod": "0x021FD74C",
+  "capturedCalls": [
+    {
+      "frame": 403,
+      "parentObject": "0x02310020",
+      "callbackFlag": 1,
+      "requestID": 0,
+      "state": 5,
+      "stateCaptureFrame": 403
+    },
+    {
+      "frame": 586,
+      "parentObject": "0x02310020",
+      "callbackFlag": 1,
+      "requestID": 0,
+      "state": 5,
+      "stateCaptureFrame": 587
+    }
+  ],
+  "derivedStatusCode": "0x7D",
+  "terminalProcessReturn": null,
+  "notes": [
+    "Overlay 11 returns 0x7D from 0x021FD74C while +0xC58 is nonzero.",
+    "The request ID at +0xC56 is zero because the parent clears it after queuing System mode 20.",
+    "An isolated trace of ARM9 method 0x0206D28C recorded no calls during the same interaction; this does not establish the normal route callback owner."
+  ]
+}

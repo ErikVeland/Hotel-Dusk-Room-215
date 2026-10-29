@@ -24,9 +24,11 @@ public struct OriginalBowlingMatchProcess: Equatable, Sendable {
     public private(set) var phase = Phase.ready
     public private(set) var returnValue: Int16?
     public private(set) var presentationFramesRemaining = 0
+    private var commentaryRequests: [Int16] = []
 
     public var throwIndex: Int? { results.nextThrow }
     public var currentScore: Int32? { turn.score }
+    public var nextCommentaryRequest: Int16? { commentaryRequests.first }
 
     public init() {
         self.init(results: OriginalBowlingResult())
@@ -91,7 +93,13 @@ public struct OriginalBowlingMatchProcess: Equatable, Sendable {
         guard phase == .rolling else { return }
         turn.advanceOneUpdate()
         guard turn.phase == .complete, let score = turn.score else { return }
-        _ = results.record(score)
+        guard let slot = results.record(score) else { return }
+        commentaryRequests.append(Self.throwCommentaryRequest(player: slot.player, score: score))
+        if slot.player == 0 {
+            commentaryRequests.append(4)
+        } else if let status = results.roundStatuses[slot.round] {
+            commentaryRequests.append(Self.roundCommentaryRequest(round: slot.round, status: status))
+        }
         if results.shouldFinish {
             presentationFramesRemaining = Self.resultAnimationFrames
             phase = .showingResult
@@ -115,9 +123,32 @@ public struct OriginalBowlingMatchProcess: Equatable, Sendable {
      */
     @discardableResult
     public mutating func beginNextThrow() -> Bool {
-        guard phase == .betweenThrows else { return false }
+        guard phase == .betweenThrows, commentaryRequests.isEmpty else { return false }
         turn = OriginalBowlingTurnProcess(ballPositionFixed20_12: Self.initialBallPositionFixed20_12)
         phase = .ready
         return true
+    }
+
+    /**
+     * Marks one recovered System dialogue response complete.
+     */
+    @discardableResult
+    public mutating func finishCommentaryResponse() -> Bool {
+        guard !commentaryRequests.isEmpty else { return false }
+        commentaryRequests.removeFirst()
+        return true
+    }
+
+    private static func throwCommentaryRequest(player: Int, score: Int32) -> Int16 {
+        switch (player, score < 5) {
+        case (0, true): return 2
+        case (0, false): return 3
+        case (1, true): return 5
+        default: return 6
+        }
+    }
+
+    private static func roundCommentaryRequest(round: Int, status: Int16) -> Int16 {
+        Int16(6 + round * 3) + status
     }
 }

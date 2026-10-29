@@ -1,8 +1,27 @@
+import CoreGraphics
 import XCTest
 @testable import HotelDuskDuoKit
 
 @MainActor
 final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
+    @MainActor
+    private final class SearchShedRendererStub: OriginalSearchShedRendering {
+        private let image: CGImage
+
+        init() throws {
+            guard let image = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
+                bytesPerRow: 192 * 4, space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage() else {
+                throw OriginalDataError.invalid("Search-shed test image")
+            }
+            self.image = image
+        }
+
+        func render(_ process: OriginalSearchShedProcess) throws -> CGImage { image }
+        func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess) -> Int? { 9 }
+        func planePoint(at point: SIMD2<Float>, height: Float) -> SIMD2<Float>? { nil }
+    }
+
     func testR304BrickProcessHasThreeSourceReturnBranches() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram("EP10_R304")
@@ -81,6 +100,39 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         if case .halted(let halt) = play.runner.phase {
             XCTAssertFalse(halt.reason.contains("AfterConfess"), halt.reason)
         }
+    }
+
+    func testProcess79SearchShedCompletesThroughItsSourceEventWithoutMetal() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let program = try catalog.loadProgram("EP10_R304")
+        let event = try XCTUnwrap(program.blocks.tables[2].first {
+            try OriginalEventCompletion.embeddedProcessID(event: $0) == 79
+        })
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        game.setMap(43, previous: 0)
+        var selection = OriginalEventSelectionContext(
+            sceneID: .max, blockID: 0, modeID: 15,
+            eventID: UInt16(event.index), nowTime: game.nowTime, mapID: game.mapID)
+        selection.debugEventSelection = true
+        let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
+        let audio = AudioController()
+        try audio.applyOriginalCommand(.disableMusic(true))
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            searchShedRendererFactory: { try SearchShedRendererStub() })
+        defer { play.stop() }
+
+        XCTAssertEqual(play.runner.phase, .process(id: 79))
+        XCTAssertNotNil(play.searchShed)
+        play.advanceFrame()
+        play.holdSearchShedTouch(x: 96, y: 128)
+        XCTAssertEqual(play.searchShed?.phase, .found)
+        play.openSearchShedTreeBox()
+        XCTAssertNil(play.searchShed)
+        XCTAssertNotEqual(play.runner.phase, .process(id: 79))
+        if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
     }
 
     func testProcess88TouchCompletesAndRunsChapterTenEnding() throws {

@@ -87,6 +87,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var bowlingImage: CGImage?
     private var bowlingRenderer: (any OriginalBowlingRendering)?
     private var bowlingTouch: SIMD2<Float>?
+    private var bowlingParent: OriginalEventRunner?
     private var applePaintingMask: OriginalApplePaintingMask?
     @Published public private(set) var cpr: OriginalCPRProcess?
     @Published public private(set) var appleWordEntry: OriginalAppleWordEntryProcess?
@@ -159,7 +160,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var brickWall: OriginalBrickWallProcess?
     private var brickWallTouch: SIMD2<Float>?
     @Published public private(set) var searchShedScreenEffects = OriginalScreenEffects()
-    private var searchShedRenderer: OriginalSearchShedRenderer?
+    private var searchShedRenderer: (any OriginalSearchShedRendering)?
     private var searchShedTouch: SIMD2<Float>?
     @Published public private(set) var bagSearch: OriginalBagSearchProcess?
     @Published public private(set) var bagSearchImage: CGImage?
@@ -243,6 +244,7 @@ public final class OriginalPlaySession: ObservableObject {
     private let cassetteRendererFactory: OriginalCassetteRendererFactory
     private let cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory
     private let bowlingRendererFactory: OriginalBowlingRendererFactory
+    private let searchShedRendererFactory: OriginalSearchShedRendererFactory
     private var lobbyTouch: SIMD2<Float>?
     private var firstPersonMovement: SIMD2<Float>?
     private var hasReturnedFromDunningIntroduction = false
@@ -330,7 +332,8 @@ public final class OriginalPlaySession: ObservableObject {
                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) },
                 cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
                 cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
-                bowlingRendererFactory: OriginalBowlingRendererFactory? = nil) {
+                bowlingRendererFactory: OriginalBowlingRendererFactory? = nil,
+                searchShedRendererFactory: OriginalSearchShedRendererFactory? = nil) {
         self.runner = runner
         self.audio = audio
         self.originalEffectPlayer = originalEffectPlayer
@@ -352,6 +355,7 @@ public final class OriginalPlaySession: ObservableObject {
         self.cassetteRendererFactory = cassetteRendererFactory ?? { try OriginalCassetteRenderer(tool: $0) }
         self.cassetteDeckRendererFactory = cassetteDeckRendererFactory ?? { try OriginalCassetteDeckRenderer() }
         self.bowlingRendererFactory = bowlingRendererFactory ?? { try OriginalBowlingRenderer() }
+        self.searchShedRendererFactory = searchShedRendererFactory ?? { try OriginalSearchShedRenderer() }
         lobby = restoredExploration
         if chapterTransition?.stage == .title {
             do { chapterTitleImages = try OriginalChapterTitleImages(library: .bundled(), chapter: runner.game.chapter) }
@@ -1867,7 +1871,7 @@ public final class OriginalPlaySession: ObservableObject {
             if searchShed == nil {
                 do {
                     let process = OriginalSearchShedProcess()
-                    let renderer = try OriginalSearchShedRenderer()
+                    let renderer = try searchShedRendererFactory()
                     searchShedRenderer = renderer
                     searchShedImage = try renderer.render(process)
                     searchShedScreenEffects = OriginalScreenEffects()
@@ -2078,6 +2082,14 @@ public final class OriginalPlaySession: ObservableObject {
             startTimer()
         case .exploration(let map):
             stopTimer()
+            if var parent = bowlingParent {
+                parent.resumeProcess(after: runner)
+                runner = parent
+                bowlingParent = nil
+                _ = bowlingMatch?.finishCommentaryResponse()
+                presentedPacketOffset = nil
+                return settle()
+            }
             if var parent = suitcaseContentsParent {
                 parent.resumeProcess(after: runner)
                 runner = parent
@@ -2487,6 +2499,20 @@ public final class OriginalPlaySession: ObservableObject {
 
     private func updateBowling() {
         guard var match = bowlingMatch, let renderer = bowlingRenderer else { return stopTimer() }
+        if let requestID = match.nextCommentaryRequest {
+            do {
+                let response = try runner.processHint(catalog: catalog, pairA: 21, pairB: requestID)
+                bowlingParent = runner
+                runner = response
+                bowlingMatch = match
+                presentedPacketOffset = nil
+                return settle()
+            } catch {
+                runner.halt("The bowling response could not be loaded: \(error)")
+                stopTimer()
+                return
+            }
+        }
         if match.phase == .dragging, let touch = bowlingTouch {
             if let lanePoint = bowlingLanePoint(pageX: touch.x, pageY: touch.y) {
                 match.updateDrag(to: lanePoint)

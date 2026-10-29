@@ -1,8 +1,23 @@
-import Metal
+import CoreGraphics
 import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalBowlingSessionTests: XCTestCase {
+    @MainActor private final class SessionRenderer: OriginalBowlingRendering {
+        private let image: CGImage
+
+        init() throws {
+            guard let image = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
+                bytesPerRow: 192 * 4, space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage() else {
+                throw OriginalDataError.invalid("Bowling test image")
+            }
+            self.image = image
+        }
+
+        func render(_ state: OriginalBowlingRenderer.SceneState) throws -> CGImage { image }
+    }
+
     func testBowlingCommentaryRequestsResolveThroughTheOriginalSystemScene() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let parent = try OriginalEventRunner(program: catalog.loadProgram("EP8_R119"),
@@ -26,9 +41,6 @@ final class OriginalBowlingSessionTests: XCTestCase {
 
     @MainActor
     func testMutedBowlingFlowWaitsForResultActionThenReachesEventEleven() throws {
-        guard MTLCreateSystemDefaultDevice() != nil else {
-            throw XCTSkip("Metal is unavailable in this test environment.")
-        }
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram("EP8_R119")
         let event = try XCTUnwrap(program.blocks.tables[2].first {
@@ -46,7 +58,8 @@ final class OriginalBowlingSessionTests: XCTestCase {
         audio.isMuted = true
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            bowlingRendererFactory: { try SessionRenderer() })
         defer { play.stop() }
 
         XCTAssertEqual(play.bowlingImage?.width, 192)
@@ -81,11 +94,13 @@ final class OriginalBowlingSessionTests: XCTestCase {
         for throwIndex in 1..<OriginalBowlingResult.throwCount {
             if play.bowlingMatch?.phase == .showingResult || play.bowlingMatch?.phase == .presentingResult ||
                 play.bowlingMatch?.phase == .completed { break }
+            drainBowlingCommentary(in: play)
             play.advanceFrame()
             XCTAssertEqual(play.bowlingMatch?.phase, .ready)
             try playCapturedThrow(throwIndex, in: play)
             let scoreIndex = try XCTUnwrap(OriginalBowlingResult.slot(for: throwIndex)).scoreOffset / 4
             XCTAssertNotNil(play.bowlingMatch?.results.throwScores[scoreIndex])
+            drainBowlingCommentary(in: play)
         }
 
         XCTAssertEqual(play.bowlingMatch?.phase, .showingResult)
@@ -134,5 +149,24 @@ final class OriginalBowlingSessionTests: XCTestCase {
         for _ in 0..<1_000 where play.bowlingMatch?.results.throwScores[scoreIndex] == nil {
             play.advanceFrame()
         }
+        drainBowlingCommentary(in: play)
+    }
+
+    @MainActor
+    private func drainBowlingCommentary(in play: OriginalPlaySession) {
+        for _ in 0..<40 {
+            guard play.bowlingMatch?.nextCommentaryRequest != nil else { return }
+            if case .process(id: 44) = play.runner.phase {
+                play.advanceFrame()
+            }
+            switch play.runner.phase {
+            case .dialogue, .itemNotice:
+                play.advanceDialogue()
+            default:
+                XCTFail("Expected the recovered bowling commentary dialogue, found \(play.runner.phase)")
+                return
+            }
+        }
+        XCTFail("Bowling commentary did not return to the match")
     }
 }

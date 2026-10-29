@@ -537,7 +537,7 @@
     {
       "processID": 75,
       "hasNativeHandler": true,
-      "explicitlyUnsupported": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R304",
@@ -650,7 +650,7 @@
     {
       "processID": 88,
       "hasNativeHandler": true,
-      "explicitlyUnsupported": true,
+      "explicitlyUnsupported": false,
       "references": [
         {
           "program": "EP10_R102",
@@ -800,10 +800,7 @@
         91
       ],
       "missingProcesses": [],
-      "unsupportedProcesses": [
-        75,
-        88
-      ]
+      "unsupportedProcesses": []
     }
   ],
   "eventModeCounts": {

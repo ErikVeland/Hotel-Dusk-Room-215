@@ -15,7 +15,7 @@ The original chapter scripts reference 47 distinct embedded processes. 0 still h
 | 7 | 43, 55 | None | None |
 | 8 | 44, 45, 52, 76 | None | None |
 | 9 | 63, 64, 81 | None | None |
-| 10 | 59, 61, 62, 67, 74, 75, 79, 80, 85, 86, 88, 90, 91 | None | 75, 88 |
+| 10 | 59, 61, 62, 67, 74, 75, 79, 80, 85, 86, 88, 90, 91 | None | None |
 
 ## Missing handlers
 
@@ -26,8 +26,6 @@ The original chapter scripts reference 47 distinct embedded processes. 0 still h
 
 | Process | Original references |
 | --- | --- |
-| 75 | EP10_R304 event 24 |
-| 88 | EP10_R102 event 4 |
 
 Regenerate with `python3 tools/audit_story_coverage.py`.
 Unknown process outcomes must remain blocked. A fabricated success result would bypass the original puzzle and its state changes.

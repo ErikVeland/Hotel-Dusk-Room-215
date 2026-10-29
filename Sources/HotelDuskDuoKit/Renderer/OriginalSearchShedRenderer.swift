@@ -4,10 +4,22 @@ import Metal
 import simd
 
 /**
+ * Draws the search shed and resolves its object and plane touch points.
+ */
+@MainActor
+public protocol OriginalSearchShedRendering: AnyObject {
+    func render(_ process: OriginalSearchShedProcess) throws -> CGImage
+    func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess) -> Int?
+    func planePoint(at point: SIMD2<Float>, height: Float) -> SIMD2<Float>?
+}
+
+public typealias OriginalSearchShedRendererFactory = @MainActor () throws -> any OriginalSearchShedRendering
+
+/**
  * Draws the source search-shed cube at each recovered overlay transform.
  */
 @MainActor
-final class OriginalSearchShedRenderer {
+final class OriginalSearchShedRenderer: OriginalSearchShedRendering {
     private let model: OriginalModelMetalPreview
     private let viewProjection: simd_float4x4
 
@@ -22,7 +34,7 @@ final class OriginalSearchShedRenderer {
         viewProjection = Self.projection
     }
 
-    func render(_ process: OriginalSearchShedProcess) throws -> CGImage {
+    public func render(_ process: OriginalSearchShedProcess) throws -> CGImage {
         let instances = process.objects.map { Self.translation($0.position) * Self.scale($0.scale) }
         return try model.render(width: 192, height: 256, viewProjection: viewProjection,
                                 visibleNodes: [2], nodeInstances: [2: instances])
@@ -31,7 +43,7 @@ final class OriginalSearchShedRenderer {
     /**
      * Returns the nearest projected box whose recovered hit triangles contain the touch.
      */
-    func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess) -> Int? {
+    public func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess) -> Int? {
         Self.object(at: point, process: process, model: model.model)
     }
 
@@ -61,7 +73,7 @@ final class OriginalSearchShedRenderer {
     /**
      * Maps a screen touch to the horizontal plane of the selected object.
      */
-    func planePoint(at point: SIMD2<Float>, height: Float) -> SIMD2<Float>? {
+    public func planePoint(at point: SIMD2<Float>, height: Float) -> SIMD2<Float>? {
         let inverse = simd_inverse(viewProjection)
         let near = Self.unproject(point, depth: 0, inverse: inverse)
         let far = Self.unproject(point, depth: 1, inverse: inverse)

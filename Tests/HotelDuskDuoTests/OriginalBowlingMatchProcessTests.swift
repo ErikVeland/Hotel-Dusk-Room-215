@@ -11,16 +11,22 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
     func testThrowsAlternateAndEarlyFinishUsesTheRecoveredCondition() throws {
         let trace = try dragUpdateTrace()
         var match = OriginalBowlingMatchProcess()
+        var commentary: [Int16] = []
 
         XCTAssertFalse(match.beginDrag(at: Self.vector(trace.initialPositionTargetFixed20_12), ballWasHit: false))
 
         for index in 0..<5 {
             try playCapturedThrow(trace, in: &match)
             XCTAssertEqual(match.results.nextThrow, index + 1)
+            while let request = match.nextCommentaryRequest {
+                commentary.append(request)
+                XCTAssertTrue(match.finishCommentaryResponse())
+            }
             if index < 4 { XCTAssertTrue(match.beginNextThrow()) }
         }
 
         XCTAssertEqual(match.results.throwScores.compactMap { $0 }, [4, 4, 4, 4, 4])
+        XCTAssertEqual(commentary, [2, 4, 5, 9, 2, 4, 5, 12, 2, 4])
         XCTAssertEqual(match.phase, .showingResult)
         XCTAssertNil(match.returnValue)
         completeResultPresentation(&match)
@@ -47,6 +53,10 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
         XCTAssertEqual(match.phase, .presentingResult)
         XCTAssertEqual(match.results.roundStatuses, [2, 2, 3])
         XCTAssertNil(match.results.nextThrow)
+        XCTAssertEqual(match.nextCommentaryRequest, 5)
+        XCTAssertTrue(match.finishCommentaryResponse())
+        XCTAssertEqual(match.nextCommentaryRequest, 15)
+        drainCommentary(&match)
         completeResultPresentation(&match)
         XCTAssertEqual(match.returnValue, 2)
     }
@@ -58,12 +68,19 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
         try playCapturedThrow(trace, in: &match)
         XCTAssertEqual(match.phase, .betweenThrows)
         XCTAssertEqual(match.results.throwScores[0], 4)
+        XCTAssertEqual(match.nextCommentaryRequest, 2)
         XCTAssertNil(match.results.throwScores[1])
         XCTAssertFalse(match.beginDrag(at: Self.vector(trace.initialPositionTargetFixed20_12), ballWasHit: true))
 
         for _ in 0..<10 { match.advanceOneUpdate() }
 
         XCTAssertEqual(match.results.throwScores[0], 4)
+        XCTAssertFalse(match.beginNextThrow())
+        XCTAssertTrue(match.finishCommentaryResponse())
+        XCTAssertEqual(match.nextCommentaryRequest, 4)
+        XCTAssertFalse(match.beginNextThrow())
+        XCTAssertTrue(match.finishCommentaryResponse())
+        XCTAssertNil(match.nextCommentaryRequest)
         XCTAssertTrue(match.beginNextThrow())
         XCTAssertEqual(match.phase, .ready)
         XCTAssertEqual(match.throwIndex, 1)
@@ -104,6 +121,10 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
         XCTAssertNil(match.returnValue)
         match.advanceOneUpdate()
         XCTAssertEqual(match.phase, .completed)
+    }
+
+    private func drainCommentary(_ match: inout OriginalBowlingMatchProcess) {
+        while match.finishCommentaryResponse() {}
     }
 
     private static func vector(_ values: [Int32]) -> SIMD3<Int32> {
