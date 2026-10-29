@@ -3,13 +3,13 @@ import simd
 
 /**
  * Approximates overlay 40's brick-face selection with the nearest triangle hit.
- * Keep this mask disconnected from gameplay until the source hit ordering is ported.
+ * This native approximation is not source-exact at shared projected edges.
  */
 enum OriginalBrickWallHitMask {
     private static let edgeTolerance: Float = 0.016
     private static let depthTolerance: Float = 0.0001
 
-    private static let faceVertices: [SIMD3<Float>] = [
+    static let faceVertices: [SIMD3<Float>] = [
         SIMD3(-0.5, -0.5, 0.5), SIMD3(0.5, -0.5, 0.5), SIMD3(-0.5, 0.5, 0.5),
         SIMD3(-0.5, 0.5, 0.5), SIMD3(0.5, -0.5, 0.5), SIMD3(0.5, 0.5, 0.5),
         SIMD3(0.5, -0.5, -0.5), SIMD3(0.5, -0.5, 0.5), SIMD3(0.5, 0.5, -0.5),

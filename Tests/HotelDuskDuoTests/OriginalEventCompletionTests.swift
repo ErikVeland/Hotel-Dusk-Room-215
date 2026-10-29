@@ -140,7 +140,7 @@ final class OriginalEventCompletionTests: XCTestCase {
         }
     }
 
-    func testChapterEightBowlingProcess52HasRecoveredReturnTransitions() throws {
+    func testChapterEightCassetteProcess52HasRecoveredReturnTransitions() throws {
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP8_R114")
         let events = try program.blocks.tables[2].filter {
             try OriginalEventCompletion.embeddedProcessID(event: $0) == 52
@@ -151,7 +151,7 @@ final class OriginalEventCompletionTests: XCTestCase {
         for (result, expectedEvent) in [(Int16(0), UInt16(16)), (1, 17), (2, 17), (3, 18)] {
             guard case .completed(let completion) = try OriginalEventCompletion.stateOnlyExit(
                 event: event, conditions: program.conditions, processReturn: result) else {
-                return XCTFail("Bowling result \(result) must select an original transition")
+            return XCTFail("Cassette process result \(result) must select an original transition")
             }
             XCTAssertEqual(completion.transition?.sourceOffset, 832 + Int(result) * 16)
             XCTAssertEqual(completion.transition?.sceneID, UInt16.max - 1)

@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Records the pencil rewind interaction from overlay 25 process 76.
+ * Records the pencil rewind interaction from overlay 25 process 45.
  */
 public struct OriginalCassetteRewindProcess: Equatable, Sendable {
     public enum Phase: Equatable, Sendable {
@@ -55,7 +55,7 @@ public struct OriginalCassetteRewindProcess: Equatable, Sendable {
         case .returnPending:
             returnUpdates += 1
             if returnUpdates >= 2 {
-                returnedProcessValue = 2
+                returnedProcessValue = 0
                 phase = .complete
             }
         case .complete:

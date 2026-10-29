@@ -3,8 +3,29 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalBowlingSessionTests: XCTestCase {
+    func testBowlingCommentaryRequestsResolveThroughTheOriginalSystemScene() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let parent = try OriginalEventRunner(program: catalog.loadProgram("EP8_R119"),
+            game: OriginalGameState.newGame(defaults: .bundled(), timestamp: 0))
+
+        for requestID: Int16 in 2...15 {
+            var response = try parent.processHint(catalog: catalog, pairA: 21, pairB: requestID)
+            XCTAssertEqual(response.session.selection.modeID, 20)
+            XCTAssertEqual(response.session.selection.pairA, 21)
+            XCTAssertEqual(response.session.selection.pairB, requestID)
+            guard case .dialogue = response.phase else {
+                return XCTFail("Bowling response \(requestID) must start its recovered System dialogue")
+            }
+            for _ in 0..<10 {
+                guard case .dialogue = response.phase else { break }
+                response.acknowledgeDialogue()
+            }
+            XCTAssertEqual(response.phase, .exploration(mapID: parent.game.mapID))
+        }
+    }
+
     @MainActor
-    func testBowlingInputReturnsItsRecoveredSuccessResultToEventEleven() throws {
+    func testMutedBowlingFlowWaitsForResultActionThenReachesEventEleven() throws {
         guard MTLCreateSystemDefaultDevice() != nil else {
             throw XCTSkip("Metal is unavailable in this test environment.")
         }
@@ -49,22 +70,32 @@ final class OriginalBowlingSessionTests: XCTestCase {
         play.releaseBowlingTouch()
         XCTAssertEqual(play.bowlingMatch?.phase, .rolling,
                        "The captured drag should launch from \(String(describing: play.bowlingMatch?.turn.ballPositionFixed20_12))")
-        for _ in 0..<180 where play.bowlingMatch?.results.throwScores[0] == nil {
+        let firstScoreIndex = try XCTUnwrap(OriginalBowlingResult.slot(for: 0)).scoreOffset / 4
+        for _ in 0..<180 where play.bowlingMatch?.results.throwScores[firstScoreIndex] == nil {
             play.advanceFrame()
         }
 
-        XCTAssertEqual(play.bowlingMatch?.results.throwScores[0], 4)
+        XCTAssertEqual(play.bowlingMatch?.results.throwScores[firstScoreIndex], 4)
         XCTAssertEqual(play.bowlingMatch?.phase, .betweenThrows)
 
         for throwIndex in 1..<OriginalBowlingResult.throwCount {
-            if play.bowlingMatch?.phase == .completed { break }
+            if play.bowlingMatch?.phase == .showingResult || play.bowlingMatch?.phase == .presentingResult ||
+                play.bowlingMatch?.phase == .completed { break }
             play.advanceFrame()
             XCTAssertEqual(play.bowlingMatch?.phase, .ready)
             try playCapturedThrow(throwIndex, in: play)
-            XCTAssertNotNil(play.bowlingMatch?.results.throwScores[throwIndex])
+            let scoreIndex = try XCTUnwrap(OriginalBowlingResult.slot(for: throwIndex)).scoreOffset / 4
+            XCTAssertNotNil(play.bowlingMatch?.results.throwScores[scoreIndex])
         }
 
+        XCTAssertEqual(play.bowlingMatch?.phase, .showingResult)
+        XCTAssertEqual(audio.soundEffectsHistory, ["SE_EVENT_BROKE_UEKIBACHI"])
+        XCTAssertNil(play.bowlingMatch?.returnValue)
+        for _ in 0..<OriginalBowlingMatchProcess.resultAnimationFrames { play.advanceFrame() }
+        XCTAssertEqual(play.bowlingMatch?.phase, .presentingResult)
+        for _ in 0..<OriginalBowlingMatchProcess.resultPresentationFrames { play.advanceFrame() }
         XCTAssertEqual(play.bowlingMatch?.phase, .completed)
+        XCTAssertEqual(play.bowlingMatch?.returnValue, 2)
         play.advanceFrame()
         XCTAssertNil(play.bowlingMatch)
         XCTAssertNotEqual(play.runner.phase, .process(id: 44))
@@ -99,7 +130,8 @@ final class OriginalBowlingSessionTests: XCTestCase {
         try holdRawTouch(SIMD2(125, 90), for: 8, in: play)
         play.releaseBowlingTouch()
         XCTAssertEqual(play.bowlingMatch?.phase, .rolling)
-        for _ in 0..<1_000 where play.bowlingMatch?.results.throwScores[throwIndex] == nil {
+        let scoreIndex = try XCTUnwrap(OriginalBowlingResult.slot(for: throwIndex)).scoreOffset / 4
+        for _ in 0..<1_000 where play.bowlingMatch?.results.throwScores[scoreIndex] == nil {
             play.advanceFrame()
         }
     }

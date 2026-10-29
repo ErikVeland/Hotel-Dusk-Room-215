@@ -4,48 +4,51 @@ import Metal
 import simd
 
 /**
+ * Renders and hit-tests the Cassette02 scene used by process 52.
+ */
+@MainActor
+public protocol OriginalCassetteDeckRendering {
+    func render(camera: OriginalCassetteDeckCamera,
+                state: OriginalCassetteDeckProcess.SceneState) throws -> CGImage
+    func hasHit(pageX: Int, pageY: Int, camera: OriginalCassetteDeckCamera,
+                state: OriginalCassetteDeckProcess.SceneState) throws -> Bool
+}
+
+public typealias OriginalCassetteDeckRendererFactory = () throws -> any OriginalCassetteDeckRendering
+
+private extension OriginalCassetteDeckProcess.ModelTransform {
+    var matrix: simd_float4x4 {
+        Self.translationMatrix(translation)
+            * Self.rotationMatrix(rotationDegrees.z, axis: SIMD3(0, 0, 1))
+            * Self.rotationMatrix(rotationDegrees.y, axis: SIMD3(0, 1, 0))
+            * Self.rotationMatrix(rotationDegrees.x, axis: SIMD3(1, 0, 0))
+    }
+
+    static func translationMatrix(_ value: SIMD3<Float>) -> simd_float4x4 {
+        var matrix = matrix_identity_float4x4
+        matrix.columns.3 = SIMD4(value, 1)
+        return matrix
+    }
+
+    static func rotationMatrix(_ degrees: Float, axis: SIMD3<Float>) -> simd_float4x4 {
+        simd_float4x4(simd_quatf(angle: degrees * .pi / 180, axis: axis))
+    }
+}
+
+/**
  * Renders overlay 28's cassette-deck models from captured source transforms.
  */
 @MainActor
-final class OriginalCassetteDeckRenderer {
+final class OriginalCassetteDeckRenderer: OriginalCassetteDeckRendering {
     enum Object: Hashable {
         case radio
         case front
         case tape
     }
 
-    struct ModelTransform: Equatable, Sendable {
-        let rotationDegrees: SIMD3<Float>
-        let translation: SIMD3<Float>
+    typealias ModelTransform = OriginalCassetteDeckProcess.ModelTransform
 
-        init(rotationDegrees: SIMD3<Float>, translation: SIMD3<Float>) {
-            self.rotationDegrees = rotationDegrees
-            self.translation = translation
-        }
-
-        var matrix: simd_float4x4 {
-            Self.translationMatrix(translation)
-                * Self.rotationMatrix(rotationDegrees.z, axis: SIMD3(0, 0, 1))
-                * Self.rotationMatrix(rotationDegrees.y, axis: SIMD3(0, 1, 0))
-                * Self.rotationMatrix(rotationDegrees.x, axis: SIMD3(1, 0, 0))
-        }
-
-        private static func translationMatrix(_ value: SIMD3<Float>) -> simd_float4x4 {
-            var matrix = matrix_identity_float4x4
-            matrix.columns.3 = SIMD4(value, 1)
-            return matrix
-        }
-
-        private static func rotationMatrix(_ degrees: Float, axis: SIMD3<Float>) -> simd_float4x4 {
-            simd_float4x4(simd_quatf(angle: degrees * .pi / 180, axis: axis))
-        }
-    }
-
-    struct SceneState: Equatable, Sendable {
-        let radio: ModelTransform
-        let front: ModelTransform
-        let tape: ModelTransform
-    }
+    typealias SceneState = OriginalCassetteDeckProcess.SceneState
 
     private let device: MTLDevice
     private let queue: MTLCommandQueue
@@ -132,5 +135,11 @@ final class OriginalCassetteDeckRenderer {
             return (object, depth)
         }
         return candidates.min { $0.1 < $1.1 }?.0
+    }
+
+    func hasHit(pageX: Int, pageY: Int, camera: OriginalCassetteDeckCamera,
+                state: SceneState) throws -> Bool {
+        try hitTest(pagePoint: SIMD2(Float(pageX), Float(pageY)), camera: camera,
+                    state: state) != nil
     }
 }

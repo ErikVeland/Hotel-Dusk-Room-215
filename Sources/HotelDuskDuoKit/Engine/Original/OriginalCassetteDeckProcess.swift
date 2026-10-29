@@ -2,9 +2,30 @@ import Foundation
 import simd
 
 /**
- * Runs the recovered cassette scene-to-controls-to-playback path.
+ * Tracks the cassette deck scene, control selection and story return.
  */
 public struct OriginalCassetteDeckProcess: Equatable, Sendable {
+    public struct ModelTransform: Equatable, Sendable {
+        public let rotationDegrees: SIMD3<Float>
+        public let translation: SIMD3<Float>
+
+        public init(rotationDegrees: SIMD3<Float>, translation: SIMD3<Float>) {
+            self.rotationDegrees = rotationDegrees
+            self.translation = translation
+        }
+    }
+
+    public struct SceneState: Equatable, Sendable {
+        public let radio: ModelTransform
+        public let front: ModelTransform
+        public let tape: ModelTransform
+
+        public init(radio: ModelTransform, front: ModelTransform, tape: ModelTransform) {
+            self.radio = radio
+            self.front = front
+            self.tape = tape
+        }
+    }
     public enum Phase: Equatable, Sendable {
         case opening
         case dragging
@@ -29,7 +50,7 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
 
     public init() {}
 
-    var camera: OriginalCassetteDeckCamera {
+    public var camera: OriginalCassetteDeckCamera {
         switch phase {
         case .opening, .dragging, .turning:
             return .init(positionFixed20_12: SIMD3(16794, 12288, 49971),
@@ -45,7 +66,7 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
         }
     }
 
-    var sceneState: OriginalCassetteDeckRenderer.SceneState {
+    public var sceneState: SceneState {
         let radioRotation = phase == .opening || phase == .dragging || phase == .turning
             ? SIMD3<Float>(0, 180, 0) : SIMD3<Float>(0, 180, 179.67654)
         return .init(
@@ -100,7 +121,7 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
         case .exiting:
             exitUpdates += 1
             if exitUpdates >= Self.exitFadeUpdates {
-                returnedProcessValue = 2
+                returnedProcessValue = selectedSelector == 1 ? 0 : 2
                 phase = .complete
             }
         case .complete:

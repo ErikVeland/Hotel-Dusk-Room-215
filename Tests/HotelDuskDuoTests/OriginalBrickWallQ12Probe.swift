@@ -18,7 +18,7 @@ enum OriginalBrickWallQ12Probe {
         guard let ray = OriginalBrickWallTouchRay.ray(at: point) else { return nil }
         let origin = vector(ray.origin)
         let direction = normalized(vector(ray.direction))
-        let end = add(origin, product(direction, 60 * unit))
+        let end = add(origin, product(direction, 100 * unit))
         var selected: (index: Int, x: Int64)?
 
         for (index, object) in objects.enumerated() {

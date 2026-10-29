@@ -250,11 +250,24 @@ public final class AudioController: ObservableObject {
         try reportFailure { try startOriginalEffect(archiveID: archiveID, entryID: entryID) }
     }
 
+    /**
+     * Fades all active effect players, as used by the original bowling result callback.
+     */
+    func stopOriginalEffects(fadeFrames: Int) {
+        effects?.stop(playerID: nil, frames: max(0, fadeFrames))
+    }
+
     private func startOriginalEffect(archiveID: Int, entryID: Int) throws {
         guard !effectsDisabled else { return }
         let archive = try soundArchive ?? OriginalSoundArchive.load()
-        let driver = try driver ?? OriginalSoundDriver.load()
         let cue = try archive.effect(archiveID: archiveID, entryID: entryID)
+        if isMuted {
+            soundArchive = archive
+            recordEffect(cue.symbol)
+            lastError = nil
+            return
+        }
+        let driver = try driver ?? OriginalSoundDriver.load()
         let output = effects ?? OriginalEffectPlayback(driver: driver)
         if cue.bankID != 44 {
             if lastEffectBank != cue.bankID || cue.playerID == 1 {
@@ -272,10 +285,14 @@ public final class AudioController: ObservableObject {
         soundArchive = archive
         self.driver = driver
         effects = output
-        soundEffectsHistory.append(cue.symbol)
-        if soundEffectsHistory.count > 128 { soundEffectsHistory.removeFirst(soundEffectsHistory.count - 128) }
+        recordEffect(cue.symbol)
         lastError = nil
         applyVolume()
+    }
+
+    private func recordEffect(_ symbol: String) {
+        soundEffectsHistory.append(symbol)
+        if soundEffectsHistory.count > 128 { soundEffectsHistory.removeFirst(soundEffectsHistory.count - 128) }
     }
 
     /// Compatibility entry point accepts only an exact original SSAR symbol.

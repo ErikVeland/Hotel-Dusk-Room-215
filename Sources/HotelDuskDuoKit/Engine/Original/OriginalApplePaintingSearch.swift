@@ -51,6 +51,21 @@ public enum OriginalAlphabetProcessContext {
         guard key == 0x15, mode == .paintingSearch else { return nil }
         return 10
     }
+
+    /**
+     * Returns the accepted success result for a recovered Chapter 9 call site.
+     */
+    public static func successfulReturnValue(
+        for invocation: OriginalEventRunner.EmbeddedProcessInvocation) -> Int16? {
+        switch mode(for: invocation) {
+        case .paintingSearch:
+            return invocation.programName == "EP9_R125" && invocation.eventSourceOffset == 104 ? 1 : 2
+        case .wordEntry:
+            return 0
+        case nil:
+            return nil
+        }
+    }
 }
 
 /**
@@ -190,7 +205,7 @@ public struct OriginalApplePaintingProcess: Equatable, Sendable {
     }
 
     /**
-     * Returns process result 2 after the player acknowledges a revealed letter.
+     * Completes the local overlay state and returns its default result value.
      */
     @discardableResult
     public mutating func acknowledgeLetter() -> Int16? {

@@ -1,15 +1,93 @@
 import simd
 import XCTest
+import CoreGraphics
 @testable import HotelDuskDuoKit
 
 final class OriginalStoryContinuationTests: XCTestCase {
+    @MainActor private final class RouteMusicOutput: OriginalMusicOutput {
+        var outputVolume: Float = 0
+        var isActive = true
+        var position: TimeInterval = 0
+        func seek(to seconds: TimeInterval) throws { position = seconds }
+        func resume() throws { isActive = true }
+        func pause() { isActive = false }
+        func stop() { isActive = false }
+    }
+
+    @MainActor private final class BitmapRouteMapRenderer: OriginalMapRendering {
+        let map: CGImage
+
+        init(mapName: String) throws {
+            guard let image = try OriginalBitmapLibrary.bundled()
+                .loadMap(path: "map/fmapscr/\(mapName).bin").makeCGImage() else {
+                throw OriginalDataError.invalid("Route map image")
+            }
+            map = image
+        }
+
+        func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage { map }
+    }
+
+    @MainActor private final class RouteBowlingRenderer: OriginalBowlingRendering {
+        private let image: CGImage
+
+        init() throws {
+            guard let image = CGContext(data: nil, width: 256, height: 192, bitsPerComponent: 8,
+                bytesPerRow: 256 * 4, space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage() else {
+                throw OriginalDataError.invalid("Route bowling image")
+            }
+            self.image = image
+        }
+
+        func render(_ state: OriginalBowlingRenderer.SceneState) throws -> CGImage { image }
+    }
+
+    @MainActor private final class BitmapRouteCassetteRenderer: OriginalCassetteRendering {
+        private let image: CGImage
+
+        init() throws { image = try BitmapRouteMapRenderer(mapName: "R205").map }
+
+        func render() throws -> CGImage { image }
+    }
+
+    @MainActor private final class BitmapCassetteDeckRenderer: OriginalCassetteDeckRendering {
+        private let image: CGImage
+
+        init() throws { image = try BitmapRouteMapRenderer(mapName: "R205").map }
+
+        func render(camera: OriginalCassetteDeckCamera,
+                    state: OriginalCassetteDeckProcess.SceneState) throws -> CGImage { image }
+
+        func hasHit(pageX: Int, pageY: Int, camera: OriginalCassetteDeckCamera,
+                    state: OriginalCassetteDeckProcess.SceneState) throws -> Bool { true }
+    }
+
+    @MainActor private final class BitmapSuitcaseContentsRenderer: OriginalSuitcaseContentsRendering {
+        let initialContents: OriginalSuitcaseContents
+        private let image: CGImage
+
+        init() throws {
+            image = try BitmapRouteMapRenderer(mapName: "R205").map
+            let bitmaps = try OriginalBitmapLibrary.bundled()
+            let masks = try OriginalSuitcaseContents.lowerObjects.map { object in
+                try bitmaps.loadTexture(path: "trick/searchbag/\(object.texture).bin").originalPixelData
+            }
+            initialContents = try OriginalSuitcaseContents(lowerHitMasks: masks)
+        }
+
+        func render(_ process: OriginalSuitcaseContentsProcess, game: OriginalGameState) throws -> CGImage { image }
+    }
+
     @MainActor func testChapterSixReachesBarFromChapterFiveSave() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let save = try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6")).load(slot: 0) else {
             throw XCTSkip("Generate the Chapter 6 save through the Chapter 5 route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
         let play = try OriginalPlaySession.restoring(save, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)))
@@ -38,6 +116,45 @@ final class OriginalStoryContinuationTests: XCTestCase {
         }
         try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
             .appendingPathComponent("chapter6-bar")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterSixTravelsFromR104ThroughR105ToR126() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter6-bar")).load() else {
+            throw XCTSkip("Generate the Chapter 6 bar checkpoint through the Chapter 5 route first")
+        }
+        let audio = AudioController(); audio.isMuted = true
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 4))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 26))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 5, interrupt: true)
+        guard case .choice(let choices) = play.runner.phase else {
+            return XCTFail("Expected the Chapter 6 first bar choice: \(play.runner.phase)")
+        }
+        XCTAssertEqual(choices.map(\.id), [1, 0])
+        play.choose(1)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let topics) = play.runner.phase else {
+            return XCTFail("Expected Louie's Chapter 6 bar topics: \(play.runner.phase)")
+        }
+        XCTAssertEqual(topics.map(\.keyword), [0, 1, 2])
+        for topic: Int16 in [0, 1, 2] {
+            play.ask(topic)
+            OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        }
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 5))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 26))
+        XCTAssertEqual(play.runner.game.nowTime, 0)
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter6-r105-return")).save(play.walkingCheckpoint())
     }
 
     @MainActor func testChapterSixFromBarExitThroughRosaErrand() throws {
@@ -277,6 +394,62 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-normal-wine-clues")).save(play.walkingCheckpoint())
         try OriginalChapterThreeRouteChecks.useItem(play, 50, on: "obj06")
         XCTAssertEqual(play.runner.phase, .process(id: 46))
+
+        for _ in 0..<65 { play.advanceFrame() }
+        for y in stride(from: 52, through: 204, by: 8) {
+            play.holdLabelPeelTouch(x: 36, y: Float(y))
+            play.advanceFrame()
+            for x in stride(from: 38, through: 156, by: 2) {
+                play.holdLabelPeelTouch(x: Float(x), y: Float(y))
+                play.advanceFrame()
+            }
+            play.releaseLabelPeelTouch()
+            play.advanceFrame()
+        }
+        for _ in 0..<65 where play.labelPeel != nil { play.advanceFrame() }
+        XCTAssertEqual(play.runner.session.selection.eventID, 9)
+        play.advanceDialogue()
+        XCTAssertEqual(play.labelPeel?.stage, .peel)
+        for _ in 0..<65 { play.advanceFrame() }
+        for _ in 0..<5 {
+            play.holdLabelPeelTouch(x: 150, y: 70)
+            play.advanceFrame()
+            play.holdLabelPeelTouch(x: 132, y: 88)
+            play.advanceFrame()
+            play.releaseLabelPeelTouch()
+            play.advanceFrame()
+        }
+        for _ in 0..<65 where play.labelPeel != nil { play.advanceFrame() }
+        XCTAssertEqual(play.runner.session.selection.eventID, 10)
+        play.advanceDialogue()
+        guard case .itemNotice(let itemID, _) = play.runner.phase else {
+            return XCTFail("Successful label peel should award the wine label: \(play.runner.phase)")
+        }
+        XCTAssertEqual(itemID, 66)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(66))
+        OriginalChapterThreeRouteChecks.drain(play)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 6))
+        if play.lobby?.mode == .counter { play.leaveLobbyCounter() }
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter6-after-label-peel")).save(play.walkingCheckpoint())
+        try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 26))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 17))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+        let helenDoor = try OriginalChapterThreeRouteChecks.doorMarker(play, 28)
+        try OriginalChapterThreeRouteChecks.navigate(play, to: helenDoor + SIMD2<Float>(0, -8_000))
+        OriginalChapterThreeRouteChecks.face(play, x: helenDoor.x, z: helenDoor.y)
+        XCTAssertEqual(play.nearbyDoor, 28)
+        try OriginalChapterThreeRouteChecks.doorComponent(play, 1, interrupt: true)
+        if play.runner.game.mapID == 39 {
+            try OriginalChapterThreeRouteChecks.doorComponent(play, 2, interrupt: true)
+        }
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 28))
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(66))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter6-helen-room")).save(play.walkingCheckpoint())
     }
 
     @MainActor func testChapterSixHelenStoryAndChapterSevenEntryFromHandoffSave() throws {
@@ -604,8 +777,1012 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertNil(play.christmasTree)
         XCTAssertEqual(play.runner.game.christmasTreeDecorationOrder, 0xE400)
         OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
-        print("AFTER DECORATING TREE", play.runner.phase, play.runner.eventIndex as Any,
-              play.runner.eventTrail, play.lobby?.people(in: play.runner.game) ?? [])
+        try OriginalChapterThreeRouteChecks.talk(play, to: 4, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 22))
+        XCTAssertEqual(play.runner.eventTrail, [13])
+        try OriginalChapterThreeRouteChecks.talk(play, to: 5, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 22))
+        XCTAssertEqual(play.runner.eventTrail, [13, 14])
+        func walkInput(to target: SIMD2<Float>) {
+            for _ in 0..<500 {
+                guard case .exploration = play.runner.phase, let position = play.lobby?.position else { break }
+                let dx = target.x - position.x, dz = target.y - position.z, distance = hypot(dx, dz)
+                if distance < 500 { break }
+                play.holdLobbyTouch(x: 96 + dx / distance * 80, y: 128 + dz / distance * 80)
+                play.advanceFrame()
+            }
+            play.releaseLobbyTouch()
+            OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        }
+        walkInput(to: SIMD2(-5000, 11000))
+        walkInput(to: SIMD2(-20000, 8000))
+        OriginalChapterThreeRouteChecks.face(play, x: -14254, z: 7700)
+        XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 11)
+        play.talkToNearbyPerson()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 22))
+        try OriginalChapterThreeRouteChecks.talk(play, to: 5, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .picture(id: 16))
+        try OriginalChapterThreeRouteChecks.picture(play, interrupt: true)
+        try OriginalChapterThreeRouteChecks.conversation(play, answers: [], topics: [])
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 22))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter7-after-tree")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterSevenDunningAndKevinAtTenForty() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter7-after-tree")).load() else {
+            throw XCTSkip("Complete the Chapter 7 tree scene through the normal route first")
+        }
+        let audio = AudioController(); audio.isMuted = true
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)))
+        defer { play.stop() }
+        try OriginalChapterThreeRouteChecks.exit(play, to: 18, interrupt: true, expectArrival: false)
+        XCTAssertEqual(play.runner.game.mapID, 18)
+        XCTAssertEqual(play.runner.program.name, "EP7_R118")
+        XCTAssertEqual(play.runner.game.nowTime, 1)
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter7-right-hallway")).save(play.walkingCheckpoint())
+        try OriginalChapterThreeRouteChecks.exit(play, to: 12, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 12)
+        XCTAssertEqual(play.runner.program.name, "EP7_R112")
+        let room = try XCTUnwrap(play.lobby)
+        let photoMarker = try XCTUnwrap(room.room.nodes.first { $0.name == "s04" })
+        func walkInput(to target: SIMD2<Float>) {
+            for _ in 0..<500 {
+                guard case .exploration = play.runner.phase, let position = play.lobby?.position else { break }
+                let dx = target.x - position.x, dz = target.y - position.z, distance = hypot(dx, dz)
+                if distance < 500 { break }
+                play.holdLobbyTouch(x: 96 + dx / distance * 80, y: 128 + dz / distance * 80)
+                play.advanceFrame()
+            }
+            play.releaseLobbyTouch()
+            OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        }
+        walkInput(to: SIMD2(-9500, -8000))
+        walkInput(to: SIMD2(-9500, 25000))
+        OriginalChapterThreeRouteChecks.face(play, x: Float(photoMarker.worldFixed[12]), z: Float(photoMarker.worldFixed[14]))
+        XCTAssertEqual(play.lobby?.nearbySearchArea, 4)
+        try OriginalChapterThreeRouteChecks.search(play, node: "obj03", closeupEvent: 73, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 12)
+        XCTAssertEqual(play.runner.program.name, "EP7_R112")
+        XCTAssertEqual(play.runner.game.nowTime, 1)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 18, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 18)
+        walkInput(to: SIMD2(10_000, -10_000))
+        walkInput(to: SIMD2(10_000, 5_000))
+        walkInput(to: SIMD2(-25_000, 5_000))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 3, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 3)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 2, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 2)
+        XCTAssertEqual(play.runner.game.nowTime, 2)
+        XCTAssertTrue(play.lobby?.people(in: play.runner.game).contains { $0.id == 10 } == true)
+        try OriginalChapterThreeRouteChecks.talk(play, to: 10, interrupt: true)
+        guard case .choice(let kyleConcerns) = play.runner.phase else { return XCTFail("Expected Kevin's first conversation choices") }
+        XCTAssertEqual(kyleConcerns.map(\.label), ["You OK?", "You're really plowed, doc!"])
+        try OriginalChapterThreeRouteChecks.choose(play, "You OK?")
+        guard case .questions(let kevinTopics) = play.runner.phase else { return XCTFail("Expected Kevin's drinking topic") }
+        XCTAssertEqual(kevinTopics.map(\.label), ["Who were you drinking with?"])
+        play.ask(7)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
+        walkInput(to: SIMD2(10_000, -5_000))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 3, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 3)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 17)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 26)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 5, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 5)
+        XCTAssertEqual(play.runner.game.nowTime, 2)
+        XCTAssertTrue(play.lobby?.people(in: play.runner.game).contains { $0.id == 4 } == true)
+        try OriginalChapterThreeRouteChecks.talk(play, to: 4, interrupt: true)
+        guard case .questions(let louieTopics) = play.runner.phase else { return XCTFail("Expected Louie's 10:40 topics") }
+        XCTAssertEqual(louieTopics.map(\.keyword), [6, 8])
+        play.ask(8)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let galleryLead) = play.runner.phase else { return XCTFail("Expected Louie's drinking follow-up") }
+        XCTAssertEqual(galleryLead.map(\.keyword), [6, 9])
+        play.ask(9)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let galleryTopic) = play.runner.phase else { return XCTFail("Expected Louie's Gallery May topic") }
+        XCTAssertEqual(galleryTopic.map(\.keyword), [6, 10])
+        play.ask(10)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let photoTopic) = play.runner.phase else { return XCTFail("Expected Louie's photo topic") }
+        XCTAssertEqual(photoTopic.map(\.keyword), [6])
+        play.ask(6)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 5))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter7-after-louie-10-40")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterSevenLeavesBarForIris() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter7-after-louie-10-40")).load() else {
+            throw XCTSkip("Complete the Chapter 7 Louie conversation first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 26)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 17)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 19, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 19)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 17)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 39)
+        let irisDoor = try OriginalChapterThreeRouteChecks.doorMarker(play, 32)
+        try OriginalChapterThreeRouteChecks.navigate(play, to: irisDoor + SIMD2<Float>(0, -8_000), interrupt: true)
+        OriginalChapterThreeRouteChecks.face(play, x: irisDoor.x, z: irisDoor.y)
+        XCTAssertEqual(play.nearbyDoor, 32, "Iris's Room 216 door at \(irisDoor), Kyle at \(play.lobby?.position as Any)")
+        try OriginalChapterThreeRouteChecks.doorComponent(play, 1, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 32)
+        XCTAssertEqual(play.runner.program.name, "EP7_R206")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter7-iris-room-arrival")).save(play.walkingCheckpoint())
+        try OriginalChapterThreeRouteChecks.talk(play, to: 9, interrupt: true)
+        try OriginalChapterThreeRouteChecks.choose(play, "What's odd?")
+        guard case .questions(let irisTopics) = play.runner.phase else {
+            return XCTFail("Expected Iris's odd-suitcase topic: \(play.runner.phase)")
+        }
+        XCTAssertEqual(irisTopics.map(\.label), ["Was anything stolen?", "What about the gallery?"])
+        play.ask(11)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let envelopeTopics) = play.runner.phase else {
+            return XCTFail("Expected Iris's envelope topics: \(play.runner.phase)")
+        }
+        XCTAssertEqual(envelopeTopics.map(\.keyword), [12, 13])
+        play.ask(13)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let whoGaveIt) = play.runner.phase else {
+            return XCTFail("Expected Iris's envelope source topic: \(play.runner.phase)")
+        }
+        XCTAssertEqual(whoGaveIt.map(\.keyword), [12, 14])
+        play.ask(14)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let graceTopics) = play.runner.phase else {
+            return XCTFail("Expected Iris's Grace topic: \(play.runner.phase)")
+        }
+        XCTAssertEqual(graceTopics.map(\.keyword), [12, 15])
+        play.ask(15)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let galleryTopics) = play.runner.phase else {
+            return XCTFail("Expected Iris's gallery topic: \(play.runner.phase)")
+        }
+        XCTAssertEqual(galleryTopics.map(\.keyword), [12])
+        play.ask(12)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .choice(let galleryFollowUps) = play.runner.phase else {
+            return XCTFail("Expected Iris's gallery follow-up choice: \(play.runner.phase)")
+        }
+        XCTAssertEqual(galleryFollowUps.map(\.label), ["What's the owner's name?", "How do you know it?"])
+        play.choose(galleryFollowUps[0].id)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter7-after-iris")).save(play.walkingCheckpoint())
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 3, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 2, interrupt: true)
+        try OriginalChapterThreeRouteChecks.talk(play, to: 10, interrupt: true)
+        guard case .choice(let kevinOpening) = play.runner.phase else {
+            return XCTFail("Expected Kevin's Chapter 7 opening: \(play.runner.phase)")
+        }
+        XCTAssertEqual(kevinOpening.map(\.label), ["Don't get mad at me!", "You two had business?"])
+        try OriginalChapterThreeRouteChecks.choose(play, "You two had business?", interrupt: true)
+        guard case .choice(let kevinReason) = play.runner.phase else {
+            return XCTFail("Expected Kevin's reason follow-up: \(play.runner.phase)")
+        }
+        XCTAssertEqual(kevinReason.map(\.label), ["You're a loser, doc!", "I got reasons for asking."])
+        try OriginalChapterThreeRouteChecks.choose(play, "I got reasons for asking.", interrupt: true)
+        guard case .questions(let kevinTopics) = play.runner.phase else {
+            return XCTFail("Expected Kevin's story topics: \(play.runner.phase)")
+        }
+        XCTAssertEqual(kevinTopics.map(\.keyword), [16, 17])
+        play.ask(16)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .choice(let irisChoices) = play.runner.phase else {
+            return XCTFail("Expected Kevin's Iris response choices: \(play.runner.phase)")
+        }
+        XCTAssertEqual(irisChoices.map(\.label), ["I believe you just met.", "I bet you're lovers!"])
+        try OriginalChapterThreeRouteChecks.choose(play, "I believe you just met.", interrupt: true)
+        guard case .questions(let graceQuestion) = play.runner.phase else {
+            return XCTFail("Expected Kevin's Grace topics: \(play.runner.phase)")
+        }
+        XCTAssertEqual(graceQuestion.map(\.keyword), [17, 19])
+        play.ask(19)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let afterGrace) = play.runner.phase else {
+            return XCTFail("Expected Kevin's follow-up topics: \(play.runner.phase)")
+        }
+        XCTAssertEqual(afterGrace.map(\.keyword), [17, 20])
+        play.ask(20)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .questions(let galleryOnly) = play.runner.phase else {
+            return XCTFail("Expected Gallery May as Kevin's remaining topic: \(play.runner.phase)")
+        }
+        XCTAssertEqual(galleryOnly.map(\.keyword), [17])
+        play.ask(17)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .choice(let galleryResponses) = play.runner.phase else {
+            return XCTFail("Expected Kevin's Gallery May response: \(play.runner.phase)")
+        }
+        XCTAssertEqual(galleryResponses.map(\.label), ["You worked there, too.", "You never worked there."])
+        try OriginalChapterThreeRouteChecks.choose(play, "You never worked there.", interrupt: true)
+        guard case .questions(let graceTopic) = play.runner.phase else {
+            return XCTFail("Expected Kevin's Grace topic: \(play.runner.phase)")
+        }
+        XCTAssertEqual(graceTopic.map(\.keyword), [18])
+        play.ask(18)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .choice(let graceChoices) = play.runner.phase else {
+            return XCTFail("Expected Kevin's fault choices: \(play.runner.phase)")
+        }
+        XCTAssertEqual(graceChoices.map(\.label), ["It was Melissa.", "It was you."])
+        try OriginalChapterThreeRouteChecks.choose(play, "It was you.", interrupt: true)
+        guard case .questions(let faultTopic) = play.runner.phase else {
+            return XCTFail("Expected Kevin's malpractice question: \(play.runner.phase)")
+        }
+        XCTAssertEqual(faultTopic.map(\.keyword), [21])
+        play.ask(21)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        guard case .choice(let firstReviewAnswers) = play.runner.phase else {
+            return XCTFail("Expected Chapter 7 review question 1: \(play.runner.phase)")
+        }
+        XCTAssertEqual(firstReviewAnswers.map(\.label), ["Rosa", "Melissa", "Iris"])
+        try OriginalChapterThreeRouteChecks.choose(play, "Melissa", interrupt: true)
+        guard case .choice(let secondReviewAnswers) = play.runner.phase else {
+            return XCTFail("Expected Chapter 7 review question 2: \(play.runner.phase)")
+        }
+        XCTAssertEqual(secondReviewAnswers.map(\.label), ["Storage", "Rosa's room", "Kitchen"])
+        try OriginalChapterThreeRouteChecks.choose(play, "Storage", interrupt: true)
+        guard case .choice(let thirdReviewAnswers) = play.runner.phase else {
+            return XCTFail("Expected Chapter 7 review question 3: \(play.runner.phase)")
+        }
+        XCTAssertEqual(thirdReviewAnswers.map(\.label), ["Kevin", "Dunning", "Louie"])
+        try OriginalChapterThreeRouteChecks.choose(play, "Louie", interrupt: true)
+        guard case .choice(let fourthReviewAnswers) = play.runner.phase else {
+            return XCTFail("Expected Chapter 7 review question 4: \(play.runner.phase)")
+        }
+        XCTAssertEqual(fourthReviewAnswers.map(\.label), ["Seven Stars", "Gallery May", "Moonlight Grill"])
+        try OriginalChapterThreeRouteChecks.choose(play, "Gallery May", interrupt: true)
+        guard case .choice(let fifthReviewAnswers) = play.runner.phase else {
+            return XCTFail("Expected Chapter 7 review question 5: \(play.runner.phase)")
+        }
+        XCTAssertEqual(fifthReviewAnswers.map(\.label), ["A small envelope", "A matchbook", "A fountain pen"])
+        try OriginalChapterThreeRouteChecks.choose(play, "A small envelope", interrupt: true)
+        XCTAssertEqual(play.chapterTransition?.stage, .prompt)
+        XCTAssertEqual(play.runner.game.chapter, 7)
+        XCTAssertEqual(play.runner.game.nowTime, 0)
+        play.answerChapterSave(false)
+        play.continueChapterTitle()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-normal-entry")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightAnswersEdPhoneCallAndEntersCorridor() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-normal-entry")).load() else {
+            throw XCTSkip("Complete the Chapter 7 review through its normal title transition first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        XCTAssertEqual(play.runner.game.chapter, 7)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true, expectArrival: false)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        try OriginalChapterThreeRouteChecks.navigate(play, to: .init(-16_687, 7_450), interrupt: true)
+        play.inspectLobbyCounter()
+        play.selectLobbyObject(x: 86, y: 165, confirmImmediately: true)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        XCTAssertEqual(play.runner.eventTrail, [1, 2, 3, 4, 5, 7])
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+        XCTAssertEqual(play.runner.program.name, "EP8_R213")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-r213-entry")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightEntersUtilityClosetFromCorridor() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r213-entry")).load() else {
+            throw XCTSkip("Reach R213 through the normal Chapter 8 route first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.exit(play, to: 38, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 38))
+        XCTAssertEqual(play.runner.game.chapter, 7)
+        XCTAssertEqual(play.runner.program.name, "EP8_R212")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-r212-utility-closet")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testWalkingViewPicksVisibleRoomObjectByHitMask() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r213-entry")).load() else {
+            throw XCTSkip("Reach R213 through the normal Chapter 8 route first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.navigate(play, to: .init(-86_000, 4_000), interrupt: true)
+        OriginalChapterThreeRouteChecks.face(play, x: -102_662, z: 3_539)
+        let lobby = try XCTUnwrap(play.lobby)
+        let visible = lobby.objectVisibility.visibleNodes(in: lobby.room, map: lobby.mapID, area: nil,
+            game: play.runner.game).intersection(lobby.room.gameplayRenderNodes)
+        let node = try XCTUnwrap(lobby.room.nodes.first { $0.name == "obj05" })
+        let world = SIMD4<Float>(Float(node.worldFixed[12]) / 4096,
+            Float(node.worldFixed[13]) / 4096, Float(node.worldFixed[14]) / 4096, 1)
+        let clip = lobby.viewProjection * world
+        let centre = SIMD2<Float>((clip.x / clip.w + 1) * 96, (1 - clip.y / clip.w) * 128)
+        let points = stride(from: -12, through: 12, by: 2).flatMap { y in
+            stride(from: -12, through: 12, by: 2).map { x in centre + SIMD2(Float(x), Float(y)) }
+        }
+        let hit = try XCTUnwrap(try points.first {
+            try lobby.pickedRoomObject(page: $0, visibleNodes: visible) == "obj05"
+        }, "The visible room-object mesh must accept a direct 3D tap")
+        XCTAssertEqual(try lobby.pickedRoomObject(page: hit, visibleNodes: visible), "obj05")
+    }
+
+    @MainActor func testChapterEightInspectsUtilityClosetSearchArea() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r212-utility-closet")).load() else {
+            throw XCTSkip("Enter the utility closet through the normal Chapter 8 route first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.navigate(play, to: .init(4096, 16138))
+        let marker = try XCTUnwrap(play.lobby?.room.nodes.first { $0.name == "s04" })
+        play.turnFirstPerson(by: atan2(Float(marker.worldFixed[12]) - (play.lobby?.position.x ?? 0),
+            Float(marker.worldFixed[14]) - (play.lobby?.position.z ?? 0)) - (play.lobby?.facing ?? 0))
+        XCTAssertEqual(play.lobby?.nearbySearchArea, 4)
+        play.inspectLobbyCounter()
+        let counter = try XCTUnwrap(play.lobby)
+        let visible = counter.objectVisibility.visibleNodes(in: counter.counter, map: counter.mapID,
+            area: counter.searchAreaID, game: play.runner.game)
+        let points = stride(from: 8, to: 248, by: 4).flatMap { y in
+            stride(from: 8, to: 184, by: 4).map { SIMD2<Float>(Float($0), Float(y)) }
+        }
+        let trashBin = try XCTUnwrap(try points.first {
+            try counter.pickedCounterNode(page: $0, visibleNodes: visible) == "obj04"
+        }, "The utility-closet trash bin must be selectable through its original hit mesh")
+        play.selectLobbyObject(x: trashBin.x, y: trashBin.y, confirmImmediately: true)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.closeup?.view.id, 315)
+        try OriginalChapterThreeRouteChecks.closeupLayer(play, event: 316, interrupt: true)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(69))
+        try OriginalChapterThreeRouteChecks.closeupLayer(play, event: 319, interrupt: true)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(42))
+        play.leaveSearchCloseup()
+        play.leaveLobbyCounter()
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-r212-items-recovered")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightReturnsToRoom215AfterFindingEnvelopeAndTape() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r212-items-recovered")).load() else {
+            throw XCTSkip("Find the envelope and tape through the Chapter 8 utility-closet route first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 31, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        XCTAssertEqual(play.runner.program.name, "EP8_R205")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-r205-after-closet")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightTravelsFromRoom215ToTheBar() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r205-after-closet")).load() else {
+            throw XCTSkip("Return to Room 215 after searching the utility closet first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 5, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 5))
+        XCTAssertEqual(play.runner.program.name, "EP8_R105")
+        try OriginalChapterThreeRouteChecks.talk(play, to: 4, interrupt: true)
+        try OriginalChapterThreeRouteChecks.choose(play, "Someone else wanted it?", interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 5))
+        XCTAssertEqual(play.runner.game.value(for: .gameFlag(index: 29)), true)
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-bar-after-closet")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightReturnsToTheCorridorFromTheBar() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-bar-after-closet")).load() else {
+            throw XCTSkip("Reach the Chapter 8 bar and ask Louie about the cassette player first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 26))
+        XCTAssertEqual(play.runner.program.name, "EP8_R126")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-r126-after-bar")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightReturnsToRoom215AfterLouieTopic() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r126-after-bar")).load() else {
+            throw XCTSkip("Reach R126 after asking Louie about the cassette player first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) },
+            suitcaseContentsRendererFactory: { try BitmapSuitcaseContentsRenderer() })
+        defer { play.stop() }
+
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 31, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        XCTAssertEqual(play.runner.game.value(for: .gameFlag(index: 29)), true)
+        XCTAssertFalse(try play.runner.game.inventory.items.contains(44))
+        let lobby = try XCTUnwrap(play.lobby)
+        let collision = lobby.collision
+        let searchPoints = stride(from: -60_000, through: 60_000, by: 1_024).flatMap { x in
+            stride(from: -60_000, through: 60_000, by: 1_024).compactMap { z -> SIMD2<Float>? in
+                let point = SIMD3<Float>(Float(x), lobby.position.y, Float(z))
+                return collision.matchingRegions(containing: point, prefix: "search").contains("search03")
+                    ? SIMD2<Float>(Float(x), Float(z)) : nil
+            }
+        }
+        let searchPoint = try XCTUnwrap(searchPoints.min {
+            simd_distance($0, SIMD2(lobby.position.x, lobby.position.z))
+                < simd_distance($1, SIMD2(lobby.position.x, lobby.position.z))
+        }, "Room 215 must contain a third search area")
+        try OriginalChapterThreeRouteChecks.navigate(play, to: searchPoint, interrupt: true)
+        let marker = try XCTUnwrap(play.lobby?.room.nodes.first { $0.name == "s03" })
+        OriginalChapterThreeRouteChecks.face(play, x: Float(marker.worldFixed[12]), z: Float(marker.worldFixed[14]))
+        for _ in 0..<100 where play.lobby?.nearbySearchArea != 3 {
+            guard case .exploration(mapID: 31) = play.runner.phase, let position = play.lobby?.position else { break }
+            let dx = searchPoint.x - position.x, dz = searchPoint.y - position.z
+            let distance = hypot(dx, dz)
+            if distance < 5 { break }
+            play.holdLobbyTouch(x: 96 + dx / distance * 80, y: 128 + dz / distance * 80)
+            play.advanceFrame()
+        }
+        play.releaseLobbyTouch()
+        XCTAssertEqual(play.lobby?.nearbySearchArea, 3)
+        try OriginalChapterThreeRouteChecks.search(play, node: "obj04", interrupt: true)
+        XCTAssertEqual(play.runner.phase, .process(id: 35))
+        try OriginalChapterThreeRouteChecks.takeFromSuitcase(play, lowerIndex: 5, interrupt: true)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(44))
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        if play.lobby?.mode == .counter { play.leaveLobbyCounter() }
+        XCTAssertEqual(play.lobby?.mode, .walking)
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-r205-pencil-collected")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightRewindsAndUsesCassetteDeck() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r205-pencil-collected")).load() else {
+            throw XCTSkip("Collect the pencil from the open suitcase first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) },
+            cassetteRendererFactory: { _ in try BitmapRouteCassetteRenderer() },
+            cassetteDeckRendererFactory: { try BitmapCassetteDeckRenderer() })
+        defer { play.stop() }
+
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(44))
+        for destination: Int16 in [39, 17, 26, 5, 26, 17, 19, 14] {
+            try OriginalChapterThreeRouteChecks.exit(play, to: destination, interrupt: true)
+            XCTAssertEqual(play.runner.game.mapID, destination)
+        }
+        XCTAssertEqual(play.runner.program.name, "EP8_R114")
+
+        let deskLobby = try XCTUnwrap(play.lobby)
+        let deskSearchPoints = stride(from: -60_000, through: 60_000, by: 1_024).flatMap { x in
+            stride(from: -60_000, through: 60_000, by: 1_024).compactMap { z -> SIMD2<Float>? in
+                let point = SIMD3<Float>(Float(x), deskLobby.position.y, Float(z))
+                return deskLobby.collision.matchingRegions(containing: point, prefix: "search").contains("search03")
+                    && simd_distance(deskLobby.collision.resolve(point), point) < 1
+                    ? SIMD2<Float>(Float(x), Float(z)) : nil
+            }
+        }
+        let deskTarget = try XCTUnwrap(deskSearchPoints.min {
+            simd_distance($0, SIMD2(deskLobby.position.x, deskLobby.position.z))
+                < simd_distance($1, SIMD2(deskLobby.position.x, deskLobby.position.z))
+        }, "R114 search area 3 is missing")
+        try OriginalChapterThreeRouteChecks.navigate(play, to: deskTarget, interrupt: true)
+        let deskMarker = try XCTUnwrap(play.lobby?.room.nodes.first { $0.name == "s03" })
+        OriginalChapterThreeRouteChecks.face(play, x: Float(deskMarker.worldFixed[12]), z: Float(deskMarker.worldFixed[14]))
+        for _ in 0..<100 where play.lobby?.nearbySearchArea != 3 {
+            guard case .exploration(mapID: 14) = play.runner.phase, let position = play.lobby?.position else { break }
+            let dx = deskTarget.x - position.x, dz = deskTarget.y - position.z
+            let distance = hypot(dx, dz)
+            if distance < 5 { break }
+            play.holdLobbyTouch(x: 96 + dx / distance * 80, y: 128 + dz / distance * 80)
+            play.advanceFrame()
+        }
+        play.releaseLobbyTouch()
+        XCTAssertEqual(play.lobby?.nearbySearchArea, 3)
+        play.inspectLobbyCounter()
+        let deskCounter = try XCTUnwrap(play.lobby)
+        let deskVisible = deskCounter.objectVisibility.visibleNodes(in: deskCounter.counter,
+            map: deskCounter.mapID, area: deskCounter.searchAreaID, game: play.runner.game)
+        let deskPoint = try XCTUnwrap(stride(from: 8, to: 248, by: 4).flatMap { y in
+            stride(from: 8, to: 184, by: 4).map { SIMD2<Float>(Float($0), Float(y)) }
+        }.first { (try? deskCounter.pickedCounterNode(page: $0, visibleNodes: deskVisible)) == "obj06" },
+            "Louie's desk hit mask is missing")
+        play.selectLobbyObject(x: deskPoint.x, y: deskPoint.y, confirmImmediately: true)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.closeup?.view.id, 110)
+        try OriginalChapterThreeRouteChecks.closeupLayer(play, event: 112, interrupt: true)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(74),
+            "Inspecting the desk should award the ballpoint pen through its original item notice")
+        play.leaveSearchCloseup()
+        play.leaveLobbyCounter()
+
+        let lobby = try XCTUnwrap(play.lobby)
+        let searchPoints = stride(from: -60_000, through: 60_000, by: 1_024).flatMap { x in
+            stride(from: -60_000, through: 60_000, by: 1_024).compactMap { z -> SIMD2<Float>? in
+                let point = SIMD3<Float>(Float(x), lobby.position.y, Float(z))
+                return lobby.collision.matchingRegions(containing: point, prefix: "search").contains("search01")
+                    && simd_distance(lobby.collision.resolve(point), point) < 1
+                    ? SIMD2<Float>(Float(x), Float(z)) : nil
+            }
+        }
+        let target = try XCTUnwrap(searchPoints.min {
+            simd_distance($0, SIMD2(lobby.position.x, lobby.position.z))
+                < simd_distance($1, SIMD2(lobby.position.x, lobby.position.z))
+        }, "R114 search area 1 is missing")
+        try OriginalChapterThreeRouteChecks.navigate(play, to: target, interrupt: true)
+        let r114Marker = try XCTUnwrap(play.lobby?.room.nodes.first { $0.name == "s01" })
+        OriginalChapterThreeRouteChecks.face(play, x: Float(r114Marker.worldFixed[12]), z: Float(r114Marker.worldFixed[14]))
+        for _ in 0..<100 where play.lobby?.nearbySearchArea != 1 {
+            guard case .exploration(mapID: 14) = play.runner.phase, let position = play.lobby?.position else { break }
+            let dx = target.x - position.x, dz = target.y - position.z
+            let distance = hypot(dx, dz)
+            if distance < 5 { break }
+            play.holdLobbyTouch(x: 96 + dx / distance * 80, y: 128 + dz / distance * 80)
+            play.advanceFrame()
+        }
+        play.releaseLobbyTouch()
+        XCTAssertEqual(play.lobby?.nearbySearchArea, 1)
+        play.inspectLobbyCounter()
+        let counter = try XCTUnwrap(play.lobby)
+        let visible = counter.objectVisibility.visibleNodes(in: counter.counter, map: counter.mapID,
+            area: counter.searchAreaID, game: play.runner.game)
+        let radioPoint = try XCTUnwrap(stride(from: 8, to: 248, by: 4).flatMap { y in
+            stride(from: 8, to: 184, by: 4).map { SIMD2<Float>(Float($0), Float(y)) }
+        }.first { (try? counter.pickedCounterNode(page: $0, visibleNodes: visible)) == "obj06" },
+            "The radio hit mask must be visible")
+        play.selectLobbyObject(x: radioPoint.x, y: radioPoint.y, confirmImmediately: true)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.closeup?.view.id, 107)
+        XCTAssertEqual(Set(play.closeup?.view.layers.map(\.eventID) ?? []), Set([108, 109]))
+        try OriginalChapterThreeRouteChecks.closeupLayer(play, event: 108, item: 42, interrupt: true)
+        XCTAssertFalse(try play.runner.game.inventory.items.contains(42), "Placing the tape on the deck should remove it from inventory")
+        XCTAssertTrue(play.runner.game.objectVisible(34), "Placing the tape should reveal the exposed tape layer")
+        XCTAssertEqual(play.closeup?.view.id, 107)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(74), "The ballpoint must be available for the first tape attempt")
+        try OriginalChapterThreeRouteChecks.closeupLayer(play, event: 109, item: 74, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .process(id: 76), "The ballpoint selector routes to the original process 76")
+        play.holdCassetteTouch(pageX: 170, pageY: 240)
+        play.advanceFrame()
+        play.releaseCassetteTouch()
+        for _ in 0..<70 { play.advanceFrame() }
+        XCTAssertNotEqual(play.runner.phase, .process(id: 76), "The normal slot-5 exit must return from the ballpoint process")
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.closeup?.view.id, 107, "The ballpoint response should return to the cassette close-up")
+        try OriginalChapterThreeRouteChecks.closeupLayer(play, event: 109, item: 44, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .process(id: 45), "The pencil selector routes to the original rewind process")
+        for raw in [SIMD2(141, 130)] + stride(from: 140, through: 135, by: -1).map({ SIMD2($0, 130) })
+            + stride(from: 129, through: 100, by: -1).map({ SIMD2(135, $0) })
+            + Array(repeating: SIMD2(135, 100), count: 5) {
+            play.holdCassetteTouch(pageX: raw.y, pageY: 255 - raw.x)
+            play.advanceFrame()
+        }
+        play.releaseCassetteTouch()
+        for _ in 0..<24 { play.advanceFrame() }
+        XCTAssertNotEqual(play.runner.phase, .process(id: 45), "The matched pencil stroke must return from the rewind process")
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(43), "Successful rewinding returns the repaired cassette item")
+        try OriginalChapterThreeRouteChecks.closeupLayer(play, event: 108, item: 43, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .process(id: 52), "The repaired cassette launches its Cassette02 process")
+
+        play.holdCassetteTouch(pageX: 156, pageY: 179)
+        play.advanceFrame()
+        play.releaseCassetteTouch()
+        for rawY in stride(from: 155, through: 108, by: -1) {
+            play.holdCassetteTouch(pageX: rawY, pageY: 179)
+            play.advanceFrame()
+        }
+        play.releaseCassetteTouch()
+        for _ in 0..<OriginalCassetteDeckProcess.controlsTransitionUpdates { play.advanceFrame() }
+        play.holdCassetteTouch(pageX: 143, pageY: 208)
+        play.advanceFrame()
+        play.releaseCassetteTouch()
+        play.activateCassetteDeckControl()
+        play.holdCassetteTouch(pageX: 177, pageY: 240)
+        play.advanceFrame()
+        play.releaseCassetteTouch()
+        for _ in 0..<OriginalCassetteDeckProcess.exitFadeUpdates { play.advanceFrame() }
+        XCTAssertNotEqual(play.runner.phase, .process(id: 52), "Cassette playback must return through the story CHK table")
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertTrue(play.runner.eventTrail.contains(20), "Side B should advance the Chapter 8 time block through R114 event 20")
+        play.leaveSearchCloseup()
+        play.leaveLobbyCounter()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 19))
+        XCTAssertEqual(play.runner.program.name, "EP8_R119")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-r119-after-cassette")).save(play.walkingCheckpoint())
+        XCTAssertEqual(play.runner.program.name, "EP8_R119")
+    }
+
+    @MainActor func testChapterEightCassetteRouteContinuesThroughIrisConversation() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-r119-after-cassette")).load() else {
+            throw XCTSkip("Complete the cassette-deck route and reach Louie's room first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+        XCTAssertEqual(play.runner.game.mapID, 19)
+        XCTAssertEqual(play.runner.program.name, "EP8_R119")
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 19))
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(43), "The repaired cassette remains available after playback")
+        XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 3, index: 9)), false,
+            "Chapter 8 starts with this event-completion bit clear")
+        XCTAssertEqual(play.runner.game.nowTime, 1)
+        for destination: Int16 in [17, 39] {
+            try OriginalChapterThreeRouteChecks.exit(play, to: destination, interrupt: true)
+        }
+        let irisDoor = try OriginalChapterThreeRouteChecks.doorMarker(play, 32)
+        try OriginalChapterThreeRouteChecks.navigate(play, to: irisDoor + SIMD2<Float>(0, -8_000))
+        OriginalChapterThreeRouteChecks.face(play, x: irisDoor.x, z: irisDoor.y)
+        try OriginalChapterThreeRouteChecks.doorComponent(play, 1, interrupt: true)
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(69))
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(43))
+        play.ask(0)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        try OriginalChapterThreeRouteChecks.conversation(play, answers: [], topics: [], show: [69, 43])
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 32))
+        XCTAssertTrue(play.lobby?.people(in: play.runner.game).contains(where: { $0.id == 9 }) == true)
+        try OriginalChapterThreeRouteChecks.talk(play, to: 9, interrupt: true)
+        try OriginalChapterThreeRouteChecks.choose(play, "Why bring it here?", interrupt: true)
+        try OriginalChapterThreeRouteChecks.choose(play, "You didn't know?", interrupt: true)
+        play.ask(1)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        try OriginalChapterThreeRouteChecks.choose(play, "The tape is insurance.", interrupt: true)
+        play.ask(2)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        try OriginalChapterThreeRouteChecks.choose(play, "You recognized it.", interrupt: true)
+        play.ask(3)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        try OriginalChapterThreeRouteChecks.choose(play, "It's because she vanished.", interrupt: true)
+        try OriginalChapterThreeRouteChecks.conversation(play, answers: ["I bet it was dirty money."], topics: [4, 6, 5])
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+        for topic in [1, 2, 3, 4, 5, 6] {
+            XCTAssertTrue(play.runner.game.keywordAsked(topic, person: 9), "Iris topic \(topic) should be covered")
+        }
+        XCTAssertEqual(play.runner.game.nowTime, 2, "Iris's completed conversation advances the chapter to 11:20 PM")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-after-iris")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightReturnsToLouiesCorridorAfterIris() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-after-iris")).load() else {
+            throw XCTSkip("Complete Iris's Chapter 8 conversation first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+        XCTAssertEqual(play.runner.game.nowTime, 2)
+        for destination: Int16 in [17, 19] {
+            try OriginalChapterThreeRouteChecks.exit(play, to: destination, interrupt: true)
+        }
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 19))
+        XCTAssertEqual(play.runner.program.name, "EP8_R119")
+        XCTAssertEqual(play.runner.game.nowTime, 2)
+        let louieDoor = try OriginalChapterThreeRouteChecks.doorMarker(play, 14)
+        try OriginalChapterThreeRouteChecks.navigate(play, to: louieDoor + SIMD2<Float>(0, -8_000), interrupt: true)
+        OriginalChapterThreeRouteChecks.face(play, x: louieDoor.x, z: louieDoor.y)
+        XCTAssertEqual(play.nearbyDoor, 14)
+        play.inspectNearbyDoor()
+        let knockTrail = play.runner.eventTrail.count
+        try OriginalChapterThreeRouteChecks.doorComponent(play, 1, interrupt: true)
+        XCTAssertEqual(play.runner.eventTrail.dropFirst(knockTrail), [4], "Louie's door knock should run R119 event 4")
+        XCTAssertEqual(play.runner.game.mapID, 19)
+        try OriginalChapterThreeRouteChecks.doorComponent(play, 2, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 14, "The door handle should enter Louie's room")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-louie-room")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightTalksToLouieAfterIris() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-louie-room")).load() else {
+            throw XCTSkip("Enter Louie's room after Iris's conversation first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+        XCTAssertEqual(play.runner.game.mapID, 14)
+        XCTAssertEqual(play.runner.program.name, "EP8_R114")
+        let priorTrail = play.runner.eventTrail.count
+        try OriginalChapterThreeRouteChecks.talk(play, to: 4, interrupt: true)
+        XCTAssertEqual(play.runner.eventTrail.dropFirst(priorTrail), [22])
+        XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 14, index: 22)), true)
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-after-louie-briefing")).save(play.walkingCheckpoint())
+    }
+
+    @MainActor func testChapterEightBowlingRouteRepeatsAfterThreeModeledMatches() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-after-louie-briefing")).load() else {
+            throw XCTSkip("Talk to Louie in his room first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) },
+            bowlingRendererFactory: { try RouteBowlingRenderer() })
+        defer { play.stop() }
+        try OriginalChapterThreeRouteChecks.exit(play, to: 19, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 19))
+        XCTAssertEqual(play.runner.program.name, "EP8_R119")
+        XCTAssertTrue(play.lobby?.people(in: play.runner.game).contains { $0.id == 4 } == true)
+        let priorTrail = play.runner.eventTrail.count
+        try OriginalChapterThreeRouteChecks.talk(play, to: 4, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .process(id: 44))
+        XCTAssertEqual(play.runner.eventTrail.dropFirst(priorTrail), [6, 8])
+        XCTAssertNotNil(play.bowlingMatch)
+        XCTAssertEqual(play.bowlingMatch?.phase, .ready)
+        try audio.applyOriginalCommand(.disableNewEffects(false))
+
+        for matchIndex in 0..<3 {
+            for throwIndex in 0..<5 {
+                if throwIndex > 0 { play.advanceFrame() }
+                try playCapturedBowlingThrow(throwIndex, in: play)
+            }
+            XCTAssertEqual(play.bowlingMatch?.phase, .showingResult)
+            XCTAssertEqual(audio.soundEffectsHistory,
+                           Array(repeating: "SE_EVENT_BROKE_UEKIBACHI", count: matchIndex + 1))
+            XCTAssertNil(play.bowlingMatch?.returnValue)
+            for _ in 0..<OriginalBowlingMatchProcess.resultAnimationFrames { play.advanceFrame() }
+            XCTAssertEqual(play.bowlingMatch?.phase, .presentingResult)
+            for _ in 0..<OriginalBowlingMatchProcess.resultPresentationFrames { play.advanceFrame() }
+            XCTAssertEqual(play.bowlingMatch?.phase, .completed)
+            XCTAssertEqual(play.bowlingMatch?.returnValue, 2)
+            play.advanceFrame()
+            XCTAssertEqual(play.runner.session.selection.eventID, 11)
+            try audio.applyOriginalCommand(.disableNewEffects(true))
+            OriginalChapterThreeRouteChecks.drain(play)
+            XCTAssertEqual(play.runner.phase, .process(id: 44))
+            XCTAssertEqual(play.runner.eventTrail.last, 8)
+            try audio.applyOriginalCommand(.disableNewEffects(false))
+        }
+    }
+
+    @MainActor func testChapterEightBowlingResultBranchesReachPlantOrRepeat() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-after-louie-briefing")).load() else {
+            throw XCTSkip("Talk to Louie in his room first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) },
+            bowlingRendererFactory: { try RouteBowlingRenderer() })
+        defer { play.stop() }
+        try OriginalChapterThreeRouteChecks.exit(play, to: 19, interrupt: true)
+        try OriginalChapterThreeRouteChecks.talk(play, to: 4, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .process(id: 44))
+
+        var lostRunner = play.runner
+        lostRunner.finishProcess(returnValue: 0)
+        var lostDialogue = [String]()
+        for _ in 0..<100 {
+            guard case .dialogue(let packet) = lostRunner.phase else { break }
+            lostDialogue += packet.pages.compactMap { String(data: $0.visibleBytes, encoding: .isoLatin1) }
+            lostRunner.acknowledgeDialogue()
+        }
+        XCTAssertTrue(lostRunner.eventTrail.suffix(2).elementsEqual([9, 12]))
+        XCTAssertTrue(lostDialogue.joined().contains("Dunning's plant"))
+        guard case .picture(id: 26) = lostRunner.phase else {
+            return XCTFail("Bowling result 0 should open the plant picture: \(lostRunner.phase)")
+        }
+
+        let postPlant = OriginalPlaySession(runner: lostRunner, audio: audio, catalog: try .bundled(),
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { postPlant.stop() }
+        try OriginalChapterThreeRouteChecks.picture(postPlant)
+        XCTAssertTrue(postPlant.runner.eventTrail.suffix(3).elementsEqual([9, 12, 13]))
+        XCTAssertEqual(postPlant.runner.phase, .exploration(mapID: 19))
+        XCTAssertEqual(postPlant.runner.program.name, "EP8_R119")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-after-bowling-plant")).save(postPlant.walkingCheckpoint())
+        try OriginalChapterThreeRouteChecks.exit(postPlant, to: 17, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(postPlant, to: 39, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(postPlant, to: 45, interrupt: true)
+        XCTAssertEqual(postPlant.runner.phase, .exploration(mapID: 45))
+        XCTAssertEqual(postPlant.runner.program.name, "EP8_R401")
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-rooftop-entry")).save(postPlant.walkingCheckpoint())
+        try OriginalChapterThreeRouteChecks.talk(postPlant, to: 5, interrupt: true)
+        XCTAssertEqual(postPlant.runner.phase, .picture(id: 40))
+        try OriginalChapterThreeRouteChecks.picture(postPlant, interrupt: true)
+        XCTAssertEqual(postPlant.runner.phase, .picture(id: 16))
+        try OriginalChapterThreeRouteChecks.picture(postPlant, interrupt: true)
+        XCTAssertEqual(postPlant.runner.phase, .questions([]))
+        postPlant.leaveConversation()
+        OriginalChapterThreeRouteChecks.drain(postPlant, interrupt: true)
+        XCTAssertEqual(postPlant.runner.phase, .exploration(mapID: 45))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-after-rooftop-meeting")).save(postPlant.walkingCheckpoint())
+        try OriginalChapterThreeRouteChecks.exit(postPlant, to: 39, interrupt: true)
+
+        var runner = play.runner
+        runner.finishProcess(returnValue: 1)
+        var dialogue = [String]()
+        for _ in 0..<100 {
+            guard case .dialogue(let packet) = runner.phase else { break }
+            dialogue += packet.pages.compactMap { String(data: $0.visibleBytes, encoding: .isoLatin1) }
+            runner.acknowledgeDialogue()
+        }
+
+        XCTAssertTrue(runner.eventTrail.suffix(2).elementsEqual([10, 8]))
+        XCTAssertTrue(dialogue.joined().contains("Once more?"))
+        XCTAssertEqual(runner.phase, .process(id: 44))
+    }
+
+    @MainActor private func playCapturedBowlingThrow(_ throwIndex: Int,
+                                                     in play: OriginalPlaySession) throws {
+        func hold(_ point: SIMD2<Int>, for frames: Int) throws {
+            let pagePoint = try XCTUnwrap(OriginalBowlingTouchRay.pagePoint(
+                touchPoint: point, orientation: .unrotated))
+            for _ in 0..<frames {
+                play.holdBowlingTouch(pageX: pagePoint.x, pageY: pagePoint.y)
+                play.advanceFrame()
+            }
+        }
+
+        try hold(SIMD2(15, 90), for: 1)
+        for _ in 0..<7 { play.advanceFrame() }
+        try hold(SIMD2(23, 90), for: 8)
+        XCTAssertEqual(play.bowlingMatch?.phase, .dragging)
+        for rawX in stride(from: 31, through: 119, by: 8) {
+            try hold(SIMD2(rawX, 90), for: 8)
+        }
+        try hold(SIMD2(125, 90), for: 8)
+        play.releaseBowlingTouch()
+        XCTAssertEqual(play.bowlingMatch?.phase, .rolling)
+
+        let scoreIndex = try XCTUnwrap(OriginalBowlingResult.slot(for: throwIndex)).scoreOffset / 4
+        for _ in 0..<5_000 where play.bowlingMatch?.results.throwScores[scoreIndex] == nil {
+            play.advanceFrame()
+        }
+        XCTAssertEqual(play.bowlingMatch?.results.throwScores[scoreIndex], 4)
     }
 
     @MainActor func testChapterThreeFromPlayedCheckpoint() throws {

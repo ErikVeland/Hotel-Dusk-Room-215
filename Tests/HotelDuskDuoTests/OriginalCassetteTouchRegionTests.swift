@@ -49,7 +49,7 @@ final class OriginalCassetteTouchRegionTests: XCTestCase {
         XCTAssertNil(process.returnedProcessValue)
         process.update(rawTouch: nil)
         XCTAssertEqual(process.phase, .complete)
-        XCTAssertEqual(process.returnedProcessValue, 2)
+        XCTAssertEqual(process.returnedProcessValue, 0)
     }
 
     func testOppositeSwipeDoesNotRewindTape() {

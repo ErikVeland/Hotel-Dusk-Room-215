@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "kind": "modified-checkpoint bowling completed-loss trace",
+  "note": "This isolated ROM-runner capture uses a low-scoring touch path at Y=105 for six throws. It records the losing match entering process stage 3 after its result dialogue. It does not capture the terminal process callback return or prove the normal Chapter 8 story exit.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "checkpointSHA256": "14654604720ea8dfb602d70e8bc28a0062fc1113545edeaf7d085f3938d6b697",
+  "commandsSHA256": "8ea51b0edd7cc9bdbdc1678ef0b811338d493e532017135fb78d9df6fa773bf8",
+  "touchPath": "For each of six throws, press at raw touch (15, 105), move in eight-pixel horizontal steps through X 119, move to (125, 105), then release. Advance each result dialogue with three short key presses.",
+  "state": {
+    "processStage": 3,
+    "processSubstage": 1,
+    "bowlingState": 0,
+    "throwIndex": 5,
+    "scores": [
+      4,
+      4,
+      4,
+      5,
+      5,
+      5
+    ],
+    "roundStatuses": [
+      2,
+      2,
+      2
+    ],
+    "dialogueRequestId": 0,
+    "dialogueCallbackPending": false
+  }
+}

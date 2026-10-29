@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Stores the six bowling results in the order used by overlay 11.
+ * Stores scores in the two player rows used by overlay 11.
  */
 public struct OriginalBowlingResult: Equatable, Sendable {
     public static let playerCount = 2
@@ -20,7 +20,10 @@ public struct OriginalBowlingResult: Equatable, Sendable {
     public init() {}
 
     public var nextThrow: Int? {
-        throwScores.firstIndex(where: { $0 == nil })
+        (0..<Self.throwCount).first { turn in
+            guard let slot = Self.slot(for: turn) else { return false }
+            return throwScores[slot.scoreOffset / 4] == nil
+        }
     }
 
     /**
@@ -29,8 +32,8 @@ public struct OriginalBowlingResult: Equatable, Sendable {
      */
     public var roundStatuses: [Int16?] {
         (0..<Self.roundCount).map { round in
-            guard let playerZero = throwScores[round * Self.playerCount],
-                  let playerOne = throwScores[round * Self.playerCount + 1],
+            guard let playerZero = throwScores[round],
+                  let playerOne = throwScores[Self.roundCount + round],
                   playerZero != -1, playerOne != -1 else { return nil }
             if playerOne < playerZero { return 1 }
             if playerZero < playerOne { return 2 }
@@ -42,7 +45,7 @@ public struct OriginalBowlingResult: Equatable, Sendable {
      * Mirrors the original result check after player zero records three scores.
      */
     public var shouldFinish: Bool {
-        let playerZeroScores = (0..<Self.roundCount).compactMap { throwScores[$0 * Self.playerCount] }
+        let playerZeroScores = (0..<Self.roundCount).compactMap { throwScores[$0] }
         guard playerZeroScores.count == Self.roundCount else { return false }
         return Self.shouldFinish(
             playerZeroScores: playerZeroScores,
@@ -60,13 +63,13 @@ public struct OriginalBowlingResult: Equatable, Sendable {
     }
 
     /**
-     * Records one result in source order: players alternate once per round.
+     * Records one result in turn order while retaining the source's player-row layout.
      */
     @discardableResult
     public mutating func record(_ score: Int32) -> ThrowSlot? {
         guard (0...Self.maximumScore).contains(score),
               let index = nextThrow, let slot = Self.slot(for: index) else { return nil }
-        throwScores[index] = score
+        throwScores[slot.scoreOffset / 4] = score
         return slot
     }
 

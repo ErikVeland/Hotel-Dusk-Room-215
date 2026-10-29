@@ -14,7 +14,7 @@ public struct OriginalAppleWordEntryProcess: Equatable, Sendable {
     }
 
     /**
-     * Adds a player-selected letter and returns the source process result when complete.
+     * Adds a player-selected letter and returns zero when the source answer is complete.
      */
     @discardableResult
     public mutating func selectLetter(at index: Int) -> Int16? {
@@ -28,6 +28,6 @@ public struct OriginalAppleWordEntryProcess: Equatable, Sendable {
         selectedLetters.append(Self.letters[index])
         guard selectedLetters.count == Self.letters.count else { return nil }
         isComplete = true
-        return 2
+        return 0
     }
 }

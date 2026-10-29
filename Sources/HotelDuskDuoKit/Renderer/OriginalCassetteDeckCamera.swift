@@ -4,18 +4,18 @@ import simd
 /**
  * Reconstructs overlay 28's view-projection matrix from its recovered camera vectors.
  */
-struct OriginalCassetteDeckCamera: Equatable, Sendable {
-    let position: SIMD3<Float>
-    let up: SIMD3<Float>
-    let target: SIMD3<Float>
+public struct OriginalCassetteDeckCamera: Equatable, Sendable {
+    public let position: SIMD3<Float>
+    public let up: SIMD3<Float>
+    public let target: SIMD3<Float>
 
-    init(positionFixed20_12: SIMD3<Int32>, upFixed20_12: SIMD3<Int32>, targetFixed20_12: SIMD3<Int32>) {
+    public init(positionFixed20_12: SIMD3<Int32>, upFixed20_12: SIMD3<Int32>, targetFixed20_12: SIMD3<Int32>) {
         position = SIMD3(Float(positionFixed20_12.x), Float(positionFixed20_12.y), Float(positionFixed20_12.z)) / 4096
         up = SIMD3(Float(upFixed20_12.x), Float(upFixed20_12.y), Float(upFixed20_12.z)) / 4096
         target = SIMD3(Float(targetFixed20_12.x), Float(targetFixed20_12.y), Float(targetFixed20_12.z)) / 4096
     }
 
-    var viewProjection: simd_float4x4 {
+    public var viewProjection: simd_float4x4 {
         let back = simd_normalize(position - target)
         let right = simd_normalize(simd_cross(up, back))
         let cameraUp = simd_cross(back, right)

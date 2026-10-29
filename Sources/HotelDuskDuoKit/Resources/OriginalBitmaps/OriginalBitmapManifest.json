@@ -12758,8 +12758,7 @@
       "source": "trick/sticktex.bin",
       "payloadSHA256": "c40877aa607858217e45f3cacb0e5dcde711b94ea4d969118f33e4c24b41ef9e",
       "status": "unresolved",
-      "error": "DTX texture; decoded by OriginalTexture",
-      "standaloneSource": "data/trick/sticktex.bin"
+      "error": "Loaded as a native DTX texture, not as a tiled bitmap"
     },
     {
       "source": "trick/switchboard/paneloff.bin",

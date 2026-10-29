@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Records the ballpoint cassette process and its shared slot 5 return.
+ * Records the ballpoint attempt from overlay 25 process 76 and its shared slot 5 return.
  */
 public struct OriginalCassetteBallpointProcess: Equatable, Sendable {
     public enum Phase: Equatable, Sendable {

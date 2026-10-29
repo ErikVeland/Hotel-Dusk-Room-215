@@ -5,6 +5,17 @@ import CryptoKit
 
 @MainActor
 final class OriginalAudioTests: XCTestCase {
+    func testMutedEffectRecordsCueWithoutStartingDevicePlayback() throws {
+        let audio = AudioController()
+        audio.isMuted = true
+
+        XCTAssertThrowsError(try audio.playOriginalEffect(archiveID: -1, entryID: 0))
+        try audio.playOriginalEffect(archiveID: 53, entryID: 0)
+
+        XCTAssertEqual(audio.soundEffectsHistory.last, "SE_NAZOTOKI_LINEN_CART")
+        XCTAssertNil(audio.lastError)
+    }
+
     func testDialogueAudioUsesOriginalLookupOrderAndStopSemantics() throws {
         let table = try OriginalDialogueAudio.load()
         XCTAssertEqual(try table.command(for: .music(mode: 0, name: "BGM_36")), .startMusic(sequenceID: 35))
@@ -391,5 +402,26 @@ final class OriginalAudioTests: XCTestCase {
                 try output.write(to: URL(fileURLWithPath: directory).appendingPathComponent("native-ssar8-entry\(entry).s16le"))
             }
         }
+    }
+
+    func testBowlingResultCueRendersTheRecoveredBrokenPotEffect() throws {
+        let archive = try OriginalSoundArchive.load()
+        let cue = try archive.effect(archiveID: 60, entryID: 0)
+        XCTAssertEqual(cue.symbol, "SE_EVENT_BROKE_UEKIBACHI")
+        XCTAssertEqual(cue.bankID, 96)
+        XCTAssertEqual(cue.playerID, 7)
+
+        let driver = try OriginalSoundDriver.load()
+        let renderer = try OriginalEffectRenderer(archive: archive, driver: driver, archiveID: 60, entryID: 0)
+        let pcm = try renderer.render(frameCount: 48_000)
+        let peak = max(pcm.left.map(abs).max() ?? 0, pcm.right.map(abs).max() ?? 0)
+        let energy = zip(pcm.left, pcm.right).reduce(Float.zero) { total, sample in
+            total + sample.0 * sample.0 + sample.1 * sample.1
+        }
+
+        XCTAssertTrue(pcm.left.allSatisfy(\.isFinite))
+        XCTAssertTrue(pcm.right.allSatisfy(\.isFinite))
+        XCTAssertGreaterThan(peak, 0.001)
+        XCTAssertGreaterThan(energy, 0)
     }
 }

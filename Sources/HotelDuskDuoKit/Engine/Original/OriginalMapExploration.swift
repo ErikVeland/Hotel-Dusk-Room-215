@@ -491,6 +491,52 @@ public struct OriginalMapExploration {
     }
 
     /**
+     * Picks a visible room object from its original hit mesh in the 3D view.
+     */
+    public func pickedRoomObject(page: SIMD2<Float>, visibleNodes: Set<Int>) throws -> String? {
+        guard mode == .walking, page.x >= 0, page.x < 192, page.y >= 0, page.y < 256 else { return nil }
+        let inverse = viewProjection.inverse
+        let ndc = SIMD2<Float>(page.x / 96 - 1, 1 - page.y / 128)
+        let near = inverse * SIMD4(ndc.x, ndc.y, 0, 1)
+        let far = inverse * SIMD4(ndc.x, ndc.y, 1, 1)
+        let start = SIMD3(near.x, near.y, near.z) / near.w
+        let end = SIMD3(far.x, far.y, far.z) / far.w
+        var closest: Float = 1
+        var name: String?
+        for group in room.groups where visibleNodes.contains(group.node) {
+            guard let mesh = group.hit else { continue }
+            let matrix = Self.roomMatrix(room.nodes[group.node].worldFixed)
+            let vertices = OriginalBytes(mesh.vertexData), indices = OriginalBytes(mesh.indexData)
+            for triangle in 0..<mesh.triangleCount {
+                let points = try (0..<3).map { corner -> SIMD3<Float> in
+                    let index = Int(try indices.u32((triangle * 3 + corner) * 4))
+                    let x = Float(Int16(bitPattern: try vertices.u16(index * 12))) / 4096
+                    let y = Float(Int16(bitPattern: try vertices.u16(index * 12 + 2))) / 4096
+                    let z = Float(Int16(bitPattern: try vertices.u16(index * 12 + 4))) / 4096
+                    let point = matrix * SIMD4(x, y, z, 1)
+                    return SIMD3(point.x, point.y, point.z)
+                }
+                if let distance = OriginalMapCollision.intersection(start, end, points[0], points[1], points[2]),
+                   distance < closest {
+                    closest = distance
+                    name = room.nodes[group.node].name
+                }
+            }
+        }
+        guard let name, let objectID = Self.subarea(node: name), objectID > 0 else { return nil }
+        return name
+    }
+
+    private static func roomMatrix(_ fixed: [Int32]) -> simd_float4x4 {
+        let values = fixed.map { Float($0) / 4096 }
+        return simd_float4x4(columns: (
+            SIMD4(values[0], values[1], values[2], values[3]),
+            SIMD4(values[4], values[5], values[6], values[7]),
+            SIMD4(values[8], values[9], values[10], values[11]),
+            SIMD4(values[12], values[13], values[14], values[15])))
+    }
+
+    /**
      * The original search picker accepts obj followed by two decimal digits (0x02033528).
      */
     public static func subarea(node: String) -> UInt16? {

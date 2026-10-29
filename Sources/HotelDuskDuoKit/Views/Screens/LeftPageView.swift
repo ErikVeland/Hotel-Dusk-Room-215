@@ -165,6 +165,9 @@ struct OriginalPlayPage: View {
             } else if play.searchShed != nil {
                 if screen == 0 { OriginalSearchShedView(play: play) }
                 else { retainedNotes }
+            } else if play.brickWall != nil {
+                if screen == 0 { OriginalBrickWallView(play: play) }
+                else { retainedNotes }
             } else if play.bagSearch != nil {
                 if screen == 0 { OriginalBagSearchView(play: play) }
                 else { retainedNotes }

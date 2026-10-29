@@ -135,7 +135,7 @@ final class OriginalChristmasTreeProcessTests: XCTestCase {
         XCTAssertEqual(process.update(fadeComplete: true), [.fadeOut(60)])
     }
 
-    func testElevenPlacedObjectsFadeOutAndReturnSourceProcessValueTwo() {
+    func testElevenPlacedObjectsFadeOutAndReturnSuccessValueZero() {
         var process = OriginalChristmasTreeProcess()
         _ = process.update()
         for index in 0..<11 {
@@ -146,7 +146,7 @@ final class OriginalChristmasTreeProcessTests: XCTestCase {
         XCTAssertFalse(process.canOpenMenu)
         XCTAssertEqual(process.update(), [.fadeOut(60)])
         XCTAssertEqual(process.update(), [])
-        XCTAssertEqual(process.update(fadeComplete: true), [.completed(2)])
-        XCTAssertEqual(process.result, 2)
+        XCTAssertEqual(process.update(fadeComplete: true), [.completed(0)])
+        XCTAssertEqual(process.result, 0)
     }
 }

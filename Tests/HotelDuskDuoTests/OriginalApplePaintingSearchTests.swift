@@ -92,7 +92,7 @@ final class OriginalApplePaintingSearchTests: XCTestCase {
         XCTAssertFalse(firstMask.contains(OriginalAlphabetTouchPoint(x: 0, y: 0)))
     }
 
-    func testPaintingProcessFindsItsLetterAndReturnsSourceResultTwo() throws {
+    func testPaintingOverlayCompletesAfterTheLetterIsAcknowledged() throws {
         let library = try OriginalBitmapLibrary.bundled()
         let renderer = try OriginalApplePaintingRenderer(library: library)
         let mask = try renderer.mask(for: 0)
@@ -165,7 +165,7 @@ final class OriginalApplePaintingSearchTests: XCTestCase {
             XCTAssertNil(process.selectLetter(at: index))
         }
         XCTAssertEqual(process.selectedLetters, Array("JENN"))
-        XCTAssertEqual(process.selectLetter(at: 4), 2)
+        XCTAssertEqual(process.selectLetter(at: 4), 0)
         XCTAssertTrue(process.isComplete)
         XCTAssertNil(process.selectLetter(at: 0))
     }

@@ -21,15 +21,34 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
         }
 
         XCTAssertEqual(match.results.throwScores.compactMap { $0 }, [4, 4, 4, 4, 4])
+        XCTAssertEqual(match.phase, .showingResult)
+        XCTAssertNil(match.returnValue)
+        completeResultPresentation(&match)
         XCTAssertEqual(match.phase, .completed)
         XCTAssertEqual(match.returnValue, 2)
     }
 
-    func testResultModelLeavesACompletedLossUnresolved() throws {
+    func testResultModelRecognisesACompletedLossWithoutEarlyFinish() throws {
         var result = OriginalBowlingResult()
         for score: Int32 in [2, 10, 2, 10, 2, 10] { XCTAssertNotNil(result.record(score)) }
         XCTAssertFalse(result.shouldFinish)
         XCTAssertNil(result.nextThrow)
+    }
+
+    func testSixthThrowCompletesAfterPlayerZeroLosesTwoRounds() throws {
+        let trace = try dragUpdateTrace()
+        var results = OriginalBowlingResult()
+        for score: Int32 in [4, 5, 4, 5, 4] { XCTAssertNotNil(results.record(score)) }
+        XCTAssertFalse(results.shouldFinish)
+
+        var match = OriginalBowlingMatchProcess(results: results)
+        try playCapturedThrow(trace, in: &match)
+
+        XCTAssertEqual(match.phase, .presentingResult)
+        XCTAssertEqual(match.results.roundStatuses, [2, 2, 3])
+        XCTAssertNil(match.results.nextThrow)
+        completeResultPresentation(&match)
+        XCTAssertEqual(match.returnValue, 2)
     }
 
     func testThrowRecordsOnceAndWaitsForTheResultPresentationBeforeReset() throws {
@@ -66,7 +85,25 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
         }
         XCTAssertEqual(match.phase, .rolling)
         for _ in 0..<5_000 where match.phase == .rolling { match.advanceOneUpdate() }
-        XCTAssertTrue([.betweenThrows, .completed, .unresolvedOutcome].contains(match.phase))
+        XCTAssertTrue([.betweenThrows, .showingResult, .presentingResult, .completed].contains(match.phase))
+    }
+
+    private func completeResultPresentation(_ match: inout OriginalBowlingMatchProcess) {
+        if match.phase == .showingResult {
+            XCTAssertEqual(match.presentationFramesRemaining, OriginalBowlingMatchProcess.resultAnimationFrames)
+            for _ in 0..<OriginalBowlingMatchProcess.resultAnimationFrames {
+                match.advanceOneUpdate()
+            }
+            XCTAssertEqual(match.phase, .presentingResult)
+        }
+        XCTAssertEqual(match.presentationFramesRemaining, OriginalBowlingMatchProcess.resultPresentationFrames)
+        for _ in 0..<(OriginalBowlingMatchProcess.resultPresentationFrames - 1) {
+            match.advanceOneUpdate()
+        }
+        XCTAssertEqual(match.phase, .presentingResult)
+        XCTAssertNil(match.returnValue)
+        match.advanceOneUpdate()
+        XCTAssertEqual(match.phase, .completed)
     }
 
     private static func vector(_ values: [Int32]) -> SIMD3<Int32> {

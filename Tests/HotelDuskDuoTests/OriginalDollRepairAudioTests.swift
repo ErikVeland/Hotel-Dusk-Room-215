@@ -2,7 +2,7 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalDollRepairAudioTests: XCTestCase {
-    func testStitchAndCompletionUseSourceArchiveThenEntry() throws {
+    func testStitchAndCompletionCueIDsResolveToSourceEntries() throws {
         let archive = try OriginalSoundArchive.load()
         var puzzle = OriginalDollRepairProcess()
         _ = puzzle.update()
@@ -11,9 +11,12 @@ final class OriginalDollRepairAudioTests: XCTestCase {
         let effects = puzzle.update()
         XCTAssertEqual(effects, [.sound(archive: 35, entry: 0)])
         for effect in effects {
-            if case .sound(let id, let entry) = effect { _ = try archive.effect(archiveID: id, entryID: entry) }
+            if case .sound(let id, let entry) = effect {
+                XCTAssertEqual(try archive.effect(archiveID: id, entryID: entry).symbol,
+                               "SE_NAZOTOKI_NINGYOU_SHURI_NUU")
+            }
         }
-        // 0x02064DC4 calls 0x0200A060(manager, entry: 0, archive: 1).
+        // This checks cue wiring and resource lookup. It does not assess PCM playback.
         for point in (1...10).map({ SIMD2<Int>($0 % 2 == 0 ? 150 : 180, 130 + $0 * 7) }) {
             _ = puzzle.update(pageTouch: point)
         }
@@ -21,6 +24,6 @@ final class OriginalDollRepairAudioTests: XCTestCase {
         var completion: [OriginalDollRepairProcess.Effect] = []
         for _ in 0..<8 { completion += puzzle.update(fadeComplete: true) }
         XCTAssertTrue(completion.contains(.sound(archive: 1, entry: 0)))
-        _ = try archive.effect(archiveID: 1, entryID: 0)
+        XCTAssertEqual(try archive.effect(archiveID: 1, entryID: 0).symbol, "ME_NAZOTOKI_SEIKOU")
     }
 }

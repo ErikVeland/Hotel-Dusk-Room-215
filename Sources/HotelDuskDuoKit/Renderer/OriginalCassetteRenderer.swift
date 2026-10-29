@@ -3,16 +3,32 @@ import Foundation
 import Metal
 import simd
 
+@MainActor
+/**
+ * Renders the cassette process scene for display.
+ */
+public protocol OriginalCassetteRendering: AnyObject {
+    func render() throws -> CGImage
+}
+
+/**
+ * The writing tool displayed by the cassette process.
+ */
+public enum OriginalCassetteTool: Sendable {
+    case ballpoint
+    case pencil
+}
+
+/**
+ * Creates the cassette scene renderer for the selected writing tool.
+ */
+public typealias OriginalCassetteRendererFactory = @MainActor (OriginalCassetteTool) throws -> any OriginalCassetteRendering
+
 /**
  * Renders the recovered cassette, writing tool and source background from overlay 25.
  */
 @MainActor
-final class OriginalCassetteRenderer {
-    enum Tool: Equatable {
-        case ballpoint
-        case pencil
-    }
-
+final class OriginalCassetteRenderer: OriginalCassetteRendering {
     enum MaskedObject: Hashable {
         case tape
         case tool
@@ -26,7 +42,7 @@ final class OriginalCassetteRenderer {
     private let background: CGImage
     private var hitMasks: [MaskedObject: OriginalModelProjectedMask] = [:]
 
-    init(tool: Tool) throws {
+    init(tool: OriginalCassetteTool) throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }

@@ -53,6 +53,10 @@ struct OriginalMapView: View {
                                 if screen == 1 {
                                     lastLookTranslation = 0
                                     play.finishFirstPersonLook()
+                                    if OriginalPageInput.isTap(from: value.startLocation, to: value.location),
+                                       let point = input.point(value.startLocation) {
+                                        play.selectLobbyRoomObject(x: Float(point.x), y: Float(point.y))
+                                    }
                                     return
                                 }
                                 play.releaseLobbyTouch()

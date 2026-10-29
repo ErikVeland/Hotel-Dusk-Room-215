@@ -2,8 +2,11 @@
 
 Process 75 selects overlay 40 in mode 0. The source event is `EP10_R304`,
 source offset 672. The event maps process returns 0, 1 and 2 to events 25, 26
-and 27. The native session still halts at this process; it does not select an
-outcome.
+and 27. The native session now runs an isolated brick-wall interaction and
+returns 0 when its doorway gate is clear, or 2 when the player leaves. Result 0
+selects the source success event. The trigger for source result 1 remains
+unverified. The session does not yet verify the normal Chapter 10 route or the
+original DS hit map.
 
 ## Recovered interaction shape
 
@@ -27,6 +30,13 @@ Overlay 40 tests two faces on each brick: its front at local `z = +0.5` and
 right side at `x = +0.5`, each made from two source triangles. The native mask
 now tests all four triangles. Earlier code tested only the `x` face.
 
+The source vertex table at `DAT_02200a3c` in overlay 40 decodes to those same
+12 local vertices. `FUN_022004f8` scales and offsets them with each brick's
+captured transform before testing the ray. This confirms the native front and
+right-side mesh shape. The screen scan's 668 extra mask hits therefore remain
+in the touch-ray mapping, transform state, or source hit-selection path; adding
+more face triangles is not supported by this source table.
+
 The player sequence is clearer in the walkthrough evidence: tapping the
 exposed wall first triggers a response that calls for a stronger tool; after
 using the hammer on the wall, the player taps bricks away until the door is
@@ -44,29 +54,78 @@ object's vertical position with `-1.0` before it updates the object's
 transform. This ties the Hammer to the brick interaction, but it does not by
 itself identify which of the three script branches follows each player action.
 
-The native engine now builds the 90 source transforms from an injected random
-seed. It uses the recovered linear random generator, alternating row offsets,
-the `row - 0.5` vertical positions, scale, and four fixed object indices. An
+The native engine builds the 90 source transforms from a deterministic seed.
+It uses the recovered linear random generator, alternating row offsets, the
+`row - 0.5` vertical positions, scale, and four fixed object indices. An
 isolated Process 75 ROM run confirmed these transforms in main RAM. The nine
-mode-0 mask bytes at `0x02111644` were all zero in that run. Tests check seeded
-positions and both fixed-cell paths. The layout component does not yet run
-Process 75 in the game. A provisional CPU hit-mask component projects the two
-source face triangles and picks the nearest projected face. Geometry tests
-cover the mask, but the process and renderer do not use it yet.
+mode-0 mask bytes at `0x02111644` were all zero in that run. The connected
+process now uses the CPU mask for full front and side faces, permits Hammer
+drags, prevents brick overlap, and checks the 48-object doorway condition.
+The board view draws the bricks without touch-region overlays. Its seed is
+still fixed, its drawing is a native approximation, and the mask scan evidence
+below shows it does not yet match the original touch map across the screen.
 
-The native projection now records the overlay camera constants: 20-degree field
-of view, 1.335 aspect value, 0.1 near plane, 60 far plane, and the fixed eye,
-target and up vectors. This establishes the camera for the 192×256 native touch
-view. ARM9 touch accessors show that the overlay does not receive the raw DS
-touch axes directly: one accessor returns the vertical coordinate or its
-191-pixel inverse, and the other returns the horizontal coordinate or its
-255-pixel inverse. A system orientation flag selects each inversion. This
-explains why comparing raw `(x, y)` coordinates directly with the native view
-was invalid. The resulting object hits are not yet verified. In the isolated
-walking fixture, the shared flag byte at `0x021046f0`
-is zero. The source accessors therefore map raw DS touch `(x, y)` to brick-view
-`(y, 255 - x)` for that run. This is ROM-backed for the fixture; normal-route
-and device settings still need checking.
+The native board view projects each source vertex with the inverse of the
+recovered touch-ray equations. It uses the fixed eye, the 20-degree angle, the
+1.33 aspect multiplier, and a 128-pixel divisor on both axes. This keeps the
+drawn front and side faces in the same coordinate basis as the CPU hit mask.
+It does not yet establish parity with the original render. ARM9 touch accessors
+show that the overlay does not receive raw DS touch axes directly: one
+accessor returns the vertical coordinate or its 191-pixel inverse, and the
+other returns the horizontal coordinate or its 255-pixel inverse. A system
+orientation flag selects each inversion. In the isolated walking fixture, the
+shared flag byte at `0x021046f0` is zero, so the source accessors map raw DS
+touch `(x, y)` to brick-view `(y, 255 - x)`. This is ROM-backed for the
+fixture; normal-route and device settings still need checking.
+
+A first 561-point scan tapped each location in one live Process 75 instance.
+That scan changed process state between points, so its selection counts are
+invalid and must not be used as mask evidence. A replacement scan restores the
+same ready checkpoint before every tap. It sampled raw points from `(8, 24)`
+through `(40, 40)`. The ROM selected no object at these points, while the
+current floating-point CPU mask reports a hit at all 561 points. The corrected
+fixture is `Tests/Fixtures/BrickWall/process-75-edge-scan.json`. This shows the
+ray or hit calculation still differs from the ROM. The injected process does
+not exercise normal Chapter 10 entry, dragging, collision, the Hammer,
+completion, or a script return.
+
+A restored-state coarse scan now covers the full 256×192 DS touch area at
+eight-pixel intervals. The ROM selected a brick at 68 of 768 points. The
+current Swift mask and test-only Q12 probe each predicted hits at 736 points,
+with 668 false positives and no misses on this grid. At all 68 ROM-positive
+points, the Q12 probe selected the same object index as the ROM. The ROM hits
+cover 16 unique objects, all in board columns 2 and 3 (`objectIndex % 6`), so
+the mismatch is strongly concentrated on the horizontal ray/projection axis.
+These counts come from the checked Swift implementations against the saved
+fixture. The capture is
+`Tests/Fixtures/BrickWall/process-75-independent-screen-scan.json`. This is
+screen-grid evidence only. The large false-positive count means neither
+candidate establishes source-faithful masks. The current native process uses
+the floating-point mask as a playable approximation; Chapter 10 completion
+and hit parity remain unverified. The rejected points need source-level
+diagnosis.
+
+A second scan rebuilds Process 75 from the same Chapter 8 walking checkpoint
+and records its ready RAM (`1f819b465774ea1057c7cec52878512d1cb6624f32c9f7d3cbfcdaf6f1a9a015`).
+This run selected no objects on the 8-pixel grid. A 2-pixel scan near the
+centre found 13 hits, all at raw Y 96, for objects 39 and 44. A raw-X sweep at
+raw Y 96 found 108 hits across 13 objects. The Swift mask predicts 738
+hits on the coarse grid. The new and earlier scans share the walking checkpoint
+hash but have different ready-RAM hashes and different results; the selection
+map is therefore not yet reproducible from the walking checkpoint alone.
+Keep both captures separate until the RNG state and ready-process setup are
+reconciled. See `Tests/Fixtures/BrickWall/process-75-reproducible-scan.json`.
+
+A fresh isolated Process 75 run captures the live object transforms after a
+tap at raw `(120, 96)`. The process structure is identified by its update
+callback at `0x021FD920`; its camera fields at `+0x2B0`, `+0x2BC`, `+0x2C8` and
+`+0x2D4` match the eye, target, right and up vectors used by the native ray.
+The captured orientation flag is zero, and the process stores selected object
+44. A focused test feeds all 90 captured positions and scales into the
+diagnostic mask, which also selects object 44. The compact evidence fixture is
+`Tests/Fixtures/BrickWall/process-75-one-tap.json`. This validates one fresh
+tap and the camera basis only. It does not validate the full touch grid, drag
+collision, hammer return, or story transition.
 
 `OriginalBrickWallTouchRay` now builds the ray from the source camera position,
 forward vector and crossed camera axes. It uses the source 20-degree angle,
@@ -141,8 +200,9 @@ none of them. The source ray now uses the recovered axis conversion. Against
 all 90 positions and scales read from Process 75 memory, its four-triangle mask
 made 677 hit predictions and matched 506 of 684 positive samples against the
 one-frame scan. Because that scan may contain stale selections, this score is
-not valid calibration. Keep the mask disconnected from gameplay until a
-per-point capture matches source selection results and drag checks.
+not valid calibration. The native process now uses the mask, but that wiring
+does not establish source parity. Keep the route marked incomplete until
+per-point selection and drag checks match the source.
 
 A new isolated scan reset touch before each tap. It sampled 3,072 raw touch
 points at 4-pixel intervals. Each sample released touch, waited three frames,
@@ -156,9 +216,9 @@ the four focused border taps at raw `(16, 32)`, `(28, 32)`, `(30, 28)`, and
 `(30, 34)` to source objects 7, 7, 13, and 13. The narrower tolerance misses
 the last two focused samples; the wider tolerance increases mismatches elsewhere.
 The wider tolerance is retained for those known touch points, but neither result
-is accurate enough to connect the mask to gameplay. The mask still predicts
-hits at points where the source scan reports none. Capture exact source
-intersection state around overlapping edges before changing the selection rule.
+is source-exact. The connected native mask still predicts hits at points where
+the source scan reports none. Capture exact source intersection state around
+overlapping edges before changing the selection rule.
 
 A 1-pixel scan of the disputed border region sampled 561 points. The ROM
 selected a brick at every point. The mask hit the same brick at 528 points. It
@@ -197,11 +257,11 @@ index. The decoded source text identifies the three outcomes:
 | 1 | 26 | Louie says, “Not all the bricks are out of…” |
 | 2 | 27 | Louie asks why Hyde is not doing anything. Hyde replies that he is ready to start. |
 
-This confirms that return `0` is the success route. It also gives a useful
-integration target: the native wall process must return `1` while the doorway
-is still obstructed, and return `0` only after it exposes the door. The
-three-outcome test checks the source transition table and dialogue records.
-Return `2` must remain the original alternate path.
+This confirms that return `0` is the success route. The native process now
+returns `0` after its doorway gate clears. It stays in the puzzle while the
+doorway remains obstructed, and returns `2` when the player leaves. The trigger
+for source return `1` still needs original execution evidence. The three-outcome
+test checks the source transition table and dialogue records.
 
 Do not confuse an update callback's `0` with the process result. The session
 marks a puzzle complete when the final process result is `0`. Overlay 40's
@@ -214,8 +274,7 @@ before it maps them to `EP10_R304` events 25–27.
 - Bind the decoded brick background and face textures to the native scene.
 - Reconstruct the procedural brick geometry and its original transforms.
 - Match the remaining source ray selection results and drag collision results.
-- Reproduce the mode-0 initial board, including its random seed and fixed
-  cells.
+- Supply the normal mode-0 random seed and fixed-cell mask.
 - Port the no-tool response, hammer-enabled brick removal, collision,
   validation, reset and exit state changes.
 - Capture a normal overlay-40 mode-0 run to verify the interaction and all
@@ -241,8 +300,8 @@ checks the hit's position against the ray endpoints. It then forms vectors
 from the hit to the three triangle vertices, normalises them, and checks the
 edge-cross winding. A point on a triangle edge uses an additional collinearity
 and endpoint-distance path. Vector cross products and dot products use Q12
-rounding; length comparisons call the ARM9 square-root unit. Relevant routines are
-`overlay_0040/022004f8.c`, `overlay_0040/02200fe4.c`, `arm9/01ff82dc.c`,
+rounding; length comparisons call the ARM9 square-root unit. Relevant routines
+are `overlay_0040/022004f8.c`, `overlay_0040/02200fe4.c`, `arm9/01ff82dc.c`,
 `arm9/01ff817c.c`, `arm9/01ff8100.c`, `arm9/020bd21c.c`,
 `arm9/020bd2b8.c` and `arm9/020bd1b4.c`.
 
@@ -254,18 +313,22 @@ fixed-point hit calculation, or validation path, not the local brick shape.
 A Q12 plane-and-winding model was evaluated against the four focused raw
 touches. With an approximate integer normaliser, it accepted brick 6 on the
 first two touches and no hit on the last two. A test-only probe now follows the
-source square-root and divider scaling path at `020bd074`. It still predicts
-6, 6, 6 and 7, while the ROM selects 7, 7, 13 and 13. A `0x10` allowance in
+source square-root and divider scaling path at `020bd074` and uses the source's
+100-unit ray segment. It still predicts 6, 6, 6 and 7, while the ROM selects
+7, 7, 13 and 13. A `0x10` allowance in
 the winding dot products did not change those results. The probe quantises a
 native floating-point ray, so its ray construction remains approximate.
 Selecting the probe winner by X, Y or Z also failed to explain the mismatches.
 
-The next implementation target is to reproduce the source ray construction
-and its floating-point-to-Q12 conversion. Then compare each face result and
-retained X value against a fresh ROM scan at disputed shared edges. The float
-mask remains diagnostic and must stay disconnected from Process 75 until that
-comparison matches. This evidence does not establish a normal Chapter 10 route
-or a completed end-to-end game.
+The full-screen scan changes the next target: record the source result at the
+plane, ray-line, segment-bound, and winding checks for both accepted and
+rejected points. The probe selects the correct object at all 68 coarse-grid
+ROM hits but accepts 668 additional points, while the focused border touches
+still have four incorrect object IDs. This is evidence of a hit-validation or
+Q12 ray-conversion mismatch; it does not isolate which check is wrong. The
+float mask remains diagnostic and must stay disconnected from Process 75 until
+the comparison matches. This evidence does not establish a normal Chapter 10
+route or a completed end-to-end game.
 
 A trial removed the aspect multiplier from the ray's vertical component,
 following the renderer's conventional projection matrix. The four captured

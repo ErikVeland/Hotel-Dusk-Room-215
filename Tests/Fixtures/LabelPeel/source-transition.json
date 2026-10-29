@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "kind": "isolated process 46 source transition trace",
+  "note": "This trace forces the process peel flag and game-state word 0xDC. It establishes source input and animation states only, not a normal Chapter 6 story route or a returned branch.",
+  "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
+  "peeledCheckpointSHA256": "63cff3039792992bec8733324f5ac1f187fffdf8f2bc023745ed3f33aa1b87f6",
+  "commandsSHA256": "12bdad65f0f4b0f0cfc70a657caa4bd8c74d149980b7388385ab2f8b8c9cbddb",
+  "processAddress": "0x2310020",
+  "gameStateAddress": "0x2111568",
+  "touchTransform": "pageX = rawY; pageY = 255 - rawX",
+  "gestures": [
+    "Two short diagonal re-grabs from raw (195,160) to (189,154).",
+    "Two diagonal pulls from raw (185,140) and (180,135), each 15 pixels up-left.",
+    "One 70-frame diagonal pull from raw (170,120) to (100,50)."
+  ],
+  "states": {
+    "regrab-1": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": false,
+      "dragProgress": 1304,
+      "dragTimer": 0,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "regrab-2": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": false,
+      "dragProgress": 1133,
+      "dragTimer": 0,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "peel-963": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": false,
+      "dragProgress": 963,
+      "dragTimer": 0,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "peel-792": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": false,
+      "dragProgress": 792,
+      "dragTimer": 0,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "long-pull-2": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": 621,
+      "dragTimer": 8,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "long-pull-10": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": 280,
+      "dragTimer": 8,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "long-pull-20": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": -61,
+      "dragTimer": 7,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "long-pull-40": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": -915,
+      "dragTimer": 6,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "long-pull-60": {
+      "state": [
+        2,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": -1768,
+      "dragTimer": 10,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "long-pull-70": {
+      "state": [
+        2,
+        3,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": -1768,
+      "dragTimer": 9,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "wait-60": {
+      "state": [
+        2,
+        3,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": -1768,
+      "dragTimer": 9,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "wait-120": {
+      "state": [
+        5,
+        1,
+        -1
+      ],
+      "peelMode": 1,
+      "selected": true,
+      "dragProgress": -1768,
+      "dragTimer": 9,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "wait-180": {
+      "state": [
+        0,
+        0,
+        -1
+      ],
+      "peelMode": 0,
+      "selected": false,
+      "dragProgress": -1768,
+      "dragTimer": 9,
+      "gameStateWord0xDC": "0x15c3"
+    },
+    "wait-240": {
+      "state": [
+        4,
+        0,
+        -1
+      ],
+      "peelMode": 0,
+      "selected": false,
+      "dragProgress": 2724,
+      "dragTimer": 0,
+      "gameStateWord0xDC": "0x0"
+    },
+    "wait-360": {
+      "state": [
+        1,
+        0,
+        -1
+      ],
+      "peelMode": 0,
+      "selected": false,
+      "dragProgress": 2724,
+      "dragTimer": 0,
+      "gameStateWord0xDC": "0x0"
+    }
+  }
+}

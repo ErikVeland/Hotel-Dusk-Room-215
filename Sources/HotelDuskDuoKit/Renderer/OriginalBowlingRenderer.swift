@@ -3,18 +3,25 @@ import Foundation
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalBowlingRendering: AnyObject {
+    func render(_ state: OriginalBowlingRenderer.SceneState) throws -> CGImage
+}
+
+public typealias OriginalBowlingRendererFactory = @MainActor () throws -> any OriginalBowlingRendering
+
 /**
  * Renders overlay 11's bowling models from the source camera and process state.
  */
 @MainActor
-final class OriginalBowlingRenderer {
-    struct SceneState: Equatable, Sendable {
-        let camera: OriginalBowlingCameraBasis
-        let ballPosition: SIMD3<Float>
-        let pins: [OriginalBowlingPinField.Pin]
+public final class OriginalBowlingRenderer: OriginalBowlingRendering {
+    public struct SceneState: Equatable, Sendable {
+        public let camera: OriginalBowlingCameraBasis
+        public let ballPosition: SIMD3<Float>
+        public let pins: [OriginalBowlingPinField.Pin]
 
-        init(cameraMatrixFixed20_12: [Int32], ballPositionFixed20_12: SIMD3<Int32>,
-             pins: [OriginalBowlingPinField.Pin]) throws {
+        public init(cameraMatrixFixed20_12: [Int32], ballPositionFixed20_12: SIMD3<Int32>,
+                    pins: [OriginalBowlingPinField.Pin]) throws {
             guard let camera = OriginalBowlingCameraBasis(matrixFixed20_12: cameraMatrixFixed20_12),
                   pins.count == OriginalBowlingPinField.pinCount else {
                 throw OriginalDataError.invalid("Bowling scene state")
@@ -33,7 +40,7 @@ final class OriginalBowlingRenderer {
     private let pin: OriginalModelMetalPreview
     private let viewProjection: simd_float4x4
 
-    init() throws {
+    public init() throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -59,7 +66,7 @@ final class OriginalBowlingRenderer {
         viewProjection = Self.projection
     }
 
-    func render(_ state: SceneState) throws -> CGImage {
+    public func render(_ state: SceneState) throws -> CGImage {
         let view = Self.view(camera: state.camera)
         let camera = viewProjection * view
         let pinInstances = state.pins.filter(\.isActive).map { value in

@@ -39,16 +39,19 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         XCTAssertTrue(outcomeText[2].contains("I'm just getting ready to start."))
     }
 
-    func testProcess75BrickModeIsHeldUntilItsPuzzleIsRecovered() throws {
+    func testProcess75BrickModeRunsAndReturnsThroughTheChapterEvent() throws {
         let play = try makeSession(program: "EP10_R304", sourceOffset: 672,
                                    processID: 75, mapID: 43)
         defer { play.stop() }
 
-        guard case .halted(let halt) = play.runner.phase else {
-            return XCTFail("Process 75 must stop until its brick puzzle is recovered")
+        XCTAssertNotNil(play.brickWall)
+        if case .halted(let halt) = play.runner.phase {
+            XCTFail("Process 75 must run its brick puzzle: \(halt.reason)")
         }
-        XCTAssertTrue(halt.reason.contains("Process 75"))
-        XCTAssertNil(play.searchShed)
+        play.leaveBrickWall()
+        XCTAssertNil(play.brickWall)
+        XCTAssertNotEqual(play.runner.phase, .process(id: 75))
+        XCTAssertEqual(play.runner.session.selection.eventID, 27)
     }
 
     func testProcess85RunsTheAfterConfessSceneBeforeItsStoryReturn() throws {

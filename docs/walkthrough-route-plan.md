@@ -60,13 +60,13 @@ through normal play.
 | Chapter | Script rooms | Story processes | Readiness |
 | --- | --- | --- | --- |
 | 5 | R102, R111, R113, R117–R119, R203–R205, R207, R212–R213 | 38, 60: handlers present | Three normal-input route tests cover Mila and the doll, evidence against Jeff, and the confession and review. Run them from the Chapter 4 save. |
-| 6 | R104–R106, R126, R202, R205, R213 | 46, 51, 53, 54, 58: handlers present | A normal-input continuation from the Chapter 5 save reaches the Chapter 6 bar and answers the room-phone event. After Rosa's 9:20 topics, Dunning's history conversation and Rosa's favour, it advances to 10:00 PM. Process 53 is solved through normal input. R106 object `obj06` identifies the red wine and `obj09` the white wine. R104 area 4 object `obj05` identifies the rosé. Room 215 area 2 object `obj03` opens Ed's package; close-up event 257 awards item 50, the adhesive remover. Knocking on Room 216 and Room 211 returns Iris's rosé and Summer's white-wine answers. Using the remover on the red wine starts process 46 through normal input. Process 46's label follow-up still halts before returning to the story. From the existing `chapter6-helen-room` handoff checkpoint, normal inputs complete Helen's story, collect Summer's pen, answer the five memory questions, and reach map 31 at Chapter 7's time-zero state. The checkpoint already contains the wine label; this continuation does not prove how the process-46 route obtained it. The bar jukebox starts process 58. Vending, coins, the normal label-removal path and audio playback remain unverified; route tests mute audio. |
-| 7 | R102, R103, R105, R112, R117, R118, R122, R126, R205–R206, R213 | 43: native handler; 55: partial | Normal-input continuations from the Chapter 7 entry save reach the second-floor hallway, R117 Central Hallway, Rosa's hallway (R126) and bar (R105). These tests verify map transitions only. The R117 Rosa region event is at time slot 1, while the handoff checkpoint is at slot 0. The Chapter 7 bar conversations, time change, Rosa conversation and route to storage remain unverified. A synthetic EP7_R122 process-55 session uses normal touch input to select the type-3 object by its rendered mesh, drag it to the native origin target, open the menu and follow the script return. The source target fields at `+0x88c/+0x894` are not initialised by the recovered overlay setup, so the origin target and success condition still need original-run confirmation. Process 43 renders ornaments and accepts drag-and-drop through their alpha masks. Its native target-to-page fit is inferred and has no original-run comparison. The other tree interaction stages and the chapter route remain incomplete. |
-| 8 | R102, R105, R113–R114, R118–R119, R124, R205–R206, R213, R401 | 44: partial native bowling handler; 45 and 76: partial native cassette handlers; 52: bowling handler | No chapter route test found. A script-entry session test replays five captured touch throws and selects event 11. It scores four pins on each throw, while the source capture scores `[6, 6, 6, 5, 5]`. The session uses the captured initial camera matrix. It still lacks the completion cue and losing returns. The full Chapter 8 route remains open. Process 76 accepts the captured pencil swipe and returns to its parent. Process 45 returns through slot 5 after its delay and fade. Factory mapping assigns process 52 to bowling resources. The native session now starts the bowling scene for process 52, but the normal `R114` route remains unverified. Cassette02 resources map to processes 76, 77 and 91. Existing process-52 cassette captures do not verify those story interactions. Check the cassette, bowling, rooftop meeting, brochure and Rosa's room. |
-| 9 | R103, R105, R107, R112–R114, R116–R118, R123, R125, R205, R207, R213 | 63: CPR; 64: apple painting; 81: apple word entry | Factory cases map process 63 to overlay 37, process 64 to overlay 38, and process 81 to overlay 38. The native session starts CPR for 63, painting search for 64 and word entry for 81. The full Chapter 9 route and puzzle outcomes remain unverified. |
-| 10 | R102–R103, R108, R117–R118, R205, R210, R213, R301–R302, R304–R305, R401 | 59: pencil sharpener; 61: picture peel; 62 and 67: code notice; 74, 86, 90 and 91: typewriter; 75: incomplete brick-wall puzzle; 79: overlay 40 mode 1 search shed; 80: cashbox; 85: AfterConfess sequence; 88: VSScene sequence | The corrected audit passes the host process ID directly to the factory, then maps its loader slot through the original slot table. It places the typewriter at process 74, the overlay 40 variants at 75 and 79, the code notice at 62 and 67, and the cashbox at 80. Process 85 now plays three original image groups and returns result 2. Its frame timing and layer placement still need comparison with the original run. Process 75 remains halted until its interaction and callback-to-script result mapping are recovered. Process 88 follows the normal touch path and returns 0, as the overlay handler specifies. The isolated native session follows its source transition, plays the next story dialogue, and returns to exploration. Process 79 accepts only return 0. Chapter 10 is not complete. |
+| 6 | R104–R106, R126, R202, R205, R213 | 46, 51, 53, 54, 58: handlers present | A normal-input continuation from the Chapter 5 save reaches the Chapter 6 bar and answers the room-phone event. After Rosa's 9:20 topics, Dunning's history conversation and Rosa's favour, it advances to 10:00 PM. Process 53 is solved through normal input. R106 object `obj06` identifies the red wine and `obj09` the white wine. R104 area 4 object `obj05` identifies the rosé. Room 215 area 2 object `obj03` opens Ed's package; close-up event 257 awards item 50, the adhesive remover. Knocking on Room 216 and Room 211 returns Iris's rosé and Summer's white-wine answers. Using the remover on the red wine starts process 46 through normal input. Normal touch input completes both process-46 stages, returns through the source story, and awards label item 66. The route then reaches R202 through R126, R117 and R213, completes Helen's story, collects Summer's pen, answers the five memory questions, and reaches map 31 at Chapter 7's time-zero state. The route now creates its own `chapter6-helen-room` checkpoint. The peel brush path and timing still lack an original-device comparison. The bar jukebox starts process 58. Vending, coins, ROM-matched label removal and audio playback remain unverified; route tests mute audio. |
+| 7 | R102, R103, R105, R112, R117–R119, R122, R126, R205–R206, R213 | 43: native handler; 55: partial | Normal inputs from the Chapter 6 Helen handoff complete the storage/tree route, return to the lobby, and reach Dunning's room. At 10:40 PM the route asks Kevin about his drinking, follows Louie's questions about the duo and Gallery May, then leaves the bar for Iris's Room 216. It completes Iris's suitcase, envelope, Grace and Gallery May topics, Kevin's lobby conversation, and all five Chapter 7 review answers. The route reaches the normal Chapter 8 title and saves `chapter8-normal-entry`; event flag 3:9 is clear afterward. Chapter start resets both event-completion banks, so Chapter 7 flags do not carry into Chapter 8. The Chapter 8 R213 script records do not establish the source of the later flag state. The box target at origin and the tree's target-to-page fit remain inferred. Neither has original-run comparison. The Chapter 6 route now obtains wine-label item 66 through process 46 and generates the Helen handoff from normal input. Route tests use muted audio. Playback remains unverified. |
+| 8 | R102, R105, R113–R114, R118–R119, R124, R205–R206, R212–R213, R401 | 44: partial native bowling handler; 45 and 76: partial cassette-rewind handlers; 52: Cassette02 deck handler | A normal-input continuation answers the 11:00 PM phone call, leaves Room 215, and reaches R213. It saves `chapter8-r213-entry`. The `in_r212` marker leads to the utility closet. From search area 4, the direct object hit mask selects `obj04`, which opens close-up 315. Normal clicks on components 316 and 319 recover inventory items 69 and 42; the route saves `chapter8-r212-items-recovered`. It returns through R213 to Room 215, then travels through R117, R105 and the bar map. Louie's “Someone else wanted it?” response resolves through normal input and sets game flag 29. The route returns through R126, R117 and R213 to Room 215, where flag 29 remains set. In search area 3, the real hit mask selects `obj04` on the open suitcase and awards pencil item 44. The route then returns through R119 to R114. Search area 3's `obj06` hit mask opens desk view 110; tapping component 112 runs `System.blk` event 651 and awards ballpoint item 74. Search area 1's `obj06` radio case opens view 107 with radio and tape components 108 and 109. Normal use of tape item 42 on component 108 consumes it and exposes the tape layer. Ballpoint item 74 selects process 76; its slot-5 exit follows the failed-attempt response. Pencil item 44 selects process 45; the successful input returns value 0 and adds repaired tape item 43. It then uses repaired tape item 43 on component 108, launches process 52, opens the deck with a held touch and swipe, selects Side B, and returns through the story CHK table. The route reaches R119 through the normal exit at time block 1. It then enters Room 216, presents items 69 and 43, and completes Iris's six Chapter 8 topics. This changes the time block to 2. The route returns to R119, knocks on Louie's door, enters R114 and talks to Louie. R114 event 22 sets event flag 14:22. The route then follows Louie back to R119 and starts bowling process 44 through event 8. A renderer seam lets this route reach the process without a Metal device. The route test now plays three modeled five-throw matches. Each reaches native result 2 and event 11, then starts process 44 again through event 8. A separate branch check injects return value 0 and follows the plant dialogue, normal picture input, travel from R119 through R117 and R213 to R401, and the rooftop meeting. After the empty topic menu is closed, the test saves `chapter8-after-rooftop-meeting` and returns to R213. This is post-process branch coverage only: process 44's original return value is still unknown, and the Chapter 8 clock remains at time block 2 after the rooftop scene. Rosa's room and the Chapter 8 review remain open. Route tests mute audio. Process 52 does not play cassette audio, so cassette sound remains unverified. The source capture scores `[6, 6, 6, 5, 5]`; normal route input still needs a matching bowling comparison. Searching `in_r210` was a wrong route (map 36 is Room 220). |
+| 9 | R103, R105, R107, R112–R114, R116–R118, R123, R125, R205, R207, R213 | 63: CPR; 64: apple painting; 81: apple word entry | Factory cases map process 63 to overlay 37, process 64 to overlay 38, and process 81 to overlay 38. Isolated session tests now complete CPR through close-and-reopen input. A process-chain check visits all five recovered painting call sites, preserves the letter mask, and enters JENNY. It uses the accepted painting returns (2, except 1 at `EP9_R125:104`) and word-entry result 0. The normal walking/story route across these paintings and later Chapter 9 scenes remain unverified. |
+| 10 | R102–R103, R108, R117–R118, R205, R210, R213, R301–R302, R304–R305, R401 | 59: pencil sharpener; 61: picture peel; 62 and 67: code notice; 74, 86, 90 and 91: typewriter; 75: incomplete brick-wall puzzle; 79: overlay 40 mode 1 search shed; 80: cashbox; 85: AfterConfess sequence; 88: VSScene sequence | The corrected audit passes the host process ID directly to the factory, then maps its loader slot through the original slot table. It places the typewriter at process 74, the overlay 40 variants at 75 and 79, the code notice at 62 and 67, and the cashbox at 80. Process 85 now plays three original image groups and returns result 2. Its frame timing and layer placement still need comparison with the original run. Process 75 now returns source result 0 when its doorway gate clears, and result 2 when the player leaves. Its screen-wide hit map disagrees with the ROM scan. The normal story entry, source result 1 trigger, and visuals remain unverified. Process 88 follows the normal touch path and returns 0, as the overlay handler specifies. The isolated native session follows its source transition, plays the next story dialogue, and returns to exploration. Process 79 accepts only return 0. Chapter 10 is not complete. |
 
-The Chapter 9 mapping is now aligned with the recovered factory: process 63 is CPR, while 64 and 81 share the apple alphabet overlay for painting search and word entry. The session starts these interactions, but no full Chapter 9 route test exists.
+The Chapter 9 mapping is now aligned with the recovered factory: process 63 is CPR, while 64 and 81 share the apple alphabet overlay for painting search and word entry. Isolated session tests verify that CPR returns to its source script. A process-chain test covers all five painting call sites, their saved letter bits, and the ordered word entry; it does not verify the normal walking route or later Chapter 9 scenes.
 
 Chapter 7 process 43 maps to overlay 13 and loads `ChristmasTree.tbl` and
 `ChristmasTree.wpf`. The 17 tree, ornament and hook textures decode through the
@@ -95,10 +95,11 @@ mask. The star appears at the tray only after the ten ornaments are placed.
 The target-to-page coordinates are a proportional fit to the
 192×256 scene; they are not confirmed against the original camera projection.
 Filling all eleven targets starts the source 60-frame completion fade and
-returns 2. The session now writes the completed order to the recovered save
-field after that successful arrangement. The menu path also returns 2 but
-does not write an order. The separate source drag stages, item-to-colour mapping,
-Chapter 7 route and original-run comparison remain open.
+returns 0. The session writes the completed order to the recovered save field
+after that successful arrangement. Leaving through the menu returns 2 and does
+not write an order. The normal route test completes the placements through
+sprite masks, then follows the script success branch. The target-to-page fit
+and item-to-colour mapping still lack original-run comparison.
 
 The Chapter 5 route tests already exist in `OriginalChapterFiveRouteTests`,
 although the earlier status notes do not record them. Run the three tests after
@@ -111,10 +112,14 @@ a circular brush with a 10-pixel radius at three points per held update, then
 accepts the peel at 99.5% clear. The native model now matches the brush radius
 and sample count. Tests cover those rules and the threshold. Event 7 in
 `EP6_R106` has four return branches to events 10, 8, 9 and 11. The native model
-does not return a result after the peel fade. The source runs another touch
-interaction and animation before it exits. The native session now halts at that
-point instead of skipping the missing state changes. It does not verify the
-four return paths. An isolated ROM process injection cleared the complete mask
+returns result 2 after the mask fade, displays event 9, and re-enters process 46.
+The peel-stage model accepts a decreasing page-X drag until an authored distance
+threshold, then returns result 0; this is not source-backed. The ROM trace in
+[`source-transition.json`](../Tests/Fixtures/LabelPeel/source-transition.json)
+starts from an injected follow-up state. Re-grabs move source progress from 1,475
+to 792. A long diagonal pull enters substate 3 at frame 70 and phase 5 at frame
+120. The trace does not capture a story return or prove the four branches in a
+normal route. An isolated ROM process injection cleared the complete mask
 and reached phase 2, substate 1. That state remained active after 120 frames
 without input, which confirms that the next touch interaction is required. A
 tap and short drag probe did not establish a successful exit. A walkthrough
@@ -196,7 +201,8 @@ per overlay and check each chapter event that calls it:
 
 | Processes | Chapters | Original interaction | Overlay |
 | --- | --- | --- | --- |
-| 45, 76 | 8 | Cassette | 25 |
+| 45, 76 | 8 | Cassette rewind | 25 |
+| 52 | 8 | Cassette playback deck | 28 |
 | 64, 81 | 9 | Apple-word puzzle | 38 |
 | 74, 86, 90, 91 | 10 | Typewriter | 41 |
 | 75 | 10 | Lounge television | 27 |
@@ -204,21 +210,28 @@ per overlay and check each chapter event that calls it:
 
 Chapter 8's `EP8_R114` event 9 invokes process 76 (source offset 372), and
 event 13 invokes process 45 (offset 452). The event encoding stores the
-process selector as byte 16 plus 23. The recovered dialogue and `CHP802`
-walkthrough establish the required item sequence: the ballpoint pen fails
-because it is round; the pencil rewinds the tape after repeated downward
-strokes; the rewound tape returns to inventory and is then used on Louie's
-deck, where side A or B can be selected. The native session now connects the
-captured process-76 swipe and parent return. It does not establish the normal
-`R114` inventory conditions, source-matched rendering, or audio. Process 45
-now displays the ballpoint preview and returns through the captured slot 5
-quit target. Its repeated-stroke behaviour does not establish a successful
-ballpoint interaction.
+process selector as byte 16 plus 23. Normal item use confirms the mapping:
+ballpoint item 74 selects process 76, whose slot-5 return chooses the failed
+attempt response; pencil item 44 selects process 45, whose successful return
+value 0 chooses event 14 and awards repaired cassette item 43. The runtime now
+renders process 76 with the ballpoint and process 45 with the pencil. Its route
+test performs both inputs and checks item 43 in inventory. The test injects a
+bitmap renderer because this environment has no Metal device, so it verifies
+script transitions and process input, not cassette graphics or audio.
+
+The `CHP802` walkthrough describes the ballpoint as too round, then uses the
+pencil to rewind the tape before returning it to the deck. A separate source
+capture associates a successful rewind gesture with process 76, which conflicts
+with the normal script selectors above. That capture came from a modified
+checkpoint and does not identify the selected inventory item. Keep its visual
+and input observations separate from the verified normal-route mapping until a
+matching source run resolves the mismatch.
 
 A fresh modified-checkpoint capture of process 76 reaches overlay 25, variant 1,
 interaction state 2 after its entrance animation. Its image shows the cassette
-deck. The touch probe did not verify side selection or the process return, so
-this capture remains scene-initialisation evidence only.
+deck. The capture does not record the selected item, so it does not establish
+whether that run matched the normal ballpoint or pencil branch. It remains
+scene-initialisation evidence only.
 
 Overlay 25's state-2 tap gate reads four bounds at `0x021FFF34` through
 `FUN_0200985C`. The source values are `[108, 100, 120, 192]`; the helper checks
@@ -271,11 +284,15 @@ appears in the wrong part of the native preview. Reproduce the captures with
 image hashes and checkpoint identity are in
 [`process-76-source-visual-trace.json`](../Tests/Fixtures/Cassette/process-76-source-visual-trace.json).
 
-The source requests sound event `0x2B` during qualifying drag frames and sound
-event `6` on success. The captured PCM has no confirmed cassette cue. Its
-sound-manager fields report no active BGM and retain last-BGM value 17. Those
-fields do not verify sound effects. Treat the PCM as runner output, not as a
-cassette audio check. The RAM snapshots and hashes are in
+The overlay sound calls need separate interpretation from the runner's event
+labels. During the interaction, the source calls the sound manager with IDs 27
+or 28, then stops ID 30. The bundled sound inventory resolves 27 to
+`SE_EVENT_SCENE_PUZZLE_CHIRAKASU` and 28 to `SE_NAZOTOKI_CLIP_NOBASHI`; this
+does not establish which call the modified-checkpoint capture reached. The
+captured PCM has no confirmed cassette cue. Its sound-manager fields report no
+active BGM and retain last-BGM value 17; those fields do not verify sound
+effects. Treat the PCM as runner output, not as a cassette audio check. The RAM
+snapshots and hashes are in
 [`held-touch-trace.json`](../Tests/Fixtures/Cassette/held-touch-trace.json).
 Reproduce the input with
 [`component-cassette-rewind.txt`](../tools/reference/component-cassette-rewind.txt)
@@ -324,9 +341,7 @@ visually verified for normal play. The quit path has no confirmed cassette
 sound cue. Do not treat the visible scene or its audio as source-matched
 evidence.
 
-`EP8_R114` event 52 embeds process 52 and its CHK table maps returns 0–3 to events 16–18. The factory audit maps that process byte to case `0x1D` and bowling resource group 11. The earlier cassette-deck tests and isolated captures labelled process 52 do not match this factory mapping. They are not evidence for the Chapter 8 cassette route. The native session now starts bowling for process 52, but no normal-input R114 route test exists.
-
-Cassette02 resources belong to factory group 28. The audited story processes that load this group are 76, 77 and 91. Existing cassette-deck captures use process-52 labels, so they need a new source entry point before they can support any of these processes. The overlay 28 camera, model transforms, touch probes and control captures remain isolated observations. They do not establish a valid story-process mapping or route return.
+`EP8_R114` event 15 embeds process 52, and its CHK table maps returns 0–3 to events 16–18. The factory audit maps process 52 to case `0x34`, overlay slot 27, and Cassette02 resource group 28. The session now starts the cassette deck for this process and preserves process 44 as bowling. The normal route test reaches process 52, uses its scene and controls, and returns through the CHK table with result 2. Its injected bitmap renderer and muted audio mean that it does not verify graphics or sound. Native process initialisation passes `0x34` for Side A and `0x59` for Side B to the audio context. Those values are outside the recovered BGM sequence range (0–35), so they must not be sent through the current music player as sequence IDs. Cassette audio playback and the source fidelity of the deck sequence remain open.
 
 Chapter 7's `EP7_R122` calls process 55 at event 3, then process 43 at event 7.
 The supplied guide places the tree-box search before tree decoration. The
@@ -337,28 +352,30 @@ when a type-3 object matches controller coordinates at `+0x88c` and `+0x894`
 (`021ff2e0`). The recovered initialisation function does not set those target
 coordinates. The native process restores the source's object types,
 fixed-point positions and drag scaling. It uses decoded MDF geometry to build
-object-shaped touch masks. A synthetic `EP7_R122` session test now selects the
-type-3 mesh, drags it to the native origin target, opens the menu and follows
-the process return into its script transition. This test requires Metal and
+object-shaped touch masks. A normal-input route test reaches storage area 3 and
+selects visible node `obj01_08` through the original model hit mask. It starts
+process 55, moves the type-3 object to the native origin target, and follows
+the success return into the Chapter 7 script. This test requires Metal and
 skips when no Metal device is available. The source setup does not initialise
 the target fields at `+0x88c` and `+0x894`, so the native origin target is an
 inference; the original target, model-to-type assignment and camera still need
 an original-run comparison. Search-shed assets belong to process 79, not
-process 55. The normal room route and original-screen comparison remain open.
-Process 43 supports ten ornament placements and reveals the star after those
-placements. Its terminal fade returns source process value 2. The target-to-page
-fit remains inferred, and the separate source drag stages and route still need
-implementation and original-run comparison. These checks establish partial
-native handlers, not Chapter 7 completion.
+process 55. The normal route continues through process 43, eleven ornament
+placements, and the post-tree talks with Louie and Mila. Process 43 returns
+zero on success and two when the menu exits early. Its target-to-page fit
+remains inferred. The route returns from storage to R118, but the Dunning room
+and later Chapter 7 scenes remain open. These checks establish partial native
+handlers, not Chapter 7 completion.
 
 Chapter 8 process 44 is the bowling interaction in overlay 11. Its original
 model archive contains decoded `2Frouka`, `boulball` and `boulpin` models. The
 process reads held touch input while the ball is selected. Its 0-based counter
-writes six interleaved result slots: player 0/1 at round 0, then player 0/1 at
-round 1, then player 0/1 at round 2 (`021fdf64`). The decompiled result check
+alternates the players' turns, but it writes scores into two player rows:
+player 0's three rounds at offsets 0, 4 and 8, then player 1's rounds at
+offsets 12, 16 and 20 (`021fdf64`). The decompiled result check
 uses player 0's three scores and three round-status values (`021fea90`). This
 agrees with the guide's three rounds and Louie's final roll into a potted plant.
-`OriginalBowlingResult` now records this interleaved layout and the recovered
+`OriginalBowlingResult` now records the player-row layout and the recovered
 round comparisons and final-check predicate; focused tests cover slot order,
 score recording, round status and the finish rule. `OriginalBowlingRenderer`
 composes the recovered lane, ball and pin models and builds a projected mesh
@@ -368,35 +385,48 @@ loads process 44, forwards held page touches and runs the match model. The
 session stays ready on the initial press and begins the drag when the touch
 moves, matching the captured press-and-drag transition. The isolated turn model
 covers source drag selection, automatic roll start, and pin scoring after motion
-stops. `OriginalBowlingMatchProcess` sequences alternating throws and applies
-the recovered early-finish predicate.
+stops. `OriginalBowlingMatchProcess` sequences alternating throws, applies the
+recovered early-finish predicate, plays the recovered broken-pot effect for an
+early win, waits through its 221-frame result display, then waits for the
+source's 60-frame result action before returning 2.
 A repeated replay of the drag-update helper scores four pins per throw, while
 the separate five-throw source capture records `[6, 6, 6, 5, 5]`; these are not
 the same touch path and do not establish score parity. The session uses the
-captured initial camera matrix and does not model the completion cue. The source
-calls `FUN_0200a2f0` with values `-1, 10, 8`, then waits on a separate object.
-The available audio command model does not establish which cue those values
-select. A focused session test starts process 44 from its script call, replays
-five captured touch throws and checks the return to event 11. The test mutes
-audio, so it provides no cue-playback evidence. It records four pins per throw,
-so it does not establish source score parity or the full Chapter 8 route.
+captured initial camera matrix and does not model the result action's graphics.
+The early-win path starts archive 60 entry 0, `SE_EVENT_BROKE_UEKIBACHI`, then
+holds its result display for 221 frames. The source later calls
+`FUN_0200a2f0` with `(-1, 10, 8)`; the `-1` branch fades active effect players
+and does not start an effect. `FUN_02026c20` schedules a 60-frame scene action,
+and `FUN_02081550` waits for its active flag to clear. The native session starts
+the recovered effect, fades active effects over 10 frames at the callback, and
+models both waits. A focused session test mutes output and checks the recorded
+effect symbol and return to event 11; it provides no playback evidence. It
+records four pins per throw, so it does not establish source score parity or the
+full Chapter 8 route.
 
 The `EP8_R119` process-44 event selects event 9 for process result 0, event 10
 for result 1, and event 11 for result 2. A focused script test verifies all
 three source transitions and their offsets. This identifies the return contract;
 it does not establish which bowling outcome reaches each return in a normal run.
 
-The overlay's completed-match path sets the process stage to 3, then
-`021ff1b8` returns process result 2 after its audio cue finishes. The
-five-throw probe records scores `[6, 6, 6, 5, 5, -1]`, round statuses
-`[1, 1, 0]`, and bowling state 10. The source checks the three player-0
-scores and finishes because fewer than two rounds have status 2. The native
-result model now matches this early-finish rule. The capture reaches process
-stage 3, then resets the bowling fields. The captured frames do not include
-the terminal return, but the overlay code defines it as result 2; `EP8_R119`
-maps result 2 to event 11. This source path is established from the isolated
-match and decompilation, while the normal Chapter 8 route remains unverified.
-Results 0 and 1 still lack verified interactions.
+The early-win path schedules a 221-frame result display with the broken-pot
+effect. The overlay then sets process stage 3. `021ff1b8` starts a 60-frame
+scene action, fades active effects, then returns 2 when the action flag clears.
+The five-throw probe records scores
+`[6, 6, 6, 5, 5, -1]`, round statuses `[1, 1, 0]`, and bowling state 10. The
+source checks player 0's three scores. It finishes when fewer than two rounds
+have status 2. The native result model matches this early-finish rule.
+
+A separate low-score capture follows six throws. It records scores
+`[4, 4, 4, 5, 5, 5]`, round statuses `[2, 2, 2]`, and process stage 3. This
+shows that a completed loss reaches the completion stage. The native match
+model now completes this path after the 60-frame result action without the
+221-frame early-win display. The capture does not include the terminal callback
+or story caller result. See
+[`loss-finish-probe.json`](../Tests/Fixtures/Bowling/loss-finish-probe.json).
+A native route test repeats three five-throw matches through events 11 and 8.
+It does not reach the plant scene. Results 0 and 1 still lack verified
+interactions.
 
 `tools/capture_bowling_component.py` now creates a reproducible process-start
 trace from a valid walking checkpoint. It records the opening state at frame
@@ -407,14 +437,14 @@ initialisation only. It does not establish normal Chapter 8 route completion,
 ball selection, a roll, or the story return.
 
 The `--turn-phase-probe` capture now follows five source rolls from that
-isolated checkpoint. The repeated touch path records player scores in their
-interleaved slots. After player 0's third score, the source enters bowling
+isolated checkpoint. The repeated touch path records alternating turns in the
+two player rows. After player 0's third score, the source enters bowling
 state 10 with two completed round wins. It then reaches process stage 3 and
 resets the bowling fields. `OriginalBowlingResult` now reaches the same finish
 decision before player 1's last score. The test compares the native model with
-the captured scores and statuses. The source overlay returns result 2 after
-its completion cue, selecting event 11 in `EP8_R119`; the trace itself does
-not capture that terminal return or verify the normal Chapter 8 route. See
+the captured scores and statuses. The overlay result callback returns 2 after
+its scene action, but the parent response path can replace it with 1. The trace
+does not capture the final return or verify the normal Chapter 8 route. See
 [`turn-phase-probe.json`](../Tests/Fixtures/Bowling/turn-phase-probe.json).
 The fixture records the dialogue callback flag separately from the match
 result. That flag is at `+0xC58`.
@@ -510,8 +540,9 @@ automatic roll threshold, then advances the existing ball and pin simulation
 until the score is available. Its focused fixture test replays the captured
 held updates and checks the source velocity. The native session now uses the
 captured camera, translated ball and lane hit planes, and held lane projections.
-The source touch replay reaches process result 2 and event 11, but its scores do
-not match the source trace. These checks do not establish Chapter 8 playability.
+The source touch replay reaches process stage 3 and resets the bowling fields,
+but it does not capture a terminal return. Its scores also differ from the
+native replay. These checks do not establish Chapter 8 playability.
 
 A second modified-checkpoint reference run now captures a successful centred
 roll in `Tests/Fixtures/Bowling/centre-roll.json`. From the ready state, it

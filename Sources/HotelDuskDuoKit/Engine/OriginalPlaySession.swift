@@ -74,8 +74,8 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var cassetteDeck: OriginalCassetteDeckProcess?
     @Published public private(set) var cassetteImage: CGImage?
     @Published public private(set) var cassetteOpacity = 1.0
-    private var cassetteRenderer: OriginalCassetteRenderer?
-    private var cassetteDeckRenderer: OriginalCassetteDeckRenderer?
+    private var cassetteRenderer: (any OriginalCassetteRendering)?
+    private var cassetteDeckRenderer: (any OriginalCassetteDeckRendering)?
     private var cassetteTouch: SIMD2<Int>?
     private var cassettePress: SIMD2<Int>?
     @Published public private(set) var applePainting: OriginalApplePaintingProcess?
@@ -85,7 +85,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var pencilSharpenerImage: CGImage?
     @Published public private(set) var bowlingMatch: OriginalBowlingMatchProcess?
     @Published public private(set) var bowlingImage: CGImage?
-    private var bowlingRenderer: OriginalBowlingRenderer?
+    private var bowlingRenderer: (any OriginalBowlingRendering)?
     private var bowlingTouch: SIMD2<Float>?
     private var applePaintingMask: OriginalApplePaintingMask?
     @Published public private(set) var cpr: OriginalCPRProcess?
@@ -148,6 +148,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var labelPeelScreenEffects = OriginalScreenEffects()
     private var labelPeelRenderer: OriginalLabelPeelRenderer?
     private var labelPeelTouch: SIMD2<Int>?
+    private var labelPeelFollowupPending = false
     @Published public private(set) var christmasTree: OriginalChristmasTreeProcess?
     @Published public private(set) var christmasTreeImage: CGImage?
     @Published public private(set) var christmasTreeScreenEffects = OriginalScreenEffects()
@@ -155,6 +156,8 @@ public final class OriginalPlaySession: ObservableObject {
     private var christmasTreeDraggedDecoration: Int?
     @Published public private(set) var searchShed: OriginalSearchShedProcess?
     @Published public private(set) var searchShedImage: CGImage?
+    @Published public private(set) var brickWall: OriginalBrickWallProcess?
+    private var brickWallTouch: SIMD2<Float>?
     @Published public private(set) var searchShedScreenEffects = OriginalScreenEffects()
     private var searchShedRenderer: OriginalSearchShedRenderer?
     private var searchShedTouch: SIMD2<Float>?
@@ -237,6 +240,9 @@ public final class OriginalPlaySession: ObservableObject {
     private let memoPullRendererFactory: OriginalMemoPullRendererFactory
     private let crowbarRendererFactory: OriginalCrowbarRendererFactory
     private let cabinetDialRendererFactory: OriginalCabinetDialRendererFactory
+    private let cassetteRendererFactory: OriginalCassetteRendererFactory
+    private let cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory
+    private let bowlingRendererFactory: OriginalBowlingRendererFactory
     private var lobbyTouch: SIMD2<Float>?
     private var firstPersonMovement: SIMD2<Float>?
     private var hasReturnedFromDunningIntroduction = false
@@ -321,7 +327,10 @@ public final class OriginalPlaySession: ObservableObject {
                 suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
                 memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
                 crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
-                cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) {
+                cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) },
+                cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
+                cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
+                bowlingRendererFactory: OriginalBowlingRendererFactory? = nil) {
         self.runner = runner
         self.audio = audio
         self.originalEffectPlayer = originalEffectPlayer
@@ -340,6 +349,9 @@ public final class OriginalPlaySession: ObservableObject {
         self.memoPullRendererFactory = memoPullRendererFactory
         self.crowbarRendererFactory = crowbarRendererFactory
         self.cabinetDialRendererFactory = cabinetDialRendererFactory
+        self.cassetteRendererFactory = cassetteRendererFactory ?? { try OriginalCassetteRenderer(tool: $0) }
+        self.cassetteDeckRendererFactory = cassetteDeckRendererFactory ?? { try OriginalCassetteDeckRenderer() }
+        self.bowlingRendererFactory = bowlingRendererFactory ?? { try OriginalBowlingRenderer() }
         lobby = restoredExploration
         if chapterTransition?.stage == .title {
             do { chapterTitleImages = try OriginalChapterTitleImages(library: .bundled(), chapter: runner.game.chapter) }
@@ -680,6 +692,45 @@ public final class OriginalPlaySession: ObservableObject {
     public func releaseTouch() { heldTouch = nil }
 
     /**
+     * Selects and drags a Chapter 10 brick with the Hammer.
+     */
+    public func holdBrickWallTouch(x: Float, y: Float) {
+        guard !isPaused, case .process(75) = runner.phase, var process = brickWall,
+              x.isFinite, y.isFinite, (0..<192).contains(x), (0..<256).contains(y) else { return }
+        let point = SIMD2(x, y)
+        if brickWallTouch == nil {
+            let hammerAvailable = (try? runner.game.inventory.items.contains(0x3b)) == true
+            guard process.beginDrag(at: point, hammerAvailable: hammerAvailable) else { return }
+        }
+        process.drag(to: point)
+        brickWallTouch = point
+        brickWall = process
+    }
+
+    /**
+     * Releases the selected brick and returns to the Chapter 10 event when the doorway is clear.
+     */
+    public func releaseBrickWallTouch() {
+        brickWallTouch = nil
+        guard !isPaused, case .process(75) = runner.phase, var process = brickWall else { return }
+        let effects = process.endDrag()
+        brickWall = process
+        guard effects.contains(.completed(0)) else { return }
+        brickWall = nil
+        runner.finishProcess(returnValue: 0)
+        settle()
+    }
+
+    public func leaveBrickWall() {
+        guard !isPaused, case .process(75) = runner.phase, var process = brickWall,
+              let result = process.leave() else { return }
+        brickWall = nil
+        brickWallTouch = nil
+        runner.finishProcess(returnValue: result)
+        settle()
+    }
+
+    /**
      * Forwards a held page touch to the bowling process.
      */
     public func holdBowlingTouch(pageX: Float, pageY: Float) {
@@ -801,12 +852,16 @@ public final class OriginalPlaySession: ObservableObject {
      */
     public func acknowledgeApplePaintingLetter() {
         guard !isPaused, case .process(64) = runner.phase, var process = applePainting,
-              let result = process.acknowledgeLetter() else { return }
+              process.acknowledgeLetter() != nil,
+              let invocation = runner.embeddedProcessInvocation,
+              let returnValue = OriginalAlphabetProcessContext.successfulReturnValue(for: invocation) else {
+            return
+        }
         applePainting = nil
         applePaintingImage = nil
         applePaintingRenderer = nil
         applePaintingMask = nil
-        runner.finishProcess(returnValue: result)
+        runner.finishProcess(returnValue: returnValue)
         settle()
     }
 
@@ -816,7 +871,12 @@ public final class OriginalPlaySession: ObservableObject {
     public func selectAppleWordLetter(at index: Int) {
         guard !isPaused, case .process(81) = runner.phase,
               var process = appleWordEntry else { return }
-        if let result = process.selectLetter(at: index) {
+        if process.selectLetter(at: index) != nil {
+            guard let invocation = runner.embeddedProcessInvocation,
+                  let result = OriginalAlphabetProcessContext.successfulReturnValue(for: invocation) else {
+                runner.halt("The apple word-entry return could not be recovered")
+                return settle()
+            }
             appleWordEntry = nil
             runner.finishProcess(returnValue: result)
             settle()
@@ -1451,8 +1511,11 @@ public final class OriginalPlaySession: ObservableObject {
             }
             startTimer()
         case .process(75):
-            runner.halt("Process 75 loads overlay 40; its original interaction is not recovered")
-            return settle()
+            if brickWall == nil {
+                brickWall = OriginalBrickWallProcess()
+                processReturn = 2
+            }
+            startTimer()
         case .process(61):
             if picturePeel == nil {
                 do {
@@ -1470,10 +1533,10 @@ public final class OriginalPlaySession: ObservableObject {
                 }
             }
             startTimer()
-        case .process(44), .process(52):
+        case .process(44):
             if bowlingMatch == nil {
                 do {
-                    let renderer = try OriginalBowlingRenderer()
+                    let renderer = try bowlingRendererFactory()
                     let match = OriginalBowlingMatchProcess()
                     bowlingImage = try renderer.render(bowlingSceneState(match))
                     bowlingRenderer = renderer
@@ -1481,6 +1544,24 @@ public final class OriginalPlaySession: ObservableObject {
                     processReturn = 2
                 } catch {
                     runner.halt("The bowling scene could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(52):
+            if cassetteDeck == nil {
+                do {
+                    let renderer = try cassetteDeckRendererFactory()
+                    let process = OriginalCassetteDeckProcess()
+                    cassetteImage = try renderer.render(camera: process.camera, state: process.sceneState)
+                    cassetteDeckRenderer = renderer
+                    cassetteDeck = process
+                    cassetteTouch = nil
+                    cassettePress = nil
+                    cassetteOpacity = 1
+                    processReturn = 2
+                } catch {
+                    runner.halt("The cassette playback scene could not be loaded: \(error)")
                     return settle()
                 }
             }
@@ -1559,12 +1640,12 @@ public final class OriginalPlaySession: ObservableObject {
             appleWordEntry = process
             startTimer()
         case .process(45):
-            if cassetteBallpoint == nil {
+            if cassetteRewind == nil {
                 do {
-                    let renderer = try OriginalCassetteRenderer(tool: .ballpoint)
+                    let renderer = try cassetteRendererFactory(.pencil)
                     cassetteImage = try renderer.render()
                     cassetteRenderer = renderer
-                    cassetteBallpoint = OriginalCassetteBallpointProcess()
+                    cassetteRewind = OriginalCassetteRewindProcess()
                     cassetteTouch = nil
                     cassettePress = nil
                     cassetteOpacity = 1
@@ -1576,12 +1657,12 @@ public final class OriginalPlaySession: ObservableObject {
             }
             startTimer()
         case .process(76):
-            if cassetteRewind == nil {
+            if cassetteBallpoint == nil {
                 do {
-                    let renderer = try OriginalCassetteRenderer(tool: .pencil)
+                    let renderer = try cassetteRendererFactory(.ballpoint)
                     cassetteImage = try renderer.render()
                     cassetteRenderer = renderer
-                    cassetteRewind = OriginalCassetteRewindProcess()
+                    cassetteBallpoint = OriginalCassetteBallpointProcess()
                     cassetteTouch = nil
                     cassettePress = nil
                     cassetteOpacity = 1
@@ -1754,7 +1835,9 @@ public final class OriginalPlaySession: ObservableObject {
             if labelPeel == nil {
                 do {
                     let renderer = try OriginalLabelPeelRenderer(library: .bundled())
-                    let puzzle = OriginalLabelPeelProcess(mask: renderer.initialMask)
+                    let stage: OriginalLabelPeelProcess.Stage = labelPeelFollowupPending ? .peel : .solvent
+                    labelPeelFollowupPending = false
+                    let puzzle = OriginalLabelPeelProcess(mask: renderer.initialMask, stage: stage)
                     labelPeelRenderer = renderer
                     labelPeelImage = try renderer.render(puzzle)
                     labelPeelScreenEffects = OriginalScreenEffects()
@@ -2412,6 +2495,16 @@ public final class OriginalPlaySession: ObservableObject {
         switch match.phase {
         case .rolling:
             match.advanceOneUpdate()
+            if match.phase == .showingResult {
+                _ = try? audio.playOriginalEffect(archiveID: 60, entryID: 0)
+            }
+        case .showingResult:
+            match.advanceOneUpdate()
+        case .presentingResult:
+            if match.presentationFramesRemaining == OriginalBowlingMatchProcess.resultPresentationFrames {
+                audio.stopOriginalEffects(fadeFrames: 10)
+            }
+            match.advanceOneUpdate()
         case .betweenThrows:
             _ = match.beginNextThrow()
         case .completed:
@@ -2422,11 +2515,6 @@ public final class OriginalPlaySession: ObservableObject {
             stopTimer()
             runner.finishProcess(returnValue: match.returnValue ?? processReturn)
             settle()
-            return
-        case .unresolvedOutcome:
-            bowlingMatch = match
-            runner.halt("The bowling result has no recovered story return")
-            stopTimer()
             return
         case .ready, .dragging:
             break
@@ -2501,9 +2589,9 @@ public final class OriginalPlaySession: ObservableObject {
         let press = cassettePress
         var sceneHit = false
         if process.phase == .opening, let press {
-            let pagePoint = SIMD2(Float(press.y), Float(255 - press.x))
-            do { sceneHit = try renderer.hitTest(pagePoint: pagePoint, camera: process.camera,
-                                                  state: process.sceneState) != nil }
+            let pagePoint = SIMD2(press.y, 255 - press.x)
+            do { sceneHit = try renderer.hasHit(pageX: pagePoint.x, pageY: pagePoint.y,
+                                                camera: process.camera, state: process.sceneState) }
             catch { runner.halt("The cassette deck could not be hit-tested: \(error)"); stopTimer(); return }
         }
         process.update(touch: cassetteTouch, pressedTouch: press, sceneHit: sceneHit)
@@ -3255,16 +3343,8 @@ public final class OriginalPlaySession: ObservableObject {
                 case .dragging(true): try? audio.ensureOriginalEffect(archiveID: 0, entryID: 44)
                 case .dragging(false):
                     _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 44, fadeFrames: 5))
-                case .followupInteractionRequired:
-                    labelPeel = nil
-                    labelPeelImage = nil
-                    labelPeelRenderer = nil
-                    labelPeelTouch = nil
-                    labelPeelScreenEffects = OriginalScreenEffects()
-                    stopTimer()
-                    runner.halt("The wine-label follow-up interaction is not recovered")
-                    return settle()
                 case .completed(let result):
+                    labelPeelFollowupPending = result == 2
                     labelPeel = nil
                     labelPeelImage = nil
                     labelPeelRenderer = nil
@@ -3733,6 +3813,28 @@ public final class OriginalPlaySession: ObservableObject {
         } catch { runner.halt("The counter selection failed: \(error)"); stopTimer() }
     }
 
+    /**
+     * Starts the search response for a room object selected with its visible hit mesh.
+     */
+    public func selectLobbyRoomObject(x: Float, y: Float) {
+        guard !isPaused, chapterTransition == nil, case .exploration = runner.phase,
+              closeup == nil, let lobby, lobby.mode == .walking,
+              let area = lobby.nearbySearchArea else { return }
+        do {
+            let visible = lobby.objectVisibility.visibleNodes(in: lobby.room, map: lobby.mapID, area: nil, game: runner.game)
+                .intersection(lobby.room.gameplayRenderNodes)
+            guard let node = try lobby.pickedRoomObject(page: SIMD2(x, y), visibleNodes: visible),
+                  let subarea = OriginalMapExploration.subarea(node: node) else { return }
+            let table = try OriginalSearchTable.bundled(map: lobby.mapName)
+            if let view = table.upViewID(area: area, subarea: subarea), view != .max {
+                pendingCloseup = (area, subarea, view)
+            }
+            runner.lookInSearchView(area: area, subarea: subarea, table: table)
+            try startSearchFallback()
+            settle()
+        } catch { runner.halt("The room object selection failed: \(error)"); settle() }
+    }
+
     public func useItemInSearchView(_ item: UInt8?) {
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup == nil, lobby?.mode == .counter else { return }
         if let item, (try? runner.game.inventory.items.contains(item)) != true { return }
@@ -3902,7 +4004,10 @@ public final class OriginalPlaySession: ObservableObject {
                                  suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
                                  memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
                                  crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
-                                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) throws -> OriginalPlaySession {
+                                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) },
+                                 cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
+                                 cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
+                                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil) throws -> OriginalPlaySession {
         let game = try checkpoint.gameState()
         let catalog = try OriginalScriptCatalog.bundled()
         guard let map = OriginalMapExploration.supportedMaps[game.mapID] else {
@@ -3927,7 +4032,10 @@ public final class OriginalPlaySession: ObservableObject {
                                        suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
                                        memoPullRendererFactory: memoPullRendererFactory,
                                        crowbarRendererFactory: crowbarRendererFactory,
-                                       cabinetDialRendererFactory: cabinetDialRendererFactory)
+                                       cabinetDialRendererFactory: cabinetDialRendererFactory,
+                                       cassetteRendererFactory: cassetteRendererFactory,
+                                       cassetteDeckRendererFactory: cassetteDeckRendererFactory,
+                                       bowlingRendererFactory: bowlingRendererFactory)
         play.lobbyRenderer = renderer
         play.lobbyMap = renderer.map
         try play.renderLobby()
@@ -3948,7 +4056,10 @@ public final class OriginalPlaySession: ObservableObject {
                                  suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
                                  memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
                                  crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
-                                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) throws -> OriginalPlaySession {
+                                 cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) },
+                                 cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
+                                 cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
+                                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil) throws -> OriginalPlaySession {
         let game = try checkpoint.gameState()
         let catalog = try OriginalScriptCatalog.bundled()
         guard OriginalMapExploration.supportedMaps[game.mapID] != nil else {
@@ -3968,7 +4079,10 @@ public final class OriginalPlaySession: ObservableObject {
                                    suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
                                    memoPullRendererFactory: memoPullRendererFactory,
                                    crowbarRendererFactory: crowbarRendererFactory,
-                                   cabinetDialRendererFactory: cabinetDialRendererFactory)
+                                   cabinetDialRendererFactory: cabinetDialRendererFactory,
+                                   cassetteRendererFactory: cassetteRendererFactory,
+                                   cassetteDeckRendererFactory: cassetteDeckRendererFactory,
+                                   bowlingRendererFactory: bowlingRendererFactory)
     }
 
     /**

@@ -53,9 +53,27 @@ final class OriginalLabelPeelProcessTests: XCTestCase {
 
         XCTAssertTrue(process.isComplete)
         XCTAssertTrue(finalReleaseEffects.contains(.fadeOut(60)))
-        XCTAssertEqual(process.update(fadeComplete: true), [.followupInteractionRequired])
+        XCTAssertEqual(process.update(fadeComplete: true), [.completed(2)])
         XCTAssertTrue(process.update(fadeComplete: true).isEmpty)
-        XCTAssertNil(process.result)
+        XCTAssertEqual(process.result, 2)
+    }
+
+    func testPeelStageAcceptsRepeatedPullsAndReturnsSuccess() {
+        let mask = [UInt8](repeating: 1, count: OriginalLabelPeelProcess.width * OriginalLabelPeelProcess.height)
+        var process = OriginalLabelPeelProcess(mask: mask, stage: .peel)
+        _ = process.update()
+
+        var releaseEffects: [OriginalLabelPeelProcess.Effect] = []
+        for _ in 0..<5 {
+            _ = process.update(pageTouch: SIMD2(150, 70))
+            _ = process.update(pageTouch: SIMD2(132, 88))
+            releaseEffects = process.update()
+        }
+
+        XCTAssertTrue(process.isPeelComplete)
+        XCTAssertEqual(releaseEffects, [.dragging(false), .fadeOut(60)])
+        XCTAssertEqual(process.update(fadeComplete: true), [.completed(0)])
+        XCTAssertEqual(process.result, 0)
     }
 
     func testSourceBrushUsesTenPixelRadiusAfterTheFirstTouchFrame() {
