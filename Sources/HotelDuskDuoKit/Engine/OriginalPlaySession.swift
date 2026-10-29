@@ -33,6 +33,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var searchItem: UInt8?
     @Published public private(set) var notebook: OriginalNotebook?
     @Published public private(set) var notebookImage: CGImage?
+    @Published public private(set) var nativeNotebookPages: [String: Data] = [:]
     private var notebookTouch: SIMD2<Int>?
     @Published public private(set) var runner: OriginalEventRunner
     @Published public private(set) var entrance: EntranceScene?
@@ -618,6 +619,18 @@ public final class OriginalPlaySession: ObservableObject {
         notebook?.turnPage(forward: forward)
         if let notebook { runner.storeNotebook(notebook) }
         refreshNotebookImage()
+    }
+
+    public func setNativeNotebookInk(page: Int, drawing: Data, packed: Data) {
+        guard !isPaused, let current = notebook, current.canEdit, current.page == page,
+              drawing.count <= 8_000_000, packed.count == OriginalNotebook.packedSize else { return }
+        let recordsProgress = beginProgressInput(.setNativeNotebookInk(page: page, drawing: drawing, packed: packed))
+        defer { endProgressInput(recordsProgress) }
+        do {
+            try notebook?.replaceInk(packed: packed)
+            nativeNotebookPages[String(page)] = drawing
+            refreshNotebookImage()
+        } catch { onProgressSaveError?(error) }
     }
 
     public func clearNotebookPage() {
@@ -1798,10 +1811,7 @@ public final class OriginalPlaySession: ObservableObject {
             startTimer()
         case .itemNotice(let id, _):
             startTimer()
-            if touchPictureImages != nil {
-                do { acquiredItemImage = try OriginalTouchPictureImages.item(id, library: .bundled()) }
-                catch { runner.halt("The item picture could not be loaded: \(error)"); return settle() }
-            }
+            acquiredItemImage = try? OriginalInventoryArtwork.shared.image(for: id)
         case .process(24):
             if bellProcess == nil {
                 do {
@@ -4715,6 +4725,7 @@ extension OriginalPlaySession {
 
     private func prepareProgress(_ journal: OriginalPlayProgress) {
         progressJournal = journal
+        nativeNotebookPages = journal.nativeNotebookPages ?? [:]
         usesInstantSaves = journal.usesInstantSaves
         dialogueNotebook.onSaveProgress = { [weak self] _ in self?.notifyProgress() }
     }
@@ -4780,6 +4791,7 @@ extension OriginalPlaySession {
     func progressCheckpoint() throws -> OriginalResumeSave {
         guard var journal = progressJournal else { return try walkingCheckpoint() }
         journal.notebook = dialogueNotebook.savedState()
+        journal.nativeNotebookPages = nativeNotebookPages.isEmpty ? nil : nativeNotebookPages
         journal.program = runner.program.name
         journal.eventIndex = runner.eventIndex
         journal.phase = progressPhase

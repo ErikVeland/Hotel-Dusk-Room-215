@@ -59,12 +59,14 @@ public final class OriginalSuitcaseContentsRenderer: OriginalSuitcaseContentsRen
     }
 
     public func render(_ process: OriginalSuitcaseContentsProcess, game: OriginalGameState) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
-            bytesPerRow: 192 * 4, space: CGColorSpaceCreateDeviceRGB(),
+        let renderScale = 2
+        guard let context = CGContext(data: nil, width: 192 * renderScale, height: 256 * renderScale, bitsPerComponent: 8,
+            bytesPerRow: 192 * renderScale * 4, space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
             throw OriginalDataError.invalid("Suitcase image context")
         }
-        context.interpolationQuality = .none
+        context.scaleBy(x: CGFloat(renderScale), y: CGFloat(renderScale))
+        context.interpolationQuality = .high
         func draw(_ image: CGImage, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat) {
             context.draw(image, in: CGRect(x: x, y: 256 - y - height, width: width, height: height))
         }

@@ -17,16 +17,17 @@ public struct JigsawPuzzleView: View {
     public var body: some View {
         GeometryReader { display in
             let book = DuoBookLayout(size: display.size, safeArea: safeArea,
-                                     handedness: session.hingeManager.handedness)
-            HStack(spacing: 0) {
+                                     handedness: session.hingeManager.handedness,
+                                     stacked: session.hingeManager.hasHardwareHinge && display.size.height > display.size.width)
+            AnyLayout(book.stacked ? AnyLayout(VStackLayout(spacing: 0)) : AnyLayout(HStackLayout(spacing: 0))) {
                 ForEach(Array(book.pages.enumerated()), id: \.element) { index, role in
                     PaperbackPageSurface(hingeManager: session.hingeManager,
                                          side: index == 0 ? .left : .right,
                                          isVisible: !session.isBookClosed) {
                         page(role: role)
-                            .padding(pageInsets(at: index))
+                            .padding(book.insets(at: index))
                     }
-                        .frame(width: book.frame(at: index).width, height: display.size.height)
+                        .frame(width: book.frame(at: index).width, height: book.frame(at: index).height)
                         .clipped()
                 }
             }

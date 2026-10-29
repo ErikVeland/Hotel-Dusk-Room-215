@@ -23,6 +23,12 @@ public struct DuoBookContainerView: View {
         .onChange(of: scenePhase) { _, phase in session.setApplicationActive(phase == .active) }
         .onAppear { session.setApplicationActive(scenePhase == .active) }
         #if canImport(UIKit)
+        #if os(iOS)
+        .onAppear { BookOrientationPolicy.update(coverIsVisible: session.isBookClosed) }
+        .onChange(of: session.hingeManager.foldState) { _, state in
+            BookOrientationPolicy.update(coverIsVisible: state == .closed)
+        }
+        #endif
         .background(HingeObserverView(manager: session.hingeManager))
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
@@ -31,11 +37,12 @@ public struct DuoBookContainerView: View {
 
     private func pageLayout(in size: CGSize, safeArea: EdgeInsets) -> some View {
         let layout = DuoBookLayout(size: size, safeArea: safeArea,
-                                   handedness: session.hingeManager.handedness)
+                                   handedness: session.hingeManager.handedness,
+                                   stacked: session.hingeManager.hasHardwareHinge && size.height > size.width)
         return ZStack {
             // Keep both pages mounted. A cover or puzzle must not destroy local
             // scroll position, selected floor, focus, or unfinished interactions.
-            HStack(spacing: 0) {
+            AnyLayout(layout.stacked ? AnyLayout(VStackLayout(spacing: 0)) : AnyLayout(HStackLayout(spacing: 0))) {
                 ForEach(Array(layout.pages.enumerated()), id: \.element) { index, page in
                     PaperbackPageSurface(hingeManager: session.hingeManager,
                                          side: index == 0 ? .left : .right,
@@ -50,7 +57,7 @@ public struct DuoBookContainerView: View {
                         }
                         .padding(layout.insets(at: index))
                     }
-                    .frame(width: layout.frame(at: index).width, height: size.height)
+                    .frame(width: layout.frame(at: index).width, height: layout.frame(at: index).height)
                     .clipped()
                 }
             }
@@ -61,9 +68,9 @@ public struct DuoBookContainerView: View {
             .accessibilityHidden(session.isJigsawPuzzleOpen || session.isBookClosed || isReadingDialogue)
 
             if isReadingDialogue, let play = session.play {
-                let metrics = DialogueSpreadMetrics(size: size, safeArea: safeArea)
+                let metrics = DialogueSpreadMetrics(size: size, safeArea: safeArea, stacked: layout.stacked)
                 NotebookDialogueSpread(play: play, notebook: play.dialogueNotebook, safeArea: safeArea,
-                                       isVisible: !session.isBookClosed && !session.isJigsawPuzzleOpen)
+                                       stacked: layout.stacked, isVisible: !session.isBookClosed && !session.isJigsawPuzzleOpen)
                     .overlay(alignment: .topTrailing) {
                         HStack {
                             if session.isReviewingConversations {
@@ -90,7 +97,9 @@ public struct DuoBookContainerView: View {
                     .accessibilityHidden(session.isBookClosed)
             }
 
-            BookSpineView(angleDegrees: session.hingeManager.hingeAngleDegrees)
+            if !isReadingDialogue {
+                BookSpineView(angleDegrees: session.hingeManager.hingeAngleDegrees, horizontal: layout.stacked)
+            }
 
             if session.isBookClosed {
                 CoverScreenView(session: session, safeArea: safeArea)

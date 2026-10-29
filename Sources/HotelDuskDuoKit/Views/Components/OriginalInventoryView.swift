@@ -121,7 +121,7 @@ struct OriginalInventoryItemImage: View {
     var body: some View {
         if let image = try? OriginalInventoryArtwork.shared.image(for: item) {
             Image(decorative: image, scale: 1)
-                .resizable().interpolation(.none).scaledToFit()
+                .resizable().interpolation(.high).scaledToFit()
                 .accessibilityLabel(OriginalInventoryArtwork.shared.name(for: item))
         } else {
             VStack(spacing: 6) {

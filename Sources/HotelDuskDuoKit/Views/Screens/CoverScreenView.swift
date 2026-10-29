@@ -1,7 +1,7 @@
 import SwiftUI
 import ImageIO
 
-/// The worn paperback print extends to every edge of the closed display.
+/// The cover stays upright and retains its proportions in every orientation.
 public struct CoverScreenView: View {
     @ObservedObject public var session: GameSession
 
@@ -17,7 +17,7 @@ public struct CoverScreenView: View {
                     Image(decorative: image, scale: 1)
                         .resizable()
                         .interpolation(.high)
-                        .scaledToFill()
+                        .scaledToFit()
                         .frame(width: display.size.width, height: display.size.height, alignment: .top)
                         .clipped()
                 }

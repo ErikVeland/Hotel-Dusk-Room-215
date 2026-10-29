@@ -17,6 +17,7 @@ enum OriginalProgressInput: Codable, Equatable, Sendable {
     case closeNotebook
     case turnNotebookPage(forward: Bool)
     case clearNotebookPage
+    case setNativeNotebookInk(page: Int, drawing: Data, packed: Data)
     case undoNotebookEdit
     case toggleNotebookEraser
     case holdNotebookTouch(x: Int, y: Int)
@@ -178,6 +179,7 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
     var chapterSlotReads: [[OriginalChapterSave?]] = []
     var chapterWrites: [ChapterWrite] = []
     var notebook: DialogueNotebook.SavedState?
+    var nativeNotebookPages: [String: Data]?
     var program = ""
     var eventIndex: Int?
     var phase = ""
@@ -190,7 +192,9 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
     }
 
     func validate() throws {
-        guard inputs.count <= 1_000_000, base.count < 16_000_000 else {
+        guard inputs.count <= 1_000_000, base.count < 16_000_000,
+              (nativeNotebookPages?.count ?? 0) <= 3,
+              nativeNotebookPages?.allSatisfy({ ["0", "1", "2"].contains($0.key) && $0.value.count <= 8_000_000 }) ?? true else {
             throw OriginalDataError.invalid("Interaction progress size")
         }
         var frames = 0
@@ -243,6 +247,7 @@ extension OriginalPlaySession {
         case .closeNotebook: closeNotebook()
         case let .turnNotebookPage(forward): turnNotebookPage(forward: forward)
         case .clearNotebookPage: clearNotebookPage()
+        case let .setNativeNotebookInk(page, drawing, packed): setNativeNotebookInk(page: page, drawing: drawing, packed: packed)
         case .undoNotebookEdit: undoNotebookEdit()
         case .toggleNotebookEraser: toggleNotebookEraser()
         case let .holdNotebookTouch(x, y): holdNotebookTouch(x: x, y: y)

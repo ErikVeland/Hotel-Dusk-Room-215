@@ -15,7 +15,7 @@ struct NativeNotebookCurl: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIPageViewController {
         let controller = UIPageViewController(transitionStyle: .pageCurl,
-            navigationOrientation: .horizontal,
+            navigationOrientation: metrics.stacked ? .vertical : .horizontal,
             options: [.spineLocation: UIPageViewController.SpineLocation.mid.rawValue])
         controller.isDoubleSided = true
         controller.view.backgroundColor = .clear

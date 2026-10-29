@@ -17,6 +17,22 @@ final class DuoBookLayoutTests: XCTestCase {
         }
     }
 
+    func testPortraitDuoPagesStackAtHingeAndKeepOuterSafeAreas() {
+        let size = CGSize(width: 669, height: 951)
+        let layout = DuoBookLayout(size: size,
+                                   safeArea: EdgeInsets(top: 24, leading: 8, bottom: 21, trailing: 30),
+                                   handedness: .rightHanded, stacked: true)
+        XCTAssertEqual(layout.frame(at: 0), CGRect(x: 0, y: 0, width: 669, height: 475.5))
+        XCTAssertEqual(layout.frame(at: 1), CGRect(x: 0, y: 475.5, width: 669, height: 475.5))
+        XCTAssertEqual(layout.insets(at: 0).top, 24)
+        XCTAssertEqual(layout.insets(at: 0).bottom, 16)
+        XCTAssertEqual(layout.insets(at: 1).top, 16)
+        XCTAssertEqual(layout.insets(at: 1).bottom, 21)
+        XCTAssertEqual(layout.insets(at: 0).trailing, 30)
+        XCTAssertEqual(DialogueSpreadMetrics(size: size, stacked: true).pageSize,
+                       CGSize(width: 669, height: 475.5))
+    }
+
     func testSafeAreasInsetContentWithoutMovingSpine() {
         let layout = DuoBookLayout(size: CGSize(width: 951, height: 669),
                                    safeArea: EdgeInsets(top: 24, leading: 0, bottom: 21, trailing: 62),

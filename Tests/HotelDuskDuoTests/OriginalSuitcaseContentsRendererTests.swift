@@ -20,8 +20,8 @@ final class OriginalSuitcaseContentsRendererTests: XCTestCase {
                 try process.update(game: game)
             }
             let image = try renderer.render(process, game: game)
-            XCTAssertEqual(image.width, 192)
-            XCTAssertEqual(image.height, 256)
+            XCTAssertEqual(image.width, 384)
+            XCTAssertEqual(image.height, 512)
             if let directory = ProcessInfo.processInfo.environment["SNAPSHOT_DIR"] {
                 try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true)
                 let url = URL(fileURLWithPath: directory).appendingPathComponent("suitcase_\(name).png")

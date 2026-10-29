@@ -74,6 +74,15 @@ public struct OriginalNotebook: Sendable {
         packed.flatMap { byte in (0..<8).map { (byte >> $0) & 1 } }
     }
 
+    public mutating func replaceInk(packed: Data) throws {
+        guard canEdit, packed.count == Self.packedSize else {
+            throw OriginalDataError.invalid("Notebook ink")
+        }
+        release()
+        undoPixels = pixels
+        pixels = Self.unpack(Array(packed))
+    }
+
     public mutating func storePage() {
         guard canEdit else { return }
         pages[page] = stride(from: 0, to: pixels.count, by: 8).map { start in

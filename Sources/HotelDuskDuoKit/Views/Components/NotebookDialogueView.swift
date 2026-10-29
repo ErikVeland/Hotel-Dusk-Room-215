@@ -5,16 +5,20 @@ struct DialogueSpreadMetrics: Equatable {
     let margin: CGFloat
     let top: CGFloat
     let bottom: CGFloat
+    let itemArtworkSize: CGFloat
+    let stacked: Bool
     var textOrigin: CGPoint { CGPoint(x: margin, y: top + 36) }
     var textSize: CGSize {
         CGSize(width: max(0, pageSize.width - margin * 2),
-               height: max(0, pageSize.height - textOrigin.y - bottom - 56))
+               height: max(0, pageSize.height - textOrigin.y - bottom - 56 - (itemArtworkSize > 0 ? itemArtworkSize + 12 : 0)))
     }
-    init(size: CGSize, safeArea: EdgeInsets = EdgeInsets()) {
-        pageSize = CGSize(width: size.width / 2, height: size.height)
+    init(size: CGSize, safeArea: EdgeInsets = EdgeInsets(), showsItem: Bool = false, stacked: Bool = false) {
+        self.stacked = stacked
+        pageSize = stacked ? CGSize(width: size.width, height: size.height / 2) : CGSize(width: size.width / 2, height: size.height)
         margin = max(36, safeArea.leading + 20, safeArea.trailing + 20)
         top = max(32, safeArea.top + 16)
         bottom = max(20, safeArea.bottom + 12)
+        itemArtworkSize = showsItem ? max(0, min(192, pageSize.width - 16, pageSize.height - top - bottom - 140)) : 0
     }
 }
 
@@ -24,6 +28,7 @@ struct NotebookDialogueSpread: View {
     @ObservedObject var play: OriginalPlaySession
     @ObservedObject var notebook: DialogueNotebook
     var safeArea = EdgeInsets()
+    var stacked = false
     var isVisible = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
@@ -45,7 +50,8 @@ struct NotebookDialogueSpread: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let metrics = DialogueSpreadMetrics(size: proxy.size, safeArea: safeArea)
+            let metrics = DialogueSpreadMetrics(size: proxy.size, safeArea: safeArea,
+                                                showsItem: !notebook.isReviewing && play.acquiredItemImage != nil, stacked: stacked)
             let key = LayoutKey(size: metrics.textSize, font: fontSize, ink: notebook.ink, visible: isVisible && scenePhase == .active)
             let writing = WritingKey(end: notebook.reader.spreadEnd,
                 paused: play.isPaused || notebook.isReviewing || scenePhase != .active || !isVisible,
@@ -56,6 +62,7 @@ struct NotebookDialogueSpread: View {
                     NativeNotebookCurl(play: play, notebook: notebook, layout: layout,
                                        metrics: metrics, fontSize: fontSize, reduceMotion: reduceMotion,
                                        gesturesEnabled: isVisible && (!play.isPaused || notebook.isReviewing))
+                        .id(stacked)
                     #else
                     DesktopNotebookSpread(play: play, notebook: notebook, layout: layout,
                                           metrics: metrics, reduceMotion: reduceMotion,
@@ -106,6 +113,14 @@ struct NotebookDialogueLeaf: View {
     let metrics: DialogueSpreadMetrics
     let pageIndex: Int
 
+    private func bindingShade(right: Bool) -> some View {
+        LinearGradient(colors: [.black.opacity(0.28), .black.opacity(0.08), .clear],
+                       startPoint: metrics.stacked ? (right ? .top : .bottom) : (right ? .leading : .trailing),
+                       endPoint: metrics.stacked ? (right ? .bottom : .top) : (right ? .trailing : .leading))
+            .frame(width: metrics.stacked ? nil : min(28, metrics.pageSize.width * 0.14),
+                   height: metrics.stacked ? min(28, metrics.pageSize.height * 0.14) : nil)
+    }
+
     private var interactive: Bool {
         if notebook.isReviewing { return false }
         switch play.runner.phase {
@@ -119,6 +134,31 @@ struct NotebookDialogueLeaf: View {
         let right = pageIndex % 2 == 1
         ZStack(alignment: .topLeading) {
             PaperSurface(side: right ? .right : .left)
+            if metrics.stacked {
+                VStack(spacing: 0) {
+                    if right {
+                        bindingShade(right: true)
+                        Spacer(minLength: 0)
+                    } else {
+                        Spacer(minLength: 0)
+                        bindingShade(right: false)
+                    }
+                }
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+            } else {
+                HStack(spacing: 0) {
+                    if right {
+                        bindingShade(right: true)
+                        Spacer(minLength: 0)
+                    } else {
+                        Spacer(minLength: 0)
+                        bindingShade(right: false)
+                    }
+                }
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+            }
             Text(right ? "FIELD NOTES" : "HOTEL DUSK")
                 .font(NovelStyle.imprint).tracking(2)
                 .foregroundStyle(NovelStyle.fadedInk)
@@ -135,18 +175,19 @@ struct NotebookDialogueLeaf: View {
             .accessibilityLabel(layout.accessibleText(page: page))
             .offset(x: metrics.textOrigin.x, y: metrics.textOrigin.y)
 
+            if right, !notebook.isReviewing, let item = play.acquiredItemImage, metrics.itemArtworkSize > 0 {
+                Image(decorative: item, scale: 1)
+                    .resizable().interpolation(.high).scaledToFit()
+                    .frame(width: metrics.itemArtworkSize, height: metrics.itemArtworkSize)
+                    .accessibilityLabel("Acquired item")
+                    .position(x: metrics.pageSize.width / 2,
+                              y: metrics.pageSize.height - metrics.bottom - 52 - metrics.itemArtworkSize / 2)
+            }
+
             HStack(spacing: 12) {
                 Text(String(format: "%03d", pageIndex + 1))
                     .font(NovelStyle.imprint).foregroundStyle(NovelStyle.fadedInk)
                     .accessibilityLabel("Page \(pageIndex + 1)")
-                if right, !notebook.isReviewing, let item = play.acquiredItemImage {
-                    Image(decorative: item, scale: 1)
-                        .resizable().interpolation(.none).scaledToFit()
-                        .frame(width: 32, height: 32)
-                        .padding(3).background(NovelStyle.paper)
-                        .shadow(color: .black.opacity(0.18), radius: 2, y: 1)
-                        .accessibilityLabel("Acquired item")
-                }
                 if right, !notebook.isReviewing, play.runner.interruptAvailable {
                     Button { play.interrupt() } label: {
                         Image(systemName: "exclamationmark.bubble.fill")

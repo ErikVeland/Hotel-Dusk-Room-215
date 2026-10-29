@@ -507,6 +507,34 @@ final class OriginalResumeSaveTests: XCTestCase {
             try play.progressCheckpoint().progress, "A new step must repair the incomplete tail")
     }
 
+    func testNativeNotebookInkSurvivesInstantSaveAndReopen() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = OriginalResumeFileStore(directory: directory)
+        let game = session(store)
+        defer { game.endOriginalGame() }
+        let play = try enterLobby(game)
+        play.openNotebook()
+        XCTAssertEqual(play.notebook?.page, 0)
+        var packed = Data(repeating: 0, count: OriginalNotebook.packedSize)
+        packed[123] = 0x48
+        let drawing = Data("native ink one".utf8)
+        play.setNativeNotebookInk(page: 0, drawing: drawing, packed: packed)
+        let saved = try XCTUnwrap(OriginalResumeFileStore(directory: directory).load())
+        XCTAssertEqual(saved.progress?.nativeNotebookPages?["0"], drawing)
+        let fresh = session(store)
+        defer { fresh.endOriginalGame() }
+        fresh.continueSavedGame()
+        let restored = try XCTUnwrap(fresh.play, fresh.saveError ?? "No restored session")
+        XCTAssertEqual(restored.nativeNotebookPages["0"], drawing)
+        XCTAssertEqual(restored.notebook?.pixels, OriginalNotebook.unpack(Array(packed)))
+        restored.closeNotebook()
+        restored.openNotebook()
+        XCTAssertEqual(restored.nativeNotebookPages["0"], drawing)
+        XCTAssertEqual(restored.notebook?.pixels, OriginalNotebook.unpack(Array(packed)))
+        XCTAssertEqual(try OriginalResumeFileStore(directory: directory).load()?.progress?.nativeNotebookPages?["0"], drawing)
+    }
+
     func testEveryWritingUpdateIsSavedWithoutPausing() throws {
         let store = Store()
         let game = session(store)

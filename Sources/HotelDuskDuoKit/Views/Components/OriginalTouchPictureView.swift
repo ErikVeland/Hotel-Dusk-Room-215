@@ -14,7 +14,7 @@ struct OriginalTouchPictureView: View {
                     Color.clear
                     if let background = images.background { layer(background, x: 0, y: 0, scale: scale) }
                     if let item = play.acquiredItemImage {
-                        layer(item, x: 32, y: 64, scale: scale)
+                        layer(item, x: 32, y: 64, scale: scale, smooth: true)
                     } else if let picture = play.touchPicture, picture.phase == .selecting {
                         layer(images.foreground, x: images.x, y: images.y, scale: scale)
                         if picture.selected { layer(images.highlight, x: images.x, y: images.y, scale: scale) }
@@ -33,9 +33,9 @@ struct OriginalTouchPictureView: View {
         }
     }
 
-    private func layer(_ image: CGImage, x: Int, y: Int, scale: CGFloat) -> some View {
+    private func layer(_ image: CGImage, x: Int, y: Int, scale: CGFloat, smooth: Bool = false) -> some View {
         Image(decorative: image, scale: 1)
-            .resizable().interpolation(.none)
+            .resizable().interpolation(smooth ? .high : .none)
             .frame(width: CGFloat(image.width) * scale, height: CGFloat(image.height) * scale)
             .offset(x: CGFloat(x) * scale, y: CGFloat(y) * scale)
             .allowsHitTesting(false)

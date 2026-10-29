@@ -24,6 +24,7 @@ final class OriginalInstantSaveLog {
         let chapterSlotReads: [[OriginalChapterSave?]]?
         let chapterWrites: [OriginalPlayProgress.ChapterWrite]?
         let notebookInk: [DialogueNotebook.SavedState.Ink]?
+        let nativeNotebookPages: [String: Data]?
         let readingAnchor: Int?
         let revealedEnd: Int?
         let reviewAnchor: Int?
@@ -71,6 +72,7 @@ final class OriginalInstantSaveLog {
             chapterSlotReads = old.chapterSlotReads == new.chapterSlotReads ? nil : new.chapterSlotReads
             chapterWrites = old.chapterWrites == new.chapterWrites ? nil : new.chapterWrites
             notebookInk = oldNotebook.ink == newNotebook.ink ? nil : newNotebook.ink
+            nativeNotebookPages = old.nativeNotebookPages == new.nativeNotebookPages ? nil : new.nativeNotebookPages
             readingAnchor = oldNotebook.readingAnchor == newNotebook.readingAnchor ? nil : newNotebook.readingAnchor
             revealedEnd = oldNotebook.revealedEnd == newNotebook.revealedEnd ? nil : newNotebook.revealedEnd
             reviewAnchor = newNotebook.reviewAnchor
@@ -99,6 +101,7 @@ final class OriginalInstantSaveLog {
             if let puzzleSeeds { journal.puzzleSeeds = puzzleSeeds }
             if let chapterSlotReads { journal.chapterSlotReads = chapterSlotReads }
             if let chapterWrites { journal.chapterWrites = chapterWrites }
+            if let nativeNotebookPages { journal.nativeNotebookPages = nativeNotebookPages }
             journal.notebook = .init(ink: notebookInk ?? notebook.ink,
                 readingAnchor: readingAnchor ?? notebook.readingAnchor, revealedEnd: revealedEnd ?? notebook.revealedEnd,
                 reviewAnchor: reviewAnchor)
