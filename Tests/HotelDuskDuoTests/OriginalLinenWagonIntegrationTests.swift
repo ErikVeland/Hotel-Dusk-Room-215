@@ -10,7 +10,15 @@ final class OriginalLinenWagonIntegrationTests: XCTestCase {
         game.setMap(11, previous: 19)
         let selection = OriginalEventSelectionContext(sceneID: 0xFFFE, blockID: 0, modeID: 15,
             eventID: 1, nowTime: game.nowTime, mapID: game.mapID)
-        let runner = try OriginalEventRunner(program: catalog.loadProgram("EP5_R111"), game: game, selection: selection)
+        let program = try catalog.loadProgram("EP5_R111")
+        let event = try XCTUnwrap(program.blocks.tables[2].first { $0.index == 1 })
+        let sourceOutcome = try OriginalEventCompletion.stateOnlyExit(
+            event: event, conditions: program.conditions, processReturn: 0)
+        guard case .completed(let completion) = sourceOutcome,
+              let transition = completion.transition else {
+            return XCTFail("Linen-wagon success must select a source event")
+        }
+        let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
         let audio = AudioController(); audio.isMuted = true
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, puzzleSeed: { 0 })
         defer { play.stop() }
@@ -50,5 +58,6 @@ final class OriginalLinenWagonIntegrationTests: XCTestCase {
         for _ in 0..<350 where play.linenWagon != nil { play.advanceFrame() }
         XCTAssertNil(play.linenWagon)
         XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 36)), true)
+        XCTAssertEqual(play.runner.session.selection.eventID, transition.eventID)
     }
 }

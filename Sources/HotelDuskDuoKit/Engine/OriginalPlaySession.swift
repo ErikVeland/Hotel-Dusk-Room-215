@@ -1837,7 +1837,7 @@ public final class OriginalPlaySession: ObservableObject {
             startTimer()
         case .process(75):
             if brickWall == nil {
-                brickWall = OriginalBrickWallProcess()
+                brickWall = OriginalBrickWallProcess(seed: puzzleSeed())
                 processReturn = 2
             }
             startTimer()

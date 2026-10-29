@@ -59,11 +59,13 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
     }
 
     func testProcess75BrickModeRunsAndReturnsThroughTheChapterEvent() throws {
+        let seed: UInt32 = 0x4B17C0DE
         let play = try makeSession(program: "EP10_R304", sourceOffset: 672,
-                                   processID: 75, mapID: 43)
+                                   processID: 75, mapID: 43, puzzleSeed: seed)
         defer { play.stop() }
 
         XCTAssertNotNil(play.brickWall)
+        XCTAssertEqual(play.brickWall?.objects, OriginalBrickWallLayout.objects(seed: seed))
         if case .halted(let halt) = play.runner.phase {
             XCTFail("Process 75 must run its brick puzzle: \(halt.reason)")
         }
@@ -188,7 +190,8 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
     }
 
     private func makeSession(program name: String, sourceOffset: Int,
-                             processID: UInt16, mapID: Int16) throws -> OriginalPlaySession {
+                             processID: UInt16, mapID: Int16,
+                             puzzleSeed: UInt32 = 0x00A7) throws -> OriginalPlaySession {
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram(name)
         let event = try XCTUnwrap(program.blocks.tables[2].first {
@@ -205,6 +208,7 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         let audio = AudioController()
         try audio.applyOriginalCommand(.disableMusic(true))
         try audio.applyOriginalCommand(.disableNewEffects(true))
-        return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
+        return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+                                   puzzleSeed: { puzzleSeed })
     }
 }

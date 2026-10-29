@@ -84,7 +84,15 @@ final class OriginalCoinTests: XCTestCase {
         game.setMap(5, previous: 17)
         let selection = OriginalEventSelectionContext(sceneID: 7, blockID: 2, modeID: 15,
             eventID: 37, nowTime: game.nowTime, mapID: game.mapID)
-        let runner = try OriginalEventRunner(program: catalog.loadProgram("EP6_R105"), game: game, selection: selection)
+        let program = try catalog.loadProgram("EP6_R105")
+        let event = try XCTUnwrap(program.blocks.tables[2].first { $0.index == 37 })
+        let sourceOutcome = try OriginalEventCompletion.stateOnlyExit(
+            event: event, conditions: program.conditions, processReturn: 0)
+        guard case .completed(let completion) = sourceOutcome,
+              let transition = completion.transition else {
+            return XCTFail("Coin-puzzle success must select a source event")
+        }
+        let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
         let audio = AudioController(); audio.isMuted = true
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
         defer { play.stop() }
@@ -104,5 +112,6 @@ final class OriginalCoinTests: XCTestCase {
         for _ in 0..<350 where play.coinPuzzle != nil { play.advanceFrame() }
         XCTAssertNil(play.coinPuzzle)
         XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 27)), true)
+        XCTAssertEqual(play.runner.session.selection.eventID, transition.eventID)
     }
 }

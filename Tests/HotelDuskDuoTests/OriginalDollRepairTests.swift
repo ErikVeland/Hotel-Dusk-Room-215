@@ -48,7 +48,15 @@ final class OriginalDollRepairTests: XCTestCase {
         try game.beginChapter(4); game.applyTimeChange(1); game.setMap(31, previous: 39)
         let selection = OriginalEventSelectionContext(sceneID: 11, blockID: 0, modeID: 15,
             eventID: 15, nowTime: game.nowTime, mapID: game.mapID)
-        let runner = try OriginalEventRunner(program: catalog.loadProgram("EP5_R205"), game: game, selection: selection)
+        let program = try catalog.loadProgram("EP5_R205")
+        let event = try XCTUnwrap(program.blocks.tables[2].first { $0.index == 15 })
+        let sourceOutcome = try OriginalEventCompletion.stateOnlyExit(
+            event: event, conditions: program.conditions, processReturn: 0)
+        guard case .completed(let completion) = sourceOutcome,
+              let transition = completion.transition else {
+            return XCTFail("Doll-repair success must select a source event")
+        }
+        let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
         let audio = AudioController(); audio.isMuted = true
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
         defer { play.stop() }
@@ -62,6 +70,7 @@ final class OriginalDollRepairTests: XCTestCase {
         XCTAssertNil(play.dollRepair)
         XCTAssertNotEqual(play.runner.phase, .process(id: 38))
         XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 14)), true)
+        XCTAssertEqual(play.runner.session.selection.eventID, transition.eventID)
     }
     @MainActor func testOriginalDollArtworkAndStitches() throws {
         let renderer = try OriginalDollRepairRenderer()

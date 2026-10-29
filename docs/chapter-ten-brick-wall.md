@@ -61,9 +61,11 @@ isolated Process 75 ROM run confirmed these transforms in main RAM. The nine
 mode-0 mask bytes at `0x02111644` were all zero in that run. The connected
 process now uses the CPU mask for full front and side faces, permits Hammer
 drags, prevents brick overlap, and checks the 48-object doorway condition.
-The board view draws the bricks without touch-region overlays. Its seed is
-still fixed, its drawing is a native approximation, and the mask scan evidence
-below shows it does not yet match the original touch map across the screen.
+The board view draws the bricks without touch-region overlays. The session now
+supplies a variable seed through its existing random-seed input. It does not
+yet reproduce the original global random state. The drawing remains a native
+approximation, and the mask scan evidence below shows it does not yet match the
+original touch map across the screen.
 
 The native board view projects each source vertex with the inverse of the
 recovered touch-ray equations. It uses the fixed eye, the 20-degree angle, the

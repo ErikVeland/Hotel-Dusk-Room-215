@@ -84,7 +84,11 @@ Process 60 now has a session host, touch view and original-artwork renderer.
 2, removes all six sheets through touch input, opens the cover, reveals and takes
 the gun, and verifies completion flag 36. This test passed with Metal access in
 1.1 seconds. Pause releases an active drag. The source script retains responsibility
-for awarding the item and continuing the conversation.
+for awarding the item and continuing the conversation. The doll-repair success test
+and linen-wagon integration test compare the native process return with the next
+event selected by the recovered source table. The linen-wagon test also verifies
+flag 36. These checks cover successful process handoffs; the full Chapter 5 route
+still needs its Chapter 4 save.
 
 The renderer uses the original fixed-point quads and transforms for the cart,
 cover and gun, plus the four sheet images selected by highlight state. The source
