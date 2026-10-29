@@ -11,9 +11,11 @@ final class OriginalChapterFourRouteTests: XCTestCase {
                 .appendingPathComponent(name)).load() else {
             throw XCTSkip("Generate the \(name) checkpoint through the native route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
-            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)))
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
+            toiletTankRendererFactory: { try OriginalRouteBitmapToiletTankRenderer() })
         return (play, directory)
     }
 
@@ -27,9 +29,11 @@ final class OriginalChapterFourRouteTests: XCTestCase {
               let save = try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)).load(slot: 2) else {
             throw XCTSkip("Complete Chapter 3 through the native route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(save, audio: audio,
-            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)))
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
+            toiletTankRendererFactory: { try OriginalRouteBitmapToiletTankRenderer() })
         defer { play.stop() }
         play.continueChapterTitle()
         Route.drain(play)

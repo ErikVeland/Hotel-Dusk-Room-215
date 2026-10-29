@@ -110,7 +110,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var toiletTank: OriginalToiletTankProcess?
     @Published public private(set) var toiletTankImage: CGImage?
     @Published public private(set) var toiletTankScreenEffects = OriginalScreenEffects()
-    private var toiletTankRenderer: OriginalToiletTankRenderer?
+    private var toiletTankRenderer: (any OriginalToiletTankRendering)?
     private var toiletTankTouch: SIMD2<Int>?
     private var toiletTankParent: OriginalEventRunner?
     @Published public private(set) var linenWagon: OriginalLinenWagonProcess?
@@ -165,7 +165,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var bagSearch: OriginalBagSearchProcess?
     @Published public private(set) var bagSearchImage: CGImage?
     @Published public private(set) var bagSearchScreenEffects = OriginalScreenEffects()
-    private var bagSearchRenderer: OriginalBagSearchRenderer?
+    private var bagSearchRenderer: (any OriginalBagSearchRendering)?
     private var bagSearchTouch: SIMD2<Float>?
     private var switchboardParent: OriginalEventRunner?
     @Published public private(set) var thinWire: OriginalThinWireProcess?
@@ -245,6 +245,8 @@ public final class OriginalPlaySession: ObservableObject {
     private let cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory
     private let bowlingRendererFactory: OriginalBowlingRendererFactory
     private let searchShedRendererFactory: OriginalSearchShedRendererFactory
+    private let toiletTankRendererFactory: OriginalToiletTankRendererFactory
+    private let bagSearchRendererFactory: OriginalBagSearchRendererFactory
     private var lobbyTouch: SIMD2<Float>?
     private var firstPersonMovement: SIMD2<Float>?
     private var hasReturnedFromDunningIntroduction = false
@@ -344,7 +346,9 @@ public final class OriginalPlaySession: ObservableObject {
                 cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
                 cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil,
-                searchShedRendererFactory: OriginalSearchShedRendererFactory? = nil) {
+                searchShedRendererFactory: OriginalSearchShedRendererFactory? = nil,
+                toiletTankRendererFactory: @escaping OriginalToiletTankRendererFactory = { try OriginalToiletTankRenderer() },
+                bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() }) {
         self.runner = runner
         self.audio = audio
         self.originalEffectPlayer = originalEffectPlayer
@@ -367,6 +371,8 @@ public final class OriginalPlaySession: ObservableObject {
         self.cassetteDeckRendererFactory = cassetteDeckRendererFactory ?? { try OriginalCassetteDeckRenderer() }
         self.bowlingRendererFactory = bowlingRendererFactory ?? { try OriginalBowlingRenderer() }
         self.searchShedRendererFactory = searchShedRendererFactory ?? { try OriginalSearchShedRenderer() }
+        self.toiletTankRendererFactory = toiletTankRendererFactory
+        self.bagSearchRendererFactory = bagSearchRendererFactory
         lobby = restoredExploration
         if chapterTransition?.stage == .title {
             do { chapterTitleImages = try OriginalChapterTitleImages(library: .bundled(), chapter: runner.game.chapter) }
@@ -386,7 +392,9 @@ public final class OriginalPlaySession: ObservableObject {
                                   suitcaseContentsRendererFactory: @escaping OriginalSuitcaseContentsRendererFactory = { try OriginalSuitcaseContentsRenderer() },
                                   memoPullRendererFactory: @escaping OriginalMemoPullRendererFactory = { try OriginalMemoPullRenderer() },
                                   crowbarRendererFactory: @escaping OriginalCrowbarRendererFactory = { try OriginalCrowbarRenderer(tornPaper: $0) },
-                                  cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) }) throws -> OriginalPlaySession {
+                                  cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) },
+                                  toiletTankRendererFactory: @escaping OriginalToiletTankRendererFactory = { try OriginalToiletTankRenderer() },
+                                  bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() }) throws -> OriginalPlaySession {
         let catalog = try OriginalScriptCatalog.bundled()
         let startTime = timestamp ?? Int64(Date().timeIntervalSince1970)
         var runner = try OriginalEventRunner.chapterOneArrival(catalog: catalog, defaults: .bundled(),
@@ -409,7 +417,9 @@ public final class OriginalPlaySession: ObservableObject {
                                    suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
                                    memoPullRendererFactory: memoPullRendererFactory,
                                    crowbarRendererFactory: crowbarRendererFactory,
-                                   cabinetDialRendererFactory: cabinetDialRendererFactory)
+                                   cabinetDialRendererFactory: cabinetDialRendererFactory,
+                                   toiletTankRendererFactory: toiletTankRendererFactory,
+                                   bagSearchRendererFactory: bagSearchRendererFactory)
         play.prepareProgress(OriginalPlayProgress(origin: .arrival, base: Data(), timestamp: startTime))
         return play
     }
@@ -2038,7 +2048,7 @@ public final class OriginalPlaySession: ObservableObject {
             if toiletTank == nil {
                 do {
                     let puzzle = OriginalToiletTankProcess()
-                    toiletTankRenderer = try OriginalToiletTankRenderer()
+                    toiletTankRenderer = try toiletTankRendererFactory()
                     toiletTankImage = try toiletTankRenderer?.render(puzzle)
                     toiletTankScreenEffects = OriginalScreenEffects()
                     toiletTank = puzzle
@@ -2207,7 +2217,7 @@ public final class OriginalPlaySession: ObservableObject {
             if bagSearch == nil {
                 do {
                     let process = OriginalBagSearchProcess()
-                    let renderer = try OriginalBagSearchRenderer()
+                    let renderer = try bagSearchRendererFactory()
                     bagSearchRenderer = renderer
                     bagSearchImage = try renderer.render(process)
                     bagSearchScreenEffects = OriginalScreenEffects()
@@ -4404,7 +4414,9 @@ public final class OriginalPlaySession: ObservableObject {
                                  cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) },
                                  cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
                                  cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
-                                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil) throws -> OriginalPlaySession {
+                                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil,
+                                 toiletTankRendererFactory: @escaping OriginalToiletTankRendererFactory = { try OriginalToiletTankRenderer() },
+                                 bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() }) throws -> OriginalPlaySession {
         if let journal = checkpoint.progress {
             _ = try checkpoint.gameState()
             let wasMuted = audio.isMuted
@@ -4431,7 +4443,9 @@ public final class OriginalPlaySession: ObservableObject {
                 suitcaseContentsRendererFactory: suitcaseContentsRendererFactory,
                 memoPullRendererFactory: memoPullRendererFactory,
                 crowbarRendererFactory: crowbarRendererFactory,
-                cabinetDialRendererFactory: cabinetDialRendererFactory)
+                cabinetDialRendererFactory: cabinetDialRendererFactory,
+                toiletTankRendererFactory: toiletTankRendererFactory,
+                bagSearchRendererFactory: bagSearchRendererFactory)
             case .walking:
                 let base = try JSONDecoder().decode(OriginalResumeSave.self, from: journal.base)
                 play = try restoring(base, audio: audio, saveStore: saveStore,
@@ -4445,7 +4459,9 @@ public final class OriginalPlaySession: ObservableObject {
                 cabinetDialRendererFactory: cabinetDialRendererFactory,
                 cassetteRendererFactory: cassetteRendererFactory,
                 cassetteDeckRendererFactory: cassetteDeckRendererFactory,
-                bowlingRendererFactory: bowlingRendererFactory)
+                bowlingRendererFactory: bowlingRendererFactory,
+                toiletTankRendererFactory: toiletTankRendererFactory,
+                bagSearchRendererFactory: bagSearchRendererFactory)
             case .chapter:
                 let base = try JSONDecoder().decode(OriginalChapterSave.self, from: journal.base)
                 play = try restoring(base, audio: audio, saveStore: saveStore,
@@ -4459,7 +4475,9 @@ public final class OriginalPlaySession: ObservableObject {
                 cabinetDialRendererFactory: cabinetDialRendererFactory,
                 cassetteRendererFactory: cassetteRendererFactory,
                 cassetteDeckRendererFactory: cassetteDeckRendererFactory,
-                bowlingRendererFactory: bowlingRendererFactory)
+                bowlingRendererFactory: bowlingRendererFactory,
+                toiletTankRendererFactory: toiletTankRendererFactory,
+                bagSearchRendererFactory: bagSearchRendererFactory)
             }
             play.stopTimer()
             if journal.origin == .walking, let session = journal.baseSession {
@@ -4523,7 +4541,9 @@ public final class OriginalPlaySession: ObservableObject {
                                        cabinetDialRendererFactory: cabinetDialRendererFactory,
                                        cassetteRendererFactory: cassetteRendererFactory,
                                        cassetteDeckRendererFactory: cassetteDeckRendererFactory,
-                                       bowlingRendererFactory: bowlingRendererFactory)
+                                       bowlingRendererFactory: bowlingRendererFactory,
+                                       toiletTankRendererFactory: toiletTankRendererFactory,
+                                       bagSearchRendererFactory: bagSearchRendererFactory)
         play.lobbyRenderer = renderer
         play.lobbyMap = renderer.map
         try play.renderLobby()
@@ -4548,7 +4568,9 @@ public final class OriginalPlaySession: ObservableObject {
                                  cabinetDialRendererFactory: @escaping OriginalCabinetDialRendererFactory = { try OriginalCabinetDialRenderer(variant: $0) },
                                  cassetteRendererFactory: OriginalCassetteRendererFactory? = nil,
                                  cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
-                                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil) throws -> OriginalPlaySession {
+                                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil,
+                                 toiletTankRendererFactory: @escaping OriginalToiletTankRendererFactory = { try OriginalToiletTankRenderer() },
+                                 bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() }) throws -> OriginalPlaySession {
         let game = try checkpoint.gameState()
         let catalog = try OriginalScriptCatalog.bundled()
         guard OriginalMapExploration.supportedMaps[game.mapID] != nil else {
@@ -4571,7 +4593,9 @@ public final class OriginalPlaySession: ObservableObject {
                                    cabinetDialRendererFactory: cabinetDialRendererFactory,
                                    cassetteRendererFactory: cassetteRendererFactory,
                                    cassetteDeckRendererFactory: cassetteDeckRendererFactory,
-                                   bowlingRendererFactory: bowlingRendererFactory)
+                                   bowlingRendererFactory: bowlingRendererFactory,
+                                   toiletTankRendererFactory: toiletTankRendererFactory,
+                                   bagSearchRendererFactory: bagSearchRendererFactory)
         play.prepareProgress(OriginalPlayProgress(origin: .chapter, base: try JSONEncoder().encode(checkpoint)))
         return play
     }

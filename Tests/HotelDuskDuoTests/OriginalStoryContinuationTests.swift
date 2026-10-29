@@ -79,18 +79,17 @@ final class OriginalStoryContinuationTests: XCTestCase {
         func render(_ process: OriginalSuitcaseContentsProcess, game: OriginalGameState) throws -> CGImage { image }
     }
 
-    @MainActor func testChapterSixReachesBarFromChapterFiveSave() throws {
+    @MainActor func testChapterSix01ReachesBarFromChapterFiveSave() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let save = try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6")).load(slot: 0) else {
             throw XCTSkip("Generate the Chapter 6 save through the Chapter 5 route first")
         }
-        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
-        audio.isMuted = true
-        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(save, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         play.continueChapterTitle()
@@ -118,13 +117,13 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-bar")).save(play.walkingCheckpoint())
     }
 
-    @MainActor func testChapterSixTravelsFromR104ThroughR105ToR126() throws {
+    @MainActor func testChapterSix02TravelsFromR104ThroughR105ToR126() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6-bar")).load() else {
             throw XCTSkip("Generate the Chapter 6 bar checkpoint through the Chapter 5 route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)),
@@ -149,7 +148,15 @@ final class OriginalStoryContinuationTests: XCTestCase {
             play.ask(topic)
             OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
         }
+        play.leaveConversation()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 5))
+        try OriginalChapterThreeRouteChecks.talk(play, to: 4)
+        if case .questions = play.runner.phase { play.leaveConversation() }
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 5))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter6-after-first-louie")).save(play.walkingCheckpoint())
         try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 26))
         XCTAssertEqual(play.runner.game.nowTime, 0)
@@ -157,19 +164,22 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-r105-return")).save(play.walkingCheckpoint())
     }
 
-    @MainActor func testChapterSixFromBarExitThroughRosaErrand() throws {
+    @MainActor func testChapterSix03FromBarExitThroughRosaErrand() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-                .appendingPathComponent("chapter6-after-bar-exit")).load() else {
+                .appendingPathComponent("chapter6-r105-return")).load() else {
             throw XCTSkip("Generate the Rosa checkpoint through the earlier Chapter 6 route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 26))
+        try OriginalChapterThreeRouteChecks.exit(play, to: 4, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 4))
         try OriginalChapterThreeRouteChecks.talk(play, to: 3)
         guard case .questions = play.runner.phase else { return XCTFail("Expected Rosa's topic menu") }
         play.ask(9)
@@ -178,8 +188,6 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertEqual(topics.map(\.keyword), [10])
         play.ask(10)
         OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
-        XCTAssertEqual(play.runner.phase, .exploration(mapID: 26))
-        try OriginalChapterThreeRouteChecks.exit(play, to: 4, interrupt: true)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 4))
         try OriginalChapterThreeRouteChecks.talk(play, to: 2)
         guard case .choice(let choices) = play.runner.phase else { return XCTFail("Expected Dunning's history choice") }
@@ -227,16 +235,17 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-normal-rosa-errand")).save(play.walkingCheckpoint())
     }
 
-    @MainActor func testChapterSixMatchsticksAndKitchenWineBottles() throws {
+    @MainActor func testChapterSix04MatchsticksAndKitchenWineBottles() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6-normal-rosa-errand")).load() else {
             throw XCTSkip("Generate the post-Rosa Chapter 6 checkpoint first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         try OriginalChapterThreeRouteChecks.exit(play, to: 4, interrupt: true)
@@ -244,8 +253,8 @@ final class OriginalStoryContinuationTests: XCTestCase {
         try OriginalChapterThreeRouteChecks.exit(play, to: 5, interrupt: true)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 5))
         try OriginalChapterThreeRouteChecks.navigate(play, to: .init(15_000, 20_000))
-        let lobby = try XCTUnwrap(play.lobby)
-        let marker = try XCTUnwrap(lobby.room.nodes.first { $0.name == "s03" })
+        let bar = try XCTUnwrap(play.lobby)
+        let marker = try XCTUnwrap(bar.room.nodes.first { $0.name == "s03" })
         OriginalChapterThreeRouteChecks.face(play, x: Float(marker.worldFixed[12]), z: Float(marker.worldFixed[14]))
         XCTAssertEqual(play.lobby?.nearbySearchArea, 3)
         play.inspectLobbyCounter()
@@ -280,16 +289,17 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-normal-white-wine")).save(play.walkingCheckpoint())
     }
 
-    @MainActor func testChapterSixFindRoseWine() throws {
+    @MainActor func testChapterSix05FindRoseWine() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6-normal-white-wine")).load() else {
             throw XCTSkip("Generate the Chapter 6 white-wine checkpoint first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
@@ -320,16 +330,17 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-normal-rose-wine")).save(play.walkingCheckpoint())
     }
 
-    @MainActor func testChapterSixGetsAdhesiveRemoverFromEdPackage() throws {
+    @MainActor func testChapterSix06GetsAdhesiveRemoverFromEdPackage() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6-normal-rose-wine")).load() else {
             throw XCTSkip("Generate the Chapter 6 rosé checkpoint first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
         defer { play.stop() }
         for destination: Int16 in [26, 17, 39, 31] {
             try OriginalChapterThreeRouteChecks.exit(play, to: destination, interrupt: true)
@@ -346,16 +357,17 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-normal-with-adhesive-remover")).save(play.walkingCheckpoint())
     }
 
-    @MainActor func testChapterSixIdentifiesWinesAndStartsLabelPeel() throws {
+    @MainActor func testChapterSix07IdentifiesWinesAndStartsLabelPeel() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6-normal-with-adhesive-remover")).load() else {
             throw XCTSkip("Generate the Chapter 6 adhesive-remover checkpoint first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
         defer { play.stop() }
         try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
         let target = try OriginalChapterThreeRouteChecks.doorMarker(play, 32)
@@ -452,16 +464,17 @@ final class OriginalStoryContinuationTests: XCTestCase {
             .appendingPathComponent("chapter6-helen-room")).save(play.walkingCheckpoint())
     }
 
-    @MainActor func testChapterSixHelenStoryAndChapterSevenEntryFromHandoffSave() throws {
+    @MainActor func testChapterSix08HelenStoryAndChapterSevenEntryFromHandoffSave() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter6-helen-room")).load() else {
             throw XCTSkip("Generate the Helen-room handoff save through the Chapter 6 route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         func assertChoiceIDs(_ expected: [UInt16]) {
@@ -553,10 +566,11 @@ final class OriginalStoryContinuationTests: XCTestCase {
                 .appendingPathComponent("chapter7-normal-entry")).load() else {
             throw XCTSkip("Complete the Chapter 6 review through the normal title transition first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
@@ -573,10 +587,11 @@ final class OriginalStoryContinuationTests: XCTestCase {
                 .appendingPathComponent("chapter7-second-floor-hallway")).load() else {
             throw XCTSkip("Leave Room 215 through the normal hallway route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
@@ -593,10 +608,11 @@ final class OriginalStoryContinuationTests: XCTestCase {
                 .appendingPathComponent("chapter7-central-hallway")).load() else {
             throw XCTSkip("Reach R117 from Room 215 through the normal Chapter 7 route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
         defer { play.stop() }
 
         try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
@@ -698,10 +714,12 @@ final class OriginalStoryContinuationTests: XCTestCase {
                 .appendingPathComponent("chapter7-storage")).load() else {
             throw XCTSkip("Reach Chapter 7 storage through the normal route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
+            bagSearchRendererFactory: { try OriginalRouteBitmapBagSearchRenderer() })
         defer { play.stop() }
 
         try OriginalChapterThreeRouteChecks.navigate(play, to: SIMD2(13598, -1065), interrupt: true)
@@ -816,10 +834,11 @@ final class OriginalStoryContinuationTests: XCTestCase {
                 .appendingPathComponent("chapter7-after-tree")).load() else {
             throw XCTSkip("Complete the Chapter 7 tree scene through the normal route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
-                .appendingPathComponent(UUID().uuidString)))
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
         defer { play.stop() }
         try OriginalChapterThreeRouteChecks.exit(play, to: 18, interrupt: true, expectArrival: false)
         XCTAssertEqual(play.runner.game.mapID, 18)
@@ -1741,6 +1760,8 @@ final class OriginalStoryContinuationTests: XCTestCase {
         try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
             .appendingPathComponent("chapter8-after-rooftop-meeting")).save(postPlant.walkingCheckpoint())
         try OriginalChapterThreeRouteChecks.exit(postPlant, to: 39, interrupt: true)
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-after-rooftop-exit")).save(postPlant.walkingCheckpoint())
 
         var runner = play.runner
         runner.finishProcess(returnValue: 1)
@@ -1754,6 +1775,33 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertTrue(runner.eventTrail.suffix(2).elementsEqual([10, 8]))
         XCTAssertTrue(dialogue.joined().contains("Once more?"))
         XCTAssertEqual(runner.phase, .process(id: 44))
+    }
+
+    @MainActor func testChapterEightReturnsToRosasRoomAfterRooftopMeeting() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter8-after-rooftop-exit")).load() else {
+            throw XCTSkip("Reach Rosa's room through the normal Chapter 8 rooftop route first")
+        }
+        let audio = AudioController(musicOutputFactory: { _, _, _ in RouteMusicOutput() })
+        audio.isMuted = true
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+        XCTAssertEqual(play.runner.game.chapter, 7)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 18, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 18))
+        XCTAssertEqual(play.runner.program.name, "EP8_R118")
+        try OriginalChapterThreeRouteChecks.talk(play, to: 3, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 18))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter8-rosa-room-entry")).save(play.walkingCheckpoint())
     }
 
     @MainActor private func playCapturedBowlingThrow(_ throwIndex: Int,

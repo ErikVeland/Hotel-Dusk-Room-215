@@ -16,9 +16,12 @@ final class OriginalChapterFiveRouteTests: XCTestCase {
     }
 
     private func session(_ checkpoint: OriginalResumeSave) throws -> OriginalPlaySession {
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         return try OriginalPlaySession.restoring(checkpoint, audio: audio,
-            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)))
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
+            suitcaseContentsRendererFactory: { try OriginalRouteBitmapSuitcaseContentsRenderer() },
+            toiletTankRendererFactory: { try OriginalRouteBitmapToiletTankRenderer() })
     }
 
     private func restore(_ name: String) throws -> OriginalPlaySession {
@@ -41,9 +44,12 @@ final class OriginalChapterFiveRouteTests: XCTestCase {
         guard let chapter = try OriginalChapterFileStore(directory: URL(fileURLWithPath: try directory)).load(slot: 1) else {
             throw XCTSkip("Complete Chapter 4 through the native route first")
         }
-        let audio = AudioController(); audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.restoring(chapter, audio: audio,
-            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)))
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
+            suitcaseContentsRendererFactory: { try OriginalRouteBitmapSuitcaseContentsRenderer() },
+            toiletTankRendererFactory: { try OriginalRouteBitmapToiletTankRenderer() })
         defer { play.stop() }
         play.continueChapterTitle()
         Route.drain(play, interrupt: true)

@@ -2,16 +2,23 @@ import CoreGraphics
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalToiletTankRendering: AnyObject {
+    func render(_ puzzle: OriginalToiletTankProcess) throws -> CGImage
+}
+
+public typealias OriginalToiletTankRendererFactory = @MainActor () throws -> any OriginalToiletTankRendering
+
 /// Original toilet model and the lid/flush pivots from overlay 26.
 @MainActor
-final class OriginalToiletTankRenderer {
+public final class OriginalToiletTankRenderer: OriginalToiletTankRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let model: OriginalModelMetalPreview
     private let lid: Int
     private let handle: Int
 
-    init() throws {
+    public init() throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -25,7 +32,7 @@ final class OriginalToiletTankRenderer {
         }
         self.lid = lid; self.handle = handle
     }
-    func render(_ puzzle: OriginalToiletTankProcess) throws -> CGImage {
+    public func render(_ puzzle: OriginalToiletTankProcess) throws -> CGImage {
         let body = Self.translation(.init(-3.32, -1.57, -1.26))
             * Self.rotation(180, .init(0, 1, 0)) * Self.rotation(-16.7, .init(1, 0, 0))
         let lidPivot = SIMD3<Float>(3.5, 0, 0.8), handlePivot = SIMD3<Float>(3.5, -2.48, 0)

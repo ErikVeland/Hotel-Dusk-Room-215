@@ -3,18 +3,27 @@ import Foundation
 import Metal
 import simd
 
+@MainActor
+public protocol OriginalBagSearchRendering: AnyObject {
+    func render(_ process: OriginalBagSearchProcess) throws -> CGImage
+    func object(at point: SIMD2<Float>, process: OriginalBagSearchProcess) throws -> Int?
+    func planePointFixed(at point: SIMD2<Float>) -> SIMD2<Int32>?
+}
+
+public typealias OriginalBagSearchRendererFactory = @MainActor () throws -> any OriginalBagSearchRendering
+
 /**
  * Renders overlay 3's box field and derives touch masks from its MDF geometry.
  */
 @MainActor
-final class OriginalBagSearchRenderer {
+public final class OriginalBagSearchRenderer: OriginalBagSearchRendering {
     private let device: MTLDevice
     private let queue: MTLCommandQueue
     private let models: [OriginalModelMetalPreview]
     private let projection: OriginalBagSearchProjection
     private let backgroundNodes: Set<Int>
 
-    init() throws {
+    public init() throws {
         guard let device = MTLCreateSystemDefaultDevice(), let queue = device.makeCommandQueue() else {
             throw OriginalDataError.missing("Metal device")
         }
@@ -35,7 +44,7 @@ final class OriginalBagSearchRenderer {
         backgroundNodes = Set([12, 13, 14, 15, 16])
     }
 
-    func render(_ process: OriginalBagSearchProcess) throws -> CGImage {
+    public func render(_ process: OriginalBagSearchProcess) throws -> CGImage {
         try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
             models[3].encode(encoder: encoder, viewProjection: projection.viewProjection,
                              visibleNodes: backgroundNodes)
@@ -56,14 +65,14 @@ final class OriginalBagSearchRenderer {
     /**
      * Returns the nearest object's projected model surface at a page point.
      */
-    func object(at point: SIMD2<Float>, process: OriginalBagSearchProcess) throws -> Int? {
+    public func object(at point: SIMD2<Float>, process: OriginalBagSearchProcess) throws -> Int? {
         try projection.object(at: point, process: process)
     }
 
     /**
      * Maps a page point to the source object's horizontal plane in 20.12 units.
      */
-    func planePointFixed(at point: SIMD2<Float>) -> SIMD2<Int32>? {
+    public func planePointFixed(at point: SIMD2<Float>) -> SIMD2<Int32>? {
         projection.planePointFixed(at: point)
     }
 
