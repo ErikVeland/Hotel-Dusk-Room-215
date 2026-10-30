@@ -77,8 +77,13 @@ public struct OriginalBitmapLibrary: Sendable {
             public let decodedSHA256: String?
             public let rgbaSHA256: String?
         }
+        public struct DataFile: Decodable, Sendable {
+            public let source: String
+            public let payloadSHA256: String
+        }
         public let formatVersion: Int
         public let images: [Record]
+        public let dataFiles: [DataFile]?
     }
     public let manifest: Manifest
     private let root: URL
@@ -207,12 +212,16 @@ extension OriginalBitmapLibrary {
         try .init(data: checkedPayload(path: path))
     }
 
-    private func checkedPayload(path: String) throws -> Data {
-        guard let record = manifest.images.first(where: { $0.source == path }) else { throw OriginalDataError.missing(path) }
+    func checkedPayload(path: String, includeDataFiles: Bool = false) throws -> Data {
+        let imageRecord = manifest.images.first { $0.source == path }
+        let dataFileRecord = includeDataFiles ? manifest.dataFiles?.first { $0.source == path } : nil
+        guard let expectedHash = imageRecord?.payloadSHA256 ?? dataFileRecord?.payloadSHA256 else {
+            throw OriginalDataError.missing(path)
+        }
         let url = resourceRoot.appendingPathComponent(path).standardizedFileURL
         guard url.path.hasPrefix(resourceRoot.path + "/") else { throw OriginalDataError.invalid("Bitmap path leaves source directory") }
         let data = try Data(contentsOf: url)
-        guard OriginalAnimationClip.digest(data) == record.payloadSHA256 else { throw OriginalDataError.checksum(path) }
+        guard OriginalAnimationClip.digest(data) == expectedHash else { throw OriginalDataError.checksum(path) }
         return data
     }
 }

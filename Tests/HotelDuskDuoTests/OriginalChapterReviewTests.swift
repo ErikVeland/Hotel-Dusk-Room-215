@@ -511,7 +511,11 @@ final class OriginalChapterReviewTests: XCTestCase {
         OriginalChapterThreeRouteChecks.face(play, x: Float(marker.worldFixed[12]), z: Float(marker.worldFixed[14]))
         for node in ["obj04", "obj05", "obj06", "obj07", "obj08", "obj09", "obj11", "obj12"] {
             try OriginalChapterThreeRouteChecks.search(play, node: node)
-            print("R301 area2 \(node): phase=\(play.runner.phase) counter=\(play.runner.game.bytes[0x1380])")
+            let selection = play.runner.session.selection
+            print("R301 area2 \(node): phase=\(play.runner.phase) counter=\(play.runner.game.bytes[0x1380]) "
+                + "mode=\(selection.modeID) area=\(selection.areaID) subarea=\(selection.subareaID) "
+                + "eventIndex=\(String(describing: play.runner.eventIndex)) event=\(selection.eventID) "
+                + "time=\(play.runner.game.nowTime)")
             if play.runner.phase != .exploration(mapID: 40) { break }
         }
     }

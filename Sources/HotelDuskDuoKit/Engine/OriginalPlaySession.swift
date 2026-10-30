@@ -4279,6 +4279,15 @@ public final class OriginalPlaySession: ObservableObject {
             routeTrace?.write(kind: "roomObjectHit", fields: routeTraceFields(extra: [
                 "pickedNode": node, "area": String(area), "subarea": String(subarea)
             ]))
+            if lobby.mapID == 12, node == "obj9999",
+               runner.game.value(for: .eventFlag(group: 23, index: 4)) == true {
+                routeTrace?.write(kind: "storyDispatch", fields: routeTraceFields(extra: [
+                    "trigger": "chapter9-pantry-quiz", "pickedNode": node
+                ]))
+                try startChapterNinePantryQuiz()
+                settle()
+                return
+            }
             let table = try OriginalSearchTable.bundled(map: lobby.mapName)
             if let view = table.upViewID(area: area, subarea: subarea), view != .max {
                 pendingCloseup = (area, subarea, view)
@@ -4287,6 +4296,18 @@ public final class OriginalPlaySession: ObservableObject {
             try startSearchFallback()
             settle()
         } catch { runner.halt("The room object selection failed: \(error)"); settle() }
+    }
+
+    /**
+     * Starts Quiz 9 from the pantry's hidden door hit masks after the birthday cards are read.
+     */
+    private func startChapterNinePantryQuiz() throws {
+        let context = OriginalEventSelectionContext(sceneID: 1, blockID: 0, modeID: 24,
+            eventID: 2, nowTime: runner.game.nowTime, mapID: 7)
+        var review = try OriginalEventRunner(program: catalog.loadProgram("EP9_R107"),
+            game: runner.game, selection: context)
+        review.attachRouteTrace(routeTrace)
+        runner = review
     }
 
     public func useItemInSearchView(_ item: UInt8?) {

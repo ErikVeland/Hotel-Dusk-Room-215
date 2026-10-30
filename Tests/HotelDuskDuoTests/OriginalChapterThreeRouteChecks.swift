@@ -268,7 +268,7 @@ enum OriginalChapterThreeRouteChecks {
                 let c = target + SIMD2<Float>(Float(dx), Float(dz))
                 let p = SIMD3<Float>(c.x, y, c.y)
                 let distance = simd_distance(c, target)
-                guard distance > 3000, distance < 9000, simd_distance(collision.resolve(p), p) < 1,
+                guard distance > 3000, distance <= 12_288, simd_distance(collision.resolve(p), p) < 1,
                       collision.firstRegion(containing: p, prefix: "in_") == nil else { continue }
                 candidates.append(c)
             }
@@ -276,26 +276,51 @@ enum OriginalChapterThreeRouteChecks {
         candidates.sort { simd_distance($0, here) < simd_distance($1, here) }
         XCTAssertFalse(candidates.isEmpty, "No standing point near \(name)")
         let map = play.runner.game.mapID
-        // A candidate behind the wall is unreachable; try the next nearest.
-        for stand in candidates.prefix(8) {
+        // A nearby point can sit on the wrong side of a large wall or person cluster.
+        for stand in candidates.prefix(64) {
             try navigate(play, to: stand, interrupt: interrupt)
             guard play.runner.game.mapID == map, case .exploration = play.runner.phase, let lobby = play.lobby else { break }
             if hypot(lobby.position.x - stand.x, lobby.position.z - stand.y) < 1500 { break }
         }
         guard play.runner.game.mapID == map, case .exploration = play.runner.phase else { return }
         face(play, x: target.x, z: target.y)
-        if play.nearbyDoor == destination {
-            guard expectArrival else {
-                play.inspectNearbyDoor()
-                drain(play, interrupt: interrupt)
-                return
-            }
-            return try door(play, destination: destination, interrupt: interrupt)
+        if !expectArrival, play.nearbyDoor == destination {
+            play.inspectNearbyDoor()
+            drain(play, interrupt: interrupt)
+            return
         }
-        // Walk-through exits change map when Kyle enters the marker's collision region.
-        let standing = SIMD2<Float>(play.lobby?.position.x ?? 0, play.lobby?.position.z ?? 0)
-        approach(play, to: target + (target - standing) * 4, interrupt: interrupt)
-        if expectArrival { XCTAssertEqual(play.runner.game.mapID, destination) }
+        let regionPoints = stride(from: -8192, through: 8192, by: 512).flatMap { dz in
+            stride(from: -8192, through: 8192, by: 512).compactMap { dx -> SIMD2<Float>? in
+                let point = target + SIMD2(Float(dx), Float(dz))
+                let world = SIMD3(point.x, y, point.y)
+                guard collision.firstRegion(containing: world, prefix: "in_") == name,
+                      simd_distance(collision.resolve(world), world) < 1 else { return nil }
+                return point
+            }
+        }.sorted { simd_distance($0, here) < simd_distance($1, here) }
+        // Walk through the matching map region first. Use a door view if it stays blocked.
+        for point in regionPoints.prefix(64) {
+            approach(play, to: point, interrupt: interrupt)
+            if play.runner.game.mapID == destination { return }
+        }
+        if play.runner.game.mapID == destination { return }
+        if play.nearbyDoor != destination {
+            approach(play, to: target, interrupt: interrupt)
+            face(play, x: target.x, z: target.y)
+        }
+        if !expectArrival, play.nearbyDoor == destination {
+            play.inspectNearbyDoor()
+            drain(play, interrupt: interrupt)
+            return
+        }
+        if play.nearbyDoor == destination { return try door(play, destination: destination, interrupt: interrupt) }
+        if expectArrival {
+            XCTAssertEqual(play.runner.game.mapID, destination,
+                "Exit from map \(map) did not reach \(destination); " +
+                "marker=\(target), matchedRegions=\(regionPoints.count), " +
+                "nearbyDoor=\(String(describing: play.nearbyDoor)), " +
+                "exitMap=\(String(describing: play.lobby?.exitMapID)), position=\(String(describing: play.lobby?.position))")
+        }
     }
 
     /// Opens the facing door view and confirms the component with an original hit index (1 knocks, 2 is the handle).
@@ -321,7 +346,10 @@ enum OriginalChapterThreeRouteChecks {
             play.selectDoorComponent(x: handle.0, y: handle.1, confirmImmediately: true)
             drain(play, interrupt: interrupt)
         }
-        XCTAssertEqual(play.runner.game.mapID, destination)
+        XCTAssertEqual(play.runner.game.mapID, destination,
+            "Door from map \(play.runner.game.previousMapID) did not reach \(destination); " +
+            "phase=\(play.runner.phase), nearbyDoor=\(String(describing: play.nearbyDoor)), " +
+            "door=\(String(describing: play.door?.doorID)), selection=\(play.runner.session.selection)")
     }
 
     /// With `itemsFirst`, items are presented before topics, and topics are asked again after each item.
