@@ -30,6 +30,16 @@ public struct OriginalDoorScene {
 
     public mutating func use(_ item: UInt8?) { self.item = item; selected = nil }
     public mutating func clearSelection() { selected = nil }
+
+    /**
+     * The Chapter 10 cellar passage removes its plate after the source door event.
+     */
+    public func visibility(game: OriginalGameState) -> [Bool] {
+        [true] + view.layers.map { layer in
+            guard doorID == 42, layer.eventID == 415 else { return true }
+            return game.value(for: .doorOpen(index: UInt16(doorID))) != false
+        }
+    }
 }
 
 /**

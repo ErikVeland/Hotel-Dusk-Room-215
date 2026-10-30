@@ -275,6 +275,7 @@ public final class OriginalPlaySession: ObservableObject {
     var onProgressCheckpoint: ((OriginalResumeSave) -> Void)?
     var onProgressSaveError: ((Error) -> Void)?
     private var progressJournal: OriginalPlayProgress?
+    private var routeTrace: OriginalRouteTraceLog?
     private var progressInputActive = false
     private var isReplayingProgress = false
     private var replaySeedIndex = [0, 0]
@@ -1778,6 +1779,10 @@ public final class OriginalPlaySession: ObservableObject {
         if door != nil, runner.session.selection.modeID == 3, runner.session.selection.sceneID < 18 {
             door = nil
             doorImage = nil
+        }
+        if let door, case .exploration = runner.phase {
+            do { try refreshDoorImage(door) }
+            catch { runner.halt("The door could not be redrawn: \(error)") }
         }
         switch runner.phase {
         case .dialogue(let packet):
@@ -4104,17 +4109,23 @@ public final class OriginalPlaySession: ObservableObject {
                   view.layers.allSatisfy({ $0.itemID < 0 && $0.processID < 0 }) else {
                 throw OriginalDataError.unsupported("Door destination \(destination)")
             }
-            let library = try OriginalBitmapLibrary.bundled()
-            let images = try ([view.background] + view.layers.map(\.asset)).map {
-                try library.loadLinear(path: "map/sdata/SearchUp/\($0).bin")
-            }
-            doorImage = try OriginalUpViewImage(bitmaps: images, visible: Array(repeating: true, count: images.count))
+            let scene = OriginalDoorScene(destination: destination, doorID: connection.id,
+                                          area: record.areaID, view: view)
+            try refreshDoorImage(scene)
             itemNames = try OriginalItemNames.bundled().names
-            door = OriginalDoorScene(destination: destination, doorID: connection.id, area: record.areaID, view: view)
+            door = scene
             runner.interactWithDoor(area: record.areaID)
             try startSearchFallback()
             settle()
         } catch { runner.halt("The door could not be loaded: \(error)"); settle() }
+    }
+
+    private func refreshDoorImage(_ scene: OriginalDoorScene) throws {
+        let library = try OriginalBitmapLibrary.bundled()
+        let bitmaps = try ([scene.view.background] + scene.view.layers.map(\.asset)).map {
+            try library.loadLinear(path: "map/sdata/SearchUp/\($0).bin")
+        }
+        doorImage = try OriginalUpViewImage(bitmaps: bitmaps, visible: scene.visibility(game: runner.game))
     }
 
     public func selectDoorComponent(x: Int, y: Int, confirmImmediately: Bool = false) {
@@ -4230,6 +4241,10 @@ public final class OriginalPlaySession: ObservableObject {
             let visible = lobby.map { $0.objectVisibility.visibleNodes(in: $0.counter, map: $0.mapID,
                 area: $0.searchAreaID, game: runner.game) }
             let repeated = try lobby?.selectCounterObject(page: SIMD2(x, y), visibleNodes: visible) != nil
+            routeTrace?.write(kind: "searchHit", fields: routeTraceFields(extra: [
+                "pickedNode": lobby?.selectedNode ?? "none", "repeated": String(repeated),
+                "confirmImmediately": String(confirmImmediately)
+            ]))
             if repeated || (confirmImmediately && lobby?.selectedNode != nil) { confirmLobbyObject() }
         } catch { runner.halt("The counter selection failed: \(error)"); stopTimer() }
     }
@@ -4270,6 +4285,9 @@ public final class OriginalPlaySession: ObservableObject {
     public func confirmLobbyObject() {
         let recordsProgress = beginProgressInput(.confirmLobbyObject)
         defer { endProgressInput(recordsProgress) }
+        routeTrace?.write(kind: "searchConfirm", fields: routeTraceFields(extra: [
+            "pickedNode": lobby?.selectedNode ?? "none", "hasItem": String(searchItem != nil)
+        ]))
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup == nil, lobby?.mode == .counter,
               let node = lobby?.selectedNode, let subarea = OriginalMapExploration.subarea(node: node) else { return }
         do {
@@ -4746,6 +4764,27 @@ public final class OriginalPlaySession: ObservableObject {
 }
 
 extension OriginalPlaySession {
+    /// Enables JSON Lines tracing for inputs, selector candidates and runner operations.
+    public func enableRouteTracing(to url: URL, runID: String, checkpointName: String) throws {
+        let trace = try OriginalRouteTraceLog(url: url, runID: runID, checkpointName: checkpointName)
+        routeTrace = trace
+        runner.attachRouteTrace(trace)
+    }
+
+    private func routeTraceFields(extra: [String: String] = [:]) -> [String: String] {
+        let state = Data(runner.game.bytes)
+        let inventory = (try? runner.game.inventory.items.map(String.init).joined(separator: ",")) ?? "unknown"
+        return [
+            "program": runner.program.name, "map": String(runner.game.mapID),
+            "previousMap": String(runner.game.previousMapID), "time": String(runner.game.nowTime),
+            "block": String(runner.session.selection.blockID), "mode": String(runner.session.selection.modeID),
+            "scene": String(runner.session.selection.sceneID), "event": String(runner.session.selection.eventID),
+            "area": String(runner.session.selection.areaID), "subarea": String(runner.session.selection.subareaID),
+            "inventory": inventory, "stateSHA256": OriginalScriptCatalog.digest(state),
+            "phase": progressPhase
+        ].merging(extra) { _, new in new }
+    }
+
     func enableInstantSaves() {
         usesInstantSaves = true
         progressJournal?.usesInstantSaves = true
@@ -4784,6 +4823,11 @@ extension OriginalPlaySession {
     }
 
     private func beginProgressInput(_ input: OriginalProgressInput) -> Bool {
+        if let routeTrace {
+            runner.attachRouteTrace(routeTrace)
+            routeTrace.beginInput(String(describing: input))
+            routeTrace.write(kind: "inputState", fields: routeTraceFields())
+        }
         guard progressJournal != nil, !isReplayingProgress, !progressInputActive else { return false }
         progressInputActive = true
         if case let .frames(count, microphone) = input,
@@ -4798,6 +4842,10 @@ extension OriginalPlaySession {
     }
 
     private func endProgressInput(_ recorded: Bool) {
+        if let routeTrace {
+            runner.attachRouteTrace(routeTrace)
+            routeTrace.write(kind: "inputComplete", fields: routeTraceFields())
+        }
         guard recorded else { return }
         progressInputActive = false
         if canSaveWalkingCheckpoint, lobbyTouch == nil, firstPersonMovement == nil {

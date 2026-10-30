@@ -64,12 +64,22 @@ public enum OriginalEventSelector {
         case unresolved(candidate: Selection, condition: OriginalConditions.Result)
     }
 
+    public struct CandidateObservation: Sendable {
+        public let selection: Selection
+        public let modeID: UInt16
+        public let eventID: UInt16
+        public let conditionKey: Int16
+        public let conditionSourceOffset: Int?
+        public let condition: OriginalConditions.Result
+    }
+
     public static func select(
         graph: OriginalBlockGraph,
         context: OriginalEventSelectionContext,
         scope: OriginalProgramScope = .normal,
         evaluate: (OriginalConditionRequest) throws -> OriginalConditions.Result,
-        applyEffect: (OriginalEventSelectionEffect) throws -> Void = { _ in }
+        applyEffect: (OriginalEventSelectionEffect) throws -> Void = { _ in },
+        observeCandidate: (CandidateObservation) -> Void = { _ in }
     ) throws -> Outcome {
         var sceneID = context.sceneID
         let mode = context.modeID
@@ -166,6 +176,16 @@ public enum OriginalEventSelector {
                     }
                     let result = try evaluate(OriginalConditionRequest(modeID: mode,
                         eventID: conditionEvent, eventKey: key, scope: conditionScope))
+                    let conditionSourceOffset: Int?
+                    switch result {
+                    case .fail(let offset), .unresolvedState(_, let offset), .unrecoveredCondition(_, let offset):
+                        conditionSourceOffset = offset
+                    case .pass:
+                        conditionSourceOffset = nil
+                    }
+                    observeCandidate(CandidateObservation(selection: selection, modeID: rowMode,
+                        eventID: rowEvent, conditionKey: key, conditionSourceOffset: conditionSourceOffset,
+                        condition: result))
                     if restoreCloseup { try applyEffect(.restoreCloseupContext) }
                     switch result {
                     case .pass: return .selected(selection)

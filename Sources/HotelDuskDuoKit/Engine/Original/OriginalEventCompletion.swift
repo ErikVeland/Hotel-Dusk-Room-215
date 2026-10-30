@@ -73,9 +73,10 @@ public enum OriginalEventCompletion {
             // Without a transition, the closeup returns to the search view
             // through fades and process state that are not recovered.
             guard let first = records?.first, let transition = try OriginalEventTransition(record: first) else {
-                // 0x0203E7C8 restores the retained search/close-up after presentation waits.
-                // Map 40 in chapter 9 has a conditional counter write that still needs its controller context.
-                if mode == 10, game?.mapID == 40, game?.chapter == 9 { return .requiresOriginalHandler(mode: mode) }
+                // 0x0203E7C8 returns to the retained search view when no CHK
+                // transition exists. R301's controller may also update its
+                // counter after this return; that input-dependent write stays
+                // with the controller, not this state-only completion.
                 return .completed(Completion(transition: nil, preventContextRestore: false))
             }
             return .completed(Completion(transition: transition, preventContextRestore: false))

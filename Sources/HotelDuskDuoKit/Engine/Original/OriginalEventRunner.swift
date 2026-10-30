@@ -95,6 +95,7 @@ public struct OriginalEventRunner: Sendable {
     public private(set) var unrenderedPresentation: [String] = []
     public private(set) var processRequests: [ProcessRequest] = []
     public private(set) var timeTransition: OriginalTimeTransition?
+    private var routeTrace: OriginalRouteTraceLog?
     private let graph: OriginalBlockGraph
     private let conditions: OriginalConditions
     private let scope: OriginalProgramScope
@@ -129,6 +130,11 @@ public struct OriginalEventRunner: Sendable {
     public private(set) var interrupt = Interrupt()
     private var noticePages: [OriginalDialoguePacket.Page] = []
     private var pendingChoice: (record: OriginalBlockGraph.Record, ids: [Int16])?
+
+    /// Enables structured selector, operation and process-return observations.
+    public mutating func attachRouteTrace(_ trace: OriginalRouteTraceLog?) {
+        routeTrace = trace
+    }
 
     /// New game state, then the hotel arrival trigger (0x0202899C) in
     /// EP1_R102 with previous map 1. The reference runner reaches this
@@ -502,6 +508,11 @@ public struct OriginalEventRunner: Sendable {
     /// The embedded process finished with its process-manager return value.
     public mutating func finishProcess(returnValue: Int16) {
         guard case .process(let id) = phase, inventoryProcess == nil else { return }
+        var fields = traceContextFields()
+        fields.merge([
+            "processID": String(id), "returnValue": String(returnValue)
+        ]) { _, new in new }
+        routeTrace?.write(kind: "processReturn", fields: fields)
         embeddedProcessInvocation = nil
         if timeTransition != nil {
             timeTransition = nil
@@ -956,6 +967,23 @@ public struct OriginalEventRunner: Sendable {
         while operationIndex < operations.count {
             let record = operations[operationIndex]
             let opcode = record.raw[0]
+            let trace = routeTrace
+            let stateBefore = trace == nil ? nil : game.bytes
+            defer {
+                if let trace, let stateBefore {
+                    let changes = stateBefore.indices.compactMap { index -> String? in
+                        let after = game.bytes[index]
+                        return stateBefore[index] == after ? nil : "\(index):\(stateBefore[index])->\(after)"
+                    }
+                    var fields = traceContextFields()
+                    fields.merge([
+                        "sourceOffset": String(record.sourceOffset), "opcode": String(opcode),
+                        "operationIndex": String(operationIndex), "raw": record.raw.map { String(format: "%02x", $0) }.joined(),
+                        "stateChanges": changes.joined(separator: ",")
+                    ]) { _, new in new }
+                    trace.write(kind: "operation", fields: fields)
+                }
+            }
             do {
                 switch opcode {
                 case 4:
@@ -1325,12 +1353,69 @@ public struct OriginalEventRunner: Sendable {
         do {
             let outcome = try OriginalEventSelector.select(graph: graph, context: context, scope: scope,
                 evaluate: { try evaluating.evaluate($0, conditions: checks, game: state) },
-                applyEffect: { evaluating.apply($0) })
+                applyEffect: { evaluating.apply($0) },
+                observeCandidate: { observation in
+                    var fields = traceContextFields(context: context)
+                    fields["candidateEventIndex"] = String(observation.selection.eventIndex)
+                    fields["candidateSourceOffset"] = String(observation.selection.eventSourceOffset)
+                    fields["candidateMode"] = String(observation.modeID)
+                    fields["candidateEventID"] = String(observation.eventID)
+                    fields["conditionKey"] = String(observation.conditionKey)
+                    fields["conditionResult"] = String(describing: observation.condition)
+                    let conditionOffset = observation.conditionKey >= 0
+                        && checks.entries.indices.contains(Int(observation.conditionKey))
+                        ? checks.entries[Int(observation.conditionKey)].first?.first?.sourceOffset
+                        : observation.conditionSourceOffset
+                    if let offset = conditionOffset {
+                        fields["conditionSourceOffset"] = String(offset)
+                    }
+                    if case .unresolvedState(let probe, _) = observation.condition {
+                        fields["unresolvedProbe"] = String(describing: probe)
+                    } else if case .unrecoveredCondition(let kind, _) = observation.condition {
+                        fields["unresolvedProbe"] = "conditionKind:\(kind)"
+                    }
+                    self.routeTrace?.write(kind: "candidate", fields: fields)
+                })
             session = evaluating
+            switch outcome {
+            case .selected(let selection):
+                var fields = traceContextFields(context: context)
+                fields.merge([
+                    "result": "selected", "eventIndex": String(selection.eventIndex),
+                    "sourceOffset": String(selection.eventSourceOffset)
+                ]) { _, new in new }
+                routeTrace?.write(kind: "selection", fields: fields)
+            case .noMatch:
+                var fields = traceContextFields(context: context)
+                fields["result"] = "noMatch"
+                routeTrace?.write(kind: "selection", fields: fields)
+            case .unresolved(let candidate, let condition):
+                var fields = traceContextFields(context: context)
+                fields.merge([
+                    "result": "unresolved", "eventIndex": String(candidate.eventIndex),
+                    "sourceOffset": String(candidate.eventSourceOffset), "condition": String(describing: condition)
+                ]) { _, new in new }
+                routeTrace?.write(kind: "selection", fields: fields)
+            }
             enter(outcome)
         } catch {
             halt("Event selection failed: \(error)")
         }
+    }
+
+    private func traceContextFields(context: OriginalEventSelectionContext? = nil) -> [String: String] {
+        let selection = context ?? session.selection
+        let inventory = (try? game.inventory.items.map(String.init).joined(separator: ",")) ?? "unknown"
+        let requests = processRequests.map { "\($0.kind):\($0.value)" }.joined(separator: ",")
+        return [
+            "program": program.name, "map": String(game.mapID), "previousMap": String(game.previousMapID),
+            "time": String(game.nowTime), "block": String(selection.blockID), "mode": String(selection.modeID),
+            "scene": String(selection.sceneID), "event": String(selection.eventID),
+            "area": String(selection.areaID), "subarea": String(selection.subareaID),
+            "checkItem": String(selection.checkItemID), "inventory": inventory,
+            "processRequests": requests,
+            "timeTransition": timeTransition.map { "\($0.request.kind):\($0.request.value)" } ?? "none"
+        ]
     }
 }
 
