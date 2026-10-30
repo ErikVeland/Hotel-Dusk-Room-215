@@ -60,6 +60,27 @@ final class OriginalResumeSaveTests: XCTestCase {
         return play
     }
 
+    func testLegacyDialogueCheckpointRestoresBeforeItsOriginalContinue() throws {
+        let audio = originalRouteTestAudio()
+        audio.restoresLegacyInteractions = true
+        let play = try OriginalPlaySession.chapterOne(audio: audio, timestamp: 123)
+        audio.restoresLegacyInteractions = false
+        defer { play.stop() }
+        let checkpoint = try play.progressCheckpoint()
+        var journal = try XCTUnwrap(checkpoint.progress)
+        journal.qualityOfLifeVersion = nil
+        let legacy = try OriginalResumeSave(game: checkpoint.gameState(),
+            checkpointFacing: checkpoint.checkpointFacing, musicSequenceID: checkpoint.musicSequenceID,
+            savedAt: checkpoint.savedAt, progress: journal)
+        let data = try JSONEncoder().encode(legacy)
+        let decoded = try JSONDecoder().decode(OriginalResumeSave.self, from: data)
+        XCTAssertNil(decoded.progress?.qualityOfLifeVersion)
+        let restored = try OriginalPlaySession.restoring(decoded, audio: originalRouteTestAudio(), saveStore: ChapterStore())
+        defer { restored.stop() }
+        XCTAssertEqual(restored.runner.phase, play.runner.phase)
+        XCTAssertEqual(restored.runner.game.bytes, play.runner.game.bytes)
+    }
+
     func testFreshSessionRestoresPositionAndContinuesWithoutReplayingArrival() throws {
         let store = Store()
         let first = session(store)

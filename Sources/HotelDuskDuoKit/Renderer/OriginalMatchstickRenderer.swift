@@ -19,8 +19,7 @@ final class OriginalMatchstickRenderer {
         stick = try image("trick/sticktex.bin")
     }
     func render(_ puzzle: OriginalMatchstickProcess) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8, bytesPerRow: 768,
-            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Matchstick context")
         }
         context.interpolationQuality = .none

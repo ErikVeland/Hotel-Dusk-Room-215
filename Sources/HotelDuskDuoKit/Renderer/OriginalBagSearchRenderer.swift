@@ -45,7 +45,7 @@ public final class OriginalBagSearchRenderer: OriginalBagSearchRendering {
     }
 
     public func render(_ process: OriginalBagSearchProcess) throws -> CGImage {
-        try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+        try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
             models[3].encode(encoder: encoder, viewProjection: projection.viewProjection,
                              visibleNodes: backgroundNodes)
             for type in models.indices {

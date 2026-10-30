@@ -225,14 +225,21 @@ public struct OriginalOpeningStripReveal: Sendable {
     }
 
     public func makePortraitImage(page: Int, library: OriginalOpeningGraphicsLibrary) throws -> CGImage {
-        let rgba = try renderPortraitRGBA(page: page, library: library)
-        guard let provider = CGDataProvider(data: rgba as CFData),
-              let space = CGColorSpace(name: CGColorSpace.sRGB),
-              let image = CGImage(width: 192, height: 256, bitsPerComponent: 8, bitsPerPixel: 32,
-                                  bytesPerRow: 192 * 4, space: space,
-                                  bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
-                                  provider: provider, decode: nil, shouldInterpolate: false,
-                                  intent: .defaultIntent) else { throw OriginalDataError.invalid("Opening card image") }
+        guard let context = OriginalArtwork.pageContext() else { throw OriginalDataError.invalid("Opening card context") }
+        context.setFillColor(CGColor(gray: 0, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 192, height: 256))
+        for command in try drawCommands(page: page) {
+            let texture = try library.loadTexture(path: command.texture)
+            guard let source = OriginalArtwork.shared.image(rgba: texture.rgba, width: texture.storedWidth,
+                height: texture.storedHeight, rotated: true),
+                  let strip = source.croppingArtwork(to: CGRect(x: command.sourceX, y: command.sourceY,
+                    width: command.width, height: command.height)) else {
+                throw OriginalDataError.invalid("Opening card strip")
+            }
+            context.draw(strip, in: CGRect(x: command.x, y: 256 - command.y - command.height,
+                width: command.width, height: command.height))
+        }
+        guard let image = context.makeImage() else { throw OriginalDataError.invalid("Opening card image") }
         return image
     }
 }

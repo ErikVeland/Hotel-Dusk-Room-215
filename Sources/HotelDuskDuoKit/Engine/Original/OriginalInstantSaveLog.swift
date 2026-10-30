@@ -28,6 +28,10 @@ final class OriginalInstantSaveLog {
         let readingAnchor: Int?
         let revealedEnd: Int?
         let reviewAnchor: Int?
+        let retraceEnd: Int?
+        let furthestRevealedEnd: Int?
+        let reviewPassageEnd: Int?
+        let reviewRevealedEnd: Int?
         let program: String
         let eventIndex: Int?
         let phase: String
@@ -40,6 +44,7 @@ final class OriginalInstantSaveLog {
                   old.origin == new.origin, old.base == new.base, old.timestamp == new.timestamp,
                   old.baseSession == new.baseSession, old.baseRuntimePosition == new.baseRuntimePosition,
                   old.baseRuntimeFacing == new.baseRuntimeFacing, old.usesInstantSaves == new.usesInstantSaves,
+                  old.qualityOfLifeVersion == new.qualityOfLifeVersion,
                   let oldNotebook = old.notebook, let newNotebook = new.notebook,
                   new.session != nil else { return nil }
             var replacement: OriginalProgressInput?
@@ -76,6 +81,10 @@ final class OriginalInstantSaveLog {
             readingAnchor = oldNotebook.readingAnchor == newNotebook.readingAnchor ? nil : newNotebook.readingAnchor
             revealedEnd = oldNotebook.revealedEnd == newNotebook.revealedEnd ? nil : newNotebook.revealedEnd
             reviewAnchor = newNotebook.reviewAnchor
+            retraceEnd = newNotebook.retraceEnd
+            furthestRevealedEnd = newNotebook.furthestRevealedEnd
+            reviewPassageEnd = newNotebook.reviewPassageEnd
+            reviewRevealedEnd = newNotebook.reviewRevealedEnd
             program = new.program
             eventIndex = new.eventIndex
             phase = new.phase
@@ -104,7 +113,8 @@ final class OriginalInstantSaveLog {
             if let nativeNotebookPages { journal.nativeNotebookPages = nativeNotebookPages }
             journal.notebook = .init(ink: notebookInk ?? notebook.ink,
                 readingAnchor: readingAnchor ?? notebook.readingAnchor, revealedEnd: revealedEnd ?? notebook.revealedEnd,
-                reviewAnchor: reviewAnchor)
+                reviewAnchor: reviewAnchor, retraceEnd: retraceEnd, furthestRevealedEnd: furthestRevealedEnd,
+                reviewPassageEnd: reviewPassageEnd, reviewRevealedEnd: reviewRevealedEnd)
             journal.program = program
             journal.eventIndex = eventIndex
             journal.phase = phase

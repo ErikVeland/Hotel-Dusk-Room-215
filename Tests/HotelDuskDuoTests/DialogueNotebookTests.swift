@@ -93,8 +93,185 @@ final class DialogueNotebookTests: XCTestCase {
         XCTAssertEqual(layout(book).text.string, "It's been three years since I quit the force.\n\nThe name's Kyle Hyde.")
         book.endPresentation()
         book.record(phase("The name's Kyle Hyde."), program: "opening")
-        XCTAssertEqual(layout(book).text.string.components(separatedBy: "The name's Kyle Hyde.").count, 3,
-                       "A line spoken again is a new passage, even when its bytes match")
+        XCTAssertEqual(layout(book).text.string.components(separatedBy: "The name's Kyle Hyde.").count, 2,
+                       "Repeating an interaction must retrace its existing passage")
+    }
+
+    func testRepeatedPassageRetracesEarlierInkAndNewDialogueReturnsToTheEnd() {
+        let book = DialogueNotebook()
+        let first = phase("The door is locked.")
+        book.record(first, program: "room215")
+        book.configure(layout(book))
+        book.finishWriting()
+        book.record(phase(String(repeating: "Another conversation. ", count: 50)), program: "room215")
+        let allInk = book.ink
+        book.configure(layout(book))
+        book.endPresentation()
+        book.followNextPassage()
+        book.record(first, program: "room215")
+        book.configure(layout(book))
+        XCTAssertEqual(book.ink, allInk)
+        XCTAssertEqual(book.reader.spreadIndex, 0)
+        XCTAssertEqual(book.reader.revealedEnd, 0)
+        book.finishWriting()
+        XCTAssertEqual(book.reader.revealedEnd, 19)
+        XCTAssertFalse(book.reader.hasNextSpread, "A repeated line must not replay unrelated later conversations")
+        XCTAssertTrue(book.consumeTap())
+        let saved = book.savedState()
+        let restored = DialogueNotebook()
+        restored.restore(saved)
+        restored.configure(layout(restored))
+        XCTAssertTrue(restored.consumeTap(), "Resume must retain the end of the repeated passage")
+        book.endPresentation()
+        book.record(phase("A new discovery."), program: "room215")
+        book.configure(layout(book))
+        XCTAssertTrue(layout(book).text.string.hasSuffix("A new discovery."))
+        XCTAssertGreaterThan(book.reader.spreadIndex, 0)
+    }
+
+    func testHistoryDuringARetraceKeepsPreviouslyReadLaterPagesAndRestoresTheRetrace() {
+        let book = DialogueNotebook()
+        let first = phase("The door is locked.")
+        book.record(first, program: "room215")
+        book.record(phase(String(repeating: "Another conversation. ", count: 50)), program: "room215")
+        book.configure(layout(book, width: 140, height: 115))
+        while true {
+            book.finishWriting()
+            guard book.reader.hasNextSpread else { break }
+            book.turnForward()
+            book.finishTurn(revision: book.turnRevision)
+        }
+        book.endPresentation()
+        book.record(first, program: "room215")
+        let retrace = book.reader
+        book.beginReview()
+        XCTAssertTrue(book.canTurnForward, "History includes later conversations already read before a retrace")
+        book.endReview()
+        XCTAssertEqual(book.reader, retrace)
+    }
+
+    func testInspectionPagesAdvanceOneTextLeafAtATimeAndSurviveReflow() {
+        let book = DialogueNotebook()
+        book.record(phase(String(repeating: "Inspect the notebook. ", count: 40)), program: "inspection")
+        let small = layout(book, width: 140, height: 115)
+        book.configure(small, singlePage: true)
+        XCTAssertFalse(book.consumeTap())
+        XCTAssertEqual(book.reader.revealedEnd, NSMaxRange(small.pages[0]))
+        XCTAssertFalse(book.consumeTap())
+        book.finishTurn(revision: book.turnRevision)
+        XCTAssertEqual(book.reader.leftIndex, 1, "Inspection reserves the other screen for its picture")
+        book.write(count: 12)
+        let anchor = book.reader.page(at: book.reader.leftIndex).location
+        let end = book.reader.revealedEnd
+        book.configure(layout(book, width: 190, height: 170), singlePage: true)
+        XCTAssertTrue(NSLocationInRange(anchor, book.reader.page(at: book.reader.leftIndex)))
+        XCTAssertEqual(book.reader.revealedEnd, end)
+        book.configure(small, singlePage: true)
+        XCTAssertEqual(book.reader.leftIndex, 1)
+    }
+
+    func testPaddingAcrossColourChangesDoesNotLoseEmphasisOrPuzzleSymbols() throws {
+        let entry = OriginalTextTable.Entry(index: 0, offset: 0,
+            bytes: Data("  A  %c1red  %c0,  word.  ".utf8))
+        let page = OriginalDialoguePacket.Page(page: 0, entries: [entry], tokens: try OriginalDialogueControl.tokens(for: entry))
+        let book = DialogueNotebook()
+        book.record(.itemNotice(itemID: 1, page: page), program: "formatting")
+        XCTAssertEqual(layout(book).text.string, "A red, word.")
+        XCTAssertTrue(book.ink.contains { $0.colour == 1 && $0.text.contains("red") })
+        let saved = book.savedState()
+        let restored = DialogueNotebook()
+        restored.restore(saved)
+        XCTAssertEqual(restored.ink, book.ink)
+    }
+
+    func testProseCleansSourcePaddingAndDecodesOriginalPunctuation() throws {
+        let entry = OriginalTextTable.Entry(index: 0, offset: 0,
+            bytes: Data([0x81, 0x49] + Array("  Wait  ".utf8) + [0xb5] + Array(" no  ,  ros".utf8) + [0xe9] + Array(" !  ".utf8)))
+        let page = OriginalDialoguePacket.Page(page: 0, entries: [entry], tokens: try OriginalDialogueControl.tokens(for: entry))
+        let book = DialogueNotebook()
+        book.record(.itemNotice(itemID: 1, page: page), program: "formatting")
+        XCTAssertEqual(layout(book).text.string, "Wait — no, rosé!")
+    }
+
+    func testSentencePausesAndPuzzleLineBreaksKeepTheirMeaning() throws {
+        let entry = OriginalTextTable.Entry(index: 0, offset: 0,
+            bytes: Data("A reason. ...And another.  %c1Wait%c0...  %+.  A&B\nC  .%+".utf8))
+        let page = OriginalDialoguePacket.Page(page: 0, entries: [entry], tokens: try OriginalDialogueControl.tokens(for: entry))
+        let book = DialogueNotebook()
+        book.record(.itemNotice(itemID: 1, page: page), program: "formatting")
+        XCTAssertEqual(layout(book).text.string, "A reason. ...And another. Wait... .  A&B\nC  .")
+    }
+
+    func testCipherTextKeepsItsOriginalSpacingAndSymbols() throws {
+        let entry = OriginalTextTable.Entry(index: 0, offset: 0, bytes: Data("%+  A&MEMENTO&IN  %+".utf8))
+        let page = OriginalDialoguePacket.Page(page: 0, entries: [entry], tokens: try OriginalDialogueControl.tokens(for: entry))
+        let book = DialogueNotebook()
+        book.record(.itemNotice(itemID: 1, page: page), program: "puzzle")
+        XCTAssertEqual(layout(book).text.string, "  A&MEMENTO&IN  ")
+    }
+
+    func testInspectionPictureRemainsVisibleThroughoutItsFollowingDialogue() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let program = try catalog.loadProgram("EP1_R205")
+        let graph = try program.blocks
+        let game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        var selectedRunner: OriginalEventRunner?
+        for event in graph.tables[2] {
+            let records = try graph.operations(forEvent: event.index)
+            guard records.contains(where: { $0.raw[0] == 8 }) else { continue }
+            var context = OriginalEventSelectionContext(sceneID: .max, blockID: 0, modeID: 15,
+                eventID: UInt16(event.index), nowTime: game.nowTime, mapID: game.mapID)
+            context.debugEventSelection = true
+            var runner = try OriginalEventRunner(program: program, game: game, selection: context)
+            for _ in 0..<100 {
+                switch runner.phase {
+                case .dialogue: runner.acknowledgeDialogue()
+                case .waiting: runner.advanceWait()
+                default: break
+                }
+                if case .picture = runner.phase {
+                    var response = runner
+                    response.finishPicture()
+                    for _ in 0..<30 {
+                        if case .dialogue(let packet) = response.phase,
+                           packet.pages.allSatisfy({ OriginalDialogueLines(page: $0).isEmpty }) {
+                            response.acknowledgeDialogue()
+                        } else { break }
+                    }
+                    switch response.phase {
+                    case .dialogue, .itemNotice: selectedRunner = runner
+                    default: break
+                    }
+                    break
+                }
+            }
+            if selectedRunner != nil { break }
+        }
+        let runner = try XCTUnwrap(selectedRunner)
+        let play = OriginalPlaySession(runner: runner, audio: originalRouteTestAudio(), catalog: catalog)
+        defer { play.stop() }
+        let picture = try XCTUnwrap(play.touchPicture)
+        let point = try XCTUnwrap((8..<184).lazy.flatMap { x in (8..<248).map { CGPoint(x: x, y: $0) } }
+            .first { picture.contains(pageX: Int($0.x), pageY: Int($0.y)) })
+        play.activatePicture(pageX: Int(point.x), pageY: Int(point.y))
+        for _ in 0..<24 { play.advanceFrame() }
+        XCTAssertNil(play.touchPicture)
+        XCTAssertNotNil(play.touchPictureImages)
+        XCTAssertTrue(play.hasInspectionArtwork)
+        switch play.runner.phase {
+        case .dialogue, .itemNotice: break
+        default: XCTFail("Expected the inspected picture's text, got \(play.runner.phase)")
+        }
+    }
+
+    func testSessionSkipsAnEmptyActionPacketWithoutAContinue() throws {
+        let audio = originalRouteTestAudio()
+        audio.isMuted = true
+        let play = try OriginalPlaySession.chapterOne(audio: audio)
+        defer { play.stop() }
+        guard case .dialogue(let packet) = play.runner.phase else { return XCTFail("Expected opening narration") }
+        XCTAssertFalse(packet.pages.allSatisfy { OriginalDialogueLines(page: $0).isEmpty },
+                       "Music and animation control packets must run without a confirmation tap")
     }
 
     func testTapFinishesBothLeavesThenTurnsEveryOverflowSpread() {
@@ -265,7 +442,7 @@ final class DialogueNotebookTests: XCTestCase {
         while case .dialogue = runner.phase { runner.acknowledgeDialogue() }
         guard case .choice(let choices) = runner.phase else { return XCTFail("Expected the suite offer") }
         for choice in choices {
-            let audio = AudioController()
+            let audio = originalRouteTestAudio()
             audio.isMuted = true
             let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
             defer { play.stop() }
@@ -288,7 +465,7 @@ final class DialogueNotebookTests: XCTestCase {
     func testFoldPausesAtTheSameDialogueAndHistoryIsBlockedByPuzzles() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
-        let session = GameSession(saveStore: OriginalChapterFileStore(directory: root),
+        let session = GameSession(audioController: originalRouteTestAudio(), saveStore: OriginalChapterFileStore(directory: root),
                                   resumeStore: OriginalResumeFileStore(directory: root))
         session.startOriginalGame()
         defer { session.endOriginalGame() }
@@ -423,7 +600,7 @@ final class DialogueNotebookTests: XCTestCase {
     }
 
     func testSessionRecordsBeforeRenderingAndDoesNotSkipUnwrittenDialogue() throws {
-        let audio = AudioController()
+        let audio = originalRouteTestAudio()
         audio.isMuted = true
         let play = try OriginalPlaySession.chapterOne(audio: audio)
         defer { play.stop() }

@@ -33,8 +33,7 @@ final class OriginalBookmarkBoxRenderer {
     }
 
     func render(_ puzzle: OriginalBookmarkBoxProcess) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8, bytesPerRow: 768,
-            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Bookmark box context")
         }
         context.interpolationQuality = .none
@@ -53,7 +52,7 @@ final class OriginalBookmarkBoxRenderer {
                 3: Self.translation(.init(0, 2.5, 6.5)) * Self.rotation(248 * .pi / 180, .init(1, 0, 0)) * Self.translation(.init(0, -2.5, -6.5)),
                 4: Self.translation(.init(0, 2.5, -6.588)) * Self.rotation(-248 * .pi / 180, .init(1, 0, 0)) * Self.translation(.init(0, -2.5, 6.588))
             ]
-            let scene = try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+            let scene = try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
                 box.encode(encoder: encoder, viewProjection: Self.projection, visibleNodes: Set(box.model.nodes.indices.filter { $0 != 6 || puzzle.taps >= 10 }),
                     modelTransform: body, nodeTransforms: flaps)
             }

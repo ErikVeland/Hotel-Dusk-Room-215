@@ -12,8 +12,8 @@ final class OriginalModelMetalTests: XCTestCase {
         game.setMap(14, previous: 19)
         let renderer = try OriginalMapRenderer(mapName: "R114")
         let image = try renderer.render(map, game: game)
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertGreaterThanOrEqual(image.width, 768)
+        XCTAssertGreaterThanOrEqual(image.height, 1024)
         let pixels = try XCTUnwrap(image.dataProvider?.data) as Data
         XCTAssertGreaterThan(Set(pixels).count, 32)
         if let output = ProcessInfo.processInfo.environment["HOTEL_DUSK_MODEL_PREVIEW"] {

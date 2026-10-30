@@ -55,12 +55,7 @@ public struct OriginalBitmap: Sendable {
     }
 
     public func makeCGImage(transparentPaletteZero: Bool) -> CGImage? {
-        guard let provider = CGDataProvider(data: rgba(transparentPaletteZero: transparentPaletteZero) as CFData),
-              let space = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
-        return CGImage(width: width, height: height, bitsPerComponent: 8, bitsPerPixel: 32,
-            bytesPerRow: width * 4, space: space,
-            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue), provider: provider,
-            decode: nil, shouldInterpolate: false, intent: .defaultIntent)
+        OriginalArtwork.shared.image(rgba: rgba(transparentPaletteZero: transparentPaletteZero), width: width, height: height)
     }
 }
 

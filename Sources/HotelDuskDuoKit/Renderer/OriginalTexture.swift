@@ -140,28 +140,27 @@ public struct OriginalTexture: Sendable {
     }
 
     public func makeCGImage() -> CGImage? {
-        guard let provider = CGDataProvider(data: rgba as CFData),
-              let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
-        return CGImage(width: storedWidth, height: storedHeight, bitsPerComponent: 8,
-                       bitsPerPixel: 32, bytesPerRow: storedWidth * 4, space: colorSpace,
-                       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
-                       provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)
+        OriginalArtwork.shared.image(rgba: rgba, width: storedWidth, height: storedHeight)
     }
 
     /// Upload only stored texels. The original material/UV decoder must choose
     /// sampling and placement; this function adds no border, filtering or fill.
     public func makeMetalTexture(device: MTLDevice) throws -> MTLTexture {
+        let enhanced = OriginalArtwork.shared.metalPixels(rgba: rgba, width: storedWidth, height: storedHeight)
+        let width = enhanced?.width ?? storedWidth
+        let height = enhanced?.height ?? storedHeight
+        let pixels = enhanced?.data ?? rgba
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .rgba8Unorm,
-                                                                 width: storedWidth, height: storedHeight,
+                                                                 width: width, height: height,
                                                                  mipmapped: false)
         descriptor.usage = .shaderRead
         descriptor.storageMode = .shared
         guard let texture = device.makeTexture(descriptor: descriptor) else {
             throw OriginalDataError.invalid("Could not allocate original texture")
         }
-        rgba.withUnsafeBytes { data in
-            texture.replace(region: MTLRegionMake2D(0, 0, storedWidth, storedHeight), mipmapLevel: 0,
-                            withBytes: data.baseAddress!, bytesPerRow: storedWidth * 4)
+        pixels.withUnsafeBytes { data in
+            texture.replace(region: MTLRegionMake2D(0, 0, width, height), mipmapLevel: 0,
+                            withBytes: data.baseAddress!, bytesPerRow: width * 4)
         }
         return texture
     }

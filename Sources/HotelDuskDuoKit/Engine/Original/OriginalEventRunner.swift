@@ -746,6 +746,8 @@ public struct OriginalEventRunner: Sendable {
         game = response.game
         unrenderedPresentation += response.unrenderedPresentation
         processRequests += response.processRequests
+        // Mode 27 appends any newly available questions (0x0203DC88).
+        if response.session.selection.modeID == 27, let available = topics() { openQuestions(available) }
     }
 
     /**
@@ -905,7 +907,8 @@ public struct OriginalEventRunner: Sendable {
     }
 
     /**
-     * 0x02045724 selects a shown-item response before returning from the inventory menu.
+     * 0x02045724 selects a chapter response before returning from the inventory menu.
+     * A miss retains the question menu for showItem(_:catalog:)'s System response.
      */
     public mutating func showItem(_ item: UInt8) {
         guard case .questions = phase, let partner,
@@ -928,9 +931,50 @@ public struct OriginalEventRunner: Sendable {
                 interrupt = Interrupt()
                 selectNext()
             case .unresolved: enter(outcome)
-            case .noMatch: halt("The shared response for showing this item is not recovered")
+            case .noMatch:
+                var context = session.selection
+                context.modeID = 16
+                context.areaID = .max
+                context.subareaID = .max
+                context.checkItemID = Int16(item)
+                lastSelectionMiss = context
             }
         } catch { halt("The shown-item response could not be selected: \(error)") }
+    }
+
+    /**
+     * 0x02028E4C tries System after the chapter's shown-item scan. If no specific
+     * System response passes, 0x0203A444 retries mode 16 with item and subarea zero.
+     * The host retains this conversation while the returned shared response runs.
+     */
+    public mutating func showItem(_ item: UInt8, catalog: OriginalScriptCatalog) throws -> Self? {
+        guard scope == .normal, case .questions = phase, let partner,
+              try game.inventory.items.contains(item) else { return nil }
+        showItem(item)
+        guard case .questions = phase, var context = lastSelectionMiss,
+              context.modeID == 16, context.checkItemID == Int16(item) else { return nil }
+        let system = try catalog.loadProgram("System"), graph = try system.blocks, checks = try system.conditions
+        var evaluating = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        evaluating.selection = context
+        let state = game
+        let outcome = try OriginalShownItemSelector.select(graph: graph, person: UInt16(bitPattern: partner),
+            item: item, nowTime: game.nowTime, scope: .system) {
+                try evaluating.evaluate($0, conditions: checks, game: state)
+            }
+        if case .unresolved = outcome {
+            var response = try Self(program: system, game: game, scope: .system, deferArrival: true)
+            response.enter(outcome)
+            return response
+        }
+        if case .selected = outcome { context = evaluating.selection }
+        game.markItemShown(item, person: partner)
+        var response = try Self(program: system, game: game, selection: context, scope: .system)
+        if case .exploration = response.phase, response.lastSelectionMiss != nil, context.modeID == 16 {
+            context.checkItemID = 0
+            context.subareaID = 0
+            response = try Self(program: system, game: game, selection: context, scope: .system)
+        }
+        return response
     }
 
     /// State 0x6F with no keyword (+0x68 = -1): the partner's mode-4 event in
@@ -1215,6 +1259,9 @@ public struct OriginalEventRunner: Sendable {
             return
         }
         if (try? reader.u16(0)) == 27 {
+            // Shared shown-item scripts have no CHK exits. Their owning chapter
+            // conversation keeps its menu and appends new topics on resumption.
+            if scope == .system { endTalkEvent(); return }
             guard let topics = topics() else { return halt("The shown-item response needs a conversation partner and keyword table") }
             let transition = key >= 0 && conditions.entries.indices.contains(Int(key))
                 ? conditions.entries[Int(key)].second?.first.flatMap { try? OriginalEventTransition(record: $0) } : nil

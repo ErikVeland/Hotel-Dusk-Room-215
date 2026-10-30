@@ -17,7 +17,7 @@ struct OriginalCodeNoticeRenderer {
         guard let image = OriginalEntrancePanels.rotated(rgba: texture.rgba,
                                                          width: texture.storedWidth,
                                                          height: texture.storedHeight),
-              image.width == 192, image.height == 256 else {
+              image.artworkWidth == 192, image.artworkHeight == 256 else {
             throw OriginalDataError.invalid("Code notice background")
         }
         pageBackground = image

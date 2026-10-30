@@ -36,9 +36,7 @@ final class OriginalChristmasTreeRenderer {
 
     func render(_ process: OriginalChristmasTreeProcess, draggedDecoration: Int? = nil,
                 at dragPoint: SIMD2<Float>? = nil) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
-            bytesPerRow: 192 * 4, space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Christmas tree render context")
         }
         context.interpolationQuality = .none
@@ -117,11 +115,6 @@ final class OriginalChristmasTreeRenderer {
     }
 
     private static func image(_ rgba: Data, width: Int, height: Int) -> CGImage? {
-        guard let provider = CGDataProvider(data: rgba as CFData),
-              let colourSpace = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
-        return CGImage(width: width, height: height, bitsPerComponent: 8, bitsPerPixel: 32,
-            bytesPerRow: width * 4, space: colourSpace,
-            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue), provider: provider,
-            decode: nil, shouldInterpolate: false, intent: .defaultIntent)
+        OriginalArtwork.shared.image(rgba: rgba, width: width, height: height)
     }
 }

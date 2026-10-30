@@ -32,10 +32,9 @@ final class OriginalFountainPenRenderer {
         var payload = Data(original.decodedPayload.prefix(528))
         payload.append(contentsOf: puzzle.mask)
         let foreground = try OriginalBitmap(data: payload)
-        guard let image = OriginalEntrancePanels.rotated(rgba: foreground.rgba(transparentPaletteZero: true),
-                width: 256, height: 192),
-              let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8, bytesPerRow: 768,
-                space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let image = OriginalArtwork.shared.maskedImage(rgba: original.rgba(transparentPaletteZero: true),
+                width: 256, height: 192, maskRGBA: foreground.rgba(transparentPaletteZero: true), rotated: true),
+              let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Fountain pen image context")
         }
         context.interpolationQuality = .none

@@ -24,6 +24,8 @@ enum OriginalProgressInput: Codable, Equatable, Sendable {
     case releaseNotebook
     case touchEntrance(pageX: Int, pageY: Int)
     case touchCodeNotice(pageX: Int, pageY: Int)
+    case touchNumberSeal(pageX: Int, pageY: Int)
+    case vendingMachine(action: OriginalVendingMachineProcess.Action)
     case touchVSScene
     case tapTypewriter(pageX: Int, pageY: Int)
     case adjustTypewriterShift(amount: Int)
@@ -172,6 +174,7 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
     var baseRuntimePosition: SIMD3<Float>?
     var baseRuntimeFacing: Float?
     var usesInstantSaves = false
+    var qualityOfLifeVersion: Int? = 1
     var timestamp: Int64 = 0
     var inputs: [OriginalProgressInput] = []
     var jigsawSeeds: [UInt32] = []
@@ -192,6 +195,9 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
     }
 
     func validate() throws {
+        guard qualityOfLifeVersion == nil || qualityOfLifeVersion == 1 else {
+            throw OriginalDataError.unsupported("Interaction presentation version")
+        }
         guard inputs.count <= 1_000_000, base.count < 16_000_000,
               (nativeNotebookPages?.count ?? 0) <= 3,
               nativeNotebookPages?.allSatisfy({ ["0", "1", "2"].contains($0.key) && $0.value.count <= 8_000_000 }) ?? true else {
@@ -218,6 +224,12 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
             let length = notebook.ink.reduce(0) { $0 + ($1.text as NSString).length }
             guard (0...length).contains(notebook.readingAnchor), (0...length).contains(notebook.revealedEnd) else {
                 throw OriginalDataError.invalid("Saved reading position")
+            }
+            for offset in [notebook.retraceEnd, notebook.furthestRevealedEnd,
+                           notebook.reviewPassageEnd, notebook.reviewRevealedEnd].compactMap({ $0 }) {
+                guard (0...length).contains(offset) else {
+                    throw OriginalDataError.invalid("Saved dialogue position")
+                }
             }
             if let review = notebook.reviewAnchor, !(0...length).contains(review) {
                 throw OriginalDataError.invalid("Saved conversation bookmark")
@@ -254,6 +266,8 @@ extension OriginalPlaySession {
         case .releaseNotebook: releaseNotebook()
         case let .touchEntrance(pageX, pageY): touchEntrance(pageX: pageX, pageY: pageY)
         case let .touchCodeNotice(pageX, pageY): touchCodeNotice(pageX: pageX, pageY: pageY)
+        case let .touchNumberSeal(pageX, pageY): touchNumberSeal(pageX: pageX, pageY: pageY)
+        case let .vendingMachine(action): vendingMachineAction(action)
         case .touchVSScene: touchVSScene()
         case let .tapTypewriter(pageX, pageY): tapTypewriter(pageX: pageX, pageY: pageY)
         case let .adjustTypewriterShift(amount): adjustTypewriterShift(by: amount)

@@ -218,6 +218,10 @@ enum JigsawArt {
     static func image(named name: String) -> CGImage? {
         if let image = cache[name] { return image }
         let basename = (name as NSString).deletingPathExtension
+        if let image = OriginalArtwork.shared.namedImage(source: "Images/Puzzles/Jigsaw/\(basename).png") {
+            cache[name] = image
+            return image
+        }
         guard let url = Bundle.module.url(forResource: basename, withExtension: "png"),
               let source = CGImageSourceCreateWithURL(url as CFURL, nil),
               let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }

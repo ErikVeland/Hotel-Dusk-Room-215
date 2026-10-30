@@ -13,6 +13,10 @@ public struct OriginalPencilSharpenerRenderer: Sendable {
     }
 
     init(bundle: Bundle) throws {
+        if let enhanced = OriginalArtwork.shared.namedImage(source: "Images/OriginalPencilSharpener.png") {
+            image = enhanced
+            return
+        }
         guard let url = bundle.url(forResource: "OriginalPencilSharpener", withExtension: "png"),
               let source = CGImageSourceCreateWithURL(url as CFURL, nil),
               let image = CGImageSourceCreateImageAtIndex(source, 0, nil),

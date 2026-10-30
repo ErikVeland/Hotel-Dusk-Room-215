@@ -30,12 +30,14 @@ struct OriginalChapterTransitionView: View {
                         .resizable().interpolation(.none).frame(width: 192, height: 256)
                     if screen == 1 {
                         Text(chapter.title).font(.system(size: 24, design: .serif)).position(x: 96, y: 76)
-                        Image(decorative: images.item, scale: 1).interpolation(.none)
-                            .position(x: CGFloat(images.item.width) / 2, y: 128 + CGFloat(images.item.height) / 2)
+                        Image(decorative: images.item, scale: 1).resizable().interpolation(.high)
+                            .frame(width: CGFloat(images.item.artworkWidth), height: CGFloat(images.item.artworkHeight))
+                            .position(x: CGFloat(images.item.artworkWidth) / 2, y: 128 + CGFloat(images.item.artworkHeight) / 2)
                     } else {
                         Text(chapter.dateLabel).font(.system(size: 12, design: .serif))
                             .position(x: 96, y: 44)
-                        Image(decorative: images.clock, scale: 1).interpolation(.none)
+                        Image(decorative: images.clock, scale: 1).resizable().interpolation(.high)
+                            .frame(width: CGFloat(images.clock.artworkWidth), height: CGFloat(images.clock.artworkHeight))
                             .position(x: 96, y: 112)
                         Text(chapter.timeRange).font(.system(size: 20, design: .serif))
                             .position(x: 96, y: 204)

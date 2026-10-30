@@ -36,7 +36,7 @@ final class OriginalSearchShedRenderer: OriginalSearchShedRendering {
 
     public func render(_ process: OriginalSearchShedProcess) throws -> CGImage {
         let instances = process.objects.map { Self.translation($0.position) * Self.scale($0.scale) }
-        return try model.render(width: 192, height: 256, viewProjection: viewProjection,
+        return try model.render(width: 384, height: 512, viewProjection: viewProjection,
                                 visibleNodes: [2], nodeInstances: [2: instances])
     }
 

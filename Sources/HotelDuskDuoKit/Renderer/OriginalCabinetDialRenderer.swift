@@ -73,7 +73,7 @@ public final class OriginalCabinetDialRenderer: OriginalCabinetDialRendering {
 
     public func render(_ puzzle: OriginalCabinetDialProcess) throws -> CGImage {
         let projection = Self.viewProjection(drawer: puzzle.showsDrawer)
-        return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
             if puzzle.showsDrawer {
                 guard puzzle.stage > 0 else { return }
                 let transform = Self.rotation(-.pi, axis: SIMD3(0, 1, 0)) * Self.scale(2970 / 4096)

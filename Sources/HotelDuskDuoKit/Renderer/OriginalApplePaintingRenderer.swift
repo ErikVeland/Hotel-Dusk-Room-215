@@ -25,10 +25,7 @@ public struct OriginalApplePaintingRenderer: Sendable {
         }
         let bitmap = bitmaps[index]
         guard let artwork = Self.image(from: bitmap),
-              let context = CGContext(data: nil, width: Self.pageWidth, height: Self.pageHeight,
-                                      bitsPerComponent: 8, bytesPerRow: 0,
-                                      space: CGColorSpaceCreateDeviceRGB(),
-                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+              let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Apple painting image")
         }
 
@@ -38,8 +35,8 @@ public struct OriginalApplePaintingRenderer: Sendable {
         let originX = CGFloat(64) + CGFloat(cameraY) / 96
         let originY = CGFloat(Self.pageHeight) / 3 + CGFloat(cameraX) / 128
         context.draw(artwork, in: CGRect(x: originX, y: originY,
-                                         width: CGFloat(artwork.width) * scale,
-                                         height: CGFloat(artwork.height) * scale))
+                                         width: CGFloat(artwork.artworkWidth) * scale,
+                                         height: CGFloat(artwork.artworkHeight) * scale))
         guard let image = context.makeImage() else {
             throw OriginalDataError.invalid("Apple painting page image")
         }
@@ -54,14 +51,6 @@ public struct OriginalApplePaintingRenderer: Sendable {
     }
 
     private static func image(from bitmap: OriginalLinearBitmap) -> CGImage? {
-        let rgba = bitmap.rgba(transparentPaletteZero: true)
-        guard let provider = CGDataProvider(data: rgba as CFData),
-              let colourSpace = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
-        return CGImage(width: bitmap.width, height: bitmap.height,
-                       bitsPerComponent: 8, bitsPerPixel: 32,
-                       bytesPerRow: bitmap.width * 4, space: colourSpace,
-                       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
-                       provider: provider, decode: nil, shouldInterpolate: false,
-                       intent: .defaultIntent)
+        OriginalArtwork.shared.image(rgba: bitmap.rgba(transparentPaletteZero: true), width: bitmap.width, height: bitmap.height)
     }
 }

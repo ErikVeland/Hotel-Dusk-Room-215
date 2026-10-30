@@ -83,7 +83,7 @@ final class OriginalPaperclipRenderer {
         }
         let backgroundBuffer = try buffer(background), wireBuffer = try buffer(wire)
         let lightBuffer = try light.map(buffer)
-        return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
             encoder.setDepthStencilState(depth)
             encoder.setCullMode(.none)
             draw(backgroundBuffer, count: background.count, texture: desk, encoder: encoder)

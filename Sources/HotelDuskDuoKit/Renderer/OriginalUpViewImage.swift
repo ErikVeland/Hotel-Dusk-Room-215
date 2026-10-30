@@ -36,9 +36,15 @@ public struct OriginalUpViewImage {
         sourcePackedHitMap = hits
         packedHitMap = Self.expandingTransparentHitPixels(in: hits, width: 256, height: 192,
                                                            radius: Self.hitMargin)
-        guard let rendered = OriginalEntrancePanels.rotated(rgba: rgba, width: 256, height: 192) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Close-up image")
         }
+        for (layer, bitmap) in bitmaps.enumerated() where visible[layer] {
+            guard let image = OriginalEntrancePanels.rotated(rgba: bitmap.rgba(transparentPaletteZero: layer > 0),
+                width: bitmap.width, height: bitmap.height) else { throw OriginalDataError.invalid("Close-up layer") }
+            context.draw(image, in: CGRect(x: 0, y: 0, width: 192, height: 256))
+        }
+        guard let rendered = context.makeImage() else { throw OriginalDataError.invalid("Close-up composite") }
         image = rendered
     }
 

@@ -40,6 +40,10 @@ final class RomImageCache {
 
     func image(named name: String) -> CGImage? {
         if let hit = cache[name] { return hit }
+        if let image = OriginalArtwork.shared.namedImage(source: "Images/Backgrounds/\(name).png") {
+            cache[name] = image
+            return image
+        }
         // `.process` may keep or flatten the folder structure, depending on the build system.
         let url = Bundle.module.url(forResource: name, withExtension: "png", subdirectory: "Images/Backgrounds")
             ?? Bundle.module.url(forResource: name, withExtension: "png")

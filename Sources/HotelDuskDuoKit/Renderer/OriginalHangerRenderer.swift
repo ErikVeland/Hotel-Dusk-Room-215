@@ -71,7 +71,7 @@ public final class OriginalHangerRenderer: OriginalHangerRendering {
 
     public func render(_ puzzle: OriginalHangerProcess) throws -> CGImage {
         let projection = Self.projection(puzzle.cameraBounds)
-        return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
             if puzzle.phase == 3, puzzle.stage == 3 {
                 let base = Self.transform(position: puzzle.pliersPosition, scale: 0.1,
                     angles: SIMD3(0.2, 0, puzzle.pliersRotation))
