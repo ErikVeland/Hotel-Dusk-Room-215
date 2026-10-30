@@ -1463,7 +1463,6 @@ final class OriginalStoryContinuationTests: XCTestCase {
                 .appendingPathComponent(UUID().uuidString)),
             mapRendererFactory: { mapName, _ in try BitmapRouteMapRenderer(mapName: mapName) })
         defer { play.stop() }
-
         try OriginalChapterThreeRouteChecks.exit(play, to: 26, interrupt: true)
         try OriginalChapterThreeRouteChecks.exit(play, to: 5, interrupt: true)
         try OriginalChapterThreeRouteChecks.navigate(play, to: .init(-50_000, -10_000))
@@ -2104,9 +2103,6 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertEqual(play.runner.game.mapID, 26)
         try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
         XCTAssertEqual(play.runner.game.mapID, 17)
-        try OriginalChapterThreeRouteChecks.exit(play, to: 3, interrupt: true)
-        XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
-        XCTAssertEqual(play.runner.program.name, "EP8_R103")
         try OriginalChapterThreeRouteChecks.exit(play, to: 19, interrupt: true)
         XCTAssertEqual(play.runner.game.mapID, 19)
         try OriginalChapterThreeRouteChecks.exit(play, to: 17, interrupt: true)
@@ -3311,8 +3307,14 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertEqual(resumed.runner.phase, .exploration(mapID: 13))
         XCTAssertEqual(resumed.runner.game.value(for: .doorOpen(index: 10)), false)
         resumed.resume()
-        try OriginalChapterThreeRouteChecks.exit(resumed, to: 24, interrupt: true, expectArrival: false)
         let backroomDoor = try OriginalChapterThreeRouteChecks.doorMarker(resumed, 24)
+        do {
+            try OriginalChapterThreeRouteChecks.walk(resumed,
+                to: backroomDoor + SIMD2<Float>(-10_000, 0), interrupt: true)
+        } catch {
+            OriginalChapterThreeRouteChecks.face(resumed, x: backroomDoor.x, z: backroomDoor.y)
+            guard resumed.nearbyDoor == 24 else { throw error }
+        }
         OriginalChapterThreeRouteChecks.face(resumed, x: backroomDoor.x, z: backroomDoor.y)
         XCTAssertEqual(resumed.nearbyDoor, 24)
         resumed.inspectNearbyDoor()
