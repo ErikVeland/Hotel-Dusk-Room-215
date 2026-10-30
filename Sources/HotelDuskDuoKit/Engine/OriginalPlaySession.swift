@@ -4087,13 +4087,19 @@ public final class OriginalPlaySession: ObservableObject {
             connections.first { table.door(id: UInt16(bitPattern: $0.id)) != nil }
         } ?? connections.first
         guard let connection else { return }
+        let doorRecord = searchTable?.door(id: UInt16(bitPattern: connection.id))
+        routeTrace?.write(kind: "doorInspection", fields: routeTraceFields(extra: [
+            "destinationMap": String(destination), "doorID": String(connection.id),
+            "doorArea": doorRecord.map { String($0.areaID) } ?? "unknown",
+            "upViewID": doorRecord.map { String($0.upViewID) } ?? "unknown"
+        ]))
         if doorTable.departsDirectly(from: lobby.mapID, using: connection, game: runner.game) {
             lobbyTouch = nil
             firstPersonMovement = nil
             return departThroughDoor(to: destination)
         }
         do {
-            guard let record = searchTable?.door(id: UInt16(bitPattern: connection.id)) else {
+            guard let record = doorRecord else {
                 throw OriginalDataError.unsupported("Door destination \(destination)")
             }
             lobbyTouch = nil
@@ -4132,7 +4138,15 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.selectDoorComponent(x: x, y: y, confirmImmediately: confirmImmediately))
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, door != nil else { return }
-        let repeated = door?.select(doorImage?.hit(pageX: x, pageY: y)) == true
+        let hit = doorImage?.hit(pageX: x, pageY: y)
+        if let hit {
+            routeTrace?.write(kind: "doorComponentHit", fields: routeTraceFields(extra: [
+                "destinationMap": String(door?.destination ?? -1), "doorID": String(door?.doorID ?? -1),
+                "area": String(door?.area ?? .max), "component": String(hit),
+                "pageX": String(x), "pageY": String(y)
+            ]))
+        }
+        let repeated = door?.select(hit) == true
         if repeated || (confirmImmediately && door?.selected != nil) { confirmDoorComponent() }
     }
 
@@ -4262,6 +4276,9 @@ public final class OriginalPlaySession: ObservableObject {
             let visible = lobby.objectVisibility.visibleNodes(in: lobby.room, map: lobby.mapID, area: nil, game: runner.game)
             guard let node = try lobby.pickedRoomObject(page: SIMD2(x, y), visibleNodes: visible),
                   let subarea = OriginalMapExploration.subarea(node: node) else { return }
+            routeTrace?.write(kind: "roomObjectHit", fields: routeTraceFields(extra: [
+                "pickedNode": node, "area": String(area), "subarea": String(subarea)
+            ]))
             let table = try OriginalSearchTable.bundled(map: lobby.mapName)
             if let view = table.upViewID(area: area, subarea: subarea), view != .max {
                 pendingCloseup = (area, subarea, view)
