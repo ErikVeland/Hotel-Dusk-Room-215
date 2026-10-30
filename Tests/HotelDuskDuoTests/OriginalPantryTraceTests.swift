@@ -77,4 +77,44 @@ final class OriginalPantryTraceTests: XCTestCase {
         XCTAssertTrue(trace.contains("\"subarea\":\"18\""))
         XCTAssertTrue(trace.contains("\"result\":\"noMatch\""))
     }
+
+    @MainActor
+    func testCardsReadCheckpointObj9998HitFallsBackInsteadOfStartingQuiz() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter9-dunning-items-and-cards")).load() else {
+            throw XCTSkip("The Chapter 9 cards-read checkpoint is not available")
+        }
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { name, _ in try OriginalRouteBitmapMapRenderer(mapName: name) })
+        defer { play.stop() }
+        play.resume()
+        try OriginalChapterThreeRouteChecks.exit(play, to: 12, interrupt: true)
+
+        let room = try XCTUnwrap(play.lobby)
+        let marker = try XCTUnwrap(room.room.nodes.first { $0.name == "s03" })
+        let target = SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
+        try OriginalChapterThreeRouteChecks.navigate(play, to: target, interrupt: true)
+        OriginalChapterThreeRouteChecks.face(play, x: target.x, z: target.y)
+        let facingRoom = try XCTUnwrap(play.lobby)
+        XCTAssertEqual(facingRoom.nearbySearchArea, 3)
+        let visible = facingRoom.objectVisibility.visibleNodes(in: facingRoom.room, map: facingRoom.mapID,
+            area: nil, game: play.runner.game)
+        let hit = try XCTUnwrap(stride(from: 0, to: 256, by: 8).lazy.flatMap { y in
+            stride(from: 0, to: 192, by: 8).map { x in SIMD2(Float(x), Float(y)) }
+        }.first { point in
+            try facingRoom.pickedRoomObject(page: point, visibleNodes: visible) == "obj9998"
+        }, "No sampled room point selected the hit-only pantry helper")
+
+        play.selectLobbyRoomObject(x: hit.x, y: hit.y)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+
+        XCTAssertEqual(play.runner.game.mapID, 12)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 12))
+        XCTAssertEqual(play.runner.session.selection.modeID, 10)
+        XCTAssertEqual(play.runner.session.selection.areaID, 3)
+        XCTAssertEqual(play.runner.session.selection.subareaID, 99)
+    }
 }

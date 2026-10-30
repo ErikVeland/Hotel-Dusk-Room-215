@@ -383,7 +383,7 @@ final class OriginalChapterReviewTests: XCTestCase {
     @MainActor func testChapterTenR301DeskReachesTheFiveLookStoryGate() throws {
         let directory = try XCTUnwrap(ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"])
         let checkpoint = try XCTUnwrap(OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-            .appendingPathComponent("chapter10-r301-first-clue")).load())
+            .appendingPathComponent("chapter10-r301-entry")).load())
         let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)),
@@ -394,6 +394,15 @@ final class OriginalChapterReviewTests: XCTestCase {
         play.onProgressCheckpoint = { instantCheckpoint = $0 }
         play.resume()
         OriginalChapterThreeRouteChecks.drain(play)
+        try OriginalChapterThreeRouteChecks.navigate(play, to: SIMD2(-14_944, -8_800))
+        let clueMarker = try XCTUnwrap(play.lobby?.room.nodes.first { $0.name == "s03" })
+        OriginalChapterThreeRouteChecks.face(play,
+            x: Float(clueMarker.worldFixed[12]), z: Float(clueMarker.worldFixed[14]))
+        try OriginalChapterThreeRouteChecks.search(play, node: "obj01_01")
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 40))
+        XCTAssertEqual(play.runner.game.bytes[0x1380], 1)
+        XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 40, index: 98)), true)
+        XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 40, index: 101)), true)
         for _ in 1...14 {
             try OriginalChapterThreeRouteChecks.search(play, node: "obj01_01")
             XCTAssertEqual(play.runner.phase, .exploration(mapID: 40))
@@ -409,7 +418,7 @@ final class OriginalChapterReviewTests: XCTestCase {
     @MainActor func testChapterTenR301CableHitSavesAfterCounterCameraPan() throws {
         let directory = try XCTUnwrap(ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"])
         let checkpoint = try XCTUnwrap(OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-            .appendingPathComponent("chapter10-r301-five-look-clue")).load())
+            .appendingPathComponent("chapter10-r301-counter15")).load())
         let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)),
