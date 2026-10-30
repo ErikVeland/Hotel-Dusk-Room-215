@@ -41,6 +41,13 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
         XCTAssertNil(result.nextThrow)
     }
 
+    func testThrowSpeedSelectsTheRecoveredRouteResultRanges() {
+        XCTAssertEqual(OriginalBowlingLaunch.routeResult(for: -409), 0)
+        XCTAssertEqual(OriginalBowlingLaunch.routeResult(for: -410), 1)
+        XCTAssertEqual(OriginalBowlingLaunch.routeResult(for: -614), 1)
+        XCTAssertEqual(OriginalBowlingLaunch.routeResult(for: -615), 2)
+    }
+
     func testSixthThrowCompletesAfterPlayerZeroLosesTwoRounds() throws {
         let trace = try dragUpdateTrace()
         var results = OriginalBowlingResult()
@@ -101,6 +108,13 @@ final class OriginalBowlingMatchProcessTests: XCTestCase {
             match.updateDrag(to: Self.vector(sample.touchPointFixed20_12))
         }
         XCTAssertEqual(match.phase, .rolling)
+        XCTAssertEqual(match.turn.ballPositionFixed20_12, SIMD3(-712, 1_556, 3_088),
+                       "The captured touch path should reach the ROM auto-launch position")
+        XCTAssertEqual(match.turn.simulation.ballMotion.state.velocityFixed20_12,
+                       SIMD3(-71, 0, -819),
+                       "The captured touch path should produce the ROM launch velocity")
+        XCTAssertEqual(match.turn.routeResult, 2,
+                       "The captured launch speed should select the source repeat result")
         for _ in 0..<5_000 where match.phase == .rolling { match.advanceOneUpdate() }
         XCTAssertTrue([.betweenThrows, .showingResult, .presentingResult, .completed].contains(match.phase))
     }

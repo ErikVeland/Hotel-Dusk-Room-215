@@ -39,10 +39,17 @@ public struct OriginalDoorTable: Sendable {
     }
 
     /**
+     * Returns every connection in source-table order for this map pair.
+     */
+    public func connections(from source: Int16, to destination: Int16) -> [Record] {
+        records.filter { ($0.mapA == source && $0.mapB == destination) || ($0.mapB == source && $0.mapA == destination) }
+    }
+
+    /**
      * 0x020B537C returns the first connection in either direction.
      */
     public func connection(from source: Int16, to destination: Int16) -> Record? {
-        records.first { ($0.mapA == source && $0.mapB == destination) || ($0.mapB == source && $0.mapA == destination) }
+        connections(from: source, to: destination).first
     }
 
     /**
@@ -57,9 +64,18 @@ public struct OriginalDoorTable: Sendable {
      * 0x0202DEC4 bypasses inspection for these sides when the original door flag is zero.
      */
     public func departsDirectly(from source: Int16, to destination: Int16, game: OriginalGameState) -> Bool {
-        guard let record = connection(from: source, to: destination),
-              let side = side(from: source, to: destination),
+        guard let record = connection(from: source, to: destination) else { return false }
+        return departsDirectly(from: source, using: record, game: game)
+    }
+
+    /**
+     * Applies the source direct-departure rule to a specific duplicate map connection.
+     */
+    public func departsDirectly(from source: Int16, using record: Record, game: OriginalGameState) -> Bool {
+        guard record.mapA == source || record.mapB == source,
               game.value(for: .doorOpen(index: UInt16(bitPattern: record.id))) == false else { return false }
+        let side = record.mapA == source ? record.sideA : record.sideB
+        let destination = record.mapA == source ? record.mapB : record.mapA
         return side.viewFlag != 0 || (source == 39 && destination == 31)
             || (source == 17 && destination == 26) || (source == 26 && destination == 5)
     }

@@ -1,9 +1,9 @@
 {
   "formatVersion": 1,
   "coverage": {
-    "files": 1939,
+    "files": 1937,
     "decoded": 439,
-    "unresolved": 1500
+    "unresolved": 1498
   },
   "images": [
     {
@@ -12083,12 +12083,6 @@
       "error": "Not a recovered tiled bitmap format"
     },
     {
-      "source": "trick/jukebox/JK_USA.txt",
-      "payloadSHA256": "d49020626c107ab4968b9b248e595ddc16489a73cf21e115fd8af804d70a0d22",
-      "status": "unresolved",
-      "error": "Text data used by OriginalJukeboxProcess"
-    },
-    {
       "source": "trick/jukebox/R01.bin",
       "payloadSHA256": "8cf44396384ff6c75426ed42e3aad69ba7169f94f18a182059560aa552f038fe",
       "status": "unresolved",
@@ -12753,12 +12747,6 @@
       "payloadSHA256": "667958422f949e0348371ae5c3ae48bb1834f1d86de4f7c3b88b453253bdbb5e",
       "status": "unresolved",
       "error": "Not a recovered tiled bitmap format"
-    },
-    {
-      "source": "trick/sticktex.bin",
-      "payloadSHA256": "c40877aa607858217e45f3cacb0e5dcde711b94ea4d969118f33e4c24b41ef9e",
-      "status": "unresolved",
-      "error": "Loaded as a native DTX texture, not as a tiled bitmap"
     },
     {
       "source": "trick/switchboard/paneloff.bin",

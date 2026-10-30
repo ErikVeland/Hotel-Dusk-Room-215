@@ -149,14 +149,44 @@ enum OriginalChapterThreeRouteChecks {
             goal = nearest ?? exact
         }
         func h(_ c: SIMD2<Int32>) -> Float { hypot(Float(c.x - goal.x), Float(c.y - goal.y)) }
-        var open: [(SIMD2<Int32>, Float)] = [(start, h(start))]
+        var open: [(point: SIMD2<Int32>, score: Float)] = []
+        func enqueue(_ entry: (point: SIMD2<Int32>, score: Float)) {
+            var index = open.count
+            open.append(entry)
+            while index > 0 {
+                let parent = (index - 1) / 2
+                guard open[parent].score > entry.score else { break }
+                open[index] = open[parent]
+                index = parent
+            }
+            open[index] = entry
+        }
+        func dequeue() -> (point: SIMD2<Int32>, score: Float)? {
+            guard !open.isEmpty else { return nil }
+            let result = open[0], last = open.removeLast()
+            guard !open.isEmpty else { return result }
+            var index = 0
+            while true {
+                let left = index * 2 + 1
+                guard left < open.count else { break }
+                let right = left + 1
+                let child = right < open.count && open[right].score < open[left].score ? right : left
+                guard open[child].score < last.score else { break }
+                open[index] = open[child]
+                index = child
+            }
+            open[index] = last
+            return result
+        }
+        enqueue((start, h(start)))
         var cost: [SIMD2<Int32>: Float] = [start: 0], parent = [SIMD2<Int32>: SIMD2<Int32>]()
         var reached: SIMD2<Int32>?
         let steps: [SIMD2<Int32>] = [.init(1, 0), .init(-1, 0), .init(0, 1), .init(0, -1),
                                      .init(1, 1), .init(1, -1), .init(-1, 1), .init(-1, -1)]
         while !open.isEmpty, cost.count < 60000 {
-            let best = open.indices.min { open[$0].1 < open[$1].1 }!
-            let current = open.remove(at: best).0
+            guard let next = dequeue() else { break }
+            let current = next.point
+            guard next.score <= cost[current]! + h(current) + 0.001 else { continue }
             if h(current) <= 1.5 { reached = current; break }
             for step in steps {
                 let next = current &+ step
@@ -165,7 +195,7 @@ enum OriginalChapterThreeRouteChecks {
                 if total < cost[next] ?? .infinity {
                     cost[next] = total
                     parent[next] = current
-                    open.append((next, total + h(next)))
+                    enqueue((next, total + h(next)))
                 }
             }
         }

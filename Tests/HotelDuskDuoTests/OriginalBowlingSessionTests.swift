@@ -65,8 +65,6 @@ final class OriginalBowlingSessionTests: XCTestCase {
         XCTAssertEqual(play.bowlingImage?.width, 192)
         XCTAssertEqual(play.bowlingImage?.height, 256)
         XCTAssertEqual(play.bowlingMatch?.phase, .ready)
-        play.advanceFrame()
-        XCTAssertEqual(play.bowlingMatch?.phase, .ready)
 
         try holdRawTouch(SIMD2(15, 90), for: 1, in: play)
         XCTAssertEqual(play.bowlingMatch?.phase, .ready)

@@ -286,6 +286,16 @@ final class OriginalDoorTests: XCTestCase {
         XCTAssertThrowsError(try OriginalDoorTable(data: Data([255, 255]) + Data(repeating: 0, count: 14)))
     }
 
+    func testR108ToR304DoorUsesTheSearchTableConnection() throws {
+        let doorTable = try OriginalStateDefaults.bundled().doorTable
+        XCTAssertEqual(doorTable.connections(from: 8, to: 43).map(\.id), [26, 49])
+        let search = try OriginalSearchTable.bundled(map: "R108")
+        XCTAssertNil(search.door(id: 26))
+        let passage = try XCTUnwrap(search.door(id: 49))
+        XCTAssertEqual(passage.areaID, 5)
+        XCTAssertEqual(passage.upViewID, 59)
+    }
+
     func testRoom215UsesItsOriginalSearchDoorRecord() throws {
         let table = try OriginalSearchTable.bundled(map: "R213")
         XCTAssertEqual(table.doors.count, 15)

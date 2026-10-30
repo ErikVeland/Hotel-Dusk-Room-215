@@ -24,6 +24,7 @@ public struct OriginalBowlingMatchProcess: Equatable, Sendable {
     public private(set) var phase = Phase.ready
     public private(set) var returnValue: Int16?
     public private(set) var presentationFramesRemaining = 0
+    private var lastRouteResult: Int16?
     private var commentaryRequests: [Int16] = []
 
     public var throwIndex: Int? { results.nextThrow }
@@ -85,7 +86,7 @@ public struct OriginalBowlingMatchProcess: Equatable, Sendable {
         if phase == .presentingResult {
             presentationFramesRemaining = max(0, presentationFramesRemaining - 1)
             if presentationFramesRemaining == 0 {
-                returnValue = 2
+                returnValue = lastRouteResult ?? 0
                 phase = .completed
             }
             return
@@ -94,6 +95,7 @@ public struct OriginalBowlingMatchProcess: Equatable, Sendable {
         turn.advanceOneUpdate()
         guard turn.phase == .complete, let score = turn.score else { return }
         guard let slot = results.record(score) else { return }
+        lastRouteResult = turn.routeResult
         commentaryRequests.append(Self.throwCommentaryRequest(player: slot.player, score: score))
         if slot.player == 0 {
             commentaryRequests.append(4)

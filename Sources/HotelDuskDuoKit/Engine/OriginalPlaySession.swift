@@ -2594,15 +2594,15 @@ public final class OriginalPlaySession: ObservableObject {
                     lobbyRenderer = try mapRendererFactory(mapName, nil)
                     lobbyMap = lobbyRenderer?.map
                 }
-                var scriptedDestination: Int16?
+                var scriptedDestination: Int16?, scriptedRelocation: Int?
                 for request in runner.processRequests.dropFirst(handledMapRequests).reversed() {
                     if request.kind == 1 {
                         scriptedDestination = request.value
                     } else if request.kind == 3 {
                         runner.consumeTimeRequest(request.value)
                     } else if request.kind == 9 {
-                        if try lobby?.relocate(to: Int(request.value)) == true, let lobby {
-                            runner.setMapPosition(lobby.position, facing: lobby.facing)
+                        if scriptedRelocation == nil {
+                            scriptedRelocation = Int(request.value)
                         }
                     } else if request.kind == 8 {
                         // Search consumes this request without updating the map position (0x020340D0).
@@ -2615,7 +2615,11 @@ public final class OriginalPlaySession: ObservableObject {
                     // 0x0202C264 request 1 starts map entry after the conversation returns.
                     lobbyTouch = nil
                     firstPersonMovement = nil
-                    return moveToMap(destination)
+                    return moveToMap(destination, relocationMarker: scriptedRelocation)
+                }
+                if let scriptedRelocation,
+                   try lobby?.relocate(to: scriptedRelocation) == true, let lobby {
+                    runner.setMapPosition(lobby.position, facing: lobby.facing)
                 }
                 if runner.game.chapter == 0, !hasReturnedFromDunningIntroduction,
                    runner.game.value(for: .eventFlag(group: 2, index: 7)) == true {
@@ -4072,15 +4076,31 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, closeup == nil, door == nil, case .exploration = runner.phase,
               let destination = nearbyDoor, let lobby, let doorTable else { return }
-        if doorTable.departsDirectly(from: lobby.mapID, to: destination, game: runner.game) {
+        let connections = doorTable.connections(from: lobby.mapID, to: destination)
+        let searchTable = try? OriginalSearchTable.bundled(map: lobby.mapName)
+        let connection = searchTable.flatMap { table in
+            connections.first { table.door(id: UInt16(bitPattern: $0.id)) != nil }
+        } ?? connections.first
+        guard let connection else { return }
+        if doorTable.departsDirectly(from: lobby.mapID, using: connection, game: runner.game) {
             lobbyTouch = nil
             firstPersonMovement = nil
             return departThroughDoor(to: destination)
         }
         do {
-            guard let connection = doorTable.connection(from: lobby.mapID, to: destination),
-                  let record = try OriginalSearchTable.bundled(map: lobby.mapName).door(id: UInt16(connection.id)),
-                  let view = try OriginalUpViewTable.bundled(map: lobby.mapName).views.first(where: { $0.id == Int16(bitPattern: record.upViewID) }),
+            guard let record = searchTable?.door(id: UInt16(bitPattern: connection.id)) else {
+                throw OriginalDataError.unsupported("Door destination \(destination)")
+            }
+            lobbyTouch = nil
+            firstPersonMovement = nil
+            guard record.upViewID != .max else {
+                runner.interactWithMapDoor(area: record.areaID)
+                try startSearchFallback()
+                return settle()
+            }
+            guard let view = try OriginalUpViewTable.bundled(map: lobby.mapName).views.first(where: {
+                      $0.id == Int16(bitPattern: record.upViewID)
+                  }),
                   view.layers.allSatisfy({ $0.itemID < 0 && $0.processID < 0 }) else {
                 throw OriginalDataError.unsupported("Door destination \(destination)")
             }
@@ -4091,8 +4111,6 @@ public final class OriginalPlaySession: ObservableObject {
             doorImage = try OriginalUpViewImage(bitmaps: images, visible: Array(repeating: true, count: images.count))
             itemNames = try OriginalItemNames.bundled().names
             door = OriginalDoorScene(destination: destination, doorID: connection.id, area: record.areaID, view: view)
-            lobbyTouch = nil
-            firstPersonMovement = nil
             runner.interactWithDoor(area: record.areaID)
             try startSearchFallback()
             settle()
@@ -4227,7 +4245,6 @@ public final class OriginalPlaySession: ObservableObject {
               let area = lobby.nearbySearchArea else { return }
         do {
             let visible = lobby.objectVisibility.visibleNodes(in: lobby.room, map: lobby.mapID, area: nil, game: runner.game)
-                .intersection(lobby.room.gameplayRenderNodes)
             guard let node = try lobby.pickedRoomObject(page: SIMD2(x, y), visibleNodes: visible),
                   let subarea = OriginalMapExploration.subarea(node: node) else { return }
             let table = try OriginalSearchTable.bundled(map: lobby.mapName)
@@ -4368,6 +4385,10 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.leaveSearchCloseup)
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup != nil else { return }
+        let search = closeup
+        let startsWordEntry = runner.program.name == "EP9_R125"
+            && runner.game.applePaintingFoundMask & 0x1f == 0x1f
+            && runner.processRequests.dropFirst(handledMapRequests).contains { $0.kind == 5 }
         searchItem = nil
         if let parent = closeupParents.popLast() {
             closeup = parent.scene
@@ -4377,6 +4398,11 @@ public final class OriginalPlaySession: ObservableObject {
         closeup = nil
         closeupImage = nil
         closeupBitmaps = []
+        if startsWordEntry, let search {
+            handledMapRequests = runner.processRequests.count
+            runner.beginChapterNineWordEntry(area: search.area, subarea: search.subarea,
+                upView: runner.session.selection.upViewID)
+        }
         settle()
     }
 
@@ -4384,7 +4410,7 @@ public final class OriginalPlaySession: ObservableObject {
         if let lobby { lobbyImage = try lobbyRenderer?.render(lobby, game: runner.game) }
     }
 
-    private func moveToMap(_ map: Int16) {
+    private func moveToMap(_ map: Int16, relocationMarker: Int? = nil) {
         do {
             guard let name = OriginalMapExploration.supportedMaps[map] else {
                 throw OriginalDataError.unsupported("Map \(map) in this chapter")
@@ -4397,11 +4423,14 @@ public final class OriginalPlaySession: ObservableObject {
             if restoresCurrentPosition, let lobby {
                 runner.setMapPosition(lobby.position, facing: lobby.checkpointFacing)
             }
-            let exploration = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.mapID,
+            var exploration = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.mapID,
                 savedGame: restoresCurrentPosition ? runner.game : nil)
             let renderer = try mapRendererFactory(name, nil)
             audio.stopWalkingAudio()
             runner = try runner.moving(to: map, program: catalog.loadMapProgram(chapter: runner.game.chapter, mapID: map))
+            if let relocationMarker, try exploration.relocate(to: relocationMarker) {
+                runner.setMapPosition(exploration.position, facing: exploration.facing)
+            }
             handledMapRequests = 0
             lobby = exploration
             lobbyRenderer = renderer

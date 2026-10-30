@@ -143,12 +143,15 @@ public struct OriginalMapExploration {
             let files: [File]
         }
         let manifest = try JSONDecoder().decode(Manifest.self, from: Data(contentsOf: root.appendingPathComponent("manifest.json")))
-        let data = try Data(contentsOf: root.appendingPathComponent("\(name).col"))
-        guard let record = manifest.files.first(where: { $0.name == "\(name).col" }),
-              OriginalScriptCatalog.digest(data) == record.sha256 else { throw OriginalDataError.checksum("\(name).col") }
+        let cellarPassage = mapID == 8 && savedGame?.value(for: .gameFlag(index: 31)) == true
+        let variant = cellarPassage ? "a" : ""
+        let collisionName = "\(name)\(variant).col"
+        let data = try Data(contentsOf: root.appendingPathComponent(collisionName))
+        guard let record = manifest.files.first(where: { $0.name == collisionName }),
+              OriginalScriptCatalog.digest(data) == record.sha256 else { throw OriginalDataError.checksum(collisionName) }
         let area = String(format: "%02d", OriginalMapCatalog.maps[mapID]!.searchArea)
-        let room = try models.load(path: "map/\(name)/\(name)/\(name).mdf")
-        let counter = area == "00" ? room : try models.load(path: "map/\(name)/\(name)_s\(area)/\(name)_s\(area).mdf")
+        let room = try models.load(path: "map/\(name)/\(name)\(variant)/\(name).mdf")
+        let counter = area == "00" ? room : try models.load(path: "map/\(name)/\(name)_s\(area)\(variant)/\(name)_s\(area).mdf")
         return try Self(collision: .init(data: data), room: room, counter: counter, restrictions: .bundled(),
             objectVisibility: .bundled(), mapID: mapID, previousMapID: previousMapID, savedGame: savedGame)
     }
@@ -245,13 +248,15 @@ public struct OriginalMapExploration {
     public func nearbyDoor(in game: OriginalGameState, table: OriginalDoorTable) -> Int16? {
         guard mode == .walking else { return nil }
         for node in room.nodes where node.groupCount == 0 && node.name.hasPrefix("in_") {
-            guard !collision.disabledDoorMarkers.contains(node.name),
-                  let index = Self.mapNames.firstIndex(of: String(node.name.dropFirst(3)).uppercased()) else { continue }
+            guard let index = Self.mapNames.firstIndex(of: String(node.name.dropFirst(3)).uppercased()) else { continue }
             let delta = SIMD3(Float(node.worldFixed[12]) - position.x, 0, Float(node.worldFixed[14]) - position.z)
             let distance = simd_length(delta)
             guard distance > 0, distance.rounded() <= 12288,
                   simd_dot(simd_normalize(delta), SIMD3(sin(facing), 0, cos(facing))) >= 0.5 else { continue }
             let destination = Int16(index)
+            // A map marker without a door-table record is a walk-through exit.
+            guard table.connection(from: mapID, to: destination) != nil else { continue }
+            // A blocking collision marker must still expose its door interaction.
             // The original checks restrictions after choosing the first marker.
             return restrictions.permitsDoor(to: destination, table: table, game: game) ? destination : nil
         }

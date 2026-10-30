@@ -211,6 +211,26 @@ public struct OriginalEventRunner: Sendable {
         lookInCloseup(area: area, subarea: subarea, event: event, mode: 12)
     }
 
+    /**
+     * Resumes R125's pending search request with the recovered word-entry event.
+     */
+    public mutating func beginChapterNineWordEntry(area: UInt16, subarea: UInt16, upView: Int16) {
+        guard program.name == "EP9_R125",
+              game.applePaintingFoundMask & 0x1f == 0x1f,
+              case .exploration = phase else { return }
+        var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        fresh.selection.sceneID = 0xFFFE
+        fresh.selection.modeID = 15
+        fresh.selection.eventID = 5
+        fresh.selection.areaID = area
+        fresh.selection.subareaID = subarea
+        fresh.selection.upViewID = upView
+        fresh.eventCommitted = true
+        session = fresh
+        interrupt = Interrupt()
+        selectNext()
+    }
+
     private mutating func lookInCloseup(area: UInt16, subarea: UInt16, event: Int16, mode: UInt16) {
         guard case .exploration = phase else { return }
         var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
@@ -290,6 +310,25 @@ public struct OriginalEventRunner: Sendable {
         fresh.selection.upViewID = item == nil ? upView ?? -1 : -1
         fresh.selection.modeID = item != nil ? 16 : upView == nil ? 13 : 14
         if let item { fresh.selection.checkItemID = Int16(item) }
+        fresh.eventCommitted = true
+        session = fresh
+        interrupt = Interrupt()
+        selectNext()
+    }
+
+    /**
+     * 0x0202DEC4 selects mode 10 when a closed map door has no up-view.
+     */
+    public mutating func interactWithMapDoor(area: UInt16, subarea: UInt16 = 1) {
+        guard case .exploration = phase else { return }
+        var fresh = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
+        fresh.selection.sceneID = 0xFFFE
+        fresh.selection.blockID = 0
+        fresh.selection.eventID = 0
+        fresh.selection.modeID = 10
+        fresh.selection.areaID = area
+        fresh.selection.subareaID = subarea
+        fresh.selection.upViewID = -1
         fresh.eventCommitted = true
         session = fresh
         interrupt = Interrupt()

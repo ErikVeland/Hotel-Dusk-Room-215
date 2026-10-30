@@ -8,6 +8,16 @@ public enum OriginalBowlingLaunch {
     public static let maximumForwardSpeedMagnitude: Int32 = 819
 
     /**
+     * Maps the final forward speed to overlay 11's event result.
+     */
+    public static func routeResult(for forwardSpeedFixed20_12: Int32) -> Int16 {
+        let speed = abs(Int64(forwardSpeedFixed20_12))
+        if speed >= 615 { return 2 }
+        if speed >= 410 { return 1 }
+        return 0
+    }
+
+    /**
      * Returns the averaged velocity when the forward delta passes the source launch threshold.
      * Values use the game's 20.12 fixed-point representation.
      */

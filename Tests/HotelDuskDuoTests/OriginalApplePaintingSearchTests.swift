@@ -41,6 +41,21 @@ final class OriginalApplePaintingSearchTests: XCTestCase {
             let wordEntryCall = invocation(program: "EP9_R125", offset: 164, process: 81, mapID: mapID)
             XCTAssertNil(OriginalAlphabetProcessContext.paintingIndex(for: wordEntryCall))
         }
+        let room111BackRoom = invocation(program: "EP9_R125", offset: 104, process: 64, mapID: 25)
+        XCTAssertEqual(OriginalAlphabetProcessContext.paintingIndex(for: room111BackRoom), 0)
+    }
+
+    func testPaintingSuccessReturnSelectsTheSourceFourthPaintingTransition() {
+        XCTAssertEqual(OriginalAlphabetProcessContext.successfulReturnValue(
+            for: invocation(program: "EP9_R117", offset: 84, process: 64)), 0)
+        XCTAssertEqual(OriginalAlphabetProcessContext.successfulReturnValue(
+            for: invocation(program: "EP9_R125", offset: 104, process: 64)), 0)
+        XCTAssertEqual(OriginalAlphabetProcessContext.successfulReturnValue(
+            for: invocation(program: "EP9_R205", offset: 248, process: 64)), 2)
+        XCTAssertEqual(OriginalAlphabetProcessContext.successfulReturnValue(
+            for: invocation(program: "EP9_R207", offset: 84, process: 64)), 2)
+        XCTAssertEqual(OriginalAlphabetProcessContext.successfulReturnValue(
+            for: invocation(program: "EP9_R213", offset: 84, process: 64)), 2)
     }
 
     func testSourceCameraTransformAndInclusivePaintingHitBounds() throws {

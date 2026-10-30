@@ -40,6 +40,10 @@ public enum OriginalAlphabetProcessContext {
     public static func paintingIndex(for invocation: OriginalEventRunner.EmbeddedProcessInvocation)
         -> Int? {
         guard mode(for: invocation) == .paintingSearch else { return nil }
+        // R125 is the Room 111 back room, which supplies the remaining J slot.
+        if invocation.programName == "EP9_R125" && invocation.eventSourceOffset == 104 {
+            return 0
+        }
         return OriginalApplePaintingSearch.paintingMapIDs.firstIndex(of: invocation.selection.mapID)
     }
 
@@ -59,7 +63,9 @@ public enum OriginalAlphabetProcessContext {
         for invocation: OriginalEventRunner.EmbeddedProcessInvocation) -> Int16? {
         switch mode(for: invocation) {
         case .paintingSearch:
-            return invocation.programName == "EP9_R125" && invocation.eventSourceOffset == 104 ? 1 : 2
+            if invocation.programName == "EP9_R117" && invocation.eventSourceOffset == 84 { return 0 }
+            if invocation.programName == "EP9_R125" && invocation.eventSourceOffset == 104 { return 0 }
+            return 2
         case .wordEntry:
             return 0
         case nil:

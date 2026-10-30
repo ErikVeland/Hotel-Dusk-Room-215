@@ -15,6 +15,7 @@ public struct OriginalBowlingTurnProcess: Equatable, Sendable {
     public private(set) var simulation: OriginalBowlingBallPinSimulation
     public private(set) var phase = Phase.ready
     public private(set) var score: Int32?
+    public private(set) var routeResult: Int16?
 
     private var drag: OriginalBowlingDrag
 
@@ -81,6 +82,7 @@ public struct OriginalBowlingTurnProcess: Equatable, Sendable {
     }
 
     private mutating func startRoll(velocity: SIMD3<Int32>) {
+        routeResult = OriginalBowlingLaunch.routeResult(for: velocity.z)
         simulation = OriginalBowlingBallPinSimulation(
             ballState: .init(positionFixed20_12: drag.ballTransformFixed20_12,
                              velocityFixed20_12: velocity),
