@@ -123,6 +123,7 @@ public struct DuoBookContainerView: View {
 struct BookSettingsMenu: View {
     @ObservedObject var session: GameSession
     var tint: Color = NovelStyle.ink
+    @AppStorage("modernNavigation") private var modernNavigation = true
 
     var body: some View {
         Menu {
@@ -134,6 +135,7 @@ struct BookSettingsMenu: View {
             }
             if session.play != nil {
                 Button("Pause game") { session.openPauseMenu() }
+                Toggle("Modern navigation", isOn: $modernNavigation)
             }
             MusicSourcePicker(audio: session.audioController)
             Button {

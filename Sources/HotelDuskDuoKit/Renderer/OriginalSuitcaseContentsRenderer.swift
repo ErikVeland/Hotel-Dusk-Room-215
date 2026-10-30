@@ -82,7 +82,7 @@ public final class OriginalSuitcaseContentsRenderer: OriginalSuitcaseContentsRen
                 let image = compartment == .upper ?
                     (index == 3 && game.value(for: .gameFlag(index: 44)) == true ? memo : upper[index]) : lower[index]
                 draw(image, x: CGFloat(position.x), y: CGFloat(position.y),
-                    width: CGFloat(image.width), height: CGFloat(image.height))
+                    width: CGFloat(image.artworkWidth), height: CGFloat(image.artworkHeight))
             }
             if compartment == .upper { draw(strap, x: 0, y: 152, width: 192, height: 64) }
         } else {
@@ -125,7 +125,7 @@ public final class OriginalSuitcaseContentsRenderer: OriginalSuitcaseContentsRen
         view.columns.3.z = -4
         let projection = simd_float4x4(columns: (SIMD4(sx, 0, 0, 0), SIMD4(0, sy, 0, 0),
             SIMD4(0, 0, far / (near - far), -1), SIMD4(0, 0, near * far / (near - far), 0))) * view
-        return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
             for node in bag.model.nodes.indices where node > 0 && !hidden.contains(node) {
                 bag.encode(encoder: encoder, viewProjection: projection, visibleNodes: [node],
                     modelTransform: translation * (node <= 4 ? upperRotation : lowerRotation))

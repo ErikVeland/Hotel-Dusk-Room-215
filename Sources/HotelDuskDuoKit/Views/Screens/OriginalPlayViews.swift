@@ -8,11 +8,13 @@ struct OriginalDialogueLines {
         let text: String
         let colour: UInt8
         let person: Int32?
+        let verbatim: Bool
 
-        init(text: String, colour: UInt8, person: Int32? = nil) {
+        init(text: String, colour: UInt8, person: Int32? = nil, verbatim: Bool = false) {
             self.text = text
             self.colour = colour
             self.person = person
+            self.verbatim = verbatim
         }
     }
     let lines: [[Run]]
@@ -21,15 +23,27 @@ struct OriginalDialogueLines {
         var lines: [[Run]] = [[]]
         var person = person
         var colour: UInt8 = 0, bytes: [UInt8] = []
+        var cipher = false
         func flush() {
             guard !bytes.isEmpty else { return }
-            lines[lines.count - 1].append(Run(text: String(bytes: bytes, encoding: .isoLatin1) ?? "", colour: colour, person: person))
+            var text = String(bytes: bytes, encoding: .isoLatin1) ?? ""
+            if !cipher {
+                text = text.replacingOccurrences(of: "\u{81}I", with: "")
+                    .replacingOccurrences(of: "µ", with: "—")
+            }
+            if !text.isEmpty {
+                lines[lines.count - 1].append(Run(text: text, colour: colour, person: person, verbatim: cipher))
+            }
             bytes = []
         }
         for token in page.tokens {
             switch token.kind {
-            case .glyph(10): flush(); lines.append([])
+            case .glyph(10):
+                flush()
+                if cipher { lines[lines.count - 1].append(Run(text: "\n", colour: colour, person: person, verbatim: true)) }
+                lines.append([])
             case .glyph(let byte): bytes.append(byte)
+            case .control(.toggleCipher): flush(); cipher.toggle()
             case .control(.color(let value)): flush(); colour = value
             case .control(.portraitMetadata(let value, _)): flush(); person = value
             case .control: break
@@ -38,6 +52,49 @@ struct OriginalDialogueLines {
         flush()
         while let last = lines.last, last.isEmpty { lines.removeLast() }
         self.lines = lines
+    }
+
+    var paragraph: [Run] {
+        var result: [Run] = []
+        var pendingSpace: Run?
+        func append(_ text: String, style: Run) {
+            guard !text.isEmpty else { return }
+            if let last = result.last, last.colour == style.colour,
+               last.person == style.person, last.verbatim == style.verbatim {
+                result[result.count - 1] = Run(text: last.text + text, colour: style.colour,
+                    person: style.person, verbatim: style.verbatim)
+            } else {
+                result.append(Run(text: text, colour: style.colour, person: style.person, verbatim: style.verbatim))
+            }
+        }
+        for (index, line) in lines.enumerated() {
+            if index > 0, let style = result.last, !style.verbatim {
+                pendingSpace = Run(text: " ", colour: style.colour, person: style.person)
+            }
+            for run in line {
+                if run.verbatim {
+                    if let space = pendingSpace, !result.isEmpty { append(" ", style: space) }
+                    pendingSpace = nil
+                    append(run.text, style: run)
+                    continue
+                }
+                let characters = Array(run.text)
+                for (offset, character) in characters.enumerated() {
+                    if character.isWhitespace {
+                        pendingSpace = run
+                    } else {
+                        let beginsEllipsis = character == "." && offset + 1 < characters.count && characters[offset + 1] == "."
+                        if let space = pendingSpace, !result.isEmpty,
+                           !",.;:!?)]}".contains(character) || beginsEllipsis {
+                            append(" ", style: space)
+                        }
+                        pendingSpace = nil
+                        append(String(character), style: run)
+                    }
+                }
+            }
+        }
+        return result
     }
 
     var isEmpty: Bool { lines.allSatisfy { $0.allSatisfy { $0.text.trimmingCharacters(in: .whitespaces).isEmpty } } }
@@ -64,22 +121,7 @@ enum OriginalEntrancePanels {
 
     /// Source pixel (column c, row r) goes to page (x: r, y: width − 1 − c).
     static func rotated(rgba: Data, width sourceWidth: Int, height sourceHeight: Int) -> CGImage? {
-        let source = [UInt8](rgba)
-        let width = sourceHeight, height = sourceWidth
-        var output = [UInt8](repeating: 0, count: width * height * 4)
-        for y in 0..<height {
-            for x in 0..<width {
-                let from = (x * sourceWidth + (sourceWidth - 1 - y)) * 4
-                let to = (y * width + x) * 4
-                output[to..<to + 4] = source[from..<from + 4]
-            }
-        }
-        guard let provider = CGDataProvider(data: Data(output) as CFData),
-              let space = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
-        return CGImage(width: width, height: height, bitsPerComponent: 8, bitsPerPixel: 32,
-                       bytesPerRow: width * 4, space: space,
-                       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
-                       provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent)
+        OriginalArtwork.shared.image(rgba: rgba, width: sourceWidth, height: sourceHeight, rotated: true)
     }
 }
 
@@ -174,6 +216,43 @@ struct OriginalBellPageView: View {
         }
     }
 
+}
+
+struct OriginalNumberSealPageView: View {
+    @ObservedObject var play: OriginalPlaySession
+
+    var body: some View {
+        if let process = play.numberSeal, let image = play.numberSealImage {
+            GeometryReader { proxy in
+                let scale = max(0, min((proxy.size.width - 16) / 192,
+                                      (proxy.size.height - 36) / 256))
+                let size = CGSize(width: 192 * scale, height: 256 * scale)
+                Image(decorative: image, scale: 1)
+                    .resizable()
+                    .interpolation(.none)
+                    .frame(width: size.width, height: size.height)
+                    .opacity(process.opacity)
+                    .overlay(alignment: .bottomTrailing) {
+                        Button {
+                            play.touchNumberSeal(pageX: 172, pageY: 240)
+                        } label: {
+                            Image(systemName: "arrow.uturn.backward")
+                                .frame(width: 32 * scale, height: 32 * scale)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Leave sticker")
+                        .disabled(process.phase != .awaitingExit)
+                    }
+                    .contentShape(Rectangle())
+                    .onPageTap { point in
+                        guard scale > 0 else { return }
+                        play.touchNumberSeal(pageX: Int(point.x / scale), pageY: Int(point.y / scale))
+                    }
+                    .notebookPhotograph()
+                    .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+            }
+        }
+    }
 }
 
 /**

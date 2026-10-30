@@ -18,8 +18,7 @@ final class OriginalSwitchboardRenderer {
     }
 
     func render(_ puzzle: OriginalSwitchboardProcess) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8, bytesPerRow: 768,
-            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Switchboard context")
         }
         context.interpolationQuality = .none
@@ -27,7 +26,7 @@ final class OriginalSwitchboardRenderer {
         for (visible, rect) in [(puzzle.leftOn, CGRect(x: 19, y: 104, width: 52, height: 77)),
                                (puzzle.rightOn, CGRect(x: 120, y: 104, width: 51, height: 77)),
                                (puzzle.lightOn, CGRect(x: 80, y: 112, width: 32, height: 32))] where visible {
-            guard let crop = on.cropping(to: rect) else { throw OriginalDataError.invalid("Switchboard crop") }
+            guard let crop = on.croppingArtwork(to: rect) else { throw OriginalDataError.invalid("Switchboard crop") }
             context.draw(crop, in: CGRect(x: rect.minX, y: 256 - rect.maxY, width: rect.width, height: rect.height))
         }
         guard let result = context.makeImage() else { throw OriginalDataError.invalid("Switchboard render") }

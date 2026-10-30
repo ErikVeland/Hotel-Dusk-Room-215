@@ -19,8 +19,7 @@ final class OriginalCoinRenderer {
         background = try image("coin_bg")
     }
     func render(_ puzzle: OriginalCoinProcess) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8, bytesPerRow: 768,
-            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Coin puzzle context")
         }
         context.interpolationQuality = .none

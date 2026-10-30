@@ -20,33 +20,29 @@ public struct OriginalMemoDrawingImage {
     }
 
     public func render(_ drawing: OriginalMemoDrawing) throws -> CGImage {
-        let source = Array(background.rgba), glyphs = Array(symbols.rgba)
-        var rgba = [UInt8](repeating: 0, count: 192 * 256 * 4)
+        guard let context = OriginalArtwork.pageContext(),
+              let paper = OriginalArtwork.shared.image(rgba: background.rgba, width: background.storedWidth,
+                height: background.storedHeight, rotated: true),
+              let glyphs = OriginalArtwork.shared.image(rgba: symbols.rgba, width: symbols.storedWidth,
+                height: symbols.storedHeight, rotated: true) else {
+            throw OriginalDataError.invalid("Memo drawing context")
+        }
+        context.draw(paper, in: CGRect(x: 0, y: 0, width: 192, height: 256))
+        context.setFillColor(CGColor(gray: 0, alpha: 1))
         for y in 0..<256 { for x in 0..<192 {
-            let raw = x * 256 + 255 - y, target = (y * 192 + x) * 4
-            for c in 0..<3 { rgba[target + c] = drawing.pixels[raw] == 0 ? source[raw * 4 + c] : 0 }
-            rgba[target + 3] = 255
+            let raw = x * 256 + 255 - y
+            if drawing.pixels[raw] != 0 { context.fill(CGRect(x: x, y: 255 - y, width: 1, height: 1)) }
         } }
         func glyph(_ column: Int, at point: SIMD2<Int>) {
-            for y in 0..<16 { for x in 0..<16 {
-                let px = point.x + x, py = point.y + y
-                guard (0..<192).contains(px), (0..<256).contains(py) else { continue }
-                let raw = ((column + x) * symbols.storedWidth + 15 - y) * 4
-                guard raw + 3 < glyphs.count, glyphs[raw + 3] != 0 else { continue }
-                let target = (py * 192 + px) * 4
-                for c in 0..<3 { rgba[target + c] = glyphs[raw + c] }
-            } }
+            guard let image = glyphs.croppingArtwork(to: CGRect(x: column, y: 0, width: 16, height: 16)) else { return }
+            context.draw(image, in: CGRect(x: point.x, y: 256 - point.y - 16, width: 16, height: 16))
         }
         for (index, point) in drawing.points.enumerated() {
             let position = point.position &+ SIMD2(0, drawing.paper == .torn ? 59 : 0)
             glyph(index * 16, at: position)
             glyph([0x150, 0x180, 0x160][point.group], at: position &+ SIMD2(8, 8))
         }
-        guard let provider = CGDataProvider(data: Data(rgba) as CFData),
-              let image = CGImage(width: 192, height: 256, bitsPerComponent: 8, bitsPerPixel: 32,
-                bytesPerRow: 192 * 4, space: CGColorSpaceCreateDeviceRGB(),
-                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue), provider: provider,
-                decode: nil, shouldInterpolate: false, intent: .defaultIntent) else {
+        guard let image = context.makeImage() else {
             throw OriginalDataError.invalid("Memo drawing image")
         }
         return image

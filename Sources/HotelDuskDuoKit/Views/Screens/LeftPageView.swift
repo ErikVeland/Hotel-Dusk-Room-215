@@ -88,6 +88,11 @@ struct OriginalPlayPage: View {
                 OriginalPicturePeelPageView(play: play, screen: screen)
             } else if play.typewriter != nil {
                 OriginalTypewriterPageView(play: play, screen: screen)
+            } else if play.vendingMachine != nil {
+                OriginalVendingMachineView(play: play, screen: screen)
+            } else if play.numberSeal != nil {
+                if screen == 0 { OriginalNumberSealPageView(play: play) }
+                else { retainedNotes }
             } else if play.codeNotice != nil {
                 if screen == 0 { OriginalCodeNoticePageView(play: play) }
                 else { retainedNotes }

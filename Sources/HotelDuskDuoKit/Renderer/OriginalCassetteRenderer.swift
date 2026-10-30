@@ -67,7 +67,7 @@ final class OriginalCassetteRenderer: OriginalCassetteRendering {
     }
 
     func render() throws -> CGImage {
-        let scene = try OriginalModelMetalPreview.render(width: 256, height: 192,
+        let scene = try OriginalModelMetalPreview.render(width: 512, height: 384,
             device: device, queue: queue) { encoder in
                 tape.encode(encoder: encoder, viewProjection: Self.viewProjection,
                     visibleNodes: Set(tape.model.nodes.indices),
@@ -78,16 +78,13 @@ final class OriginalCassetteRenderer: OriginalCassetteRendering {
                 tableSurface.encode(encoder: encoder, viewProjection: Self.viewProjection,
                     modelTransform: Self.sourceTableTransform)
             }
-        var rgba = Data(count: 256 * 192 * 4)
-        rgba.withUnsafeMutableBytes { storage in
-            guard let context = CGContext(data: storage.baseAddress, width: 256, height: 192,
-                bitsPerComponent: 8, bytesPerRow: 256 * 4, space: CGColorSpaceCreateDeviceRGB(),
-                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return }
-            context.interpolationQuality = .none
-            context.draw(background, in: CGRect(x: 0, y: 0, width: 256, height: 192))
-            context.draw(scene, in: CGRect(x: 0, y: 0, width: 256, height: 192))
+        guard let context = OriginalArtwork.pageContext(width: 256, height: 192) else {
+            throw OriginalDataError.invalid("Cassette composition")
         }
-        guard let page = OriginalEntrancePanels.rotated(rgba: rgba, width: 256, height: 192) else {
+        context.draw(background, in: CGRect(x: 0, y: 0, width: 256, height: 192))
+        context.draw(scene, in: CGRect(x: 0, y: 0, width: 256, height: 192))
+        guard let combined = context.makeImage(),
+              let page = OriginalArtwork.shared.rotatedImage(combined, logicalWidth: 256, logicalHeight: 192) else {
             throw OriginalDataError.invalid("Cassette scene image")
         }
         return page

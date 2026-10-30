@@ -77,7 +77,7 @@ final class OriginalCassetteDeckRenderer: OriginalCassetteDeckRendering {
     }
 
     func render(camera: OriginalCassetteDeckCamera, state: SceneState) throws -> CGImage {
-        let scene = try OriginalModelMetalPreview.render(width: 256, height: 192,
+        let scene = try OriginalModelMetalPreview.render(width: 512, height: 384,
             device: device, queue: queue) { encoder in
                 radio.encode(encoder: encoder, viewProjection: camera.viewProjection,
                     visibleNodes: Set(radio.model.nodes.indices), modelTransform: state.radio.matrix)
@@ -86,17 +86,14 @@ final class OriginalCassetteDeckRenderer: OriginalCassetteDeckRendering {
                 tape.encode(encoder: encoder, viewProjection: camera.viewProjection,
                     visibleNodes: Set(tape.model.nodes.indices), modelTransform: state.tape.matrix)
             }
-        var rgba = Data(count: 256 * 192 * 4)
-        rgba.withUnsafeMutableBytes { storage in
-            guard let context = CGContext(data: storage.baseAddress, width: 256, height: 192,
-                bitsPerComponent: 8, bytesPerRow: 256 * 4, space: CGColorSpaceCreateDeviceRGB(),
-                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return }
-            context.setFillColor(CGColor(gray: 0, alpha: 1))
-            context.fill(CGRect(x: 0, y: 0, width: 256, height: 192))
-            context.interpolationQuality = .none
-            context.draw(scene, in: CGRect(x: 0, y: 0, width: 256, height: 192))
+        guard let context = OriginalArtwork.pageContext(width: 256, height: 192) else {
+            throw OriginalDataError.invalid("Cassette-deck composition")
         }
-        guard let page = OriginalEntrancePanels.rotated(rgba: rgba, width: 256, height: 192) else {
+        context.setFillColor(CGColor(gray: 0, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 256, height: 192))
+        context.draw(scene, in: CGRect(x: 0, y: 0, width: 256, height: 192))
+        guard let combined = context.makeImage(),
+              let page = OriginalArtwork.shared.rotatedImage(combined, logicalWidth: 256, logicalHeight: 192) else {
             throw OriginalDataError.invalid("Cassette-deck scene image")
         }
         return page

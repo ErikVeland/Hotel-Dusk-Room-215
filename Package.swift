@@ -33,6 +33,7 @@ let package = Package(
                 .copy("Resources/OriginalTextures"),
                 .copy("Resources/OriginalModels"),
                 .copy("Resources/OriginalBitmaps"),
+                .copy("Resources/EnhancedArtwork"),
                 .copy("Metal")
             ]
         ),

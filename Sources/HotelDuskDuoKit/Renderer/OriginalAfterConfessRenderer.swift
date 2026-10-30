@@ -39,15 +39,13 @@ final class OriginalAfterConfessRenderer {
     }
 
     private static func composite(base: CGImage, overlay: CGImage) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
-            bytesPerRow: 768, space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("AfterConfess image context")
         }
         context.interpolationQuality = .none
         context.draw(base, in: CGRect(x: 0, y: 0, width: 192, height: 256))
-        let width = min(192, overlay.width)
-        let height = min(256, overlay.height)
+        let width = min(192, overlay.artworkWidth)
+        let height = min(256, overlay.artworkHeight)
         context.draw(overlay, in: CGRect(x: (192 - width) / 2, y: (256 - height) / 2,
                                          width: width, height: height))
         guard let image = context.makeImage() else {
@@ -57,9 +55,7 @@ final class OriginalAfterConfessRenderer {
     }
 
     private static func blankPage() throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
-            bytesPerRow: 768, space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
+        guard let context = OriginalArtwork.pageContext(),
               let image = context.makeImage() else {
             throw OriginalDataError.invalid("AfterConfess blank page")
         }

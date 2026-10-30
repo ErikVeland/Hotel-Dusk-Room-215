@@ -40,9 +40,11 @@ struct NotebookDialogueSpread: View {
         let font: CGFloat
         let ink: [OriginalDialogueLines.Run]
         let visible: Bool
+        let singlePage: Bool
     }
     private struct WritingKey: Equatable {
         let end: Int
+        let revision: Int
         let paused: Bool
         let instant: Bool
         let turning: Bool
@@ -50,24 +52,34 @@ struct NotebookDialogueSpread: View {
 
     var body: some View {
         GeometryReader { proxy in
-            let metrics = DialogueSpreadMetrics(size: proxy.size, safeArea: safeArea,
-                                                showsItem: !notebook.isReviewing && play.acquiredItemImage != nil, stacked: stacked)
-            let key = LayoutKey(size: metrics.textSize, font: fontSize, ink: notebook.ink, visible: isVisible && scenePhase == .active)
-            let writing = WritingKey(end: notebook.reader.spreadEnd,
+            let inspection = !notebook.isReviewing && play.hasInspectionArtwork
+            let metrics = DialogueSpreadMetrics(size: proxy.size, safeArea: safeArea, stacked: stacked)
+            let key = LayoutKey(size: metrics.textSize, font: fontSize, ink: notebook.ink,
+                visible: isVisible && scenePhase == .active, singlePage: inspection)
+            let writing = WritingKey(end: notebook.reader.spreadEnd, revision: notebook.passageRevision,
                 paused: play.isPaused || notebook.isReviewing || scenePhase != .active || !isVisible,
                 instant: reduceMotion || voiceOver, turning: notebook.isTurning)
             Group {
                 if let layout = notebook.layout {
-                    #if canImport(UIKit)
-                    NativeNotebookCurl(play: play, notebook: notebook, layout: layout,
-                                       metrics: metrics, fontSize: fontSize, reduceMotion: reduceMotion,
-                                       gesturesEnabled: isVisible && (!play.isPaused || notebook.isReviewing))
-                        .id(stacked)
-                    #else
-                    DesktopNotebookSpread(play: play, notebook: notebook, layout: layout,
-                                          metrics: metrics, reduceMotion: reduceMotion,
-                                          gesturesEnabled: isVisible && (!play.isPaused || notebook.isReviewing))
-                    #endif
+                    if inspection {
+                        AnyLayout(stacked ? AnyLayout(VStackLayout(spacing: 0)) : AnyLayout(HStackLayout(spacing: 0))) {
+                            OriginalInspectionArtwork(play: play)
+                                .frame(width: metrics.pageSize.width, height: metrics.pageSize.height)
+                            NotebookDialogueLeaf(play: play, notebook: notebook, layout: layout,
+                                metrics: metrics, pageIndex: notebook.reader.leftIndex, inspection: true)
+                        }
+                    } else {
+                        #if canImport(UIKit)
+                        NativeNotebookCurl(play: play, notebook: notebook, layout: layout,
+                                           metrics: metrics, fontSize: fontSize, reduceMotion: reduceMotion,
+                                           gesturesEnabled: isVisible && (!play.isPaused || notebook.isReviewing))
+                            .id(stacked)
+                        #else
+                        DesktopNotebookSpread(play: play, notebook: notebook, layout: layout,
+                                              metrics: metrics, reduceMotion: reduceMotion,
+                                              gesturesEnabled: isVisible && (!play.isPaused || notebook.isReviewing))
+                        #endif
+                    }
                 } else {
                     HStack(spacing: 0) { PaperSurface(); PaperSurface(side: .right) }
                 }
@@ -75,7 +87,11 @@ struct NotebookDialogueSpread: View {
             .environment(\.layoutDirection, .leftToRight)
             .onChange(of: key, initial: true) { _, value in
                 guard value.visible else { return }
-                notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font))
+                notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font),
+                                   singlePage: value.singlePage)
+            }
+            .onChange(of: notebook.turnRevision) { _, revision in
+                if inspection, notebook.isTurning { notebook.finishTurn(revision: revision) }
             }
             .task(id: writing) {
                 guard !writing.paused, !writing.turning else { return }
@@ -112,6 +128,7 @@ struct NotebookDialogueLeaf: View {
     let layout: DialogueNotebookLayout
     let metrics: DialogueSpreadMetrics
     let pageIndex: Int
+    var inspection = false
 
     private func bindingShade(right: Bool) -> some View {
         LinearGradient(colors: [.black.opacity(0.28), .black.opacity(0.08), .clear],
@@ -131,7 +148,7 @@ struct NotebookDialogueLeaf: View {
 
     var body: some View {
         let page = notebook.reader.page(at: pageIndex)
-        let right = pageIndex % 2 == 1
+        let right = inspection || pageIndex % 2 == 1
         ZStack(alignment: .topLeading) {
             PaperSurface(side: right ? .right : .left)
             if metrics.stacked {
@@ -165,6 +182,15 @@ struct NotebookDialogueLeaf: View {
                 .lineLimit(1).minimumScaleFactor(0.7)
                 .position(x: metrics.margin + 53, y: metrics.top + 10)
                 .accessibilityHidden(true)
+            if !notebook.isReviewing, let portrait = play.encounterPortraits.first(where: { $0.screen == (right ? 0 : 1) }) {
+                OriginalAnimationFrameView(frame: portrait.frame)
+                    .frame(width: min(metrics.pageSize.width * 0.34, 150),
+                           height: min(metrics.pageSize.height * 0.34, 190))
+                    .opacity(0.22)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+                    .position(x: metrics.pageSize.width * 0.78, y: metrics.pageSize.height * 0.34)
+            }
             Canvas { context, _ in
                 context.withCGContext { layout.draw(page: page, revealedEnd: notebook.reader.revealedEnd, in: $0) }
             }
@@ -175,7 +201,7 @@ struct NotebookDialogueLeaf: View {
             .accessibilityLabel(layout.accessibleText(page: page))
             .offset(x: metrics.textOrigin.x, y: metrics.textOrigin.y)
 
-            if right, !notebook.isReviewing, let item = play.acquiredItemImage, metrics.itemArtworkSize > 0 {
+            if right, !inspection, !notebook.isReviewing, let item = play.acquiredItemImage, metrics.itemArtworkSize > 0 {
                 Image(decorative: item, scale: 1)
                     .resizable().interpolation(.high).scaledToFit()
                     .frame(width: metrics.itemArtworkSize, height: metrics.itemArtworkSize)
@@ -247,5 +273,31 @@ struct NotebookDialogueView: View {
                 .accessibilityLabel(layout.accessibleText(page: page))
             }
         }
+    }
+}
+
+struct OriginalInspectionArtwork: View {
+    @ObservedObject var play: OriginalPlaySession
+
+    var body: some View {
+        ZStack {
+            PaperSurface()
+            Group {
+                if play.acquiredItemImage != nil || play.touchPictureImages != nil {
+                    OriginalTouchPictureView(play: play)
+                } else if play.suitcaseContents != nil {
+                    OriginalSuitcaseContentsView(play: play, interactive: false)
+                } else if play.closeup != nil {
+                    OriginalSearchCloseupView(play: play, interactive: false)
+                } else if play.door != nil {
+                    OriginalDoorView(play: play, interactive: false)
+                } else if play.lobby?.mode == .counter {
+                    OriginalMapView(play: play, screen: 0)
+                }
+            }
+            .padding(20)
+            .allowsHitTesting(false)
+        }
+        .clipped()
     }
 }

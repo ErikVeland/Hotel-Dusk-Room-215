@@ -35,7 +35,7 @@ public final class OriginalModelMetalPreview {
     /// The caller can preserve materials whose original runtime texture slot was unbound.
     public init(modelPath: String, models: OriginalModelLibrary, textures: OriginalTextureLibrary,
                 device: MTLDevice, textureLoader: ((String) throws -> OriginalTexture)? = nil,
-                untexturedMaterials: Set<Int> = [], gameplayOnly: Bool = false) throws {
+                untexturedMaterials: Set<Int> = [], gameplayOnly: Bool = false, smoothTextures: Bool = false) throws {
         self.device = device
         model = try models.load(path: modelPath)
         guard let queue = device.makeCommandQueue() else { throw OriginalDataError.invalid("Metal command queue") }
@@ -102,7 +102,8 @@ public final class OriginalModelMetalPreview {
                 let repeatValue = material.originalRecord[46]
                 let repeatMask: UInt32 = repeatValue == 3 ? 3 : ([1, 2].contains(repeatValue) ? 1 : 0)
                 let flipValue = UInt32(material.originalRecord[47])
-                sampling = SIMD4(1, repeatMask, flipValue <= 3 ? flipValue : 0, 0)
+                sampling = SIMD4(UInt32(uploaded.width / texture.storedWidth), repeatMask,
+                                 flipValue <= 3 ? flipValue : 0, smoothTextures ? 1 : 0)
             }
             prepared.append(try Draw(node: group.node, buffers: geometry.makeMetalBuffers(device: device),
                                      texture: gpuTexture, dimensions: dimensions, sampling: sampling))
@@ -217,14 +218,29 @@ public final class OriginalModelMetalPreview {
         return mirror && p >= int(extent) ? period - 1 - p : p;
     }
     fragment float4 original_model_colour(Vertex in [[stage_in]]) { return float4(in.rgb, 1); }
+    float4 original_model_texel(int2 p, constant Uniforms &u, texture2d<float> tex) {
+        p.x = source_texel_address(p.x, u.dimensions.x * u.sampling.x, u.sampling.y & 1, u.sampling.z & 1);
+        p.y = source_texel_address(p.y, u.dimensions.y * u.sampling.x, u.sampling.y & 2, u.sampling.z & 2);
+        if (p.x >= int(u.dimensions.z * u.sampling.x) || p.y >= int(u.dimensions.w * u.sampling.x)) return float4(0);
+        return tex.read(uint2(p));
+    }
     fragment float4 original_model_fragment(Vertex in [[stage_in]], constant Uniforms &u [[buffer(1)]],
                                              texture2d<float> tex [[texture(0)]]) {
-        int2 p = int2(floor(in.uv));
-        p.x = source_texel_address(p.x, u.dimensions.x, u.sampling.y & 1, u.sampling.z & 1);
-        p.y = source_texel_address(p.y, u.dimensions.y, u.sampling.y & 2, u.sampling.z & 2);
-        // Omitted source texels remain undefined. Never synthesize padding.
-        if (p.x >= int(u.dimensions.z) || p.y >= int(u.dimensions.w)) discard_fragment();
-        float4 colour = tex.read(uint2(p));
+        float4 colour;
+        if (u.sampling.w != 0) {
+            float2 coordinate = in.uv * float(u.sampling.x) - 0.5;
+            int2 base = int2(floor(coordinate));
+            float2 weight = fract(coordinate);
+            float4 a = original_model_texel(base, u, tex);
+            float4 b = original_model_texel(base + int2(1, 0), u, tex);
+            float4 c = original_model_texel(base + int2(0, 1), u, tex);
+            float4 d = original_model_texel(base + int2(1, 1), u, tex);
+            a.rgb *= a.a; b.rgb *= b.a; c.rgb *= c.a; d.rgb *= d.a;
+            colour = mix(mix(a, b, weight.x), mix(c, d, weight.x), weight.y);
+            if (colour.a > 0) colour.rgb /= colour.a;
+        } else {
+            colour = original_model_texel(int2(floor(in.uv * float(u.sampling.x))), u, tex);
+        }
         if (colour.a == 0) discard_fragment();
         return float4(colour.rgb * in.rgb, colour.a);
     }

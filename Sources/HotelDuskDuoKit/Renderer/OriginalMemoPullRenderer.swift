@@ -68,7 +68,7 @@ public final class OriginalMemoPullRenderer: OriginalMemoPullRendering {
         func object(_ position: SIMD3<Float>, scale: Float) -> simd_float4x4 {
             scene * Self.translation(position / 4096) * simd_float4x4(diagonal: SIMD4(scale, scale, scale, 1))
         }
-        return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
             cabinet.encode(encoder: encoder, viewProjection: projection, visibleNodes: Set(cabinet.model.nodes.indices),
                            modelTransform: object(SIMD3(3482, 82, 0), scale: 5652 / 4096))
             wall.encode(encoder: encoder, viewProjection: projection, visibleNodes: Set(wall.model.nodes.indices),

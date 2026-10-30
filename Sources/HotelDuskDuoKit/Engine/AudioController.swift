@@ -38,6 +38,7 @@ public final class AudioController: ObservableObject {
     private var recordings: RecordedMusicLibrary?
     private var musicOutputFactory: MusicOutputFactory?
     var isRestoringProgress = false
+    var restoresLegacyInteractions = false
     private var preferences: UserDefaults?
     private var effects: OriginalEffectPlayback?
     private var library: OriginalAudioLibrary?

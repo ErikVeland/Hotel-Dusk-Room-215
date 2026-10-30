@@ -36,6 +36,8 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var nativeNotebookPages: [String: Data] = [:]
     private var notebookTouch: SIMD2<Int>?
     @Published public private(set) var runner: OriginalEventRunner
+    @Published public private(set) var encounterPortraits: [OriginalEncounterAnimations.Portrait] = []
+    private var encounterAnimations: OriginalEncounterAnimations?
     @Published public private(set) var entrance: EntranceScene?
     @Published public private(set) var bell: BellScene?
 
@@ -45,6 +47,12 @@ public final class OriginalPlaySession: ObservableObject {
         public var quitEnabled: Bool
     }
     @Published public private(set) var sign: SignScene?
+    @Published public private(set) var vendingMachine: OriginalVendingMachineProcess?
+    @Published public private(set) var vendingMachineImage: CGImage?
+    @Published public private(set) var vendingMachineProducts: [UInt8: CGImage] = [:]
+    @Published public private(set) var numberSeal: OriginalNumberSealProcess?
+    @Published public private(set) var numberSealImage: CGImage?
+    private var numberSealTouch: SIMD2<Int>?
     @Published public private(set) var codeNotice: OriginalCodeNoticeProcess?
     @Published public private(set) var codeNoticeImage: CGImage?
     @Published public private(set) var codeNoticeCaption: String?
@@ -222,6 +230,7 @@ public final class OriginalPlaySession: ObservableObject {
     private var searchParent: OriginalEventRunner?
     /// The conversation that a notebook memo response interrupts.
     private var memoParent: OriginalEventRunner?
+    private var shownItemParent: OriginalEventRunner?
     private var pendingCloseup: (area: UInt16, subarea: UInt16, view: UInt16)?
     private var pendingChildCloseup: (view: UInt16, requestStart: Int)?
     private var closeupParents: [(scene: OriginalSearchCloseup, bitmaps: [OriginalLinearBitmap])] = []
@@ -250,6 +259,7 @@ public final class OriginalPlaySession: ObservableObject {
     private let bagSearchRendererFactory: OriginalBagSearchRendererFactory
     private var lobbyTouch: SIMD2<Float>?
     private var firstPersonMovement: SIMD2<Float>?
+    private var usesLegacyInteractionPacing = false
     private var hasReturnedFromDunningIntroduction = false
     private var signProcess: OriginalSignProcess?
     private var heldTouch: OriginalEntranceProcess.Touch?
@@ -288,7 +298,7 @@ public final class OriginalPlaySession: ObservableObject {
     public var canSaveWalkingCheckpoint: Bool {
         guard case .exploration(let map) = runner.phase else { return false }
         return lobby?.mapID == map && lobby?.mode == .walking && chapterTransition == nil
-            && notebook == nil && door == nil && closeup == nil && searchParent == nil && memoParent == nil
+            && notebook == nil && door == nil && closeup == nil && searchParent == nil && memoParent == nil && shownItemParent == nil
             && jigsawParent == nil && toiletTankParent == nil && differencesParent == nil && switchboardParent == nil && suitcaseContentsParent == nil && pendingDeparture == nil
             && pendingDoorOpen == nil && pendingCloseup == nil && pendingChildCloseup == nil
             && handledMapRequests == runner.processRequests.count
@@ -296,7 +306,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     var canReviewConversations: Bool {
         guard !dialogueNotebook.ink.isEmpty, chapterTransition == nil, notebook == nil,
-              process == nil, bellProcess == nil, signProcess == nil, codeNotice == nil, picturePeel == nil, jigsaw == nil,
+              process == nil, bellProcess == nil, signProcess == nil, vendingMachine == nil, numberSeal == nil, codeNotice == nil, picturePeel == nil, jigsaw == nil,
               clock == nil, suitcaseKey == nil, thinWire == nil, hanger == nil, switchboard == nil, fountainPen == nil, bookmarkBox == nil, dollRepair == nil, coinPuzzle == nil, matchsticks == nil, jukebox == nil, linenWagon == nil, differences == nil, toiletTank == nil,
               suitcaseContents == nil, memoPull == nil, cabinetDial == nil,
               crowbar == nil, memoDrawing == nil, paperclip == nil, labelPeel == nil, christmasTree == nil, searchShed == nil,
@@ -353,8 +363,10 @@ public final class OriginalPlaySession: ObservableObject {
                 bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() }) {
         self.runner = runner
         self.audio = audio
+        usesLegacyInteractionPacing = audio.restoresLegacyInteractions
         self.originalEffectPlayer = originalEffectPlayer
         self.catalog = catalog
+        encounterAnimations = try? OriginalEncounterAnimations(catalog: catalog)
         self.fixture = fixture
         self.jigsawSeed = jigsawSeed
         self.puzzleSeed = puzzleSeed
@@ -563,7 +575,12 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.showItemInConversation(item: item))
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, case .questions = runner.phase else { return }
-        runner.showItem(item)
+        do {
+            if let response = try runner.showItem(item, catalog: catalog) {
+                shownItemParent = runner
+                runner = response
+            }
+        } catch { runner.halt("The shared item response could not be loaded: \(error)") }
         settle()
     }
 
@@ -696,6 +713,24 @@ public final class OriginalPlaySession: ObservableObject {
         guard !isPaused, case .process(let id) = runner.phase, id == 62 || id == 67,
               (0..<192).contains(pageX), (0..<256).contains(pageY), codeNotice != nil else { return }
         pendingCodeNoticeTouch = SIMD2(pageX, pageY)
+    }
+
+    public func touchNumberSeal(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(.touchNumberSeal(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
+        guard !isPaused, runner.phase == .process(id: 87), numberSeal != nil,
+              (0..<192).contains(pageX), (0..<256).contains(pageY) else { return }
+        numberSealTouch = SIMD2(pageX, pageY)
+    }
+
+    public func vendingMachineAction(_ action: OriginalVendingMachineProcess.Action) {
+        let recordsProgress = beginProgressInput(.vendingMachine(action: action))
+        defer { endProgressInput(recordsProgress) }
+        guard !isPaused, runner.phase == .process(id: 57), var process = vendingMachine else { return }
+        if let sound = process.receive(action) {
+            try? audio.playOriginalEffect(archiveID: action == .quit ? 8 : 52, entryID: sound)
+        }
+        vendingMachine = process
     }
 
     /**
@@ -1766,6 +1801,15 @@ public final class OriginalPlaySession: ObservableObject {
         crowbarTouch = nil
     }
 
+    var hasInspectionArtwork: Bool {
+        switch runner.phase {
+        case .dialogue, .itemNotice, .waiting:
+            return acquiredItemImage != nil || touchPictureImages != nil || closeup != nil || door != nil
+                || suitcaseContents != nil || lobby?.mode == .counter
+        default: return false
+        }
+    }
+
     /// Starts whatever the runner's current phase needs from the host.
     private func settle() {
         defer {
@@ -1773,6 +1817,12 @@ public final class OriginalPlaySession: ObservableObject {
         }
         if chapterTransition != nil { startTimer(); return }
         if notebook != nil { startTimer(); return }
+        switch runner.phase {
+        case .dialogue, .itemNotice, .picture, .waiting: break
+        default:
+            touchPictureImages = nil
+            acquiredItemImage = nil
+        }
         /**
          * 0x0203E7C8 leaves the door close-up when its transition starts a person's normal event.
          */
@@ -1787,11 +1837,21 @@ public final class OriginalPlaySession: ObservableObject {
         switch runner.phase {
         case .dialogue(let packet):
             startTimer()
-            touchPictureImages = nil
-            acquiredItemImage = nil
+            do {
+                try encounterAnimations?.present(packet, program: runner.program.name)
+                encounterPortraits = encounterAnimations?.portraits ?? []
+            } catch {
+                encounterAnimations?.clear()
+                encounterPortraits = []
+            }
             if presentedPacketOffset != packet.sourceOffset {
                 presentedPacketOffset = packet.sourceOffset
                 applyAudioControls(packet)
+            }
+            if !usesLegacyInteractionPacing, packet.pages.allSatisfy({ OriginalDialogueLines(page: $0).isEmpty }) {
+                dialogueNotebook.endPresentation()
+                runner.acknowledgeDialogue()
+                return settle()
             }
         case .picture(let id):
             if touchPicture == nil {
@@ -1840,6 +1900,39 @@ public final class OriginalPlaySession: ObservableObject {
             startTimer()
         case .process(63):
             cpr = OriginalCPRProcess()
+        case .process(57):
+            if vendingMachine == nil {
+                do {
+                    let process = OriginalVendingMachineProcess(
+                        randomInfo: runner.memoRandomInfo(seed: nextProgressSeed(jigsaw: false)),
+                        shifted: runner.game.bytes[0x137F] != 0,
+                        itemStates: Array(runner.game.bytes[0x9D..<0xF5]))
+                    let renderer = try OriginalVendingMachineRenderer(library: .bundled())
+                    vendingMachine = process
+                    vendingMachineImage = renderer.keypad
+                    vendingMachineProducts = renderer.products
+                } catch {
+                    runner.halt("The vending machine could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
+        case .process(87):
+            if numberSeal == nil {
+                do {
+                    let process = OriginalNumberSealProcess(mapID: runner.game.mapID,
+                        randomInfo: runner.memoRandomInfo(seed: nextProgressSeed(jigsaw: false)),
+                        shifted: runner.game.bytes[0x137F] != 0)
+                    let renderer = try OriginalNumberSealRenderer(process: process, library: .bundled())
+                    numberSeal = process
+                    numberSealImage = renderer.image
+                    numberSealTouch = nil
+                } catch {
+                    runner.halt("The numbered sticker could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
         case .process(62), .process(67):
             if codeNotice == nil {
                 do {
@@ -2476,6 +2569,13 @@ public final class OriginalPlaySession: ObservableObject {
                 jigsaw?.finishHint()
                 return settle()
             }
+            if var parent = shownItemParent {
+                parent.resumeConversation(after: runner)
+                runner = parent
+                shownItemParent = nil
+                presentedPacketOffset = nil
+                return settle()
+            }
             if var parent = memoParent {
                 parent.resumeConversation(after: runner)
                 runner = parent
@@ -2676,6 +2776,11 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         // Music and effect fades continue while reading, browsing and choosing.
         audio.advanceOriginalFrame()
+        if case .dialogue = runner.phase {
+            if (try? encounterAnimations?.advance()) == true {
+                encounterPortraits = encounterAnimations?.portraits ?? []
+            }
+        }
         guard !isBrowsingInventory, chapterTransition == nil else { return }
         if notebook != nil {
             if let touch = notebookTouch {
@@ -2694,7 +2799,7 @@ public final class OriginalPlaySession: ObservableObject {
             let people = lobby?.people(in: runner.game).map(\.position) ?? []
             let previousPosition = lobby?.position
             if let movement = firstPersonMovement {
-                lobby?.update(firstPersonMovement: movement, people: people)
+                lobby?.update(firstPersonMovement: movement, people: people, modernPace: !usesLegacyInteractionPacing)
             } else {
                 lobby?.update(heldPageTouch: lobbyTouch, people: people)
             }
@@ -2726,6 +2831,8 @@ public final class OriginalPlaySession: ObservableObject {
             runner.advanceWait()
             return settle()
         }
+        if vendingMachine != nil { return updateVendingMachine() }
+        if numberSeal != nil { return updateNumberSeal() }
         if codeNotice != nil { return updateCodeNotice() }
         if afterConfess != nil { return updateAfterConfess() }
         if vsScene != nil { return updateVSScene() }
@@ -2917,6 +3024,38 @@ public final class OriginalPlaySession: ObservableObject {
         pencilSharpenerImage = nil
         stopTimer()
         runner.finishProcess(returnValue: returnValue)
+        settle()
+    }
+
+    private func updateVendingMachine() {
+        guard var process = vendingMachine else { return stopTimer() }
+        if let sound = process.update() {
+            try? audio.playOriginalEffect(archiveID: 52, entryID: sound)
+        }
+        vendingMachine = process
+        guard let result = process.result else { return }
+        vendingMachine = nil
+        vendingMachineImage = nil
+        vendingMachineProducts = [:]
+        stopTimer()
+        runner.finishProcess(returnValue: result)
+        settle()
+    }
+
+    private func updateNumberSeal() {
+        guard var process = numberSeal else { return stopTimer() }
+        let previous = process.phase
+        process.update(touch: numberSealTouch)
+        numberSealTouch = nil
+        numberSeal = process
+        if previous == .awaitingExit, case .fadingOut = process.phase {
+            try? audio.playOriginalEffect(archiveID: 8, entryID: 2)
+        }
+        guard let result = process.result else { return }
+        numberSeal = nil
+        numberSealImage = nil
+        stopTimer()
+        runner.finishProcess(returnValue: result)
         settle()
     }
 
@@ -4059,6 +4198,7 @@ public final class OriginalPlaySession: ObservableObject {
     public func finishFirstPersonLook() {
         let recordsProgress = beginProgressInput(.finishFirstPersonLook)
         defer { endProgressInput(recordsProgress) }
+        if canSaveWalkingCheckpoint { redrawLobby() }
         checkpointWalking()
     }
 
@@ -4068,6 +4208,7 @@ public final class OriginalPlaySession: ObservableObject {
         lobbyTouch = nil
         firstPersonMovement = nil
         if case .exploration = runner.phase { lobby?.update(heldPageTouch: nil) }
+        if canSaveWalkingCheckpoint { redrawLobby() }
         checkpointWalking()
     }
 
@@ -4495,12 +4636,15 @@ public final class OriginalPlaySession: ObservableObject {
             _ = try checkpoint.gameState()
             let wasMuted = audio.isMuted
             let wasRestoring = audio.isRestoringProgress
+            let wasLegacy = audio.restoresLegacyInteractions
             var restored = false
             audio.isMuted = true
             audio.isRestoringProgress = true
+            audio.restoresLegacyInteractions = journal.qualityOfLifeVersion == nil
             defer {
                 audio.stopAll()
                 audio.isRestoringProgress = wasRestoring
+                audio.restoresLegacyInteractions = wasLegacy
                 audio.isMuted = wasMuted
                 if restored, let sequence = checkpoint.musicSequenceID {
                     try? audio.playOriginalSequence(id: sequence)
@@ -4810,6 +4954,7 @@ extension OriginalPlaySession {
 
     private func prepareProgress(_ journal: OriginalPlayProgress) {
         progressJournal = journal
+        usesLegacyInteractionPacing = journal.qualityOfLifeVersion == nil
         nativeNotebookPages = journal.nativeNotebookPages ?? [:]
         usesInstantSaves = journal.usesInstantSaves
         dialogueNotebook.onSaveProgress = { [weak self] _ in self?.notifyProgress() }
@@ -4877,6 +5022,7 @@ extension OriginalPlaySession {
                 let base = unchanged ? progressJournal!.base : try JSONEncoder().encode(checkpoint)
                 progressJournal = OriginalPlayProgress(origin: .walking, base: base, baseSession: runner.session,
                     baseRuntimePosition: runner.game.mapPosition, baseRuntimeFacing: runner.game.facing, usesInstantSaves: usesInstantSaves)
+                usesLegacyInteractionPacing = false
             } catch { onProgressSaveError?(error) }
         }
         notifyProgress()

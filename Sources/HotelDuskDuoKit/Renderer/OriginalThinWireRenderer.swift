@@ -40,7 +40,7 @@ public final class OriginalThinWireRenderer: OriginalThinWireRendering {
         if variant.isDoor {
             let texture = try bitmaps.loadTexture(path: "trick/bag/\(variant == .door ? "d218" : "chika").bin")
             let rotated = OriginalEntrancePanels.rotated(rgba: texture.rgba, width: texture.storedWidth, height: texture.storedHeight)
-            guard let image = rotated?.cropping(to: CGRect(x: 0, y: texture.storedWidth - texture.logicalWidth,
+            guard let image = rotated?.croppingArtwork(to: CGRect(x: 0, y: texture.storedWidth - texture.logicalWidth,
                 width: texture.logicalHeight, height: texture.logicalWidth)) else {
                 throw OriginalDataError.invalid("Door lock picture")
             }
@@ -59,7 +59,7 @@ public final class OriginalThinWireRenderer: OriginalThinWireRendering {
     public func render(_ puzzle: OriginalThinWireProcess) throws -> CGImage {
         if puzzle.showsLock { return try renderLock(puzzle) }
         let projection = OriginalSuitcaseProjection.viewProjection(eye: puzzle.eye, target: puzzle.target)
-        return try OriginalModelMetalPreview.render(width: 192, height: 256, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
             wire.encode(encoder: encoder, viewProjection: projection, visibleNodes: Set(wire.model.nodes.indices),
                 modelTransform: Self.transform(position: puzzle.drawnWire,
                     scale: puzzle.variant == .thin ? 0.006 : 0.06,
@@ -74,8 +74,7 @@ public final class OriginalThinWireRenderer: OriginalThinWireRendering {
     }
 
     private func renderLock(_ puzzle: OriginalThinWireProcess) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8, bytesPerRow: 192 * 4,
-            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Thin-wire lock image context")
         }
         context.interpolationQuality = .none

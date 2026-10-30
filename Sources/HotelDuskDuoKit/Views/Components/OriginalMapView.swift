@@ -6,6 +6,7 @@ import SwiftUI
 struct OriginalMapView: View {
     @ObservedObject var play: OriginalPlaySession
     let screen: UInt8
+    @AppStorage("modernNavigation") private var modernNavigation = true
     @State private var showsInventory = false
     @State private var lastLookTranslation: CGFloat = 0
 
@@ -18,6 +19,8 @@ struct OriginalMapView: View {
                         play.useItemInSearchView(item)
                     } : nil,
                     onClose: { showsInventory = false })
+            } else if modernNavigation, screen == 1, lobby.mode == .walking {
+                modernView(lobby)
             } else {
                 VStack(spacing: 8) {
                     GeometryReader { proxy in
@@ -30,7 +33,8 @@ struct OriginalMapView: View {
                                     .frame(width: 192, height: 256, alignment: .topLeading)
                                     .offset(x: CGFloat(lobby.mapBitmapOffset.x), y: CGFloat(lobby.mapBitmapOffset.y))
                             } else if let image = play.lobbyImage {
-                                Image(decorative: image, scale: 1).interpolation(.none)
+                                Image(decorative: image, scale: 1).resizable().interpolation(.high)
+                                    .frame(width: 192, height: 256)
                             }
                         }
                         .frame(width: 192, height: 256)
@@ -71,7 +75,8 @@ struct OriginalMapView: View {
                         .accessibilityLabel(lobby.mode == .walking ? (screen == 0 ? "Floor plan" : "3D view. Drag to look around.") : "Search view")
                     }
                     if screen == 1, lobby.mode == .walking {
-                        OriginalNavigationControls(play: play)
+                        Text("Hold a direction on the floor plan to walk.")
+                            .font(NovelStyle.caption)
                         interactionButtons
                     }
                     if screen == 0 {
@@ -105,9 +110,58 @@ struct OriginalMapView: View {
         }
     }
 
+    private func modernView(_ lobby: OriginalMapExploration) -> some View {
+        VStack(spacing: 8) {
+            Text(OriginalMapExploration.displayName(for: lobby.mapID))
+                .font(NovelStyle.imprint)
+            GeometryReader { proxy in
+                let input = OriginalPageInput(available: proxy.size)
+                ZStack(alignment: .bottomLeading) {
+                    Color.black
+                    if let image = play.lobbyImage {
+                        Image(decorative: image, scale: 1)
+                            .resizable().interpolation(.high)
+                            .frame(width: input.size.width, height: input.size.height)
+                            .frame(width: proxy.size.width, height: proxy.size.height)
+                    }
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                let delta = value.translation.width - lastLookTranslation
+                                lastLookTranslation = value.translation.width
+                                play.turnFirstPerson(by: -Float(delta) * 0.008)
+                            }
+                            .onEnded { value in
+                                lastLookTranslation = 0
+                                play.finishFirstPersonLook()
+                                guard OriginalPageInput.isTap(from: value.startLocation, to: value.location) else { return }
+                                let origin = CGPoint(x: (proxy.size.width - input.size.width) / 2,
+                                                     y: (proxy.size.height - input.size.height) / 2)
+                                if let point = input.point(CGPoint(x: value.startLocation.x - origin.x,
+                                                                  y: value.startLocation.y - origin.y)) {
+                                    play.selectLobbyRoomObject(x: Float(point.x), y: Float(point.y))
+                                }
+                            })
+                    OriginalNavigationControls(play: play, compact: true)
+                        .padding(8)
+                        .background(NovelStyle.paper.opacity(0.88), in: Circle())
+                        .padding(12)
+                }
+                .clipped()
+                .accessibilityLabel("3D view. Drag to look; use the movement pad to walk.")
+            }
+            Text("Drag to look · Hold the pad to walk or move sideways")
+                .font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
+            interactionButtons
+        }
+        .onChange(of: modernNavigation) { _, _ in play.releaseLobbyTouch() }
+        .onDisappear { lastLookTranslation = 0; play.releaseLobbyTouch() }
+    }
+
     private var interactionButtons: some View {
         HStack {
-            Button("Door") { play.inspectNearbyDoor() }.disabled(play.nearbyDoor == nil)
+            Button(play.nearbyDoor.map { OriginalMapExploration.displayName(for: $0) } ?? "Door") { play.inspectNearbyDoor() }.disabled(play.nearbyDoor == nil)
             Button("Inspect") { play.inspectLobbyCounter() }
                 .disabled(play.lobby?.canInspectCounter(in: play.runner.game) != true)
             Button("Talk") { play.talkToNearbyPerson() }

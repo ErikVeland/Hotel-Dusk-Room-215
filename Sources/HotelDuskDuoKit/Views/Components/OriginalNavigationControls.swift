@@ -3,6 +3,7 @@ import SwiftUI
 /// The pad moves relative to the camera. Releasing it always stops movement.
 struct OriginalNavigationControls: View {
     @ObservedObject var play: OriginalPlaySession
+    var compact = false
     @GestureState private var touch: CGPoint?
     private let diameter: CGFloat = 112
 
@@ -38,8 +39,10 @@ struct OriginalNavigationControls: View {
                 .onEnded { _ in play.releaseLobbyTouch() })
             .accessibilityLabel("Movement pad")
             .accessibilityHint("Hold up or down to walk. Hold left or right to move sideways.")
-            Text("Drag the view to look around.\n\nHold the pad to walk or move sideways.")
-                .font(NovelStyle.caption)
+            if !compact {
+                Text("Drag the view to look around.\n\nHold the pad to walk or move sideways.")
+                    .font(NovelStyle.caption)
+            }
         }
         .foregroundStyle(NovelStyle.ink)
         .onDisappear { play.releaseLobbyTouch() }

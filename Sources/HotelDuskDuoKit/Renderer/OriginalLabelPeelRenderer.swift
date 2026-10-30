@@ -39,9 +39,7 @@ final class OriginalLabelPeelRenderer {
     }
 
     func render(_ process: OriginalLabelPeelProcess) throws -> CGImage {
-        guard let context = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
-            bytesPerRow: 768, space: CGColorSpaceCreateDeviceRGB(),
-            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+        guard let context = OriginalArtwork.pageContext() else {
             throw OriginalDataError.invalid("Wine label image context")
         }
         context.interpolationQuality = .none
@@ -61,12 +59,8 @@ final class OriginalLabelPeelRenderer {
         for index in process.mask.indices where process.mask[index] == 0 || process.mask[index] >= 128 {
             rgba[index * 4 + 3] = 0
         }
-        guard let provider = CGDataProvider(data: Data(rgba) as CFData),
-              let colourSpace = CGColorSpace(name: CGColorSpace.sRGB),
-              let labelImage = CGImage(width: label.storedWidth, height: label.storedHeight,
-                  bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: label.storedWidth * 4,
-                  space: colourSpace, bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
-                  provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent) else {
+        guard let labelImage = OriginalArtwork.shared.maskedImage(rgba: label.rgba,
+            width: label.storedWidth, height: label.storedHeight, maskRGBA: Data(rgba)) else {
             throw OriginalDataError.invalid("Wine label texture")
         }
         context.draw(labelImage, in: .init(x: 32, y: 48, width: 128, height: 160))
@@ -75,14 +69,7 @@ final class OriginalLabelPeelRenderer {
     }
 
     private static func image(_ texture: OriginalTexture) throws -> CGImage {
-        guard let provider = CGDataProvider(data: texture.rgba as CFData),
-              let colourSpace = CGColorSpace(name: CGColorSpace.sRGB),
-              let image = CGImage(width: texture.storedWidth, height: texture.storedHeight,
-                  bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: texture.storedWidth * 4,
-                  space: colourSpace, bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue),
-                  provider: provider, decode: nil, shouldInterpolate: false, intent: .defaultIntent) else {
-            throw OriginalDataError.invalid("Wine label texture")
-        }
+        guard let image = texture.makeCGImage() else { throw OriginalDataError.invalid("Wine label texture") }
         return image
     }
 }

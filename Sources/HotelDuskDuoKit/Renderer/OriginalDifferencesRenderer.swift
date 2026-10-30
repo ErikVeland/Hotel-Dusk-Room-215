@@ -13,21 +13,20 @@ final class OriginalDifferencesRenderer {
     }
     func makeProcess() throws -> OriginalDifferencesProcess { try .init(mask: Array(background.originalPixelData)) }
     func render(_ puzzle: OriginalDifferencesProcess) throws -> CGImage {
-        let source = Array(background.rgba)
-        var pixels = [UInt8](repeating: 0, count: 192 * 256 * 4)
-        let colour: [UInt8] = [231, 82, 82] // Original BGR555 palette entry 0x295C.
+        guard let context = OriginalArtwork.pageContext(),
+              let artwork = OriginalArtwork.shared.image(rgba: background.rgba, width: background.storedWidth,
+                height: background.storedHeight, rotated: true) else {
+            throw OriginalDataError.invalid("Pamphlet context")
+        }
+        context.draw(artwork, in: CGRect(x: 0, y: 0, width: 192, height: 256))
+        context.setFillColor(CGColor(red: 231.0 / 255, green: 82.0 / 255, blue: 82.0 / 255, alpha: 1))
         for y in 0..<256 { for x in 0..<192 {
-            let raw = x * 256 + 255 - y, at = (y * 192 + x) * 4
-            for channel in 0..<3 {
-                pixels[at + channel] = puzzle.drawing.pixels[raw] == 0 ? source[raw * 4 + channel] : colour[channel]
+            let raw = x * 256 + 255 - y
+            if puzzle.drawing.pixels[raw] != 0 {
+                context.fill(CGRect(x: x, y: 255 - y, width: 1, height: 1))
             }
-            pixels[at + 3] = 255
         } }
-        guard let provider = CGDataProvider(data: Data(pixels) as CFData),
-              let image = CGImage(width: 192, height: 256, bitsPerComponent: 8, bitsPerPixel: 32,
-                bytesPerRow: 768, space: CGColorSpaceCreateDeviceRGB(),
-                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.last.rawValue), provider: provider,
-                decode: nil, shouldInterpolate: false, intent: .defaultIntent) else {
+        guard let image = context.makeImage() else {
             throw OriginalDataError.invalid("Pamphlet image")
         }
         return image

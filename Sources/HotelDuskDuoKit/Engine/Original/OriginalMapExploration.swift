@@ -9,6 +9,12 @@ public struct OriginalMapExploration {
     public enum Mode: Equatable { case walking, counter }
     public let mapID: Int16
     public static let supportedMaps = OriginalMapCatalog.maps.mapValues(\.name)
+    private static let mapLabels = AssetLoader.shared.loadCatalog()?.maps ?? []
+
+    public static func displayName(for mapID: Int16) -> String {
+        let index = Int(mapID) - 1
+        return mapLabels.indices.contains(index) ? mapLabels[index] : "Door"
+    }
     /**
      * Name order in 0x020FAB2C, used by 0x0209C04C to resolve model markers.
      */
@@ -296,13 +302,14 @@ public struct OriginalMapExploration {
     }
 
     /// Smooth movement relative to the camera; backwards and strafing retain the view direction.
-    public mutating func update(firstPersonMovement input: SIMD2<Float>, people: [SIMD3<Float>] = []) {
+    public mutating func update(firstPersonMovement input: SIMD2<Float>, people: [SIMD3<Float>] = [], modernPace: Bool = true) {
         checkpointFacing = facing
         guard mode == .walking, input.x.isFinite, input.y.isFinite else { return }
         let length = hypot(input.x, input.y)
         guard length > 0.12 else { return }
         let direction = input / max(1, length)
-        let speed: Float = Float(Int(246 * 1.1 * ([17, 19, 39].contains(mapID) ? 1.35 : 1)))
+        let pace = modernPace ? 1.8 : 1.1
+        let speed: Float = Float(Int(246 * pace * ([17, 19, 39].contains(mapID) ? 1.35 : 1)))
         let forward = SIMD3<Float>(sin(facing), 0, cos(facing))
         let right = SIMD3<Float>(-cos(facing), 0, sin(facing))
         previousPosition = position

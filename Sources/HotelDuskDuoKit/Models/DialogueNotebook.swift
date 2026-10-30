@@ -9,44 +9,63 @@ final class DialogueNotebook: ObservableObject {
             let text: String
             let colour: UInt8
             let person: Int32?
+            var verbatim: Bool? = nil
         }
         let ink: [Ink]
         let readingAnchor: Int
         let revealedEnd: Int
         var reviewAnchor: Int? = nil
+        var retraceEnd: Int? = nil
+        var furthestRevealedEnd: Int? = nil
+        var reviewPassageEnd: Int? = nil
+        var reviewRevealedEnd: Int? = nil
     }
 
     var onSaveProgress: ((Bool) -> Void)?
 
     func savedState() -> SavedState {
-        SavedState(ink: ink.map { .init(text: $0.text, colour: $0.colour, person: $0.person) },
+        SavedState(ink: ink.map { .init(text: $0.text, colour: $0.colour, person: $0.person, verbatim: $0.verbatim) },
             readingAnchor: isTurning && (isHoldingTurn || !turnWillComplete) ? turnAnchor : readingAnchor,
-            revealedEnd: reader.revealedEnd, reviewAnchor: reviewAnchor)
+            revealedEnd: reader.revealedEnd, reviewAnchor: reviewAnchor,
+            retraceEnd: reader.passageEnd, furthestRevealedEnd: max(furthestRevealedEnd, reader.revealedEnd),
+            reviewPassageEnd: reviewPassageEnd, reviewRevealedEnd: reviewRevealedEnd)
     }
 
     func restore(_ saved: SavedState) {
-        ink = saved.ink.map { .init(text: $0.text, colour: $0.colour, person: $0.person) }
+        ink = saved.ink.map { .init(text: $0.text, colour: $0.colour, person: $0.person, verbatim: $0.verbatim ?? false) }
         readingAnchor = saved.readingAnchor
-        reader = Reader(revealedEnd: saved.revealedEnd)
+        reader = Reader(revealedEnd: saved.revealedEnd, passageEnd: saved.retraceEnd)
+        furthestRevealedEnd = saved.furthestRevealedEnd ?? saved.revealedEnd
         layout = nil
         pendingLayout = !ink.isEmpty
         isHoldingTurn = false
         isTurning = false
         reviewAnchor = saved.reviewAnchor
+        reviewPassageEnd = saved.reviewPassageEnd
+        reviewRevealedEnd = saved.reviewRevealedEnd
     }
     struct Reader: Equatable {
         var pages: [NSRange] = []
         var spreadIndex = 0
         var revealedEnd = 0
-        var leftIndex: Int { spreadIndex * 2 }
+        var passageEnd: Int?
+        var pagesPerSpread = 2
+        var leftIndex: Int { spreadIndex * pagesPerSpread }
         func page(at index: Int) -> NSRange {
             pages.indices.contains(index) ? pages[index] : NSRange(location: pages.last.map(NSMaxRange) ?? 0, length: 0)
         }
-        var spreadEnd: Int { max(NSMaxRange(page(at: leftIndex)), NSMaxRange(page(at: leftIndex + 1))) }
+        var spreadEnd: Int {
+            let end = NSMaxRange(page(at: leftIndex + pagesPerSpread - 1))
+            return min(end, passageEnd ?? end)
+        }
         var isWriting: Bool { revealedEnd < spreadEnd }
-        var hasNextSpread: Bool { leftIndex + 2 < pages.count }
+        var hasNextSpread: Bool {
+            leftIndex + pagesPerSpread < pages.count &&
+                page(at: leftIndex + pagesPerSpread).location < (passageEnd ?? Int.max)
+        }
     }
 
+    @Published private(set) var passageRevision = 0
     @Published private(set) var ink: [OriginalDialogueLines.Run] = []
     @Published private(set) var reader = Reader()
     @Published private(set) var layout: DialogueNotebookLayout?
@@ -62,7 +81,10 @@ final class DialogueNotebook: ObservableObject {
     // Keep the source offset across temporary cover sizes and repeated reflows.
     private var readingAnchor = 0
     private var followsNextPassage = false
+    private var furthestRevealedEnd = 0
     private var reviewAnchor: Int?
+    private var reviewPassageEnd: Int?
+    private var reviewRevealedEnd: Int?
     private(set) var turnFromSpread = 0
     var turnsBackward: Bool { turnFromSpread > reader.spreadIndex }
     var isReviewing: Bool { reviewAnchor != nil }
@@ -71,7 +93,7 @@ final class DialogueNotebook: ObservableObject {
     }
     var canTurnForward: Bool {
         !pendingLayout && !isTurning && !reader.isWriting && reader.hasNextSpread &&
-            (!isReviewing || reader.page(at: reader.leftIndex + 2).location < reader.revealedEnd)
+            (!isReviewing || reader.page(at: reader.leftIndex + reader.pagesPerSpread).location < reader.revealedEnd)
     }
 
     func followNextPassage() { followsNextPassage = true }
@@ -79,11 +101,19 @@ final class DialogueNotebook: ObservableObject {
     func beginReview() {
         guard reviewAnchor == nil else { return }
         reviewAnchor = readingAnchor
+        reviewPassageEnd = reader.passageEnd
+        reviewRevealedEnd = reader.revealedEnd
+        reader.passageEnd = nil
+        reader.revealedEnd = max(reader.revealedEnd, furthestRevealedEnd)
     }
 
     func endReview() {
         guard let anchor = reviewAnchor else { return }
         reviewAnchor = nil
+        reader.passageEnd = reviewPassageEnd
+        reader.revealedEnd = reviewRevealedEnd ?? reader.revealedEnd
+        reviewPassageEnd = nil
+        reviewRevealedEnd = nil
         if isTurning {
             turnRevision += 1
             isTurning = false
@@ -150,42 +180,56 @@ final class DialogueNotebook: ObservableObject {
             presentations = []
         default: return
         }
-        var next = ink
-        // Packet order is narrative order. Original screen IDs do not assign leaves.
+        var passage: [OriginalDialogueLines.Run] = []
         for page in pages {
             let person = presentations.first { $0.page == page.page }.map { Int32($0.person) }
-            let lines = OriginalDialogueLines(page: page, person: person)
-            guard !lines.isEmpty else { continue }
-            if !next.isEmpty { next.append(.init(text: "\n\n", colour: 0)) }
-            let writtenLines = lines.lines.filter { !$0.allSatisfy { $0.text.trimmingCharacters(in: .whitespaces).isEmpty } }
-            for (index, line) in writtenLines.enumerated() {
-                if index > 0 { next.append(.init(text: " ", colour: 0)) }
-                next.append(contentsOf: line)
-            }
+            let paragraph = OriginalDialogueLines(page: page, person: person).paragraph
+            guard !paragraph.isEmpty else { continue }
+            if !passage.isEmpty { passage.append(.init(text: "\n\n", colour: 0)) }
+            passage.append(contentsOf: paragraph)
         }
-        if next != ink {
-            if followsNextPassage {
-                readingAnchor = ink.reduce(0) { $0 + ($1.text as NSString).length } + (ink.isEmpty ? 0 : 2)
-                reader.revealedEnd = max(reader.revealedEnd, readingAnchor)
-                followsNextPassage = false
-            }
+        guard !passage.isEmpty else { return }
+        passageRevision += 1
+        furthestRevealedEnd = max(furthestRevealedEnd, reader.revealedEnd)
+        if let index = ink.indices.first(where: { start in
+            start + passage.count <= ink.count && Array(ink[start..<(start + passage.count)]) == passage
+        }) {
+            readingAnchor = ink[..<index].reduce(0) { $0 + ($1.text as NSString).length }
+            reader.passageEnd = readingAnchor + passage.reduce(0) { $0 + ($1.text as NSString).length }
+            reader.revealedEnd = readingAnchor
+            followsNextPassage = false
             pendingLayout = true
-            ink = next
+            if let layout { configure(layout, singlePage: reader.pagesPerSpread == 1) }
+            return
         }
+        let wasRetracing = reader.passageEnd != nil
+        reader.passageEnd = nil
+        reader.revealedEnd = max(reader.revealedEnd, furthestRevealedEnd)
+        if followsNextPassage || wasRetracing {
+            readingAnchor = ink.reduce(0) { $0 + ($1.text as NSString).length } + (ink.isEmpty ? 0 : 2)
+            reader.revealedEnd = max(reader.revealedEnd, readingAnchor)
+            followsNextPassage = false
+        }
+        var next = ink
+        if !next.isEmpty { next.append(.init(text: "\n\n", colour: 0)) }
+        next.append(contentsOf: passage)
+        pendingLayout = true
+        ink = next
     }
 
-    func configure(_ layout: DialogueNotebookLayout) {
+    func configure(_ layout: DialogueNotebookLayout, singlePage: Bool = false) {
         // Empty cover geometry must not discard the last usable pagination.
         guard !layout.pages.isEmpty || ink.isEmpty else { return }
         let anchor = readingAnchor
         var next = reader
         next.pages = layout.pages
+        next.pagesPerSpread = singlePage ? 1 : 2
         let anchorPage = layout.pages.firstIndex { NSLocationInRange(anchor, $0) } ?? max(0, layout.pages.count - 1)
-        next.spreadIndex = anchorPage / 2
+        next.spreadIndex = anchorPage / next.pagesPerSpread
         if isTurning, next.pages != reader.pages {
             let sourceAnchor = isHoldingTurn || !turnWillComplete ? turnAnchor : readingAnchor
             let sourcePage = layout.pages.firstIndex { NSLocationInRange(sourceAnchor, $0) } ?? max(0, layout.pages.count - 1)
-            next.spreadIndex = sourcePage / 2
+            next.spreadIndex = sourcePage / next.pagesPerSpread
             readingAnchor = sourceAnchor
             turnRevision += 1
             isTurning = false
