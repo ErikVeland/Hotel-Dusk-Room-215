@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A21500000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A21500000000000000000002 /* Assets.xcassets */; };
 		98F3554BF390089E6FC66C38 /* HotelDuskDuoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 99E6802D5D467857B5D71480 /* HotelDuskDuoKit */; };
 		C6D20DA786F756CE45D36D59 /* HotelDuskDuoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB88226230A4BD4F5451B68 /* HotelDuskDuoApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A21500000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = HotelDuskDuo/Resources/Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		5F8910055F0C701D82DF4E9A /* Hotel Dusk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hotel Dusk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FB88226230A4BD4F5451B68 /* HotelDuskDuoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotelDuskDuoApp.swift; sourceTree = "<group>"; };
 		F57FFDF4C59592BA5783A64B /* Hotel Dusk Room 215 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Hotel Dusk Room 215"; path = .; sourceTree = SOURCE_ROOT; };
@@ -57,6 +59,7 @@
 		6AC7B045731B797118F11B22 = {
 			isa = PBXGroup;
 			children = (
+				A21500000000000000000002 /* Assets.xcassets */,
 				0B8B2BA7A363BCDED3A2DC45 /* HotelDuskDuoApp */,
 				3441FA2BE5BBDF776B76D445 /* Packages */,
 				084EB1003AC99D708B2F8BF3 /* Products */,
@@ -72,6 +75,7 @@
 			buildPhases = (
 				694D87418929BDB317997388 /* Sources */,
 				3BE8DC6E4D7B5BEC559CC26E /* Frameworks */,
+				A21500000000000000000003 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -114,6 +118,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A21500000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A21500000000000000000001 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		694D87418929BDB317997388 /* Sources */ = {
