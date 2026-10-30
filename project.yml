@@ -12,11 +12,14 @@ targets:
     platform: iOS
     sources:
       - Sources/HotelDuskDuoApp
+      - path: HotelDuskDuo/Resources/Assets.xcassets
+        buildPhase: resources
     dependencies:
       - package: HotelDuskDuo
         product: HotelDuskDuoKit
     settings:
       base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         PRODUCT_NAME: Hotel Dusk
         PRODUCT_BUNDLE_IDENTIFIER: com.veland.hoteldusk.duo
         GENERATE_INFOPLIST_FILE: YES
