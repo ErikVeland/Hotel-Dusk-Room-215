@@ -2,47 +2,65 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalBagSearchProcessTests: XCTestCase {
-    func testProvisionalModelBuildsTwentyObjectField() {
+    func testOverlayThirtyBuildsItsRecoveredTwentySixObjectField() {
         let process = OriginalBagSearchProcess()
 
-        XCTAssertEqual(process.objects.count, 20)
-        XCTAssertEqual(process.objects.compactMap(\.type), [1, 3, 1, 1, 2, 1, 0, 0, 0, 0])
-        XCTAssertEqual(process.objects[1].positionFixed, SIMD3(-2_048, 0, 0))
-        XCTAssertEqual(process.objects[1].scale, SIMD3(1, 0.5, 1))
-        XCTAssertNil(process.objects[2].type)
-        XCTAssertEqual(process.objects[2].positionFixed, SIMD3(-40_960, 0, -40_960))
+        XCTAssertEqual(process.objects.count, 26)
+        XCTAssertEqual(process.objects[0].positionFixed, SIMD3(4_096, 6_144, -2_048))
+        XCTAssertEqual(process.objects[2].scale, SIMD3(1, 1, 2))
+        XCTAssertEqual(process.objects[7].scale, SIMD3(1, 2, 1))
+        XCTAssertEqual(process.objects[9].positionFixed, SIMD3(-4_096, 2_048, -14_336))
+        XCTAssertEqual(process.objects[9].scale, SIMD3(1, 3, 1))
+        XCTAssertEqual(process.objects[15].scale, SIMD3(1, 1, 2))
     }
 
-    func testProvisionalModelCompletesWhenTypeThreeReachesOrigin() throws {
+    func testTreeBoxTapIsBlockedUntilTheOverlappingObjectMoves() {
         var process = OriginalBagSearchProcess()
-        let object = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
-        let start = SIMD2(process.objects[object].positionFixed.x, process.objects[object].positionFixed.z)
+        let treeBox = process.objects[9]
+        let treePoint = SIMD2(treeBox.positionFixed.x, treeBox.positionFixed.z)
 
-        process.beginDrag(object: object, at: start)
-        process.drag(to: .zero)
+        process.beginDrag(object: 9, at: treePoint)
+        XCTAssertFalse(process.endDrag())
+        XCTAssertEqual(process.phase, .arranging)
 
-        XCTAssertEqual(process.objects[object].positionFixed.x, 0)
-        XCTAssertEqual(process.objects[object].positionFixed.z, 0)
+        let blocker = process.objects[5]
+        let blockerPoint = SIMD2(blocker.positionFixed.x, blocker.positionFixed.z)
+        process.beginDrag(object: 5, at: blockerPoint)
+        process.drag(to: SIMD2(blockerPoint.x + 4_096, blockerPoint.y))
+        XCTAssertFalse(process.endDrag())
+
+        process.beginDrag(object: 9, at: treePoint)
         XCTAssertTrue(process.endDrag())
         XCTAssertEqual(process.phase, .found)
         XCTAssertTrue(process.canOpenMenu)
     }
 
-    func testProvisionalModelRejectsOtherTypesAndNearMisses() throws {
+    func testObjectsAfterTheTargetIndexCanAlsoBlockIt() {
         var process = OriginalBagSearchProcess()
-        process.beginDrag(object: 0, at: SIMD2(-4_096, 0))
-        process.drag(to: .zero)
+        let laterObject = process.objects[18]
+        let laterPoint = SIMD2(laterObject.positionFixed.x, laterObject.positionFixed.z)
+        process.beginDrag(object: 18, at: laterPoint)
+        process.drag(to: SIMD2(process.objects[9].positionFixed.x, laterPoint.y))
         XCTAssertFalse(process.endDrag())
 
-        let target = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
-        let start = SIMD2(process.objects[target].positionFixed.x, process.objects[target].positionFixed.z)
-        process.beginDrag(object: target, at: start)
-        process.drag(to: SIMD2(1, 0))
+        let treeBox = process.objects[9]
+        process.beginDrag(object: 9,
+            at: SIMD2(treeBox.positionFixed.x, treeBox.positionFixed.z))
         XCTAssertFalse(process.endDrag())
         XCTAssertEqual(process.phase, .arranging)
     }
 
-    func testMenuReturnsTheRecoveredOverlayResultTwo() {
+    func testOtherObjectTapDoesNotCompleteTheSearch() {
+        var process = OriginalBagSearchProcess()
+        let object = process.objects[0]
+        process.beginDrag(object: 0,
+            at: SIMD2(object.positionFixed.x, object.positionFixed.z))
+
+        XCTAssertFalse(process.endDrag())
+        XCTAssertEqual(process.phase, .arranging)
+    }
+
+    func testMenuReturnsFailureWhenTreeBoxRemainsBlocked() {
         var process = OriginalBagSearchProcess()
         process.openMenu()
 
@@ -53,14 +71,18 @@ final class OriginalBagSearchProcessTests: XCTestCase {
         XCTAssertEqual(process.phase, .exiting)
     }
 
-    func testProvisionalModelReturnsSuccessAfterFindingTheTreeBox() throws {
+    func testFoundTreeBoxReturnsSuccessFromTheMenu() {
         var process = OriginalBagSearchProcess()
-        let object = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
-        let start = SIMD2(process.objects[object].positionFixed.x, process.objects[object].positionFixed.z)
-        process.beginDrag(object: object, at: start)
-        process.drag(to: .zero)
-        XCTAssertTrue(process.endDrag())
+        let blocker = process.objects[5]
+        let blockerPoint = SIMD2(blocker.positionFixed.x, blocker.positionFixed.z)
+        process.beginDrag(object: 5, at: blockerPoint)
+        process.drag(to: SIMD2(blockerPoint.x + 4_096, blockerPoint.y))
+        XCTAssertFalse(process.endDrag())
 
+        let treeBox = process.objects[9]
+        process.beginDrag(object: 9,
+            at: SIMD2(treeBox.positionFixed.x, treeBox.positionFixed.z))
+        XCTAssertTrue(process.endDrag())
         process.openMenu()
 
         XCTAssertEqual(process.update(), [.fadeOut(60)])

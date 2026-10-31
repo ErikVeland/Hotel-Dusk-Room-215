@@ -2,7 +2,7 @@ import Foundation
 import simd
 
 /**
- * Projects overlay 3's object geometry for depth-ordered input and ground-plane drags.
+ * Projects overlay 30's cube geometry for depth-ordered input and ground-plane drags.
  */
 struct OriginalBagSearchProjection {
     let models: [OriginalModel]
@@ -10,10 +10,9 @@ struct OriginalBagSearchProjection {
     let viewProjection: simd_float4x4
 
     init(models: [OriginalModel]) throws {
-        guard models.count == 4 else { throw OriginalDataError.invalid("Bag-search model set") }
+        guard models.count == 1 else { throw OriginalDataError.invalid("Tree-search model set") }
         self.models = models
-        nodesByType = [Set(models[0].nodes.indices), Set(models[1].nodes.indices),
-                       Set(models[2].nodes.indices), Set([2, 3, 4, 6, 7, 8, 9, 10])]
+        nodesByType = [Set([2])]
         viewProjection = Self.projection * Self.view
     }
 
@@ -34,11 +33,11 @@ struct OriginalBagSearchProjection {
     func objectMasks(process: OriginalBagSearchProcess) throws -> [(Int, OriginalModelProjectedMask)] {
         var masks = [(Int, OriginalModelProjectedMask)]()
         for (index, object) in process.objects.enumerated() {
-            guard let type = object.type else { continue }
-            let mask = try OriginalModelProjectedMask(model: models[type],
+            guard object.type != nil else { continue }
+            let mask = try OriginalModelProjectedMask(model: models[0],
                 viewProjection: viewProjection,
                 modelTransform: Self.translation(Self.position(object.positionFixed)) * Self.scale(object.scale),
-                width: 192, height: 256, visibleNodes: nodesByType[type])
+                width: 192, height: 256, visibleNodes: nodesByType[0])
             masks.append((index, mask))
         }
         return masks
@@ -65,8 +64,8 @@ struct OriginalBagSearchProjection {
 
     private static var projection: simd_float4x4 {
         let near: Float = 0.1
-        let far: Float = 60
-        let focal = 1 / tan(Float(30) * Float.pi / 360)
+        let far: Float = 100
+        let focal = 1 / tan(Float.pi / 9)
         let aspect = Float(192) / 256
         return simd_float4x4(columns: (
             SIMD4(focal / aspect, 0, 0, 0),
@@ -76,7 +75,7 @@ struct OriginalBagSearchProjection {
     }
 
     private static var view: simd_float4x4 {
-        let eye = SIMD3<Float>(0, 5, 1)
+        let eye = SIMD3<Float>(5, 1.5, 7)
         let target = SIMD3<Float>(0, 1, 0)
         let backward = simd_normalize(eye - target)
         let right = simd_normalize(simd_cross(SIMD3<Float>(0, 1, 0), backward))
