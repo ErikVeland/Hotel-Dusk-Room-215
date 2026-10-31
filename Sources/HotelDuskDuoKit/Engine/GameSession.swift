@@ -7,10 +7,14 @@ import Combine
 public final class GameSession: ObservableObject {
     @Published public private(set) var chapterSaves: [OriginalChapterSave?] = Array(repeating: nil, count: 3)
     @Published public private(set) var saveError: String?
+    @Published public private(set) var recoveryNotice: String?
     private let saveStore: any OriginalChapterSaveStore
     private let resumeStore: any OriginalResumeSaveStore
+    private let safePlaceStore: any OriginalResumeSaveStore
     private let mapRendererFactory: OriginalMapRendererFactory
     @Published public private(set) var resumeSave: OriginalResumeSave?
+    private var safePlaceSave: OriginalResumeSave?
+    private var restoringAfterStop = false
     @Published public private(set) var isPauseMenuOpen = false
     @Published public private(set) var isReviewingConversations = false
     private var isAppActive = true
@@ -46,9 +50,11 @@ public final class GameSession: ObservableObject {
                 jigsawPuzzleManager: JigsawPuzzleManager? = nil,
                 saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
                 resumeStore: any OriginalResumeSaveStore = OriginalResumeFileStore.application,
+                safePlaceStore: any OriginalResumeSaveStore = OriginalResumeFileStore.safePlaceApplication,
                 mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) }) {
         self.saveStore = saveStore
         self.resumeStore = resumeStore
+        self.safePlaceStore = safePlaceStore
         self.mapRendererFactory = mapRendererFactory
         self.hingeManager = hingeManager ?? DuoHingeManager()
         self.audioController = audioController
@@ -61,6 +67,8 @@ public final class GameSession: ObservableObject {
         refreshChapterSaves()
         do { resumeSave = try resumeStore.load() }
         catch { saveError = "The resume checkpoint could not be read: \(error)" }
+        do { safePlaceSave = try safePlaceStore.load() }
+        catch { saveError = "The safe-place checkpoint could not be read: \(error)" }
         observeFoldEvents()
     }
 
@@ -147,12 +155,50 @@ public final class GameSession: ObservableObject {
         isPauseMenuOpen = false
         isReviewingConversations = next.dialogueNotebook.isReviewing
         playCancellable = next.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
+        next.onWalkingCheckpoint = { [weak self] checkpoint in self?.storeSafePlace(checkpoint) }
         next.onProgressCheckpoint = { [weak self] checkpoint in self?.persist(checkpoint) }
         next.onProgressSaveError = { [weak self] error in self?.saveError = "Progress could not be saved: \(error)" }
+        next.onRecoverableStop = { [weak self] halt in self?.recoverFromStop(halt) }
         play = next
+        if let checkpoint = try? next.walkingCheckpoint() { storeSafePlace(checkpoint) }
         saveCurrentPlace()
         updatePlayActivity()
+        if case .halted(let halt) = next.runner.phase { recoverFromStop(halt) }
     }
+
+    private func storeSafePlace(_ checkpoint: OriginalResumeSave) {
+        safePlaceSave = checkpoint
+        do { try safePlaceStore.save(checkpoint) }
+        catch { saveError = "The safe-place checkpoint could not be saved: \(error)" }
+    }
+
+    private func recoverFromStop(_ halt: OriginalEventRunner.Halt) {
+        guard !restoringAfterStop else { return }
+        restoringAfterStop = true
+        defer { restoringAfterStop = false }
+        guard let checkpoint = safePlaceSave else {
+            recoveryNotice = "This interaction could not continue. Play returned to the beginning."
+            startOriginalGame()
+            return
+        }
+        do {
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController,
+                saveStore: saveStore, mapRendererFactory: mapRendererFactory)
+            if case .halted(let restoreHalt) = next.runner.phase {
+                throw OriginalDataError.invalid("Safe-place restore stopped at \(restoreHalt.program)")
+            }
+            play?.stop()
+            let location = "\(halt.program)\(halt.eventIndex.map { " event \($0)" } ?? "")"
+            recoveryNotice = "The \(location) interaction could not continue. Play returned to the last safe place."
+            attachPlay(next)
+        } catch {
+            recoveryNotice = "The \(halt.program) interaction could not continue. Play returned to the beginning."
+            saveError = "The safe-place checkpoint could not be restored: \(error)"
+            startOriginalGame()
+        }
+    }
+
+    public func dismissRecoveryNotice() { recoveryNotice = nil }
 
     private func persist(_ checkpoint: OriginalResumeSave) {
         guard checkpoint.state != resumeSave?.state || checkpoint.checkpointFacing != resumeSave?.checkpointFacing ||

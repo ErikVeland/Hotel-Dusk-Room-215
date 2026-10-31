@@ -274,6 +274,8 @@ public final class OriginalPlaySession: ObservableObject {
     var onWalkingCheckpoint: ((OriginalResumeSave) -> Void)?
     var onProgressCheckpoint: ((OriginalResumeSave) -> Void)?
     var onProgressSaveError: ((Error) -> Void)?
+    var onRecoverableStop: ((OriginalEventRunner.Halt) -> Void)?
+    private var didReportRecoverableStop = false
     private var progressJournal: OriginalPlayProgress?
     private var routeTrace: OriginalRouteTraceLog?
     private var progressInputActive = false
@@ -1776,6 +1778,7 @@ public final class OriginalPlaySession: ObservableObject {
         onWalkingCheckpoint = nil
         onProgressCheckpoint = nil
         onProgressSaveError = nil
+        onRecoverableStop = nil
         dialogueNotebook.onSaveProgress = nil
         lobbyTouch = nil
         firstPersonMovement = nil
@@ -1805,6 +1808,13 @@ public final class OriginalPlaySession: ObservableObject {
     private func settle() {
         defer {
             dialogueNotebook.record(runner.phase, program: runner.program.name)
+        }
+        if case .halted(let halt) = runner.phase {
+            stopTimer()
+            guard !didReportRecoverableStop else { return }
+            didReportRecoverableStop = true
+            onRecoverableStop?(halt)
+            return
         }
         if chapterTransition != nil { startTimer(); return }
         if notebook != nil { startTimer(); return }
