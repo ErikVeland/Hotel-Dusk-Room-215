@@ -18,6 +18,11 @@ public struct RightPageView: View {
                     .font(NovelStyle.caption)
                     .foregroundStyle(NovelStyle.redInk)
             }
+            if let notice = session.recoveryNotice, !session.isPauseMenuOpen {
+                Button(notice) { session.dismissRecoveryNotice() }
+                    .font(NovelStyle.caption)
+                    .foregroundStyle(NovelStyle.redInk)
+            }
             if let play = session.play {
                 if session.isPauseMenuOpen { OriginalPauseView(session: session) }
                 else if play.chapterTransition != nil { OriginalChapterTransitionView(play: play, screen: 0) }

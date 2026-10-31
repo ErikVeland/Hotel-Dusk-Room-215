@@ -112,4 +112,4 @@ See [Chapter 3 progress](chapter-three-progress.md) for the current route and re
 
 ## Chapter 4
 
-The native route now plays Chapter 4 from the roof to the review through normal input. Opcode 34 and departure clock requests are recovered. Game-over pages (`%r`) now stop play with an explicit message, because the failure screen and retry restore are not recovered. See [Chapter 4 progress](chapter-four-progress.md).
+The native route now plays Chapter 4 from the roof to the review through normal input. Opcode 34 and departure clock requests are recovered. Game-over pages (`%r`) still lack the original failure screen and retry behaviour. If one is reached, the app now returns to the last safe walking place, or starts Chapter 1 when no safe place is available. See [Chapter 4 progress](chapter-four-progress.md).
