@@ -51,7 +51,7 @@ def main():
     parser.add_argument('--source', type=Path, default=ROOT / 'extracted/unpacked_wpf')
     parser.add_argument('--bundle', type=Path, default=ROOT / 'Sources/HotelDuskDuoKit/Resources/OriginalBitmaps')
     parser.add_argument('--report', type=Path, default=ROOT / 'docs/original-opening-graphics-report.json')
-    parser.add_argument('--previews', type=Path, default=ROOT / 'docs/previews/original-opening-cards')
+    parser.add_argument('--previews', type=Path, default=ROOT / '.cache/previews/original-opening-cards')
     args = parser.parse_args()
     arm9 = args.arm9.read_bytes()
     textures, entries = {}, []

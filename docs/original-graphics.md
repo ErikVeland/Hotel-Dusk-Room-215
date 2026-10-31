@@ -180,7 +180,7 @@ discarded in this diagnostic preview and must be resolved before gameplay.
 ```sh
 python3 tools/decode_mdf.py \
   --bundle Sources/HotelDuskDuoKit/Resources/OriginalModels
-HOTEL_DUSK_MODEL_PREVIEW="$PWD/docs/previews/original-models/R212-native-metal.png" \
+HOTEL_DUSK_MODEL_PREVIEW="$PWD/.cache/previews/original-models/R212-native-metal.png" \
   swift test --filter OriginalModelMetalTests
 ```
 

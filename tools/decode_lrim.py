@@ -8,6 +8,7 @@ from decode_bitmap import Bitmap
 from decode_talk_bg import write_png
 
 ROOT = Path(__file__).resolve().parents[1]
+PREVIEW_DIRECTORY = ROOT / ".cache/previews/original-tile-animations"
 
 
 def lz10(data):
@@ -94,7 +95,7 @@ def main():
                         src = (y * bitmap.width + x) * 4
                         dst = ((bitmap.width - 1 - x) * bitmap.height + y) * 4
                         upright[dst:dst + 4] = bitmap.rgba[src:src + 4]
-                write_png(192, 256, upright, str(ROOT / f"docs/previews/original-tile-animations/05-05R/{index:03}.png"))
+                write_png(192, 256, upright, str(PREVIEW_DIRECTORY / f"05-05R/{index:03}.png"))
         entries.append({"source": path.relative_to(source).as_posix(), "payloadSHA256": sha(data),
                         "frameCount": len(frames), "frames": frames})
     report = {"formatVersion": 1, "coverage": {"animations": len(entries), "frames": total}, "animations": entries}
