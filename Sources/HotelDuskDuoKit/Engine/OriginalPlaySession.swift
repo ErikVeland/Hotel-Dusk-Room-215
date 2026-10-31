@@ -34,6 +34,8 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var notebook: OriginalNotebook?
     @Published public private(set) var notebookImage: CGImage?
     @Published public private(set) var nativeNotebookPages: [String: Data] = [:]
+    @Published private(set) var encounterPortraits: [OriginalEncounterAnimations.Portrait] = []
+    private var encounterAnimations: OriginalEncounterAnimations?
     private var notebookTouch: SIMD2<Int>?
     @Published public private(set) var runner: OriginalEventRunner {
         didSet { reportRecoverableStopIfNeeded() }
@@ -273,6 +275,7 @@ public final class OriginalPlaySession: ObservableObject {
     private var pendingDeparture: (map: Int16, requestStart: Int)?
     private var process: OriginalEntranceProcess?
     private var bellProcess: OriginalBellProcess?
+    private var bellParent: OriginalEventRunner?
     private var bellMask: [UInt8] = []
     private var fixture: String?
     private var processReturn: Int16 = 2
@@ -2606,6 +2609,13 @@ public final class OriginalPlaySession: ObservableObject {
                 switchboard?.finishHint()
                 return settle()
             }
+            if var parent = bellParent {
+                parent.resumeProcess(after: runner)
+                runner = parent
+                bellParent = nil
+                presentedPacketOffset = nil
+                return settle()
+            }
             if var parent = jigsawParent {
                 parent.resumeProcess(after: runner)
                 runner = parent
@@ -4188,27 +4198,41 @@ public final class OriginalPlaySession: ObservableObject {
         pendingTouch = nil
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let step = current.update(input, mask: bellMask)
+        var requestedHint: (pairA: Int16, pairB: Int16)?
         for effect in step.effects {
             switch effect {
             case .fade(let fade): fadeRemaining[fade.screen] = Int(fade.duration)
             case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
             case .processReturn(let value): processReturn = value
-            case .hintTalk, .presentation: break
+            case .hintTalk(let pairA, let pairB): requestedHint = (pairA, pairB)
+            case .presentation: break
             }
         }
         bellProcess = current
         bell = BellScene(angle: current.bellAngle, awaitingTouch: current.awaitingTouch,
                          quitEnabled: current.quitEnabled)
         guard step.status != 0 else { return }
+        if step.status == 1 {
+            if let requestedHint {
+                do {
+                    let hint = try runner.processHint(catalog: catalog, pairA: requestedHint.pairA,
+                                                      pairB: requestedHint.pairB)
+                    bellParent = runner
+                    runner = hint
+                    presentedPacketOffset = nil
+                } catch {
+                    runner.halt("The bell hint could not be loaded: \(error)")
+                }
+            } else {
+                runner.halt("The bell requested a hint without a System dialogue pair")
+            }
+            return settle()
+        }
         bellProcess = nil
         bell = nil
         fadeRemaining = [:]
         stopTimer()
-        if step.status == 1 {
-            runner.halt("Bell hint talk (mode 20 via 0x021FE468) is not recovered")
-        } else {
-            runner.finishProcess(returnValue: processReturn)
-        }
+        runner.finishProcess(returnValue: processReturn)
         settle()
     }
 

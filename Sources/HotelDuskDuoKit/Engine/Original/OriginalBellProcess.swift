@@ -39,8 +39,7 @@ public struct OriginalBellProcess: Equatable, Codable, Sendable {
         /// (0x02026E68). The talk controller reads it as the process return.
         case processReturn(Int16)
         /// 0x021FE468 writes mode 20 with this pair into the talk session
-        /// (0x020282A4) and asks for the talk process. No recovered path
-        /// sets the request field, so the host must stop if this occurs.
+        /// (0x020282A4) and asks for the talk process.
         case hintTalk(pairA: Int16, pairB: Int16)
         /// Calls into talk-screen presentation helpers that are not drawn.
         case presentation(address: UInt32)

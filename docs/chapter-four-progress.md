@@ -18,7 +18,7 @@ Run the chain with `HOTEL_DUSK_ROUTE_CHECKPOINTS` set, in the order above, after
 
 - Opcode 34 (`0x0203C51C`) pushes a request with the record's kind and value. It then commits scene 1, mode 29 and block 0, with the value in session `+0x3A` (`0x02028240`, `0x020282EC`). Mode-29 events select on this value. Dunning's Room 217 scene and the R117 search use it.
 - A departure script's clock request (kind 3) now changes the time before the destination map selects its arrival events. Before this change, the request was lost when the runner moved to the new map.
-- Text control `%r` with four digits is decoded. It starts every game-over sequence in the original scripts (69 files). The game-over screen and retry restore are not recovered, so the runner now stops at such a page with an explicit message. It no longer continues as if the player had not failed.
+- Text control `%r` with four digits is decoded. It starts every game-over sequence in the original scripts (69 files). The original game-over screen and retry restore are not recovered. The host returns play to the last safe walking place, or to Chapter 1 if it cannot restore that place.
 
 ## Route helpers
 
@@ -32,7 +32,7 @@ Run the chain with `HOTEL_DUSK_ROUTE_CHECKPOINTS` set, in the order above, after
 
 ## Limits
 
-- Game over and retry are not implemented. A wrong answer or a failed search stops play.
+- The original game-over screen and retry are not implemented. A wrong answer or failed search returns play to the last safe walking place, or to Chapter 1 when no safe place is available.
 - Request kind 7 from opcode 34 is recorded but not drawn. Its original presentation effect is not recovered.
 - The route uses one set of answers. Other branches are not checked.
 - These are native playability checks. They are not byte-for-byte comparisons with a matching original run.
