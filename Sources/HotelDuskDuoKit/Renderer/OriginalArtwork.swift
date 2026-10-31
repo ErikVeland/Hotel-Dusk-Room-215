@@ -3,8 +3,14 @@ import Foundation
 import ImageIO
 
 public final class OriginalArtwork: @unchecked Sendable {
+    private static let hdGraphicsPreferenceKey = "hdGraphicsEnabled"
+
     public static let shared = OriginalArtwork(resourceRoot: Bundle.module.resourceURL?
         .appendingPathComponent("EnhancedArtwork"))
+
+    private static var hdGraphicsEnabled: Bool {
+        UserDefaults.standard.object(forKey: hdGraphicsPreferenceKey) as? Bool ?? true
+    }
 
     private struct Manifest: Decodable {
         struct Record: Decodable {
@@ -54,13 +60,15 @@ public final class OriginalArtwork: @unchecked Sendable {
     }
 
     public func enhancedImage(rgba: Data, width: Int, height: Int) -> CGImage? {
-        guard width > 0, height > 0, rgba.count == width * height * 4, !records.isEmpty else { return nil }
+        guard Self.hdGraphicsEnabled, width > 0, height > 0,
+              rgba.count == width * height * 4, !records.isEmpty else { return nil }
         let key = "\(width)x\(height)-\(OriginalAnimationClip.digest(rgba))"
         guard let record = records[key], record.width == width, record.height == height else { return nil }
         return load(record)
     }
 
     func namedImage(source: String) -> CGImage? {
+        guard Self.hdGraphicsEnabled else { return nil }
         guard let record = namedRecords[source] else { return nil }
         return load(record)
     }

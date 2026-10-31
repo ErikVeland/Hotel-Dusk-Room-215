@@ -26,6 +26,7 @@ public final class GameSession: ObservableObject {
     @Published public private(set) var animationPreviewID: String?
     /// The active recovered route.
     @Published public private(set) var play: OriginalPlaySession?
+    @Published public private(set) var graphicsRevision = 0
     @Published public var isJigsawPuzzleOpen = false {
         didSet {
             if !isJigsawPuzzleOpen { jigsawPuzzleManager.cancelPendingFold() }
@@ -45,6 +46,9 @@ public final class GameSession: ObservableObject {
     private var animationDecoder: OriginalAnimationDecoder?
 
     public var animationCheckpoint: OriginalAnimationCheckpoint? { animationDecoder?.checkpoint() }
+
+    /// Refreshes book views after a display preference changes.
+    public func refreshGraphics() { graphicsRevision &+= 1 }
 
     public init(hingeManager: DuoHingeManager? = nil,
                 audioController: AudioController = AudioController(),
