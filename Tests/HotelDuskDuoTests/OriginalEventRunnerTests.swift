@@ -115,6 +115,27 @@ final class OriginalEventRunnerTests: XCTestCase {
         XCTAssertEqual(runner.eventIndex, 4)
     }
 
+    func testBellHintDialogueResumesTheSuspendedProcess() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var parent = try lobbyExploration()
+        parent.lookInSearchView(area: 2, subarea: 2, table: try .bundled(map: "R102"))
+        parent.acknowledgeDialogue()
+        XCTAssertEqual(parent.phase, .process(id: 24))
+
+        var hint = try parent.processHint(catalog: catalog, pairA: 1, pairB: 1)
+        XCTAssertEqual(hint.session.selection.modeID, 20)
+        XCTAssertEqual(hint.session.selection.pairA, 1)
+        XCTAssertEqual(hint.session.selection.pairB, 1)
+        guard case .dialogue = hint.phase else {
+            return XCTFail("The first bell hint must start its System dialogue")
+        }
+        while case .dialogue = hint.phase { hint.acknowledgeDialogue() }
+
+        parent.resumeProcess(after: hint)
+
+        XCTAssertEqual(parent.phase, .process(id: 24))
+    }
+
     func testRingingTheBellLeadsToDunningsFirstConversation() throws {
         var runner = try lobbyExploration()
         runner.lookInSearchView(area: 2, subarea: 2, table: try .bundled(map: "R102"))
@@ -365,5 +386,23 @@ final class OriginalBellProcessTests: XCTestCase {
         XCTAssertEqual(process.processReturn, 1)
         XCTAssertEqual(process.rings, 0)
         XCTAssertTrue(effects.contains(.sound(archive: 8, entry: 2)))
+    }
+
+    func testHintStagesRequestMatchingSystemDialoguePairs() throws {
+        let mask = try mask()
+        let hintStates: [(stage: Int16, delay: Int16, pair: Int16)] = [(2, 1, 1), (3, 0, 2)]
+        for hintState in hintStates {
+            var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(OriginalBellProcess()))
+                as? [String: Any])
+            object["stage"] = hintState.stage
+            object["hintDelay"] = hintState.delay
+            var process = try JSONDecoder().decode(OriginalBellProcess.self,
+                from: JSONSerialization.data(withJSONObject: object))
+
+            let step = process.update(.init(), mask: mask)
+
+            XCTAssertEqual(step.status, 1)
+            XCTAssertTrue(step.effects.contains(.hintTalk(pairA: 1, pairB: hintState.pair)))
+        }
     }
 }

@@ -182,7 +182,7 @@ Event 4 has mode 15 and byte 16 = 1, so process 24 runs. Factory `0x0200B334` ca
 | Bell touch | `0x021FE3AC` | A new press inside the inclusive rectangle at `0x021FE7F8` (x′ 56–96, y′ 72–120), or on a nonzero `bell01.bin` pixel at index y′ × 256 + 255 − x′. Coordinates use the handedness transform at `0x02009920` and `0x02009960`. |
 | Quit | `0x0202778C`, `0x020267F0` | Button slot 5, x′ 228–252, y′ 156–188, when enabled. Plays archive 8, entry 2, fades screen 0, and sets +0x43C to 1. After the fade, the result is 1 and the update returns 2. |
 | Result | `0x02026E68` | The trick base writes through its +0x288 pointer, which message 0x1F supplies. The talk controller reads it as the process return. |
-| Hint request | `0x021FE468` | +0x466 values 1 and 2 write mode 20, pair (1, value) (`0x020282A4`) and request the talk process. Only update stages 2 and 3 set +0x466, and no code in overlay 32 enters them. The native host stops if a request occurs. |
+| Hint request | `0x021FE468` | +0x466 values 1 and 2 write mode 20, pair (1, value) (`0x020282A4`) and request the talk process. The native host opens the matching System dialogue and resumes the bell after the response. The recovered overlay does not enter these stages during the normal three-ring route. |
 
 `bell01.bin` and `bell02.bin` are 8-bit linear bitmaps. After 16 zero bytes, the header holds width 256, height 192, width, height, kind 4, 256 colours and palette offset 0x20. Pixels follow at 0x220. The mask pointer at `0x021FCBEC` (base + u16 0x1C + u16 0x1A × 2) confirms the offsets. `bell01.bin` has 5,412 nonzero pixels. The draw at `0x021FD7B4` puts `bell01` (rotated by +0x444) and `bell02` on the 3D screen.
 

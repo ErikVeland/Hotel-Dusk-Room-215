@@ -2,7 +2,7 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalBagSearchProcessTests: XCTestCase {
-    func testOverlayThreeBuildsTheRecoveredTwentyObjectField() {
+    func testProvisionalModelBuildsTwentyObjectField() {
         let process = OriginalBagSearchProcess()
 
         XCTAssertEqual(process.objects.count, 20)
@@ -13,7 +13,7 @@ final class OriginalBagSearchProcessTests: XCTestCase {
         XCTAssertEqual(process.objects[2].positionFixed, SIMD3(-40_960, 0, -40_960))
     }
 
-    func testDraggingTypeThreeToTheSourceTargetRevealsTheTreeBox() throws {
+    func testProvisionalModelCompletesWhenTypeThreeReachesOrigin() throws {
         var process = OriginalBagSearchProcess()
         let object = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
         let start = SIMD2(process.objects[object].positionFixed.x, process.objects[object].positionFixed.z)
@@ -28,7 +28,7 @@ final class OriginalBagSearchProcessTests: XCTestCase {
         XCTAssertTrue(process.canOpenMenu)
     }
 
-    func testOtherObjectTypesAndNearMissesDoNotCompleteThePuzzle() throws {
+    func testProvisionalModelRejectsOtherTypesAndNearMisses() throws {
         var process = OriginalBagSearchProcess()
         process.beginDrag(object: 0, at: SIMD2(-4_096, 0))
         process.drag(to: .zero)
@@ -53,7 +53,7 @@ final class OriginalBagSearchProcessTests: XCTestCase {
         XCTAssertEqual(process.phase, .exiting)
     }
 
-    func testFoundTreeBoxReturnsSuccessFromTheMenu() throws {
+    func testProvisionalModelReturnsSuccessAfterFindingTheTreeBox() throws {
         var process = OriginalBagSearchProcess()
         let object = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
         let start = SIMD2(process.objects[object].positionFixed.x, process.objects[object].positionFixed.z)
