@@ -1483,15 +1483,7 @@ public final class OriginalPlaySession: ObservableObject {
               let renderer = searchShedRenderer else { return }
         let point = SIMD2(x, y)
         if searchShedTouch == nil, let object = renderer.object(at: point, process: process) {
-            if object == 9 {
-                _ = process.select(object: object, targetIsUnobstructed: true)
-            } else if let position = renderer.planePoint(at: point, height: process.objects[object].position.y) {
-                process.beginDrag(object: object, at: position)
-            }
-        }
-        if process.draggedObject != nil, let object = process.draggedObject,
-           let position = renderer.planePoint(at: point, height: process.objects[object].position.y) {
-            process.drag(to: position)
+            _ = process.registerHit(object: object)
         }
         searchShedTouch = point
         searchShed = process
@@ -1503,7 +1495,6 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.releaseSearchShedTouch)
         defer { endProgressInput(recordsProgress) }
         searchShedTouch = nil
-        searchShed?.endDrag()
     }
 
     public func openSearchShedMenu() {
@@ -1517,7 +1508,7 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.openSearchShedTreeBox)
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(79) = runner.phase, var process = searchShed else { return }
-        let effects = process.openFoundBox()
+        let effects = process.confirmFoundSearch()
         searchShed = process
         applySearchShed(effects)
     }
@@ -4098,7 +4089,7 @@ public final class OriginalPlaySession: ObservableObject {
                 case .fadeOut(let updates):
                     try searchShedScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2,
                                                                  from: 0, frames: UInt16(updates))
-                case .foundTreeBox:
+                case .successReady:
                     break
                 case .completed(let result):
                     searchShed = nil
