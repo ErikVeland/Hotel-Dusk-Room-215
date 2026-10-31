@@ -27,10 +27,11 @@ public struct OriginalNotebook: Sendable {
     /// The first available memo that has not been read. The notebook opens at its page.
     public let unreadMemo: Int?
 
+    /// Tile offsets read through the notebook's 0x02079CC0 table.
+    private static let applePageSlots = [(x: 16, y: 14), (x: 4, y: 18), (x: 14, y: 24),
+                                         (x: 8, y: 5), (x: 1, y: 2)]
+
     public init(game: OriginalGameState, load: (String) throws -> Data) throws {
-        guard game.bytes[0x13D8..<0x13DA].allSatisfy({ $0 == 0 }) else {
-            throw OriginalDataError.unsupported("Apple notebook page composition")
-        }
         pages = (0..<3).map { Array(game.bytes[(0x3558 + $0 * Self.packedSize)..<(0x3558 + ($0 + 1) * Self.packedSize)]) }
         inkLayers = Array(repeating: [], count: 3)
         locked = (0..<3).map { game.bytes[0x13C8 + $0] != 0 }
@@ -72,6 +73,34 @@ public struct OriginalNotebook: Sendable {
             if unread == nil, !game.memoRead(index) {
                 unread = index
                 startPage = pages.count - 1
+            }
+        }
+        if game.appleNotebookPageMask != 0 {
+            let path = "system/note/memo/appmem_M.bin"
+            let data = try load(path)
+            guard data.count == Self.packedSize else { throw OriginalDataError.invalid("Apple notebook page length") }
+            var overview = Array(data)
+            for index in Self.applePageSlots.indices where game.appleNotebookPageMask & (1 << index) == 0 {
+                let slot = Self.applePageSlots[index]
+                let start = slot.x * 0x100 + slot.y * 8
+                for row in 0..<5 {
+                    let lowerBound = start + row * 0x100
+                    let range = lowerBound..<(lowerBound + 0x28)
+                    guard range.upperBound <= overview.count else {
+                        throw OriginalDataError.invalid("Apple notebook page slot")
+                    }
+                    overview.replaceSubrange(range, with: repeatElement(0, count: range.count))
+                }
+            }
+            pages.append(overview)
+            inkLayers.append([])
+
+            for index in 1..<Self.applePageSlots.count where game.appleNotebookPageMask & (1 << index) != 0 {
+                let path = String(format: "system/note/memo/apppic%d_M.bin", index + 1)
+                let data = try load(path)
+                guard data.count == Self.packedSize else { throw OriginalDataError.invalid("Apple notebook drawing length") }
+                pages.append(Array(data))
+                inkLayers.append([])
             }
         }
         unreadMemo = unread

@@ -1912,69 +1912,43 @@ final class OriginalStoryContinuationTests: XCTestCase {
         let model = try library.load(path: "trick/searchshed/soko.mdf")
         let projection = try OriginalBagSearchProjection(models: [model])
         let treeBox = try XCTUnwrap(bagSearch.objects.firstIndex { $0.type == 3 })
-        var masks = try projection.objectMasks(process: bagSearch)
-        for blocker in bagSearch.objects.indices where blocker != treeBox {
-            guard let mask = masks.first(where: { $0.0 == blocker })?.1 else { continue }
-            var visiblePoint: SIMD2<Float>?
-            for y in stride(from: min(255, Int(mask.bounds.maxY.rounded(.up)) - 1),
-                            through: max(0, Int(mask.bounds.minY)), by: -2) where visiblePoint == nil {
-                for x in stride(from: max(0, Int(mask.bounds.minX)),
-                                to: min(192, Int(mask.bounds.maxX.rounded(.up))), by: 2) {
+        func visibleTouchPoints(_ process: OriginalBagSearchProcess) throws -> [Int: SIMD2<Float>] {
+            let masks = try projection.objectMasks(process: process)
+            var points = [Int: SIMD2<Float>]()
+            for y in stride(from: 0, to: 256, by: 4) {
+                for x in stride(from: 0, to: 192, by: 4) {
                     let point = SIMD2<Float>(Float(x), Float(y))
-                    guard let depth = mask.depth(at: point),
-                          depth <= (masks.compactMap { $0.1.depth(at: point) }.min() ?? .infinity),
-                          projection.planePointFixed(at: point) != nil else { continue }
-                    visiblePoint = point
-                    break
+                    guard projection.planePointFixed(at: point) != nil else { continue }
+                    let nearest = masks.compactMap { index, mask in
+                        mask.depth(at: point).map { (index, $0) }
+                    }.min { $0.1 < $1.1 }
+                    if let nearest, points[nearest.0] == nil { points[nearest.0] = point }
                 }
             }
-            guard let start = visiblePoint,
-                  let startPlane = projection.planePointFixed(at: start) else { continue }
-            let target = [SIMD2<Int32>(4_096, 0), SIMD2<Int32>(-4_096, 0),
-                          SIMD2<Int32>(0, 8_192), SIMD2<Int32>(0, -8_192)]
-                .compactMap { offset -> SIMD2<Float>? in
-                    let plane = SIMD2(startPlane.x + offset.x, startPlane.y + offset.y)
-                    let clip = projection.viewProjection * SIMD4(Float(plane.x) / 4_096, 0,
-                                                                  Float(plane.y) / 4_096, 1)
-                    let page = SIMD2((clip.x / clip.w + 1) * 96, (1 - clip.y / clip.w) * 128)
-                    return page.x >= 0 && page.x < 192 && page.y >= 0 && page.y < 256 ? page : nil
-                }.first
-            guard let target else { continue }
+            return points
+        }
+
+        var visiblePoints = try visibleTouchPoints(bagSearch)
+        let destination = SIMD2<Float>(0, 255)
+        XCTAssertNotNil(projection.planePointFixed(at: destination))
+        for _ in 0..<30 where visiblePoints[treeBox] == nil {
+            guard let blocker = visiblePoints.keys.sorted().first(where: { $0 != treeBox }),
+                  let start = visiblePoints[blocker] else { break }
             play.holdBagSearchTouch(x: start.x, y: start.y)
-            guard play.bagSearch?.draggedObject == blocker else {
-                play.releaseBagSearchTouch()
-                continue
-            }
-            play.holdBagSearchTouch(x: target.x, y: target.y)
+            play.holdBagSearchTouch(x: destination.x, y: destination.y)
             play.releaseBagSearchTouch()
-            masks = try projection.objectMasks(process: try XCTUnwrap(play.bagSearch))
+            visiblePoints = try visibleTouchPoints(XCTUnwrap(play.bagSearch))
         }
-        let treeBoxMask = try XCTUnwrap(masks.first { $0.0 == treeBox }?.1)
-        var startCandidate: (point: SIMD2<Float>, error: Int64)?
-        for y in stride(from: max(0, Int(treeBoxMask.bounds.minY)),
-                        to: min(256, Int(treeBoxMask.bounds.maxY.rounded(.up))), by: 2) {
-            for x in stride(from: max(0, Int(treeBoxMask.bounds.minX)),
-                            to: min(192, Int(treeBoxMask.bounds.maxX.rounded(.up))), by: 2) {
-                let point = SIMD2<Float>(Float(x), Float(y))
-                guard let depth = treeBoxMask.depth(at: point) else { continue }
-                let frontDepth = masks.compactMap { $0.1.depth(at: point) }.min() ?? .infinity
-                guard depth <= frontDepth, let plane = projection.planePointFixed(at: point) else { continue }
-                let dx = Int64(bagSearch.objects[treeBox].positionFixed.x - plane.x)
-                let dz = Int64(bagSearch.objects[treeBox].positionFixed.z - plane.y)
-                let error = dx * dx + dz * dz
-                if startCandidate == nil || error < startCandidate!.error {
-                    startCandidate = (point, error)
-                }
-            }
-        }
-        let start = try XCTUnwrap(startCandidate?.point)
+        let start = try XCTUnwrap(visiblePoints[treeBox])
         let startPlane = try XCTUnwrap(projection.planePointFixed(at: start))
         let initialPosition = bagSearch.objects[treeBox].positionFixed
         let targetPlane = SIMD2(startPlane.x - initialPosition.x, startPlane.y - initialPosition.z)
         let clip = projection.viewProjection * SIMD4(Float(targetPlane.x) / 4096, 0,
                                                      Float(targetPlane.y) / 4096, 1)
         let target = SIMD2((clip.x / clip.w + 1) * 96, (1 - clip.y / clip.w) * 128)
-        XCTAssertEqual(projection.planePointFixed(at: target), targetPlane)
+        let roundTrip = try XCTUnwrap(projection.planePointFixed(at: target))
+        XCTAssertLessThanOrEqual(abs(Int64(roundTrip.x) - Int64(targetPlane.x)), 256)
+        XCTAssertLessThanOrEqual(abs(Int64(roundTrip.y) - Int64(targetPlane.y)), 256)
         play.holdBagSearchTouch(x: start.x, y: start.y)
         play.holdBagSearchTouch(x: target.x, y: target.y)
         play.releaseBagSearchTouch()

@@ -168,6 +168,8 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
     /// Overlay 13 stores the Christmas tree decoration order at state offset 0x13DA.
     public var christmasTreeDecorationOrder: UInt16 { read16(0x13DA) }
     public mutating func storeChristmasTreeDecorationOrder(_ value: UInt16) { write16(0x13DA, value) }
+    /// The notebook reads its five apple-page bits from the game substructure at 0x13D8.
+    public var appleNotebookPageMask: UInt16 { read16(0x13D8) & 0x1F }
     public var cashboxDialRetainedValue: UInt16 { read16(0x13DE) }
     public mutating func storeCashboxDialValue(_ value: UInt16) { write16(0x13DE, value) }
 

@@ -40,8 +40,6 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var runner: OriginalEventRunner {
         didSet { reportRecoverableStopIfNeeded() }
     }
-    @Published private(set) var encounterPortraits: [OriginalEncounterAnimations.Portrait] = []
-    private var encounterAnimations: OriginalEncounterAnimations?
     @Published public private(set) var entrance: EntranceScene?
     @Published public private(set) var bell: BellScene?
 
@@ -4703,8 +4701,7 @@ public final class OriginalPlaySession: ObservableObject {
         guard next != lobbyRenderScale else { return }
         lobbyRenderScale = next
         lobbyRenderer?.setDisplayScale(CGFloat(next))
-        do { try renderLobby() }
-        catch { sourceError = String(describing: error) }
+        redrawLobby()
     }
 
     private func moveToMap(_ map: Int16, relocationMarker: Int? = nil) {
