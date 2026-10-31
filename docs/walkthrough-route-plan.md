@@ -366,6 +366,9 @@ is modified-checkpoint evidence only. The native process now recognises this
 slot-5 tap, fades for 60 updates and returns value 2. This covers the captured
 exit path; it does not verify the normal parent event. See
 [`process-45-quit-path.json`](../Tests/Fixtures/Cassette/process-45-quit-path.json).
+The native model's six-frame success threshold is inferred. Its focused test
+checks that heuristic only; the captured matched gesture remains in the ROM
+process, so this test does not establish source parity.
 
 Overlay 25 loads `bg.bin` and `table.bin` as textures, then loads `pencil.mdf`,
 `ballpen.mdf` and `tape.mdf` with their matching source textures. The bundled
