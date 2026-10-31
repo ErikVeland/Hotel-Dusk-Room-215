@@ -10,8 +10,8 @@ final class OriginalSearchShedRendererTests: XCTestCase {
         guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
         let renderer = try OriginalSearchShedRenderer()
         let image = try renderer.render(OriginalSearchShedProcess())
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
         let pixels = try XCTUnwrap(image.dataProvider?.data) as Data
         XCTAssertGreaterThan(pixels.enumerated().filter { $0.offset % 4 == 3 && $0.element > 0 }.count, 256)
         XCTAssertGreaterThan(Set(pixels).count, 16)

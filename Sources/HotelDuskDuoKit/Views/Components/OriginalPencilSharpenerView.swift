@@ -13,7 +13,7 @@ struct OriginalPencilSharpenerView: View {
             if let image = play.pencilSharpenerImage {
                 Image(decorative: image, scale: 1)
                     .resizable()
-                    .interpolation(.none)
+                    .interpolation(image.width > 192 ? .high : .none)
                     .frame(width: input.size.width, height: input.size.height)
                     .contentShape(Rectangle())
                     .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)

@@ -45,7 +45,7 @@ struct OriginalInspectionImage: View {
             let input = OriginalPageInput(available: CGSize(width: max(0, proxy.size.width - 16),
                                                        height: max(0, proxy.size.height - 36)))
             Image(decorative: image, scale: 1)
-                .resizable().interpolation(.none)
+                .resizable().interpolation(image.width > 192 ? .high : .none)
                 .frame(width: input.size.width, height: input.size.height)
                 .overlay(alignment: .topLeading) {
                     if selected, let point = lastPoint {

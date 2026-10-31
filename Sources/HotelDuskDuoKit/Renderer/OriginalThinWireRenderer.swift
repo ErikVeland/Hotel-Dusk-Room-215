@@ -59,7 +59,7 @@ public final class OriginalThinWireRenderer: OriginalThinWireRendering {
     public func render(_ puzzle: OriginalThinWireProcess) throws -> CGImage {
         if puzzle.showsLock { return try renderLock(puzzle) }
         let projection = OriginalSuitcaseProjection.viewProjection(eye: puzzle.eye, target: puzzle.target)
-        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 768, height: 1024, device: device, queue: queue) { encoder in
             wire.encode(encoder: encoder, viewProjection: projection, visibleNodes: Set(wire.model.nodes.indices),
                 modelTransform: Self.transform(position: puzzle.drawnWire,
                     scale: puzzle.variant == .thin ? 0.006 : 0.06,

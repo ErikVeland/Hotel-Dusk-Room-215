@@ -46,6 +46,15 @@ public struct OriginalMapExploration {
         let scroll = OriginalMapCatalog.maps[mapID]!.compact ? simd_clamp(point, SIMD2(repeating: -96), SIMD2(repeating: 96)) : point
         return origin - SIMD2(Float(Int(scroll.x)), Float(Int(scroll.y)))
     }
+    public var mapPlayerPoint: SIMD2<Float> {
+        let centre = SIMD2<Float>(96, 128)
+        guard OriginalMapCatalog.maps[mapID]!.compact else { return centre }
+        let point = mapOrigin + SIMD2(position.x, position.z) / 4096 * mapScale
+        return SIMD2<Float>(128, 128) + point + mapBitmapOffset
+    }
+
+    public static let walkingHorizontalFieldOfView: Float = 50 * .pi / 180
+
     public private(set) var mode: Mode = .walking
     public private(set) var position = SIMD3<Float>(-82, 12288, 21217)
     public private(set) var facing: Float = .pi
@@ -567,7 +576,7 @@ public struct OriginalMapExploration {
             SIMD4(right.x, up.x, back.x, 0), SIMD4(right.y, up.y, back.y, 0),
             SIMD4(right.z, up.z, back.z, 0), SIMD4(-simd_dot(right, eye), -simd_dot(up, eye), -simd_dot(back, eye), 1)))
         // 0x0202FED8: 25-degree half-angle; DS aspect 255/191; near 0.1, far 40.
-        let sx: Float = 1 / tan(25 * .pi / 180), sy = sx * 191 / 255
+        let sx: Float = 1 / tan(Self.walkingHorizontalFieldOfView / 2), sy = sx * 191 / 255
         let near: Float = 0.1, far: Float = 40
         let projection = simd_float4x4(columns: (
             SIMD4(sx, 0, 0, 0), SIMD4(0, sy, 0, 0),

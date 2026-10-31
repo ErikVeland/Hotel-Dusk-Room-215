@@ -63,8 +63,8 @@ final class OriginalDoorWireTests: XCTestCase {
     @MainActor func testOriginalDoorArtLoadsAndRenders() throws {
         for variant: OriginalThinWireProcess.Variant in [.door, .orderedDoor] {
             let image = try OriginalThinWireRenderer(variant: variant).render(ready(variant))
-            XCTAssertEqual(image.width, 192)
-            XCTAssertEqual(image.height, 256)
+            XCTAssertEqual(image.width, 768)
+            XCTAssertEqual(image.height, 1024)
         }
     }
 }

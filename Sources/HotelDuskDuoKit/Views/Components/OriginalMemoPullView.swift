@@ -14,7 +14,7 @@ struct OriginalMemoPullView: View {
                 ZStack {
                     Color.black
                     if let image = play.memoPullImage {
-                        Image(decorative: image, scale: 1).interpolation(.none)
+                        Image(decorative: image, scale: 1).resizable().interpolation(.high).frame(width: 192, height: 256)
                     }
                     (brightness > 0 ? Color.white : Color.black)
                         .opacity(Double(min(16, abs(brightness))) / 16)

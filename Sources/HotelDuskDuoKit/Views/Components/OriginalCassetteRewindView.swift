@@ -13,7 +13,7 @@ struct OriginalCassetteRewindView: View {
                 ZStack {
                     Color.black
                     if let image = play.cassetteImage {
-                        Image(decorative: image, scale: 1).interpolation(.none).opacity(play.cassetteOpacity)
+                        Image(decorative: image, scale: 1).resizable().interpolation(.high).frame(width: 192, height: 256).opacity(play.cassetteOpacity)
                     }
                 }
                 .frame(width: 192, height: 256)

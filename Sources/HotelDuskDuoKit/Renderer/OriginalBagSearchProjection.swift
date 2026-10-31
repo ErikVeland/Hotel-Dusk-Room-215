@@ -64,8 +64,8 @@ struct OriginalBagSearchProjection {
 
     private static var projection: simd_float4x4 {
         let near: Float = 0.1
-        let far: Float = 100
-        let focal = 1 / tan(Float.pi / 9)
+        let far: Float = 60
+        let focal = 1 / tan(Float.pi / 18)
         let aspect = Float(192) / 256
         return simd_float4x4(columns: (
             SIMD4(focal / aspect, 0, 0, 0),
@@ -76,7 +76,7 @@ struct OriginalBagSearchProjection {
 
     private static var view: simd_float4x4 {
         let eye = SIMD3<Float>(5, 1.5, 7)
-        let target = SIMD3<Float>(0, 1, 0)
+        let target = SIMD3<Float>(1, 1.5, 0)
         let backward = simd_normalize(eye - target)
         let right = simd_normalize(simd_cross(SIMD3<Float>(0, 1, 0), backward))
         let up = simd_cross(backward, right)

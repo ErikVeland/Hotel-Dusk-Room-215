@@ -43,7 +43,7 @@ public final class OriginalSuitcaseRenderer: OriginalSuitcaseRendering {
     public func render(_ puzzle: OriginalSuitcaseKeyProcess) throws -> CGImage {
         let projection = OriginalSuitcaseProjection.viewProjection(eye: puzzle.eye, target: puzzle.target)
         let currentKey = puzzle.isBroken ? brokenKey : key
-        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 768, height: 1024, device: device, queue: queue) { encoder in
             currentKey.encode(encoder: encoder, viewProjection: projection, visibleNodes: Set(currentKey.model.nodes.indices),
                 modelTransform: Self.transform(position: puzzle.drawnKey, scale: puzzle.keyScale,
                     roll: puzzle.keyRoll, turn: puzzle.keyTurn))

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rebuild verified room lettering and the reviewed illustrative door texture."""
+"""Retired exploratory door and lettering prototype; do not use for a pack."""
 import argparse
 import json
 from pathlib import Path
@@ -86,6 +86,7 @@ def main(args):
 
 
 if __name__ == "__main__":
+    raise SystemExit("Retired: this prototype distorted the door and plaque. Use build_chapter_one_door_candidate.py for the isolated candidate.")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=ROOT / ".cache/original-art-export")
     parser.add_argument("--output", type=Path, default=ROOT / "tools/artwork-overrides")

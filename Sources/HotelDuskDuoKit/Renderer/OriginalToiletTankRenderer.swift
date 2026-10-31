@@ -40,7 +40,7 @@ public final class OriginalToiletTankRenderer: OriginalToiletTankRendering {
             lid: Self.translation(lidPivot) * Self.rotation(puzzle.lidAngle, .init(0, 1, 0)) * Self.translation(-lidPivot),
             handle: Self.translation(handlePivot) * Self.rotation(puzzle.phase == 2 ? puzzle.flushAngle : 0, .init(0, 0, 1)) * Self.translation(-handlePivot)
         ]
-        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 768, height: 1024, device: device, queue: queue) { encoder in
             model.encode(encoder: encoder, viewProjection: Self.projection, visibleNodes: Set(model.model.nodes.indices), modelTransform: body, nodeTransforms: nodes)
         }
     }

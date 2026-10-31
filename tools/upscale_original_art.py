@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproducible offline 2x AI artwork pack. Inference never runs in the game."""
+"""Reproducible offline artwork pack. Inference never runs in the game."""
 import argparse
 import hashlib
 import json
@@ -14,6 +14,7 @@ from scipy.ndimage import distance_transform_edt
 from scipy.ndimage import gaussian_filter
 import torch
 from spandrel import ModelLoader
+from artwork_scalers import model_pipeline, routing_settings
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -150,33 +151,49 @@ def compare(args, manifest):
 
 
 def run(args, manifest):
+    if args.chapter_one and not args.skip_animation:
+        raise ValueError("The current animation finish was rejected; replace it before building a Chapter 1 pack")
     args.output.mkdir(parents=True, exist_ok=True)
-    names = ["4x-Manga109Attempt.pth", "4x-Nomos8kSC.pth", "2xHDCube_Compact.pth"] if args.model == "mixed" else [args.model]
+    # Keep short-lived files outside the bundled resource directory: Xcode may
+    # copy that directory while the offline asset job is running.
+    staging = args.output.parent / ("." + args.output.name + "-staging")
+    staging.mkdir(parents=True, exist_ok=True)
+    selection = manifest["images"]
+    if args.chapter_one:
+        from chapter_one_art import select, selected_clips
+        clips = selected_clips()
+        selection = [r for r in selection if select(r, clips)]
+    if args.skip_animation:
+        selection = [r for r in selection if r["category"] != "animation"]
+    if args.limit:
+        selection = selection[:args.limit]
+    names = sorted({name for record in selection for name in model_pipeline(record["category"], args.model)})
     fingerprints = {name: sha(args.models / name) for name in names}
-    settings = {"model": args.model, "modelSHA256": fingerprints, "scale": 4, "animationScale": 8,
+    settings = {"model": args.model, "modelRouting": routing_settings(args.model),
+                "modelSHA256": fingerprints, "scale": 4, "animationScale": 8,
                 "tile": 320, "overlap": 24, "edgePadding": "symmetric-16",
-                "alpha": "Lanczos with original transparent support preserved", "version": 5,
+                "alpha": "Lanczos with original transparent support preserved", "version": 6,
                 "detail": "Three source-consistency back-projection steps; no denoising",
                 "materialFinish": "Restrained graphite hatching, dry grain and fine-edge emphasis",
                 "orientation": "Bitmap archive images inferred upright, then returned to source orientation"}
     settings_path = args.output / "Settings.json"
     if settings_path.exists() and json.loads(settings_path.read_text()) != settings:
         raise ValueError("Output pack belongs to another model or settings; use another output folder")
+    if not settings_path.exists() and (args.output / "ArtworkManifest.json").exists():
+        raise ValueError("Output pack has no settings provenance; use a fresh output folder")
     settings_path.write_text(json.dumps(settings, indent=2) + "\n")
     models = {name: load_model(args.models / name) for name in names}
     records = []
     started = time.monotonic()
-    selection = manifest["images"][:args.limit] if args.limit else manifest["images"]
     for index, record in enumerate(selection):
         target = args.output / (record["key"] + ".png")
         override = args.overrides / target.name
-        if args.model == "mixed":
-            name = ("4x-Manga109Attempt.pth" if record["category"] == "animation" else
-                    "4x-Nomos8kSC.pth" if record["category"] in ("texture", "linear", "bitmap", "map") else "4x-Nomos8kSC.pth")
-        else:
-            name = args.model
+        pipeline = model_pipeline(record["category"], args.model)
+        name = pipeline[0]
         if override.exists():
-            shutil.copyfile(override, target)
+            temporary = staging / (target.stem + ".tmp")
+            shutil.copyfile(override, temporary)
+            os.replace(temporary, target)
         elif not target.exists():
             image = Image.open(args.input / target.name)
             upright = record["category"] in ("linear", "bitmap", "cinematic") or (
@@ -187,13 +204,16 @@ def run(args, manifest):
             result = preserve_source_detail(image, result)
             if record["category"] == "animation":
                 master = result
-                result = upscale(master, models["2xHDCube_Compact.pth"], scale=2)
+                # One tile fits the 768×1024 animation master. This avoids
+                # repeated GPU dispatches; compared with 320px overlapping
+                # tiles, a representative frame produced identical output pixels.
+                result = upscale(master, models[pipeline[1]], tile=1536, scale=2)
                 result = preserve_source_detail(master, result)
             if record["category"] == "texture":
                 result = illustrated_material(result, record["key"])
             if upright:
                 result = result.transpose(Image.Transpose.ROTATE_270)
-            temporary = target.with_suffix(".tmp")
+            temporary = staging / (target.stem + ".tmp")
             result.save(temporary, format="PNG", compress_level=6)
             os.replace(temporary, target)
         with Image.open(target) as output:
@@ -202,16 +222,20 @@ def run(args, manifest):
                 raise ValueError("Incorrect enhanced dimensions or transparency: " + str(target))
             output_hash = hashlib.sha256(output.tobytes()).hexdigest()
         records.append({**record, "file": target.name, "pngSHA256": sha(target),
-                        "outputRGBA256": output_hash, "model": name, "scale": scale,
+                        "outputRGBA256": output_hash,
+                        "model": "override" if override.exists() else name,
+                        "finishModel": pipeline[1] if record["category"] == "animation" and not override.exists() else None,
+                        "scale": scale,
                         "overrideSHA256": sha(override) if override.exists() else None})
         if index % 50 == 0 or index == len(selection) - 1:
             elapsed = time.monotonic() - started
             print(f"{index + 1}/{len(selection)} images; {elapsed:.1f}s", flush=True)
-    result = {"formatVersion": 1, **settings, "complete": len(selection) == len(manifest["images"]),
+    result = {"formatVersion": 1, **settings, "complete": args.limit is None and not args.skip_animation,
+              "scope": "chapter1-conservative" if args.chapter_one else "all",
               "coverage": manifest["coverage"], "images": records, "excluded": manifest["excluded"],
               "seconds": round(time.monotonic() - started, 2)}
     path = args.output / "ArtworkManifest.json"
-    temporary = path.with_suffix(".tmp")
+    temporary = staging / "ArtworkManifest.tmp"
     temporary.write_text(json.dumps(result, indent=2) + "\n")
     os.replace(temporary, path)
     print(json.dumps({"images": len(records), "complete": result["complete"], "seconds": result["seconds"]}), flush=True)
@@ -226,6 +250,8 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="mixed")
     parser.add_argument("--compare", action="store_true")
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--chapter-one", action="store_true")
+    parser.add_argument("--skip-animation", action="store_true", help="process textures only; leave the pack incomplete")
     parser.add_argument("--threads", type=int, default=8)
     options = parser.parse_args()
     torch.set_num_threads(options.threads)

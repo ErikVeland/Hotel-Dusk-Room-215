@@ -13,7 +13,7 @@ public struct OriginalOpeningCardPage: View {
     public var body: some View {
         Image(decorative: image, scale: 1)
             .resizable()
-            .interpolation(.none)
+            .interpolation(image.width > 192 ? .high : .none)
             .aspectRatio(CGFloat(192) / 256, contentMode: .fit)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(.black)

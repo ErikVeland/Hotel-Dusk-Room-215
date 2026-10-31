@@ -52,7 +52,7 @@ final class OriginalBookmarkBoxRenderer {
                 3: Self.translation(.init(0, 2.5, 6.5)) * Self.rotation(248 * .pi / 180, .init(1, 0, 0)) * Self.translation(.init(0, -2.5, -6.5)),
                 4: Self.translation(.init(0, 2.5, -6.588)) * Self.rotation(-248 * .pi / 180, .init(1, 0, 0)) * Self.translation(.init(0, -2.5, 6.588))
             ]
-            let scene = try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
+            let scene = try OriginalModelMetalPreview.render(width: 768, height: 1024, device: device, queue: queue) { encoder in
                 box.encode(encoder: encoder, viewProjection: Self.projection, visibleNodes: Set(box.model.nodes.indices.filter { $0 != 6 || puzzle.taps >= 10 }),
                     modelTransform: body, nodeTransforms: flaps)
             }

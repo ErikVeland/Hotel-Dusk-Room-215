@@ -4,7 +4,12 @@ import Metal
 @MainActor
 public protocol OriginalMapRendering: AnyObject {
     var map: CGImage { get }
+    func setDisplayScale(_ scale: CGFloat)
     func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage
+}
+
+public extension OriginalMapRendering {
+    func setDisplayScale(_ scale: CGFloat) {}
 }
 
 public typealias OriginalMapRendererFactory = @MainActor (String, UInt16?) throws -> any OriginalMapRendering
@@ -19,7 +24,7 @@ public final class OriginalMapRenderer: OriginalMapRendering {
     private var counter: OriginalModelMetalPreview?
     private let mapName: String
     private let initialSearchArea: UInt16?
-    private var previousCamera: [Float]?
+    private var renderScale = 4
 
     public init(mapName: String = "R102", searchArea: UInt16? = nil) throws {
         self.mapName = mapName
@@ -49,10 +54,12 @@ public final class OriginalMapRenderer: OriginalMapRendering {
         let visible = state.objectVisibility.visibleNodes(in: scene.model, map: state.mapID,
             area: state.mode == .walking ? nil : state.searchAreaID, game: game)
             .intersection(scene.model.gameplayRenderNodes)
-        let camera = [state.position.x, state.position.z, state.facing, state.pan, state.mode == .walking ? 0 : 1]
-        let scale = previousCamera == nil || previousCamera == camera ? 4 : 2
-        previousCamera = camera
-        return try scene.render(width: 192 * scale, height: 256 * scale, viewProjection: state.viewProjection,
+        return try scene.render(width: 192 * renderScale, height: 256 * renderScale, viewProjection: state.viewProjection,
             visibleNodes: visible)
+    }
+
+    public func setDisplayScale(_ scale: CGFloat) {
+        guard scale.isFinite, scale > 0 else { return }
+        renderScale = min(16, max(4, Int(ceil(scale))))
     }
 }

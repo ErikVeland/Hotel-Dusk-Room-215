@@ -4,10 +4,17 @@ import Foundation
  * Notebook pages and ink from 0x020797CC, 0x02079CC8 and 0x02078DA8.
  */
 public struct OriginalNotebook: Sendable {
+    struct InkLayer: Sendable {
+        let pixels: [UInt8]
+        let offset: Int
+        let rows: Int
+    }
+
     public static let packedSize = 0x1800
     public private(set) var page = 0
     public private(set) var pages: [[UInt8]]
     public private(set) var pixels: [UInt8]
+    private var inkLayers: [[InkLayer]]
     public private(set) var erasing = false
     private let locked: [Bool]
     private var undoPixels: [UInt8]
@@ -15,6 +22,7 @@ public struct OriginalNotebook: Sendable {
 
     public var canEdit: Bool { page < 3 && !locked[page] }
     public var pageCount: Int { pages.count }
+    var currentInkLayers: [InkLayer] { inkLayers[page] }
 
     /// The first available memo that has not been read. The notebook opens at its page.
     public let unreadMemo: Int?
@@ -24,11 +32,13 @@ public struct OriginalNotebook: Sendable {
             throw OriginalDataError.unsupported("Apple notebook page composition")
         }
         pages = (0..<3).map { Array(game.bytes[(0x3558 + $0 * Self.packedSize)..<(0x3558 + ($0 + 1) * Self.packedSize)]) }
+        inkLayers = Array(repeating: [], count: 3)
         locked = (0..<3).map { game.bytes[0x13C8 + $0] != 0 }
         for index in 0..<16 where game.bytes[0x87B + index / 8] & (1 << (index % 8)) != 0 {
             let data = try load(String(format: "system/note/memo/memo%02d_M.bin", index + 1))
             guard data.count == Self.packedSize else { throw OriginalDataError.invalid("Notebook drawing length") }
             pages.append(Array(data))
+            inkLayers.append([])
         }
         /**
          * 0x020797CC packs available Mila memos top-down onto shared pages. A page breaks
@@ -44,6 +54,7 @@ public struct OriginalNotebook: Sendable {
             if group == nil { group = Int(data[5]) }
             if !pageStarted || used + rows > 0x100 || group != Int(data[5]) {
                 pages.append(Array(repeating: 0, count: Self.packedSize))
+                inkLayers.append([])
                 pageStarted = true
                 used = 0
                 group = nil
@@ -55,6 +66,8 @@ public struct OriginalNotebook: Sendable {
                 let target = column * 0x100 + 0x100 - used - rows
                 pages[pages.count - 1].replaceSubrange(target..<(target + rows), with: data[source..<(source + rows)])
             }
+            inkLayers[inkLayers.count - 1].append(InkLayer(
+                pixels: Self.unpack(Array(data[0x10...])), offset: used, rows: rows))
             used += rows
             if unread == nil, !game.memoRead(index) {
                 unread = index

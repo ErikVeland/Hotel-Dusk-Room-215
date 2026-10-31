@@ -67,7 +67,7 @@ final class OriginalCassetteRenderer: OriginalCassetteRendering {
     }
 
     func render() throws -> CGImage {
-        let scene = try OriginalModelMetalPreview.render(width: 512, height: 384,
+        let scene = try OriginalModelMetalPreview.render(width: 1024, height: 768,
             device: device, queue: queue) { encoder in
                 tape.encode(encoder: encoder, viewProjection: Self.viewProjection,
                     visibleNodes: Set(tape.model.nodes.indices),

@@ -40,6 +40,8 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var runner: OriginalEventRunner {
         didSet { reportRecoverableStopIfNeeded() }
     }
+    @Published private(set) var encounterPortraits: [OriginalEncounterAnimations.Portrait] = []
+    private var encounterAnimations: OriginalEncounterAnimations?
     @Published public private(set) var entrance: EntranceScene?
     @Published public private(set) var bell: BellScene?
 
@@ -245,6 +247,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var lobbyImage: CGImage?
     public private(set) var lobbyMap: CGImage?
     private var lobbyRenderer: (any OriginalMapRendering)?
+    private var lobbyRenderScale = 4
     private let mapRendererFactory: OriginalMapRendererFactory
     private let suitcaseRendererFactory: OriginalSuitcaseRendererFactory
     private let hangerRendererFactory: OriginalHangerRendererFactory
@@ -2753,7 +2756,9 @@ public final class OriginalPlaySession: ObservableObject {
                 if lobby?.mapID != map {
                     lobby = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.previousMapID,
                         savedGame: runner.game.previousMapID == map ? runner.game : nil)
-                    lobbyRenderer = try mapRendererFactory(mapName, nil)
+                    let renderer = try mapRendererFactory(mapName, nil)
+                    renderer.setDisplayScale(CGFloat(lobbyRenderScale))
+                    lobbyRenderer = renderer
                     lobbyMap = lobbyRenderer?.map
                 }
                 var scriptedDestination: Int16?, scriptedRelocation: Int?
@@ -4443,7 +4448,9 @@ public final class OriginalPlaySession: ObservableObject {
                 let suffix = String(format: "%02d", area)
                 let model = try OriginalModelLibrary.bundled().load(path: "map/\(lobby.mapName)/\(lobby.mapName)_s\(suffix)/\(lobby.mapName)_s\(suffix).mdf")
                 try lobby.prepareSearch(area: area, model: model)
-                lobbyRenderer = try mapRendererFactory(lobby.mapName, area)
+                let renderer = try mapRendererFactory(lobby.mapName, area)
+                renderer.setDisplayScale(CGFloat(lobbyRenderScale))
+                lobbyRenderer = renderer
             }
             guard lobby.inspectCounter() else { return }
             self.lobby = lobby
@@ -4690,6 +4697,16 @@ public final class OriginalPlaySession: ObservableObject {
         if let lobby { lobbyImage = try lobbyRenderer?.render(lobby, game: runner.game) }
     }
 
+    public func setDisplayScale(_ scale: CGFloat) {
+        guard scale.isFinite, scale > 0 else { return }
+        let next = min(16, max(4, Int(ceil(scale))))
+        guard next != lobbyRenderScale else { return }
+        lobbyRenderScale = next
+        lobbyRenderer?.setDisplayScale(CGFloat(next))
+        do { try renderLobby() }
+        catch { sourceError = String(describing: error) }
+    }
+
     private func moveToMap(_ map: Int16, relocationMarker: Int? = nil) {
         do {
             guard let name = OriginalMapExploration.supportedMaps[map] else {
@@ -4706,6 +4723,7 @@ public final class OriginalPlaySession: ObservableObject {
             var exploration = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.mapID,
                 savedGame: restoresCurrentPosition ? runner.game : nil)
             let renderer = try mapRendererFactory(name, nil)
+            renderer.setDisplayScale(CGFloat(lobbyRenderScale))
             audio.stopWalkingAudio()
             runner = try runner.moving(to: map, program: catalog.loadMapProgram(chapter: runner.game.chapter, mapID: map))
             if let relocationMarker, try exploration.relocate(to: relocationMarker) {
@@ -4869,6 +4887,7 @@ public final class OriginalPlaySession: ObservableObject {
                                        toiletTankRendererFactory: toiletTankRendererFactory,
                                        bagSearchRendererFactory: bagSearchRendererFactory,
                                        bookmarkBoxRender: bookmarkBoxRender)
+        renderer.setDisplayScale(CGFloat(play.lobbyRenderScale))
         play.lobbyRenderer = renderer
         play.lobbyMap = renderer.map
         try play.renderLobby()

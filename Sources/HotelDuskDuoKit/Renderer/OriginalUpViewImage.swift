@@ -13,7 +13,7 @@ public struct OriginalUpViewImage {
 
     static let hitMargin = 2
 
-    public init(bitmaps: [OriginalLinearBitmap], visible: [Bool]) throws {
+    public init(bitmaps: [OriginalLinearBitmap], visible: [Bool], artwork: OriginalArtwork = .shared) throws {
         guard !bitmaps.isEmpty, bitmaps.count <= 16, visible.count == bitmaps.count, visible[0],
               bitmaps.allSatisfy({ $0.width == 256 && $0.height == 192 && [3, 4].contains($0.kind) }) else {
             throw OriginalDataError.invalid("Close-up bitmap layers")
@@ -40,8 +40,8 @@ public struct OriginalUpViewImage {
             throw OriginalDataError.invalid("Close-up image")
         }
         for (layer, bitmap) in bitmaps.enumerated() where visible[layer] {
-            guard let image = OriginalEntrancePanels.rotated(rgba: bitmap.rgba(transparentPaletteZero: layer > 0),
-                width: bitmap.width, height: bitmap.height) else { throw OriginalDataError.invalid("Close-up layer") }
+            guard let image = artwork.image(rgba: bitmap.rgba(transparentPaletteZero: layer > 0),
+                width: bitmap.width, height: bitmap.height, rotated: true) else { throw OriginalDataError.invalid("Close-up layer") }
             context.draw(image, in: CGRect(x: 0, y: 0, width: 192, height: 256))
         }
         guard let rendered = context.makeImage() else { throw OriginalDataError.invalid("Close-up composite") }

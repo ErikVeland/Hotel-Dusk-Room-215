@@ -140,8 +140,8 @@ final class OriginalCabinetDialTests: XCTestCase {
         var process = OriginalCabinetDialProcess(randomValue: 100, retainedValue: 0)
         update(&process, count: 2)
         let image = try renderer.render(process)
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
         if let folder = ProcessInfo.processInfo.environment["SNAPSHOT_DIR"] {
             try FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: true)
             let url = URL(fileURLWithPath: folder).appendingPathComponent("dial-entry.png")

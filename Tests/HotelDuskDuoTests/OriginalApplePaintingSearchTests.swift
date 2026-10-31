@@ -96,8 +96,8 @@ final class OriginalApplePaintingSearchTests: XCTestCase {
             XCTAssertTrue(mask.contains(targetPoint), "Painting \(index + 1) target is transparent")
             XCTAssertFalse(mask.contains(OriginalAlphabetTouchPoint(x: -1, y: 0)))
             let image = try renderer.render(index: index)
-            XCTAssertEqual(image.width, OriginalApplePaintingRenderer.pageWidth)
-            XCTAssertEqual(image.height, OriginalApplePaintingRenderer.pageHeight)
+            XCTAssertEqual(image.width, OriginalApplePaintingRenderer.pageWidth * 4)
+            XCTAssertEqual(image.height, OriginalApplePaintingRenderer.pageHeight * 4)
             XCTAssertEqual(bitmap.width, 256)
             XCTAssertEqual(bitmap.height, 256)
         }

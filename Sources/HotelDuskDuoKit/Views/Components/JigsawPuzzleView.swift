@@ -154,7 +154,7 @@ public struct JigsawPuzzleView: View {
         Group {
             if let image = JigsawArt.image(named: name) {
                 Image(decorative: image, scale: 1)
-                    .resizable().interpolation(.none)
+                    .resizable().interpolation(.high)
             }
         }
     }
@@ -172,7 +172,7 @@ private struct JigsawPieceView: View {
         Group {
             if let image = JigsawArt.image(named: piece.image) {
                 Image(decorative: image, scale: 1)
-                    .resizable().interpolation(.none)
+                    .resizable().interpolation(.high)
             }
         }
         .frame(width: piece.width * scale, height: piece.height * scale)

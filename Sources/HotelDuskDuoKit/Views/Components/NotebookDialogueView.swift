@@ -129,6 +129,7 @@ struct NotebookDialogueLeaf: View {
     let metrics: DialogueSpreadMetrics
     let pageIndex: Int
     var inspection = false
+    @AppStorage("pencilCharacterAnimations") private var pencilCharacterAnimations = true
 
     private func bindingShade(right: Bool) -> some View {
         LinearGradient(colors: [.black.opacity(0.28), .black.opacity(0.08), .clear],
@@ -186,7 +187,7 @@ struct NotebookDialogueLeaf: View {
                 OriginalAnimationFrameView(frame: portrait.frame)
                     .frame(width: min(metrics.pageSize.width * 0.34, 150),
                            height: min(metrics.pageSize.height * 0.34, 190))
-                    .opacity(0.22)
+                    .opacity(pencilCharacterAnimations ? 0.42 : 0.22)
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
                     .position(x: metrics.pageSize.width * 0.78, y: metrics.pageSize.height * 0.34)

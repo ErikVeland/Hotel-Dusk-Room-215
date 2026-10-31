@@ -38,7 +38,7 @@ public final class OriginalBagSearchRenderer: OriginalBagSearchRendering {
     }
 
     public func render(_ process: OriginalBagSearchProcess) throws -> CGImage {
-        try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
+        try OriginalModelMetalPreview.render(width: 768, height: 1024, device: device, queue: queue) { encoder in
             let instances = process.objects.filter { $0.type != nil }.map {
                 Self.translation(Self.position($0.positionFixed)) * Self.scale($0.scale)
             }

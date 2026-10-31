@@ -41,7 +41,7 @@ struct OriginalTouchPictureView: View {
 
     private func layer(_ image: CGImage, x: Int, y: Int, scale: CGFloat, smooth: Bool = false) -> some View {
         Image(decorative: image, scale: 1)
-            .resizable().interpolation(smooth ? .high : .none)
+            .resizable().interpolation(smooth || image.width > image.artworkWidth ? .high : .none)
             .frame(width: CGFloat(image.artworkWidth) * scale, height: CGFloat(image.artworkHeight) * scale)
             .offset(x: CGFloat(x) * scale, y: CGFloat(y) * scale)
             .allowsHitTesting(false)
