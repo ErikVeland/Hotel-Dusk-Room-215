@@ -1909,12 +1909,45 @@ final class OriginalStoryContinuationTests: XCTestCase {
         XCTAssertEqual(play.runner.phase, .process(id: 55))
         let bagSearch = try XCTUnwrap(play.bagSearch)
         let library = try OriginalModelLibrary.bundled()
-        let models = try ["p01", "p02", "p03", "kaban"].map {
-            try library.load(path: "trick/bag/\($0).mdf")
-        }
-        let projection = try OriginalBagSearchProjection(models: models)
+        let model = try library.load(path: "trick/searchshed/soko.mdf")
+        let projection = try OriginalBagSearchProjection(models: [model])
         let treeBox = try XCTUnwrap(bagSearch.objects.firstIndex { $0.type == 3 })
-        let masks = try projection.objectMasks(process: bagSearch)
+        var masks = try projection.objectMasks(process: bagSearch)
+        for blocker in bagSearch.objects.indices where blocker != treeBox {
+            guard let mask = masks.first(where: { $0.0 == blocker })?.1 else { continue }
+            var visiblePoint: SIMD2<Float>?
+            for y in stride(from: max(0, Int(mask.bounds.minY)),
+                            to: min(256, Int(mask.bounds.maxY.rounded(.up))), by: 2) where visiblePoint == nil {
+                for x in stride(from: max(0, Int(mask.bounds.minX)),
+                                to: min(192, Int(mask.bounds.maxX.rounded(.up))), by: 2) {
+                    let point = SIMD2<Float>(Float(x), Float(y))
+                    guard let depth = mask.depth(at: point),
+                          depth <= (masks.compactMap { $0.1.depth(at: point) }.min() ?? .infinity) else { continue }
+                    visiblePoint = point
+                    break
+                }
+            }
+            guard let start = visiblePoint,
+                  let startPlane = projection.planePointFixed(at: start) else { continue }
+            let target = [SIMD2<Int32>(4_096, 0), SIMD2<Int32>(-4_096, 0),
+                          SIMD2<Int32>(0, 8_192), SIMD2<Int32>(0, -8_192)]
+                .compactMap { offset -> SIMD2<Float>? in
+                    let plane = SIMD2(startPlane.x + offset.x, startPlane.y + offset.y)
+                    let clip = projection.viewProjection * SIMD4(Float(plane.x) / 4_096, 0,
+                                                                  Float(plane.y) / 4_096, 1)
+                    let page = SIMD2((clip.x / clip.w + 1) * 96, (1 - clip.y / clip.w) * 128)
+                    return page.x >= 0 && page.x < 192 && page.y >= 0 && page.y < 256 ? page : nil
+                }.first
+            guard let target else { continue }
+            play.holdBagSearchTouch(x: start.x, y: start.y)
+            guard play.bagSearch?.draggedObject == blocker else {
+                play.releaseBagSearchTouch()
+                continue
+            }
+            play.holdBagSearchTouch(x: target.x, y: target.y)
+            play.releaseBagSearchTouch()
+            masks = try projection.objectMasks(process: try XCTUnwrap(play.bagSearch))
+        }
         let treeBoxMask = try XCTUnwrap(masks.first { $0.0 == treeBox }?.1)
         var startCandidate: (point: SIMD2<Float>, error: Int64)?
         for y in stride(from: max(0, Int(treeBoxMask.bounds.minY)),

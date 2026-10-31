@@ -34,7 +34,9 @@
       "interactionGate": 0,
       "interactionGateTimer": 0,
       "interactionGateMode": 3,
-      "sourceCounter4E4": 1
+      "sourceCounter4E4": 1,
+      "spoolCounter195E": 398,
+      "spoolScale4E0": 0.0
     },
     "after-quit-input": {
       "processPresent": true,
@@ -66,7 +68,9 @@
       "interactionGate": 0,
       "interactionGateTimer": 0,
       "interactionGateMode": 3,
-      "sourceCounter4E4": 1
+      "sourceCounter4E4": 1,
+      "spoolCounter195E": 398,
+      "spoolScale4E0": 0.0
     },
     "quit-gate-set": {
       "processPresent": true,
@@ -98,7 +102,9 @@
       "interactionGate": 1,
       "interactionGateTimer": 51,
       "interactionGateMode": 2,
-      "sourceCounter4E4": 1
+      "sourceCounter4E4": 1,
+      "spoolCounter195E": 398,
+      "spoolScale4E0": 0.0
     },
     "quit-fade-progress": {
       "processPresent": true,
@@ -130,7 +136,9 @@
       "interactionGate": 1,
       "interactionGateTimer": 1,
       "interactionGateMode": 2,
-      "sourceCounter4E4": 1
+      "sourceCounter4E4": 1,
+      "spoolCounter195E": 398,
+      "spoolScale4E0": 0.0
     },
     "after-quit-return": {
       "processPresent": true,
@@ -162,7 +170,9 @@
       "interactionGate": 0,
       "interactionGateTimer": 0,
       "interactionGateMode": 3,
-      "sourceCounter4E4": 0
+      "sourceCounter4E4": 0,
+      "spoolCounter195E": 0,
+      "spoolScale4E0": 0.0
     }
   }
 }

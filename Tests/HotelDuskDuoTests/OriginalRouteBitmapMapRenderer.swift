@@ -68,10 +68,8 @@ final class OriginalRouteBitmapBagSearchRenderer: OriginalBagSearchRendering {
 
     init() throws {
         let library = try OriginalModelLibrary.bundled()
-        let models = try ["p01", "p02", "p03", "kaban"].map {
-            try library.load(path: "trick/bag/\($0).mdf")
-        }
-        projection = try OriginalBagSearchProjection(models: models)
+        let model = try library.load(path: "trick/searchshed/soko.mdf")
+        projection = try OriginalBagSearchProjection(models: [model])
         guard let image = CGContext(data: nil, width: 192, height: 256, bitsPerComponent: 8,
             bytesPerRow: 192 * 4, space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)?.makeImage() else {

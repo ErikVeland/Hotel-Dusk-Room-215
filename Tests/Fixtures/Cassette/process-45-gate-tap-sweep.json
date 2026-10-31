@@ -42,7 +42,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "down": {
           "processPresent": true,
@@ -74,7 +76,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "held": {
           "processPresent": true,
@@ -106,7 +110,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "released": {
           "processPresent": true,
@@ -138,7 +144,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         }
       }
     },
@@ -179,7 +187,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "down": {
           "processPresent": true,
@@ -211,7 +221,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "held": {
           "processPresent": true,
@@ -243,7 +255,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "released": {
           "processPresent": true,
@@ -275,7 +289,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         }
       }
     },
@@ -316,7 +332,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "down": {
           "processPresent": true,
@@ -348,7 +366,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "held": {
           "processPresent": true,
@@ -380,7 +400,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "released": {
           "processPresent": true,
@@ -412,7 +434,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         }
       }
     },
@@ -453,7 +477,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "down": {
           "processPresent": true,
@@ -485,7 +511,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "held": {
           "processPresent": true,
@@ -517,7 +545,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "released": {
           "processPresent": true,
@@ -549,7 +579,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         }
       }
     },
@@ -590,7 +622,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "down": {
           "processPresent": true,
@@ -622,7 +656,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "held": {
           "processPresent": true,
@@ -654,7 +690,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "released": {
           "processPresent": true,
@@ -686,7 +724,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         }
       }
     },
@@ -727,7 +767,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "down": {
           "processPresent": true,
@@ -759,7 +801,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "held": {
           "processPresent": true,
@@ -791,7 +835,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         },
         "released": {
           "processPresent": true,
@@ -823,7 +869,9 @@
           "interactionGate": 0,
           "interactionGateTimer": 0,
           "interactionGateMode": 3,
-          "sourceCounter4E4": 0
+          "sourceCounter4E4": 0,
+          "spoolCounter195E": 398,
+          "spoolScale4E0": 0.0
         }
       }
     }
