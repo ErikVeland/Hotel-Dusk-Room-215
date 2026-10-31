@@ -3,6 +3,29 @@ import XCTest
 
 @MainActor
 final class OriginalPencilSharpenerSessionTests: XCTestCase {
+    func testPencilSharpenerNeedsRepeatedCrosswiseStrokes() {
+        var process = OriginalPencilSharpenerProcess()
+
+        process.holdTouch(pageX: 91, pageY: 100)
+        process.holdTouch(pageX: 121, pageY: 130)
+        process.holdTouch(pageX: 91, pageY: 100)
+        XCTAssertEqual(process.powderProgress, 0)
+        process.releaseTouch()
+
+        for _ in 0..<5 {
+            process.holdTouch(pageX: 91, pageY: 100)
+            process.holdTouch(pageX: 121, pageY: 70)
+            process.holdTouch(pageX: 91, pageY: 100)
+            process.releaseTouch()
+        }
+        XCTAssertNil(process.returnedProcessValue)
+
+        process.holdTouch(pageX: 91, pageY: 100)
+        process.holdTouch(pageX: 121, pageY: 70)
+        process.holdTouch(pageX: 91, pageY: 100)
+        XCTAssertEqual(process.returnedProcessValue, 0)
+    }
+
     func testChapterTenProcess59StartsTheFactoryMappedPencilSharpener() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram("EP10_R301")
@@ -60,6 +83,37 @@ final class OriginalPencilSharpenerSessionTests: XCTestCase {
         XCTAssertNil(play.pencilSharpener)
         if case .process(59) = play.runner.phase { XCTFail("Pencil sharpener did not return") }
         XCTAssertEqual(play.runner.session.selection.eventID, transition.eventID)
+        if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
+    }
+
+    func testChapterTenProcess59GrindingReturnsGraphitePowderEvent() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let program = try catalog.loadProgram("EP10_R301")
+        let event = try XCTUnwrap(program.blocks.tables[2].first { $0.sourceOffset == 440 })
+        let game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        var selection = OriginalEventSelectionContext(
+            sceneID: .max, blockID: 0, modeID: 15, eventID: UInt16(event.index),
+            nowTime: game.nowTime, mapID: 40)
+        selection.debugEventSelection = true
+        let runner = try OriginalEventRunner(program: program, game: game, selection: selection)
+        let audio = AudioController()
+        audio.isMuted = true
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)))
+        defer { play.stop() }
+
+        for _ in 0..<6 {
+            play.holdPencilSharpenerTouch(pageX: 91, pageY: 100)
+            play.holdPencilSharpenerTouch(pageX: 121, pageY: 70)
+            play.holdPencilSharpenerTouch(pageX: 91, pageY: 100)
+            play.releasePencilSharpenerTouch()
+        }
+        play.advanceFrame()
+
+        XCTAssertNil(play.pencilSharpener)
+        XCTAssertEqual(play.runner.session.selection.eventID, 15)
+        if case .process(59) = play.runner.phase { XCTFail("The powder process did not return") }
         if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
     }
 

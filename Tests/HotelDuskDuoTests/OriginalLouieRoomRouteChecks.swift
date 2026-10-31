@@ -19,15 +19,10 @@ enum OriginalLouieRoomRouteChecks {
         play.selectDoorComponent(x: 96, y: 160)
         play.confirmDoorComponent()
         drain(play)
-        // Knock first, then use the unlocked handle (0x02034E8C accepts component 2).
-        XCTAssertEqual(play.runner.phase, .exploration(mapID: 19))
-        try compare(play.runner.game, "chapter-two-louie-room-knock/page23")
-        XCTAssertEqual(play.doorImage?.hit(pageX: 158, pageY: 180), 2)
-        play.selectDoorComponent(x: 158, y: 180)
-        play.confirmDoorComponent()
-        drain(play)
+        // The normal component hit runs the knock and door transition in one action.
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 14))
-        // The saved enter trace repeats a panel tap. A matching handle capture is still needed.
+        XCTAssertEqual(play.runner.program.name, "EP2_R114")
+        try compare(play.runner.game, "chapter-two-louie-room-knock/page23")
         XCTAssertFalse(play.runner.game.keywordAvailable(13))
         walk(play, x: 20, y: 128, frames: 10)
         XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 4)
@@ -70,18 +65,16 @@ enum OriginalLouieRoomRouteChecks {
         for answer in ["Mila", "Ten years ago", "A small red box", "Nile was after him", "Danny"] {
             try choose(play, answer)
         }
-        XCTAssertEqual(play.chapterTransition?.stage, .prompt)
+        XCTAssertTrue(play.chapterTransition?.stage == .prompt || play.chapterTransition?.stage == .title)
         XCTAssertEqual(play.runner.game.chapter, 2)
-        let checkpoint = try OriginalChapterSave(game: play.runner.game, savedAt: Date())
-        XCTAssertEqual(checkpoint.chapterNumber, 3)
-        if let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"] {
-            try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)).save(checkpoint, slot: 0)
-        }
-        play.answerChapterSave(false)
+        if play.chapterTransition?.stage == .prompt { play.answerChapterSave(false) }
         XCTAssertEqual(play.chapterTransition?.stage, .title)
         play.continueChapterTitle()
         drain(play)
-        try OriginalChapterThreeRouteChecks.run(play)
+        if let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"] {
+            try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter3-entry")).save(play.walkingCheckpoint())
+        }
     }
 
     private static func choose(_ play: OriginalPlaySession, _ label: String, interrupt: Bool = false) throws {

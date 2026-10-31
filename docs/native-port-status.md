@@ -2,7 +2,7 @@
 
 The architecture is Swift and SwiftUI, with Metal for the Duo book material. The original ROM is the comparison reference. No emulator integration is planned or included.
 
-The native game remains incomplete. The checked new-game route plays through the Chapter 4 review. Checkpoint-based normal-input tests cover Chapters 5–7 and parts of Chapter 8. Chapter 8 bowling and later route work remain open. Chapters 9–10 have component recovery without a verified complete route. Game-over retries and original presentation remain unfinished. The [walkthrough route plan](walkthrough-route-plan.md) records the detailed boundaries.
+The native game remains incomplete. A fresh-game normal-input test chain reaches the Chapter 10 ending through instant-save checkpoints. Focused tests restore checkpoints between route sections, so this is a connected route proof rather than one uninterrupted app session. Original-device checks remain open for selected route triggers, puzzle gestures, bowling scores and audio. Game-over retries and original presentation also remain unfinished. See the [route tracing workbench](route-tracing-workbench.md) and [walkthrough route plan](walkthrough-route-plan.md) for the current boundaries.
 
 ## Playable opening slice
 
