@@ -910,9 +910,10 @@ public struct OriginalEventRunner: Sendable {
      * 0x02045724 selects a chapter response before returning from the inventory menu.
      * A miss retains the question menu for showItem(_:catalog:)'s System response.
      */
-    public mutating func showItem(_ item: UInt8) {
+    @discardableResult
+    public mutating func showItem(_ item: UInt8, catalog: OriginalScriptCatalog? = nil) -> Self? {
         guard case .questions = phase, let partner,
-              (try? game.inventory.items.contains(item)) == true else { return }
+              (try? game.inventory.items.contains(item)) == true else { return nil }
         var evaluating = session
         let state = game, checks = conditions
         do {
@@ -932,48 +933,47 @@ public struct OriginalEventRunner: Sendable {
                 selectNext()
             case .unresolved: enter(outcome)
             case .noMatch:
-                var context = session.selection
-                context.modeID = 16
-                context.areaID = .max
-                context.subareaID = .max
-                context.checkItemID = Int16(item)
-                lastSelectionMiss = context
+                guard scope == .normal, let catalog,
+                      var response = try sharedShownItemResponse(item, catalog: catalog) else { return nil }
+                response.game.markItemShown(item, person: partner)
+                return response
             }
         } catch { halt("The shown-item response could not be selected: \(error)") }
+        return nil
     }
 
     /**
-     * 0x02028E4C tries System after the chapter's shown-item scan. If no specific
-     * System response passes, 0x0203A444 retries mode 16 with item and subarea zero.
-     * The host retains this conversation while the returned shared response runs.
+     * Runs the matching System response when the active chapter has no item row.
      */
-    public mutating func showItem(_ item: UInt8, catalog: OriginalScriptCatalog) throws -> Self? {
-        guard scope == .normal, case .questions = phase, let partner,
-              try game.inventory.items.contains(item) else { return nil }
-        showItem(item)
-        guard case .questions = phase, var context = lastSelectionMiss,
-              context.modeID == 16, context.checkItemID == Int16(item) else { return nil }
-        let system = try catalog.loadProgram("System"), graph = try system.blocks, checks = try system.conditions
-        var evaluating = OriginalEventSession.mapSession(nowTime: game.nowTime, mapID: game.mapID)
-        evaluating.selection = context
-        let state = game
-        let outcome = try OriginalShownItemSelector.select(graph: graph, person: UInt16(bitPattern: partner),
-            item: item, nowTime: game.nowTime, scope: .system) {
+    private mutating func sharedShownItemResponse(_ item: UInt8, catalog: OriginalScriptCatalog) throws -> Self? {
+        guard let partner else { return nil }
+        let sharedProgram = try catalog.loadProgram("System")
+        let graph = try sharedProgram.blocks
+        var evaluating = session
+        let state = game, checks = try sharedProgram.conditions
+        let outcome = try OriginalShownItemSelector.select(graph: graph,
+            person: UInt16(bitPattern: partner), item: item, nowTime: game.nowTime, scope: .system) {
                 try evaluating.evaluate($0, conditions: checks, game: state)
             }
-        if case .unresolved = outcome {
-            var response = try Self(program: system, game: game, scope: .system, deferArrival: true)
-            response.enter(outcome)
-            return response
-        }
-        if case .selected = outcome { context = evaluating.selection }
-        game.markItemShown(item, person: partner)
-        var response = try Self(program: system, game: game, selection: context, scope: .system)
-        if case .exploration = response.phase, response.lastSelectionMiss != nil, context.modeID == 16 {
-            context.checkItemID = 0
-            context.subareaID = 0
-            response = try Self(program: system, game: game, selection: context, scope: .system)
-        }
+        guard case .selected(let selected) = outcome else { return nil }
+
+        let block = graph.tables[1][selected.blockIndex]
+        let event = graph.tables[2][selected.eventIndex]
+        let blockReader = OriginalBytes(block.raw), eventReader = OriginalBytes(event.raw)
+        var response = try Self(program: sharedProgram, game: game, keywords: keywords,
+                                scope: .system, deferArrival: true)
+        response.session = evaluating
+        response.session.selection.sceneID = UInt16(bitPattern: partner)
+        response.session.selection.blockID = try blockReader.u16(0)
+        response.session.selection.modeID = try eventReader.u16(0)
+        response.session.selection.eventID = try eventReader.u16(2)
+        response.session.selection.areaID = .max
+        response.session.selection.subareaID = .max
+        response.session.selection.checkItemID = Int16(item)
+        response.session.operationIndex = 0
+        response.session.eventCommitted = true
+        response.partner = partner
+        response.begin(eventIndex: selected.eventIndex)
         return response
     }
 

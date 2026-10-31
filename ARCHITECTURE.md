@@ -51,6 +51,8 @@ Hinge input -> hinge manager -> session -> pause/resume and puzzle fold events
 
 `GameSession` owns the script catalogue, notebook drafts, preview state, audio controller, hinge manager, and active play session. `DuoBookContainerView` keeps the inner pages mounted while the cover or jigsaw hides them.
 
+`GameSession` stores the latest walking checkpoint separately from the exact resume save. Engine halts restore the walking checkpoint automatically. The pause menu also offers **Return to last safe place** for interactions that remain active without making progress; this discards the current interaction and may require the player to repeat it.
+
 This ownership preserves state during the running process. Native Chapter 2 checkpoints now survive process termination through an injected save store. General midgame save and restore remains unfinished.
 
 ## Original game runtime
@@ -102,7 +104,7 @@ The runner also retains process requests whose map or search consumers remain un
 
 `OriginalNotebook` owns three writable pages, acquired drawings, ink, undo state and page navigation. It receives a loader for original packed drawing bytes. The session retains the parent conversation or map, samples held ink, and stores writable pages in original game state. `OriginalNotebookImage` converts the original tiles to page pixels. Acquired drawings remain read-only. Mila’s grouped notes and apple-painting pages halt explicitly until their composition is recovered. Notebook state survives close and reopen within the running session. General midgame saves remain unfinished. The Chapter 2 starting checkpoint preserves this state in native saves.
 
-`OriginalShownItemSelector` scans the current person’s blocks at the current time for modes 16 and 27. The runner preserves selection effects, clears the item marker and starts the response. Mode 27 returns to the question menu, including an empty menu when no exit transition exists. Views offer inventory choices and forward selection to the session. Melissa’s item-3 response has complete original state comparisons. Shared System responses and other shown-item paths remain incomplete.
+`OriginalShownItemSelector` scans the current person's blocks at the current time for modes 16 and 27. If no chapter response matches, the runner checks the System script for the same person and item. `OriginalPlaySession` keeps the conversation runner while the shared response runs, then restores the question menu. If no chapter or System response matches, the question menu remains open and game state does not change. Melissa's item-3 response has full original-state comparisons. Other shown-item paths need route checks.
 
 `OriginalTouchPicture` handles opcode 8 as a blocking process. The session loads its original table and images, then forwards presses and releases. The model builds the original packed hit mask and requires a second press to confirm a selection. The following opcode owns item acquisition. Unsupported picture modes stop explicitly. The selection overlay uses the original polygon alpha 15, equivalent to 50% blending. Image loading and selection rendering remain separate from the model.
 

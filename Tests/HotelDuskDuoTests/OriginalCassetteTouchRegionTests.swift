@@ -66,4 +66,26 @@ final class OriginalCassetteTouchRegionTests: XCTestCase {
         XCTAssertEqual(process.dragProgress, 100)
         XCTAssertEqual(process.qualifyingTouchFrames, 0)
     }
+
+    func testProcess45QuitTapReturnsThroughTheCapturedSixtyUpdateFade() {
+        var process = OriginalCassetteRewindProcess()
+        process.update(rawTouch: nil, pressedTouch: SIMD2(15, 170))
+
+        XCTAssertEqual(process.phase, .quitFade)
+        XCTAssertEqual(process.opacity, 1)
+        XCTAssertNil(process.returnedProcessValue)
+
+        for _ in 0..<(OriginalCassetteRewindProcess.quitFadeUpdates - 1) {
+            process.update(rawTouch: nil)
+        }
+        XCTAssertEqual(process.phase, .quitFade)
+        XCTAssertNil(process.returnedProcessValue)
+        XCTAssertGreaterThan(process.opacity, 0)
+
+        process.update(rawTouch: nil)
+
+        XCTAssertEqual(process.phase, .complete)
+        XCTAssertEqual(process.returnedProcessValue, 2)
+        XCTAssertEqual(process.opacity, 1)
+    }
 }

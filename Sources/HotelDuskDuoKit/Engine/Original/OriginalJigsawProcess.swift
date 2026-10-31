@@ -87,6 +87,7 @@ public struct OriginalJigsawProcess: Equatable, Codable, Sendable {
 
     public var placedCount: Int { pieces.indices.filter(isPlaced).count }
     public var acceptsInput: Bool { variant != .reverse && phase == 1 && stage == 0 && result == nil }
+    public var awaitsFold: Bool { variant == .reverse && phase == 3 && stage == 1 && result == nil && !reopened }
 
     /// Only the reverse process accepts a close/open cycle. Opening to any
     /// angle is sufficient. Earlier folds cannot carry into this process.

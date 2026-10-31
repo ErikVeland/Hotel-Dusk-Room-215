@@ -2,6 +2,18 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalJigsawProcessTests: XCTestCase {
+    func testSoftwareFoldAvailableOnlyWhenReversePuzzleAwaitsFold() {
+        var puzzle = OriginalJigsawProcess(seed: 1, variant: .reverse)
+        XCTAssertFalse(puzzle.awaitsFold)
+        for _ in 0..<10 where !puzzle.awaitsFold { _ = puzzle.update(screen0FadeComplete: true) }
+        XCTAssertTrue(puzzle.awaitsFold)
+        puzzle.receiveFold(isClosed: true)
+        puzzle.receiveFold(isClosed: false)
+        _ = puzzle.update(screen0FadeComplete: true)
+        XCTAssertFalse(puzzle.awaitsFold)
+        XCTAssertFalse(ready().awaitsFold)
+    }
+
     private func ready() -> OriginalJigsawProcess {
         var puzzle = OriginalJigsawProcess(seed: 0x3DEAC027)
         for _ in 0..<4 { _ = puzzle.update() }

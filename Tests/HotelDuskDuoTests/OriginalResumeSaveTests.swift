@@ -148,8 +148,36 @@ final class OriginalResumeSaveTests: XCTestCase {
         let restored = try XCTUnwrap(game.play)
         XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
         XCTAssertEqual(restored.lobby?.position, position)
-        XCTAssertEqual(safePlaceStore.checkpoint, checkpoint)
+        XCTAssertEqual(game.play?.runner.game.bytes, try checkpoint.gameState().bytes)
+        XCTAssertEqual(game.play?.lobby?.checkpointFacing, checkpoint.checkpointFacing)
         XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
+    }
+
+    func testPausedPlayerCanReturnToLastSafePlaceFromAnActiveInteraction() throws {
+        let resumeStore = Store(), safePlaceStore = Store()
+        let game = session(resumeStore, safePlaceStore: safePlaceStore)
+        defer { game.endOriginalGame() }
+        let play = try enterLobby(game)
+        play.holdLobbyTouch(x: 140, y: 80)
+        for _ in 0..<160 { play.advanceFrame() }
+        play.holdLobbyTouch(x: 70, y: 75)
+        for _ in 0..<46 { play.advanceFrame() }
+        play.releaseLobbyTouch()
+        let checkpoint = try XCTUnwrap(safePlaceStore.checkpoint)
+        let safePosition = play.lobby?.position
+        play.inspectLobbyCounter()
+        XCTAssertEqual(play.lobby?.mode, .counter)
+
+        game.openPauseMenu()
+        XCTAssertTrue(game.canReturnToSafePlace)
+        game.returnToSafePlace()
+
+        let restored = try XCTUnwrap(game.play)
+        XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
+        XCTAssertEqual(restored.lobby?.position, safePosition)
+        XCTAssertEqual(try resumeStore.checkpoint?.gameState().bytes, try checkpoint.gameState().bytes)
+        XCTAssertFalse(game.isPauseMenuOpen)
+        XCTAssertTrue(game.recoveryNotice?.contains("unfinished interaction") == true)
     }
 
     func testRecoverableStopWithoutSafePlaceStartsChapterOne() throws {

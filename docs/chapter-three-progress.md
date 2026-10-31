@@ -47,7 +47,7 @@ HOTEL_DUSK_ROUTE_CHECKPOINTS="$PWD/.build/story-checkpoints" \
 ## Puzzle work on 26 October 2026
 
 - Jigsaw masks remain separate for the incomplete, full and restored variants. The reverse puzzle requires a new close-and-open fold cycle and its original fade/hold sequence.
-- Door locks use four source pin shapes, the original cursor boundary and four-second reset. Input tests solve process 77 through the touch model; process 78's ordered-pin path still needs a full solve check.
+- Door locks use four source pin shapes, the original cursor boundary and four-second reset. The Chapter 3 route solves its referenced process 77 through normal touch input and verifies its story flag and return. Process 78 is not referenced by the Chapter 3 story scripts; its ordered-pin behaviour remains an unverified optional variant.
 - The electrical panel requires one continuous gesture from a switch onto the connecting bar and upward. Single-switch attempts reset and request the original hint.
 - The fountain pen uses the original rubbing mask, completion regions and dust-clearing random rule. Touch inspection and microphone clearing retain distinct return values. Microphone access is explicit and stops while play is suspended.
 - The bookmark box uses the original Euler rotation cases, orientation-dependent tapping and slow rightward extraction. Both source entry and successful return have a native host check.

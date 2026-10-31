@@ -2,6 +2,23 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalShownItemSelectorTests: XCTestCase {
+    func testChapterMissUsesBundledSystemShownItemResponse() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let normal = try catalog.loadProgram("EP1_R102").blocks
+        let system = try catalog.loadProgram("System").blocks
+        XCTAssertEqual(try OriginalShownItemSelector.select(graph: normal, person: 2, item: 0, nowTime: 0) { _ in .pass }, .noMatch)
+
+        var requests: [OriginalConditionRequest] = []
+        let shared = try OriginalShownItemSelector.select(graph: system, person: 2,
+            item: 0, nowTime: 0, scope: .system) {
+                requests.append($0)
+                return .pass
+            }
+        guard case .selected(let selected) = shared else { return XCTFail("Expected Dunning's shared response") }
+        XCTAssertEqual(selected.eventIndex, 32)
+        XCTAssertEqual(requests, [.init(modeID: 16, eventID: 32, eventKey: 32, scope: .system)])
+    }
+
     func testItemResponseScansThePersonsBlocksAtTheCurrentTime() throws {
         let graph = try OriginalScriptCatalog.bundled().loadProgram("EP1_R213").blocks
         var requests: [OriginalConditionRequest] = []
