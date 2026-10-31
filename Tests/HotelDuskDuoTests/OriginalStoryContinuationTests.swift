@@ -1916,13 +1916,14 @@ final class OriginalStoryContinuationTests: XCTestCase {
         for blocker in bagSearch.objects.indices where blocker != treeBox {
             guard let mask = masks.first(where: { $0.0 == blocker })?.1 else { continue }
             var visiblePoint: SIMD2<Float>?
-            for y in stride(from: max(0, Int(mask.bounds.minY)),
-                            to: min(256, Int(mask.bounds.maxY.rounded(.up))), by: 2) where visiblePoint == nil {
+            for y in stride(from: min(255, Int(mask.bounds.maxY.rounded(.up)) - 1),
+                            through: max(0, Int(mask.bounds.minY)), by: -2) where visiblePoint == nil {
                 for x in stride(from: max(0, Int(mask.bounds.minX)),
                                 to: min(192, Int(mask.bounds.maxX.rounded(.up))), by: 2) {
                     let point = SIMD2<Float>(Float(x), Float(y))
                     guard let depth = mask.depth(at: point),
-                          depth <= (masks.compactMap { $0.1.depth(at: point) }.min() ?? .infinity) else { continue }
+                          depth <= (masks.compactMap { $0.1.depth(at: point) }.min() ?? .infinity),
+                          projection.planePointFixed(at: point) != nil else { continue }
                     visiblePoint = point
                     break
                 }
