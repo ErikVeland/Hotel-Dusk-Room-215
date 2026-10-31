@@ -93,6 +93,47 @@ final class OriginalNotebookTests: XCTestCase {
         XCTAssertThrowsError(try OriginalNotebook(game: game) { _ in Data(repeating: 0, count: 0x1800) })
     }
 
+    func testAppleNotebookPagesUseCollectedBitsAndSourceSlots() throws {
+        var bytes = [UInt8](repeating: 0, count: OriginalGameState.byteCount)
+        bytes[0x13D8] = 0b01001
+        let game = try OriginalGameState(snapshot: Data(bytes))
+        var loaded = [String]()
+        let notebook = try OriginalNotebook(game: game) { path in
+            loaded.append(path)
+            if path == "system/note/memo/appmem_M.bin" {
+                return Data(repeating: 0xA5, count: OriginalNotebook.packedSize)
+            }
+            if path == "system/note/memo/apppic4_M.bin" {
+                return Data(repeating: 0x4A, count: OriginalNotebook.packedSize)
+            }
+            throw OriginalDataError.missing(path)
+        }
+
+        XCTAssertEqual(game.appleNotebookPageMask, 0b01001)
+        XCTAssertEqual(notebook.pageCount, 5)
+        XCTAssertEqual(loaded, ["system/note/memo/appmem_M.bin", "system/note/memo/apppic4_M.bin"])
+        XCTAssertEqual(notebook.pages[4], [UInt8](repeating: 0x4A, count: OriginalNotebook.packedSize))
+
+        let overview = notebook.pages[3]
+        let slots = [(16, 14), (4, 18), (14, 24), (8, 5), (1, 2)]
+        for (index, (x, y)) in slots.enumerated() {
+            let start = x * 0x100 + y * 8
+            let found = game.appleNotebookPageMask & (1 << index) != 0
+            for row in 0..<5 {
+                let lowerBound = start + row * 0x100
+                let range = lowerBound..<(lowerBound + 0x28)
+                XCTAssertEqual(overview[range].allSatisfy { $0 == 0 }, !found,
+                               "Apple page slot \(index), row \(row) must match its found bit")
+            }
+        }
+
+        var allApplePages = bytes
+        allApplePages[0x13D8] = 0x1F
+        let completeGame = try OriginalGameState(snapshot: Data(allApplePages))
+        let completeNotebook = try OriginalNotebook(game: completeGame, load: OriginalBitmapLibrary.bundled().loadNotebookData)
+        XCTAssertEqual(completeNotebook.pageCount, 8)
+    }
+
     func testAngledStrokesAndErasureMatchOriginalStorage() throws {
         var game = try state("melissa-notebook-open/opened")
         var notebook = try OriginalNotebook(game: game, load: OriginalBitmapLibrary.bundled().loadNotebookData)

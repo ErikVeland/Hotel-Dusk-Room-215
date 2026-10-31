@@ -19,6 +19,7 @@ The checked Chapter 1 route opens it after returning Melissa’s puzzle piece. T
 | `0x02078930` | Address the original 8×8 ink tiles and apply page bounds. |
 | `0x020788B0` | Swap current and undo buffers. A second Undo restores the edit. |
 | `0x02078DA8` | Pack writable ink on page change and close. |
+| `0x020797CC` | Append the apple-note overview and each collected detail page. Clear uncollected regions from the overview using the five tile positions at `0x020E195C` and the mask at state offset `0x13D8`. |
 
 Each page has 6,144 packed bytes and 49,152 expanded pixels. Writable pages start at game offset `0x3558`. Lock bytes start at `0x13C8`. Acquired drawing flags start at `0x87B`. Opening clears the notification byte at `0x87D`.
 
@@ -54,7 +55,7 @@ The native drawing snapshot was inspected. It shows the original drawing upright
 
 ## Remaining work
 
-- Compose Mila’s later grouped notes and the apple-painting pages. Their flags currently stop notebook loading explicitly.
+- Compare later grouped-note page breaks with original captures that contain mixed memo groups.
 - Recover original menu graphics, paper layers, cursor, page-turn animation and sound cues.
 - Compare locked writable pages and additional stroke edge cases with original execution.
 - Connect notebook viewing requests from later dialogue and puzzles, including mode-25 conversation responses.
