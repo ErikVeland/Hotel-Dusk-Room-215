@@ -2123,15 +2123,15 @@ final class LayoutSnapshotTests: XCTestCase {
     func testRenderOriginalJigsawAssemblyAndFoldSequence() throws {
         let size = CGSize(width: 951, height: 669)
         let coverSize = CGSize(width: 420, height: 630)
-        let manifest = JigsawManifest.bundled
+        let manifest = try JigsawManifest.loadBundled()
         XCTAssertEqual(manifest.boardWidth, 192)
         XCTAssertEqual(manifest.boardHeight, 256)
         XCTAssertEqual(manifest.pieces.count, 20)
         for name in [manifest.frontImage, manifest.reverseImage, manifest.tableImage,
                      manifest.trayImage, manifest.foldTrayImage] {
             let image = try XCTUnwrap(JigsawArt.image(named: name), name)
-            XCTAssertEqual(image.width, 192)
-            XCTAssertEqual(image.height, 256)
+            XCTAssertEqual(image.width, 768)
+            XCTAssertEqual(image.height, 1024)
         }
         for piece in manifest.pieces {
             XCTAssertNotNil(JigsawArt.image(named: piece.image), piece.image)

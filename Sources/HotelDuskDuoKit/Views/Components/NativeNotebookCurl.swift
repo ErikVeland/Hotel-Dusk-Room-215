@@ -51,7 +51,7 @@ struct NativeNotebookCurl: UIViewControllerRepresentable {
         }
 
         @available(*, unavailable)
-        required init?(coder: NSCoder) { fatalError("Use init(index:leaf:)") }
+        required init?(coder: NSCoder) { return nil }
     }
 
     @MainActor

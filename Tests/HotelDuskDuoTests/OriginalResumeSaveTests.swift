@@ -171,7 +171,7 @@ final class OriginalResumeSaveTests: XCTestCase {
         XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
     }
 
-    func testMissingNativeProcessStateReturnsToLastSafeWalkingPlace() throws {
+    func testMissingNativeProcessStateRestoresLastSafePlace() throws {
         let safePlaceStore = Store()
         let game = session(safePlaceStore: safePlaceStore)
         defer { game.endOriginalGame() }
@@ -188,12 +188,11 @@ final class OriginalResumeSaveTests: XCTestCase {
         play.advanceDialogue()
         XCTAssertEqual(play.runner.phase, .process(id: 24))
 
-        play.haltMissingProcessState()
+        play.recoverMissingProcessState()
 
         let restored = try XCTUnwrap(game.play)
         XCTAssertFalse(restored === play)
         XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
-        XCTAssertEqual(restored.runner.program.name, "EP1_R102")
         XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
     }
 

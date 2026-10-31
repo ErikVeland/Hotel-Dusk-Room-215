@@ -208,6 +208,7 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
      * Applies overlay 11's sampled tilted-pin position correction from 0x02203DB8.
      */
     public mutating func resolvePinPositionalContacts() {
+        let sampleContactDistanceSquared = Self.pinCollisionRadius * Self.pinCollisionRadius * 0.25
         for firstIndex in pins.indices {
             let firstStart = Self.positionSampleStart(pins[firstIndex])
             let firstEnd = Self.positionSampleEnd(pins[firstIndex])
@@ -219,7 +220,7 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
                     for secondStep in 0...6 {
                         let secondPoint = Self.interpolate(secondStart, secondEnd, step: secondStep)
                         let delta = firstPoint - secondPoint
-                        guard simd_length_squared(delta) < 0.25 * Self.pinCollisionRadius * Self.pinCollisionRadius else {
+                        guard simd_length_squared(delta) < sampleContactDistanceSquared else {
                             continue
                         }
                         let firstPosition = pins[firstIndex].positionFixed20_12
@@ -273,6 +274,9 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
             pin.motionFixed20_12.y = 0
             pin.motionFixed20_12.z = min(Self.fixedValue(normalZ * speed), 0)
             pin.angularVelocity = -velocityZ * Float.pi * Self.pinLateralVelocityScale
+            pin.directionAngle = Self.directionAngle(
+                deltaX: Float(ballPositionFixed20_12.x &- pin.positionFixed20_12.x) / Self.fixedPointScale,
+                deltaZ: Float(ballPositionFixed20_12.z &- pin.positionFixed20_12.z) / Self.fixedPointScale)
             pin.needsUpdate = true
             pins[index] = pin
 
@@ -328,9 +332,9 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
     }
 
     private static func interpolate(_ start: SIMD2<Float>, _ end: SIMD2<Float>, step: Int) -> SIMD2<Float> {
-        let startWeight = Float(step) / 6
-        let endWeight = 1 - startWeight
-        return start * startWeight + end * endWeight
+        let startStep = Float(step)
+        let endStep = Float(6 - step)
+        return (start * startStep) / 6 + (end * endStep) / 6
     }
 
     private static func correctedPosition(_ position: Int32, awayFrom otherPosition: Int32) -> Int32 {

@@ -60,8 +60,8 @@ through normal play.
 | Chapter | Script rooms | Story processes | Readiness |
 | --- | --- | --- | --- |
 | 5 | R102, R111, R113, R117–R119, R203–R205, R207, R212–R213 | 38, 60: handlers present | Three normal-input route tests cover Mila and the doll, evidence against Jeff, and the confession and review. Run them from the Chapter 4 save. |
-| 6 | R104–R106, R126, R202, R205, R213 | 46, 51, 53, 54, 58: handlers present | The fresh normal-input route now runs from the Chapter 5 handoff through both matchstick puzzles, Summer's conversation, bourbon object `obj05`, the bar exit, Rosa and Dunning's conversations, the kitchen wine route, Rose wine recovery, Ed's package adhesive remover, wine identification, label peel and Helen's story handoff. The generated Chapter 7 entry checkpoint then passes into the Chapter 7 route. Instant saving persists the post-Summer checkpoint and the route restores and resumes it before leaving the bar. Process 46's peeled-label gesture and original-ROM return, vending and jukebox playback remain unverified. Route tests mute audio. |
-| 7 | R102, R103, R105, R112, R117–R119, R122, R126, R205–R206, R213 | 43: partial; 55: recovered logic, device verification open | Process 55 maps to overlay 30. The native process now uses all 26 recovered transforms, the `soko.mdf` cube model and the object-9 blocker rule. Focused process and CPU projection tests pass. The Chapter 7 normal-touch route and Metal rendering are unverified on this host, so the route chain is not yet a source-matched proof. Process 43's decoration target-to-page fit still needs an original-run comparison. The Chapter 6 route obtains wine-label item 66 through process 46 and reaches Helen from normal input. Route tests mute audio. Playback remains unverified. |
+| 6 | R104–R106, R126, R202, R205, R213 | 46, 51, 53, 54, 58: handlers present | The fresh normal-input route runs from the Chapter 5 handoff through both matchstick puzzles, Summer's conversation, bourbon object `obj05`, the bar exit, Rosa and Dunning's conversations, the kitchen wine route, Rose wine recovery, Ed's package adhesive remover, wine identification, label peel and Helen's story handoff. The label model receives the saved overlay word, applies four-pixel touch quantisation and projected strict hit bounds, updates the source-space peel position, and uses the recovered 737 boundary. Unit checks cover two projected pulls; the route test completes the process and reaches wine-label item 66 and Helen. Exact touch and animation parity still need a normal original-device comparison. Vending behavior is checked; jukebox playback remains unverified because route tests mute audio. |
+| 7 | R102, R103, R105, R112, R117–R119, R122, R126, R205–R206, R213 | 43 and 55: recovered logic, original-device comparison open | Process 55 maps to overlay 30. The native process uses all 26 recovered transforms, the `soko.mdf` cube model and the object-9 blocker rule. The Chapter 7 checkpoint route uses normal session inputs and CPU-projected touch points to complete the tree search, decoration and story return. It does not verify visible touch mapping or Metal rendering against the original device. Process 43's decoration target-to-page fit still needs an original-run comparison. The Chapter 6 route reaches wine-label item 66 through process 46 and reaches Helen from normal input. Route tests mute audio. Playback remains unverified. |
 | 8 | R102, R105, R113–R114, R118–R119, R124, R205–R206, R212–R213, R401 | 44: partial native bowling handler; 45 and 76: partial cassette-rewind handlers; 52: Cassette02 deck handler | A normal-input continuation answers the 11:00 PM phone call, leaves Room 215, and reaches R213. It saves `chapter8-r213-entry`. The `in_r212` marker leads to the utility closet. From search area 4, the direct object hit mask selects `obj04`, which opens close-up 315. Normal clicks on components 316 and 319 recover inventory items 69 and 42; the route saves `chapter8-r212-items-recovered`. It returns through R213 to Room 215, then travels through R117, R105 and the bar map. Louie's “Someone else wanted it?” response resolves through normal input and sets game flag 29. The route returns through R126, R117 and R213 to Room 215, where flag 29 remains set. In search area 3, the real hit mask selects `obj04` on the open suitcase and awards pencil item 44. The route then returns through R119 to R114. Search area 3's `obj06` hit mask opens desk view 110; tapping component 112 runs `System.blk` event 651 and awards ballpoint item 74. Search area 1's `obj06` radio case opens view 107 with radio and tape components 108 and 109. Normal use of tape item 42 on component 108 consumes it and exposes the tape layer. Ballpoint item 74 selects process 76; its slot-5 exit follows the failed-attempt response. Pencil item 44 selects process 45; the successful input returns value 0 and adds repaired tape item 43. It then uses repaired tape item 43 on component 108, launches process 52, opens the deck with a held touch and swipe, selects Side B, and returns through the story CHK table. The route reaches R119 through the normal exit at time block 1. It then enters Room 216, presents items 69 and 43, and completes Iris's six Chapter 8 topics. This changes the time block to 2. The route returns to R119, knocks on Louie's door, enters R114 and talks to Louie. R114 event 22 sets event flag 14:22. The route then follows Louie back to R119 and starts bowling process 44 through event 8. A renderer seam lets this route reach the process without a Metal device. The route test saves and restores the ready bowling process through an instant progress checkpoint, resumes the restored session, then restores again from the instant checkpoint emitted after throw one with its score and between-throws state preserved. It continues through three modeled five-throw matches. Each reaches native result 2 and event 11, then starts process 44 again through event 8. A separate branch check injects return value 0 to follow the rooftop route through normal picture input. The new normal-input low-speed match also returns result 0, opens the plant picture, and completes the Rosa search-call scene. It reads Mila's new notebook message in the empty topic menu; this runs the source rooftop return dialogue and advances to time block 3 (11:40 pm) before saving `chapter8-after-rooftop-meeting`. The test returns to R213. A continuation then exits R213 through R117 and R103 to R118 at time block 3. It saves a progress checkpoint and restores it in a fresh session. After the test resumes the session, the saved map position remains unchanged and walking input is available. This verifies the time transition and map path after the injected bowling result. The normal route now exits R118 through R113 into Rosa's R124 back room, selects the picture target `obj07` from search area 1, and sets event flag 24:0. It inspects the remaining photographs, completes Rosa's conversation, escorts Mila, and answers the Chapter 8 review through normal input. The route then reaches the Chapter 9 title and saves `chapter9-normal-entry`. An instant checkpoint after a normal 3D hit on the Chapter 9 cardboard box restores in a fresh session. Route tests mute audio. Process 52 does not play cassette audio, so cassette sound remains unverified. The ROM capture scores `[6, 6, 6, 5, 5]` for this horizontal drag, while the native model scores 4 per throw. Bowling route thresholds now match the recovered source speed ranges. Final score parity remains open. Searching `in_r210` was a wrong route (map 36 is Room 220). |
 | 9 | R102, R103, R105, R107, R112–R114, R116–R118, R123, R125, R205, R207, R213 | 63: CPR; 64: apple painting; 81: apple word entry | Factory cases map process 63 to overlay 37, process 64 to overlay 38, and process 81 to overlay 38. Normal Chapter 9 entry follows Chapter 8. Normal movement, hit meshes, close-ups and letter reveals recover Y, N, E and N from Room 215, Room 217, upstairs R213 and downstairs R117. Instant checkpoints restore active painting reveals. R117 returns 0 at its painting call site; closing the view consumes its pending request and advances to block 1. R103 arrival places Louie in the lobby. Normal conversation covers his three topics; Dunning interrupts, returns Louie to the bar, and advances time to block 2. The route reaches R118 and its arrival dialogue, then opens R113 through the knock-then-handle sequence. Rosa reveals the special room and moves to R116 after the follow-up question. The route returns through the upper stairs and R103 to R116, enters R125 and opens painting close-up 153 through counter object `obj08`. Process 64 maps R125's call site to the missing J letter. Instant save and restore preserve the reveal; acknowledging it completes the five-letter mask. Normal word-entry input enters JENNY and returns to R116, where Mila is present. R125 event 3 now completes and sets flag 25:3, allowing the R116 arrival selector to start process 63. The CPR test performs close-and-reopen input, restores the active instant save, answers Mila's required topics, and returns to the lobby for Kevin's conversation. Kevin's topics advance time to 12:40 A.M.; a fresh session restores from the instant save at map R103. From the 12:40 A.M. Kevin checkpoint, normal walking through the R118 marker reaches R213, then the normal door exit reaches Room 215. The Chapter 9 phone hit mask runs Ed's history and the interruption. The first door input starts Rosa's scene; a second normal door input returns to R213/map39. The route reaches Dunning's Room 207/map33 and saves `chapter9-dunning-room`. In area 2, normal hit testing opens dresser view 275; components 276 and 277 inspect letterhead and an envelope. R103→R117 and R103→R102 remain closed, and R118→R122 is a loop. The route reaches the pantry at R112 search area 4 and saves a restorable instant checkpoint. Its normal door to R123 reaches the Dunning desk; normal hit testing opens view 87, where event 89 acquires item 41 (Old Hotel Brochure) and event 88 acquires item 60 (Article on Osterzone). After leaving that view, normal hit testing opens drawer view 90 and event 91 reads the birthday cards, setting flag 23:4. Instant saves restore the items and flag. The R112 departure to R118 is verified after this flag is set; it is the normal hallway exit. A pan-zero hit on pantry area 3 object `obj06` runs event 2 but returns to exploration. In area 4, object `obj04` opens view 74. Its event 75 layer returns the refrigerator and paint dialogue through a restorable instant checkpoint. `R112.srh` maps subareas 1–8 in areas 1–3 to no up-view. Normal pantry hit testing now starts the secret-door quiz after the birthday-card flag. Five answers reach Chapter 10 through a normal-input route. The hidden hit mask still needs original-game capture.
 | 10 | R102–R103, R108, R117–R118, R205, R210, R213, R301–R302, R304–R305, R401 | 59: pencil sharpener; 61: picture peel; 62 and 67: code notice; 74, 86, 90 and 91: typewriter; 75: brick-wall puzzle; 79: overlay 40 mode 1 search shed; 80: cashbox; 85: AfterConfess sequence; 88: VSScene sequence | The corrected audit passes the host process ID directly to the factory, then maps its loader slot through the original slot table. It places the typewriter at process 74, the overlay 40 variants at 75 and 79, the code notice at 62 and 67, and the cashbox at 80. Process 59 now supports both the source result-2 exit animation and repeated crosswise sharpening strokes. Native input reaches result 0 and event 15 in the Chapter 10 route test. Process 61 now returns result 0 after the player clears the cover and selects event 9. An early exit returns 2 and selects event 11. The normal-input route verifies the successful branch. The focused test mutes audio and does not verify sound. Process 85 now plays three original image groups and returns result 2. Its frame timing and layer placement still need comparison with the original run. Process 75 now returns source result 0 when its doorway gate clears, and result 2 when the player leaves. Its screen-wide hit map disagrees with the ROM scan. Normal input now reaches R301 from the cellar through R304. The R304 bar event removes its plate and exposes the door-handle hit mask. Instant checkpoint `chapter10-r301-entry` saves the R301 arrival at time 0. R301 event 25 is the plug layer on view 398. Its inverted condition passes while flag 40:22 is clear, then completes event 27. A route test reaches the plug through normal input and starts process 59 after using Pencil item 44 on file layer 396. Event 13 requires flag 40:27, which this route sets. Process 59 returns 0, 1 or 2 to events 15, 16 or 17. Event 15 adds Graphite Powder (item 70). The native process now returns result 0 after repeated crosswise drags, then awards Graphite Powder through event 15 in the normal route test. Its 500 page-space distance threshold follows the source result threshold and walkthrough gesture, but does not match source-particle units. Isolated ROM probes still stop at counter 376 and do not verify the gesture against the original process. Event 22 requires item 70 in area 1/subarea 8. Event 22 completion unlocks typewriter process 74. Process 74 return 0 selects event 35, which enables event 106 and event 108's time-1 command. The native route test verifies process 59 result 0 before testing the time transition. Source-ROM gesture parity remains open. The R302 event-9 route now enters R305 and reaches the final conversation. The normal R301 typewriter route reaches R304 at time index 1, where region 1 selects event 17. Region 4 event 40 requires a later R302 event 9. Process 88 follows the normal touch path and returns 0, as the overlay handler specifies. The isolated native session follows its source transition, plays the next story dialogue, and returns to exploration. Process 79 now uses the 90-slot overlay 40 layout, counts five valid interior hits and waits for confirmation before result 0. Its CPU mesh-hit check and injected-renderer event route pass. The Metal route test skips on this host. Native layout uses a fixed seed for replay stability and does not yet vary box-face details like the original. The native route now reaches the 8:00 AM clock and Room 215 at time 3. Original-device fidelity checks remain open for wall geometry, sharpener input and audio. |
@@ -141,10 +141,12 @@ The original factory maps process 46 to overlay 22, which loads
 a circular brush with a 10-pixel radius at three points per held update, then
 accepts the peel at 99.5% clear. The native model now matches the brush radius
 and sample count. Tests cover those rules and the threshold. Event 7 in
-`EP6_R106` has four return branches to events 10, 8, 9 and 11. The native model
-returns result 2 after the mask fade, displays event 9, and re-enters process 46.
-The peel-stage model accepts a decreasing page-X drag until an authored distance
-threshold, then returns result 0; this is not source-backed. The ROM trace in
+`EP6_R106` has four return branches to events 10, 8, 9 and 11. In the normal
+native route, solvent completion returns result 2, displays event 9, and
+re-enters process 46. The follow-up process now uses the recovered projected
+touch bounds and 737 source-position boundary; its tested result 0 selects
+event 10 and awards item 66. A normal original-ROM run has not confirmed that
+full sequence. The ROM trace in
 [`source-transition.json`](../Tests/Fixtures/LabelPeel/source-transition.json)
 starts from an injected follow-up state. Re-grabs move source progress from 1,475
 to 792. A long diagonal pull enters substate 3 at frame 70 and phase 5 at frame
@@ -189,36 +191,35 @@ flag, and seeds the source position from that word minus `0x1000`, with a lower
 clamp of −1,516. Clearing the solvent mask starts a fade, then resumes the
 same process at phase 2, substate 1. The follow-up controller transforms the
 raw touch, applies source-space hit tests, and updates its drag position from
-the cursor and grab offset. It uses a source-space boundary of 737. The later
-peel animation advances to phase 5 and returns process result 2. The script
-table maps result 2 to event 9. These source paths are present, but the normal
-Chapter 6 entry word, touch transform and resulting event have not been
-captured together.
+the cursor and grab offset. It uses a source-space boundary of 737. Its phase-5
+return depends on the overlay's saved return state. In the normal native route,
+the follow-up result 0 selects event 10 and awards item 66; a matching normal
+ROM trace has not confirmed this return branch.
 
 The isolated `source-transition.json` capture forces the follow-up flag and
 story word. It reaches the peel animation after a long diagonal pull and later
 returns to an idle process state. It does not capture the story return. The
-normal Chapter 6 test reaches process 46 after using the solvent, but its
-native model does not pass the source story word into the process. The model's
-78-page-pixel peel threshold and result 0 are not source-backed. Do not use
-those settings as evidence of the original peel rule. The remaining work is to
-capture an ordinary Chapter 6 ROM route from process entry through touch input
-and its returned event. The injected scans in
+normal Chapter 6 test now passes the story word into the live model and uses
+projected touch points that follow the recovered moving hit bounds. It returns
+through event 10, awards item 66 and continues to Helen. A normal Chapter 6 ROM
+trace is still needed to compare the complete gesture, animation and returned
+event. The injected scans in
 [`process-46-followup.json`](../Tests/Fixtures/LabelPeel/process-46-followup.json)
 and [`regrab-after-pull.json`](../Tests/Fixtures/LabelPeel/regrab-after-pull.json)
 do not prove normal-route hit geometry.
 
-The normal Chapter 6 route now reaches process 46 after collecting adhesive
+The normal Chapter 6 route reaches process 46 after collecting adhesive
 remover from Ed's package, asking Iris about rosé, asking Summer about white
-wine, and applying the remover to the red bottle. The test saves a checkpoint
-before the bottle interaction. It mutes audio, so it provides no playback
-evidence. The native process model does not yet receive the story-state word
-that the original overlay reads at `+0xdc`; the normal-route test therefore
-confirms the process entry only. The isolated injection used a generic Room
-215 state with that word clear, so its follow-up gesture results cannot be
-applied to this route. Next, capture or model the word from the normal process
-entry, then validate the second drag and its event return before adding a
-label item or continuing to Helen.
+wine, and applying the remover to the red bottle. The process receives the
+story-state word read at `+0xdc`. Its live model now quantises page touches to
+four-pixel steps, applies the recovered projected-coordinate transform and
+strict dynamic hit rectangle, tracks the source-space drag position, and
+completes below the recovered 737 boundary. Tests cover the saved `0x15c3`
+word, projected bounds, coordinate samples, two pulls, and the Chapter 6 route
+through item 66 and Helen. The original ROM's full normal-route touch and
+animation sequence has not been compared with this model, so exact input and
+presentation parity remain open. Route audio is muted and provides no playback
+evidence.
 
 Several later processes share an original overlay. Keep one implementation
 per overlay and check each chapter event that calls it:
@@ -227,9 +228,11 @@ per overlay and check each chapter event that calls it:
 | --- | --- | --- | --- |
 | 45, 76 | 8 | Cassette rewind | 25 |
 | 52 | 8 | Cassette playback deck | 28 |
+| 50 | System | Lounge television | 27 | Cartoon, news and exit callbacks now use recovered System responses. The event has no story-state transition. |
+| 68–71 | System | Coin edge puzzles | 29 | Native edge rules and touch route are implemented. A non-matching result returns to play without halting. Original-device comparisons remain open. |
 | 64, 81 | 9 | Apple-word puzzle | 38 |
 | 74, 86, 90, 91 | 10 | Typewriter | 41 |
-| 75 | 10 | Lounge television | 27 |
+| 75 | 10 | Brick-wall puzzle | 40 |
 | 79 | 10 | Search shed | 30 |
 
 Chapter 8's `EP8_R114` event 9 invokes process 76 (source offset 372), and
@@ -383,11 +386,13 @@ drag objects. That mapping was wrong. The native process now uses the 26
 recovered positions and scales, the shared `cube24` model, and the recovered
 blocker thresholds. Process tests cover the initial blocker, moving it clear,
 and later-index blockers. The renderer now uses `soko.mdf`; CPU projection
-tests pass after clearing the target. Metal rendering and the normal-touch
-route are not verified on this host. Treat this as recovered process logic,
-not full Chapter 7 route proof. Process 43 still needs an original comparison
-for its target-to-page fit. The Chapter 7 route test skips on hosts without
-Metal.
+tests pass after clearing the target. The checkpoint route reaches process 55
+through normal story input, uses CPU-projected points to solve both processes
+55 and 43, and returns to the story. This verifies route completion through
+the session's input APIs. It does not verify visible touch mapping against the
+original game. Metal rendering also remains unverified on this host. Process
+43 still needs an original comparison for its target-to-page fit. The route
+test uses a bitmap renderer and does not require Metal.
 
 Chapter 8 process 44 is the bowling interaction in overlay 11. Its original
 model archive contains decoded `2Frouka`, `boulball` and `boulpin` models. The

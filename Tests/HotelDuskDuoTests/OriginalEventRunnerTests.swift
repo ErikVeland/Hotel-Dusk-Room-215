@@ -59,6 +59,27 @@ final class OriginalEventRunnerTests: XCTestCase {
         XCTAssertEqual(runner.phase, .exploration(mapID: 2))
     }
 
+    func testEveryChapterStoryOperationHasARunnerHandler() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let handledOpcodes = Set<UInt8>([4, 6, 8, 11, 12, 16, 18, 24, 29, 30, 34, 35, 47, 49, 52, 53])
+            .union(OriginalEventRunner.presentationOpcodes)
+            .union(OriginalEventRunner.advanceOnlyOpcodes)
+            .union(OriginalEventRunner.processRequestOpcodes)
+
+        for programName in catalog.programNames {
+            let graph = try catalog.loadProgram(programName).blocks
+            for event in graph.tables[2] {
+                for operation in try graph.operations(forEvent: event.index) {
+                    let opcode = operation.raw[0]
+                    let isHandledStateCommand = try OriginalStateCommand(record: operation) != nil
+                    let isHandledDialogueKind = opcode == 10 && [1, 2, 5].contains(operation.raw[4])
+                    XCTAssertTrue(handledOpcodes.contains(opcode) || isHandledStateCommand || isHandledDialogueKind,
+                                  "\(programName) event \(event.index) offset \(operation.sourceOffset) uses opcode \(opcode)")
+                }
+            }
+        }
+    }
+
     // MARK: R102 counter bell and Dunning's first conversation
 
     /// Events 0-2 with the entrance returning 0, ending in lobby exploration.

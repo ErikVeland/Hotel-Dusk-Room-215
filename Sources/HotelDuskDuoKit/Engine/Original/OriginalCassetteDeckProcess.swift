@@ -5,6 +5,11 @@ import simd
  * Tracks the cassette deck scene, control selection and story return.
  */
 public struct OriginalCassetteDeckProcess: Equatable, Sendable {
+    public enum Variant: Sendable {
+        case sideA
+        case sideB
+    }
+
     public struct ModelTransform: Equatable, Sendable {
         public let rotationDegrees: SIMD3<Float>
         public let translation: SIMD3<Float>
@@ -36,9 +41,15 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
         case complete
     }
 
+    public enum Effect: Equatable, Sendable {
+        case sound(archiveID: Int, entryID: Int)
+    }
+
     public static let controlsTransitionUpdates = 180
     public static let exitFadeUpdates = 60
+    public static let soundArchiveID = 48
 
+    public let variant: Variant
     public private(set) var phase = Phase.opening
     public private(set) var selectedSelector: Int?
     public private(set) var returnedProcessValue: Int16?
@@ -48,7 +59,11 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
     private var transitionUpdates = 0
     private var exitUpdates = 0
 
-    public init() {}
+    public init(variant: Variant = .sideA) {
+        self.variant = variant
+    }
+
+    public var sourceMusicSequenceID: Int16 { variant == .sideA ? 0x34 : 0x59 }
 
     public var camera: OriginalCassetteDeckCamera {
         switch phase {
@@ -85,37 +100,42 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
     /**
      * Advances one source update from a held point, a new press and the scene mesh hit result.
      */
-    public mutating func update(touch: SIMD2<Int>?, pressedTouch: SIMD2<Int>?, sceneHit: Bool) {
+    public mutating func update(touch: SIMD2<Int>?, pressedTouch: SIMD2<Int>?, sceneHit: Bool) -> [Effect] {
+        var effects: [Effect] = []
         switch phase {
         case .opening:
-            guard let touch, sceneHit else { return }
+            guard let touch, sceneHit else { return effects }
             lastPoint = touch
             upwardDrag = 0
             phase = .dragging
+            effects.append(.sound(archiveID: Self.soundArchiveID, entryID: 0))
         case .dragging:
             guard let touch, (0..<256).contains(touch.x), (0..<192).contains(touch.y) else {
                 lastPoint = nil
                 upwardDrag = 0
                 phase = .opening
-                return
+                return effects
             }
             if let previous = lastPoint { upwardDrag += max(0, previous.y - touch.y) }
             lastPoint = touch
             if upwardDrag >= 48 {
                 phase = .turning
                 transitionUpdates = Self.controlsTransitionUpdates
+                effects.append(.sound(archiveID: Self.soundArchiveID, entryID: 1))
             }
         case .turning:
             transitionUpdates -= 1
             if transitionUpdates <= 0 {
                 phase = .controlsReady
                 lastPoint = nil
+                effects.append(.sound(archiveID: Self.soundArchiveID, entryID: 2))
             }
         case .controlsReady:
-            guard let pressedTouch, let selector = Self.selector(at: pressedTouch) else { return }
+            guard let pressedTouch, let selector = Self.selector(at: pressedTouch) else { return effects }
             selectedSelector = selector
+            effects.append(.sound(archiveID: Self.soundArchiveID, entryID: 3))
         case .playing:
-            guard let pressedTouch, Self.isBackTap(pressedTouch) else { return }
+            guard let pressedTouch, Self.isBackTap(pressedTouch) else { return effects }
             phase = .exiting
             exitUpdates = 0
         case .exiting:
@@ -127,11 +147,13 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
         case .complete:
             break
         }
+        return effects
     }
 
-    public mutating func activateSelectedControl() {
-        guard phase == .controlsReady, selectedSelector != nil else { return }
+    public mutating func activateSelectedControl() -> [Effect] {
+        guard phase == .controlsReady, selectedSelector != nil else { return [] }
         phase = .playing
+        return [.sound(archiveID: Self.soundArchiveID, entryID: 4)]
     }
 
     public mutating func requestExit() {

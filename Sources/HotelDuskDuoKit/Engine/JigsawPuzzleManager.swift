@@ -20,10 +20,17 @@ public final class JigsawPuzzleManager: ObservableObject {
     @Published public private(set) var placements: [String: Placement] = [:]
     @Published public private(set) var selectedPieceID: String?
     public let manifest: JigsawManifest
+    public let manifestLoadError: String?
     public var hasRevealedReverse: Bool { phase == .reverseRevealed }
 
-    public init(manifest: JigsawManifest = JigsawManifest.bundled) {
-        self.manifest = manifest
+    public init(manifestLoader: () throws -> JigsawManifest = { try JigsawManifest.loadBundled() }) {
+        do {
+            manifest = try manifestLoader()
+            manifestLoadError = nil
+        } catch {
+            manifest = .unavailable
+            manifestLoadError = String(describing: error)
+        }
         for (index, piece) in manifest.pieces.enumerated() {
             // Scatter the original pieces across the original tabletop. No target
             // markers or solved-picture overlay are shown during assembly.
@@ -111,12 +118,18 @@ public struct JigsawManifest: Decodable, Sendable {
     public let rotateLeftImage: String
     public let rotateRightImage: String
 
-    public static let bundled: JigsawManifest = {
-        guard let url = Bundle.module.url(forResource: "JigsawManifest", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let manifest = try? JSONDecoder().decode(JigsawManifest.self, from: data) else {
-            preconditionFailure("The original jigsaw asset manifest is missing or invalid.")
+    fileprivate static let unavailable = JigsawManifest(
+        boardWidth: 1, boardHeight: 1, pieces: [], frontImage: "", reverseImage: "",
+        tableImage: "", trayImage: "", foldTrayImage: "", rotateLeftImage: "", rotateRightImage: "")
+
+    public static func loadBundled() throws -> JigsawManifest {
+        guard let url = Bundle.module.url(forResource: "JigsawManifest", withExtension: "json") else {
+            throw OriginalDataError.missing("Original jigsaw asset manifest")
         }
-        return manifest
-    }()
+        do {
+            return try JSONDecoder().decode(JigsawManifest.self, from: Data(contentsOf: url))
+        } catch {
+            throw OriginalDataError.invalid("Original jigsaw asset manifest: \(error)")
+        }
+    }
 }

@@ -2,6 +2,56 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalLabelPeelProcessTests: XCTestCase {
+    func testSourceWordRestoresTheFollowupPeelPosition() {
+        XCTAssertEqual(OriginalLabelPeelProcess.sourcePosition(from: 0), 1_475)
+        XCTAssertEqual(OriginalLabelPeelProcess.sourcePosition(from: 0x15C3), 1_475)
+        XCTAssertEqual(OriginalLabelPeelProcess.sourcePosition(from: 0x0900), -1_516)
+
+        let process = OriginalLabelPeelProcess(mask: [], stage: .peel, sourceStateWord: 0x15C3)
+        XCTAssertEqual(process.sourcePosition, 1_475)
+    }
+
+    func testSourceFollowupHitRegionUsesTheRecoveredDynamicExtent() {
+        let aboveBoundary = OriginalLabelPeelProcess.projectedHitRegion(position: 1_000,
+                                                                         previousPosition: 900)
+        XCTAssertEqual(aboveBoundary, .init(minimumX: 1_000, maximumX: 2_638,
+                                            minimumY: 900, maximumY: 2_538))
+        XCTAssertTrue(aboveBoundary.contains(SIMD2(1_001, 901)))
+        XCTAssertFalse(aboveBoundary.contains(SIMD2(1_000, 901)))
+        XCTAssertFalse(aboveBoundary.contains(SIMD2(2_638, 901)))
+
+        let belowBoundary = OriginalLabelPeelProcess.projectedHitRegion(position: 500,
+                                                                         previousPosition: 490)
+        XCTAssertEqual(belowBoundary, .init(minimumX: 500, maximumX: 2_375,
+                                            minimumY: 490, maximumY: 2_365))
+        XCTAssertTrue(belowBoundary.contains(SIMD2(501, 491)))
+        XCTAssertFalse(belowBoundary.contains(SIMD2(2_375, 2_000)))
+    }
+
+    func testFollowupTouchUsesSourceCoordinateQuantisationAndProjection() {
+        XCTAssertEqual(OriginalLabelPeelProcess.projectedTouch(SIMD2(150, 75)), SIMD2(2_218, 2_389))
+        XCTAssertEqual(OriginalLabelPeelProcess.projectedTouch(SIMD2(145, 75)), SIMD2(2_048, 2_389))
+        XCTAssertEqual(OriginalLabelPeelProcess.projectedTouch(SIMD2(132, 75)), SIMD2(1_536, 2_389))
+    }
+
+    func testFollowupPeelTracksProjectedPositionAndUsesSourceBoundary() {
+        var process = OriginalLabelPeelProcess(mask: [], stage: .peel, sourceStateWord: 0x15C3)
+        _ = process.update()
+
+        XCTAssertEqual(process.update(pageTouch: SIMD2(150, 75)), [.dragging(true)])
+        _ = process.update(pageTouch: SIMD2(145, 75))
+        XCTAssertEqual(process.sourcePosition, 1_305)
+        XCTAssertFalse(process.isPeelComplete)
+        XCTAssertEqual(process.update(), [.dragging(false)])
+
+        _ = process.update(pageTouch: SIMD2(150, 75))
+        _ = process.update(pageTouch: SIMD2(132, 75))
+        XCTAssertEqual(process.sourcePosition, 623)
+        XCTAssertTrue(process.isPeelComplete)
+        XCTAssertEqual(process.update(), [.dragging(false), .fadeOut(60)])
+        XCTAssertEqual(process.update(fadeComplete: true), [.completed(0)])
+    }
+
     func testChapterSixPeelEventHasFourSourceReturnBranches() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram("EP6_R106")
@@ -63,12 +113,13 @@ final class OriginalLabelPeelProcessTests: XCTestCase {
         var process = OriginalLabelPeelProcess(mask: mask, stage: .peel)
         _ = process.update()
 
-        var releaseEffects: [OriginalLabelPeelProcess.Effect] = []
-        for _ in 0..<5 {
-            _ = process.update(pageTouch: SIMD2(150, 70))
-            _ = process.update(pageTouch: SIMD2(132, 88))
-            releaseEffects = process.update()
-        }
+        _ = process.update(pageTouch: SIMD2(150, 75))
+        _ = process.update(pageTouch: SIMD2(132, 88))
+        let firstReleaseEffects = process.update()
+        XCTAssertEqual(firstReleaseEffects, [.dragging(false)])
+        _ = process.update(pageTouch: SIMD2(150, 75))
+        _ = process.update(pageTouch: SIMD2(130, 88))
+        let releaseEffects = process.update()
 
         XCTAssertTrue(process.isPeelComplete)
         XCTAssertEqual(releaseEffects, [.dragging(false), .fadeOut(60)])

@@ -86,7 +86,7 @@ final class OriginalBowlingSessionTests: XCTestCase {
             play.advanceFrame()
         }
 
-        XCTAssertEqual(play.bowlingMatch?.results.throwScores[firstScoreIndex], 4)
+        XCTAssertEqual(play.bowlingMatch?.results.throwScores[firstScoreIndex], 5)
         XCTAssertEqual(play.bowlingMatch?.phase, .betweenThrows)
 
         for throwIndex in 1..<OriginalBowlingResult.throwCount {

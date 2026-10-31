@@ -2,6 +2,16 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalDialogueControlTests: XCTestCase {
+    func testBundledRetryMarkerIsDecoded() throws {
+        let program = try OriginalScriptCatalog.bundled().loadProgram("EP2_R205")
+        let markers = program.text.entries.filter { entry in
+            entry.bytes == Data("%r0001".utf8)
+        }
+        XCTAssertFalse(markers.isEmpty)
+        XCTAssertEqual(try OriginalDialogueControl.tokens(for: markers[0]).map(\.kind),
+                       [.control(.retry(1))])
+    }
+
     func testOpeningKeepsOriginalMusicAndAllThreeLines() throws {
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102")
         let operations = try program.blocks.operations(forEvent: 0)

@@ -15,23 +15,37 @@ public struct JigsawPuzzleView: View {
     }
 
     public var body: some View {
-        GeometryReader { display in
-            let book = DuoBookLayout(size: display.size, safeArea: safeArea,
-                                     handedness: session.hingeManager.handedness,
-                                     stacked: session.hingeManager.hasHardwareHinge && display.size.height > display.size.width)
-            AnyLayout(book.stacked ? AnyLayout(VStackLayout(spacing: 0)) : AnyLayout(HStackLayout(spacing: 0))) {
-                ForEach(Array(book.pages.enumerated()), id: \.element) { index, role in
-                    PaperbackPageSurface(hingeManager: session.hingeManager,
-                                         side: index == 0 ? .left : .right,
-                                         isVisible: !session.isBookClosed) {
-                        page(role: role)
-                            .padding(book.insets(at: index))
+        Group {
+            if puzzleManager.manifestLoadError != nil {
+                VStack(spacing: 16) {
+                    Text("The jigsaw preview could not load its data.")
+                        .font(NovelStyle.body)
+                        .multilineTextAlignment(.center)
+                    Button("Back") { session.isJigsawPuzzleOpen = false }
+                        .buttonStyle(BookTextButtonStyle())
+                }
+                .padding(24)
+            } else {
+                GeometryReader { display in
+                    let book = DuoBookLayout(size: display.size, safeArea: safeArea,
+                                             handedness: session.hingeManager.handedness,
+                                             stacked: session.hingeManager.hasHardwareHinge
+                                                && display.size.height > display.size.width)
+                    AnyLayout(book.stacked ? AnyLayout(VStackLayout(spacing: 0)) : AnyLayout(HStackLayout(spacing: 0))) {
+                        ForEach(Array(book.pages.enumerated()), id: \.element) { index, role in
+                            PaperbackPageSurface(hingeManager: session.hingeManager,
+                                                 side: index == 0 ? .left : .right,
+                                                 isVisible: !session.isBookClosed) {
+                                page(role: role)
+                                    .padding(book.insets(at: index))
+                            }
+                            .frame(width: book.frame(at: index).width, height: book.frame(at: index).height)
+                            .clipped()
+                        }
                     }
-                        .frame(width: book.frame(at: index).width, height: book.frame(at: index).height)
-                        .clipped()
+                    .environment(\.layoutDirection, .leftToRight)
                 }
             }
-            .environment(\.layoutDirection, .leftToRight)
         }
         .foregroundStyle(NovelStyle.ink)
     }

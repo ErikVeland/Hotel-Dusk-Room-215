@@ -10,7 +10,12 @@ struct OriginalChapterTransitionView: View {
     var body: some View {
         if let transition = play.chapterTransition {
             if transition.stage == .title {
-                titlePage
+                if let chapter {
+                    titlePage(chapter)
+                } else {
+                    Button("Continue") { play.continueChapterTitle() }
+                        .accessibilityLabel("Chapter title unavailable. Continue")
+                }
             } else if screen == 0 {
                 Text("Your progress saves automatically.")
                     .font(NovelStyle.caption)
@@ -19,9 +24,9 @@ struct OriginalChapterTransitionView: View {
         }
     }
 
-    private var chapter: OriginalChapter { try! OriginalChapter(play.runner.game.chapter) }
+    private var chapter: OriginalChapter? { try? OriginalChapter(play.runner.game.chapter) }
 
-    private var titlePage: some View {
+    private func titlePage(_ chapter: OriginalChapter) -> some View {
         GeometryReader { proxy in
             let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
             ZStack(alignment: .topLeading) {

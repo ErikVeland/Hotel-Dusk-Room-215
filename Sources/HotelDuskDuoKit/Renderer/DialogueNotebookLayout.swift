@@ -136,7 +136,7 @@ struct DialogueNotebookLayout {
 
     func draw(page: NSRange, revealedEnd: Int, in context: CGContext) {
         guard let frame = frames[page.location], page.length > 0 else { return }
-        let lines = CTFrameGetLines(frame) as! [CTLine]
+        let lines = CTFrameGetLines(frame) as? [CTLine] ?? []
         var origins = [CGPoint](repeating: .zero, count: lines.count)
         CTFrameGetLineOrigins(frame, CFRange(location: 0, length: 0), &origins)
         context.saveGState()

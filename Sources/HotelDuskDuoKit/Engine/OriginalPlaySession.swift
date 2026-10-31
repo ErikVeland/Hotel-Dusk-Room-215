@@ -138,8 +138,14 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var coinPuzzle: OriginalCoinProcess?
     @Published public private(set) var coinPuzzleImage: CGImage?
     @Published public private(set) var coinPuzzleScreenEffects = OriginalScreenEffects()
+    @Published public private(set) var coinEdgePuzzle: OriginalCoinEdgeProcess?
+    @Published public private(set) var coinEdgePuzzleImage: CGImage?
+    @Published public private(set) var loungeTV: OriginalLoungeTVProcess?
     private var coinPuzzleRenderer: OriginalCoinRenderer?
     private var coinPuzzleTouch: SIMD2<Float>?
+    private var coinEdgeTouchActive = false
+    private var coinEdgeSelectionFrames = 0
+    private var loungeTVParent: OriginalEventRunner?
     @Published public private(set) var dollRepair: OriginalDollRepairProcess?
     @Published public private(set) var dollRepairImage: CGImage?
     @Published public private(set) var dollRepairScreenEffects = OriginalScreenEffects()
@@ -314,7 +320,7 @@ public final class OriginalPlaySession: ObservableObject {
         guard case .exploration(let map) = runner.phase else { return false }
         return lobby?.mapID == map && lobby?.mode == .walking && chapterTransition == nil
             && notebook == nil && door == nil && closeup == nil && searchParent == nil && memoParent == nil
-            && shownItemParent == nil && jigsawParent == nil && toiletTankParent == nil && differencesParent == nil && switchboardParent == nil && suitcaseContentsParent == nil && pendingDeparture == nil
+            && shownItemParent == nil && jigsawParent == nil && loungeTVParent == nil && toiletTankParent == nil && differencesParent == nil && switchboardParent == nil && suitcaseContentsParent == nil && pendingDeparture == nil
             && pendingDoorOpen == nil && pendingCloseup == nil && pendingChildCloseup == nil
             && handledMapRequests == runner.processRequests.count
     }
@@ -323,7 +329,7 @@ public final class OriginalPlaySession: ObservableObject {
         guard !dialogueNotebook.ink.isEmpty, chapterTransition == nil, notebook == nil,
               process == nil, bellProcess == nil, signProcess == nil, codeNotice == nil, picturePeel == nil, jigsaw == nil,
               shownItemParent == nil,
-              clock == nil, suitcaseKey == nil, thinWire == nil, hanger == nil, switchboard == nil, fountainPen == nil, bookmarkBox == nil, dollRepair == nil, coinPuzzle == nil, matchsticks == nil, jukebox == nil, linenWagon == nil, differences == nil, toiletTank == nil,
+              clock == nil, suitcaseKey == nil, thinWire == nil, hanger == nil, switchboard == nil, fountainPen == nil, bookmarkBox == nil, dollRepair == nil, coinPuzzle == nil, coinEdgePuzzle == nil, matchsticks == nil, jukebox == nil, linenWagon == nil, differences == nil, toiletTank == nil,
               suitcaseContents == nil, memoPull == nil, cabinetDial == nil,
               crowbar == nil, memoDrawing == nil, paperclip == nil, labelPeel == nil, christmasTree == nil, searchShed == nil,
               bagSearch == nil,
@@ -1116,7 +1122,12 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.activateCassetteDeckControl)
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, cassetteDeck != nil else { return }
-        cassetteDeck?.activateSelectedControl()
+        guard let effects = cassetteDeck?.activateSelectedControl() else { return }
+        for effect in effects {
+            if case .sound(let archive, let entry) = effect {
+                _ = try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
+            }
+        }
     }
 
     public func exitCassetteDeck() {
@@ -1124,6 +1135,37 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, cassetteDeck != nil else { return }
         cassetteDeck?.requestExit()
+    }
+
+    /**
+     * Runs a source-backed Lounge TV callback or exits the shared interaction.
+     */
+    public func loungeTVAction(_ action: OriginalLoungeTVProcess.Action) {
+        let recordsProgress = beginProgressInput(.loungeTV(action: action))
+        defer { endProgressInput(recordsProgress) }
+        guard !isPaused, case .process(50) = runner.phase, var process = loungeTV,
+              let effect = process.apply(action),
+              case .systemResponse(let pairB) = effect else { return }
+        loungeTV = process
+        do {
+            let response = try runner.processHint(catalog: catalog, pairA: 27, pairB: pairB)
+            if case .exploration = response.phase {
+                runner.resumeProcess(after: response)
+                process.finishResponse()
+                loungeTV = action == .leave ? nil : process
+                if action == .leave {
+                    stopTimer()
+                    runner.finishProcess(returnValue: 2)
+                }
+            } else {
+                loungeTVParent = runner
+                runner = response
+                presentedPacketOffset = nil
+            }
+        } catch {
+            runner.halt("The Lounge TV response could not be loaded: \(error)")
+        }
+        settle()
     }
 
     private func captureCassetteTouch(pageX: Int, pageY: Int) {
@@ -1267,7 +1309,8 @@ public final class OriginalPlaySession: ObservableObject {
     public func holdCoinPuzzleTouch(x: Float, y: Float) {
         let recordsProgress = beginProgressInput(.holdCoinPuzzleTouch(x: x, y: y))
         defer { endProgressInput(recordsProgress) }
-        guard !isPaused, case .process(51) = runner.phase, x.isFinite, y.isFinite,
+        guard !isPaused, case .process(let id) = runner.phase,
+              id == 51 || (68...71).contains(id), x.isFinite, y.isFinite,
               x >= 0, x < 192, y >= 0, y < 256 else { return }
         coinPuzzleTouch = SIMD2(x, y)
     }
@@ -1275,6 +1318,7 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.releaseCoinPuzzleTouch)
         defer { endProgressInput(recordsProgress) }
         coinPuzzleTouch = nil
+        coinEdgeTouchActive = false
     }
     public func quitCoinPuzzle() {
         let recordsProgress = beginProgressInput(.quitCoinPuzzle)
@@ -2039,11 +2083,12 @@ public final class OriginalPlaySession: ObservableObject {
                 }
             }
             startTimer()
-        case .process(52):
+        case .process(52), .process(89):
             if cassetteDeck == nil {
                 do {
                     let renderer = try cassetteDeckRendererFactory()
-                    let process = OriginalCassetteDeckProcess()
+                    guard case .process(let processID) = runner.phase else { return settle() }
+                    let process = OriginalCassetteDeckProcess(variant: processID == 89 ? .sideB : .sideA)
                     cassetteImage = try renderer.render(camera: process.camera, state: process.sceneState)
                     cassetteDeckRenderer = renderer
                     cassetteDeck = process
@@ -2280,6 +2325,25 @@ public final class OriginalPlaySession: ObservableObject {
                 }
             }
             startTimer()
+        case .process(let id) where (68...71).contains(id):
+            if coinEdgePuzzle == nil {
+                do {
+                    guard let variant = OriginalCoinEdgeProcess.Variant(rawValue: Int16(id)) else {
+                        throw OriginalDataError.invalid("Coin edge process \(id)")
+                    }
+                    let puzzle = OriginalCoinEdgeProcess(variant: variant)
+                    let renderer = try OriginalCoinRenderer()
+                    coinPuzzleRenderer = renderer
+                    coinEdgePuzzleImage = try renderer.render(puzzle)
+                    coinEdgeTouchActive = false
+                    coinEdgeSelectionFrames = 0
+                    coinEdgePuzzle = puzzle
+                } catch {
+                    runner.halt("The coin edge puzzle could not be loaded: \(error)")
+                    return settle()
+                }
+            }
+            startTimer()
         case .process(38):
             if dollRepair == nil {
                 do {
@@ -2327,7 +2391,8 @@ public final class OriginalPlaySession: ObservableObject {
                     let renderer = try OriginalLabelPeelRenderer(library: .bundled())
                     let stage: OriginalLabelPeelProcess.Stage = labelPeelFollowupPending ? .peel : .solvent
                     labelPeelFollowupPending = false
-                    let puzzle = OriginalLabelPeelProcess(mask: renderer.initialMask, stage: stage)
+                    let puzzle = OriginalLabelPeelProcess(mask: renderer.initialMask, stage: stage,
+                                                          sourceStateWord: runner.game.wineLabelPeelState)
                     labelPeelRenderer = renderer
                     labelPeelImage = try renderer.render(puzzle)
                     labelPeelScreenEffects = OriginalScreenEffects()
@@ -2550,10 +2615,13 @@ public final class OriginalPlaySession: ObservableObject {
                 }
             }
             startTimer()
+        case .process(50):
+            loungeTV = loungeTV ?? OriginalLoungeTVProcess()
+            stopTimer()
         case .process(let id):
             guard id == 56 else {
                 runner.halt("Process \(id) is not recovered")
-                return settle()
+                return
             }
             if process == nil {
                 process = OriginalEntranceProcess()
@@ -2568,6 +2636,14 @@ public final class OriginalPlaySession: ObservableObject {
             startTimer()
         case .exploration(let map):
             stopTimer()
+            if var parent = loungeTVParent {
+                parent.resumeProcess(after: runner)
+                runner = parent
+                loungeTVParent = nil
+                loungeTV?.finishResponse()
+                presentedPacketOffset = nil
+                return settle()
+            }
             if var parent = bowlingParent {
                 parent.resumeProcess(after: runner)
                 runner = parent
@@ -2833,17 +2909,12 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     /**
-     * Returns to the last safe place if an active process loses its native state.
+     * Returns to the last safe place when an active process loses its native state.
      */
-    func haltMissingProcessState() {
-        let interaction: String
-        if case .process(let processID) = runner.phase {
-            interaction = "Process \(processID)"
-        } else {
-            interaction = "The active interaction"
-        }
+    func recoverMissingProcessState() {
         stopTimer()
-        runner.halt("\(interaction) lost its native state")
+        guard case .process(let processID) = runner.phase else { return }
+        runner.halt("Process \(processID) lost its native state")
     }
 
     /// Resolve original music and sound controls through the recovered tables.
@@ -2955,6 +3026,7 @@ public final class OriginalPlaySession: ObservableObject {
         if signProcess != nil { return updateSign() }
         if thinWire != nil { return updateThinWire() }
         if differences != nil { return updateDifferences() }
+        if coinEdgePuzzle != nil { return updateCoinEdgePuzzle() }
         if coinPuzzle != nil { return updateCoinPuzzle() }
         if matchsticks != nil { return updateMatchsticks() }
         if linenWagon != nil { return updateLinenWagon() }
@@ -2982,8 +3054,9 @@ public final class OriginalPlaySession: ObservableObject {
             return
         }
         // These interactions respond directly to input and do not need frame updates.
-        if typewriter != nil || brickWall != nil || appleWordEntry != nil { return }
-        guard var current = process else { return haltMissingProcessState() }
+        if typewriter != nil || brickWall != nil || applePainting != nil || appleWordEntry != nil
+            || cpr != nil || jukebox != nil { return }
+        guard var current = process else { return recoverMissingProcessState() }
         let input = OriginalEntranceProcess.Input(newTouch: pendingTouch, leftHanded: false,
             page0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
         pendingTouch = nil
@@ -3060,7 +3133,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateBowling() {
-        guard var match = bowlingMatch, let renderer = bowlingRenderer else { return haltMissingProcessState() }
+        guard var match = bowlingMatch, let renderer = bowlingRenderer else { return recoverMissingProcessState() }
         if let requestID = match.nextCommentaryRequest {
             do {
                 let response = try runner.processHint(catalog: catalog, pairA: 21, pairB: requestID)
@@ -3117,7 +3190,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updatePencilSharpener() {
-        guard var current = pencilSharpener else { return haltMissingProcessState() }
+        guard var current = pencilSharpener else { return recoverMissingProcessState() }
         current.updateOneFrame()
         pencilSharpener = current
         guard let returnValue = current.returnedProcessValue else { return }
@@ -3129,7 +3202,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateVendingMachine() {
-        guard var process = vendingMachine else { return haltMissingProcessState() }
+        guard var process = vendingMachine else { return recoverMissingProcessState() }
         if let sound = process.update() {
             try? audio.playOriginalEffect(archiveID: 52, entryID: sound)
         }
@@ -3144,7 +3217,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateNumberSeal() {
-        guard var process = numberSeal else { return haltMissingProcessState() }
+        guard var process = numberSeal else { return recoverMissingProcessState() }
         let previous = process.phase
         process.update(touch: numberSealTouch)
         numberSealTouch = nil
@@ -3161,7 +3234,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCodeNotice() {
-        guard var process = codeNotice else { return haltMissingProcessState() }
+        guard var process = codeNotice else { return recoverMissingProcessState() }
         let controlFinished = process.phase == .waitingForExitControl
         let effects = process.update(pageTouch: pendingCodeNoticeTouch,
                                      exitControlFinished: controlFinished)
@@ -3184,7 +3257,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCassetteBallpoint() {
-        guard var process = cassetteBallpoint else { return haltMissingProcessState() }
+        guard var process = cassetteBallpoint else { return recoverMissingProcessState() }
         let previousPhase = process.phase
         process.update(newRawTouch: cassettePress)
         cassettePress = nil
@@ -3203,7 +3276,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCassetteDeck() {
-        guard var process = cassetteDeck, let renderer = cassetteDeckRenderer else { return haltMissingProcessState() }
+        guard var process = cassetteDeck, let renderer = cassetteDeckRenderer else { return recoverMissingProcessState() }
         let oldCamera = process.camera
         let oldState = process.sceneState
         let press = cassettePress
@@ -3214,7 +3287,12 @@ public final class OriginalPlaySession: ObservableObject {
                                                 camera: process.camera, state: process.sceneState) }
             catch { runner.halt("The cassette deck could not be hit-tested: \(error)"); stopTimer(); return }
         }
-        process.update(touch: cassetteTouch, pressedTouch: press, sceneHit: sceneHit)
+        let effects = process.update(touch: cassetteTouch, pressedTouch: press, sceneHit: sceneHit)
+        for effect in effects {
+            if case .sound(let archive, let entry) = effect {
+                _ = try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
+            }
+        }
         cassettePress = nil
         cassetteOpacity = process.opacity
         if oldCamera != process.camera || oldState != process.sceneState {
@@ -3234,7 +3312,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCassetteRewind() {
-        guard var process = cassetteRewind else { return haltMissingProcessState() }
+        guard var process = cassetteRewind else { return recoverMissingProcessState() }
         let touch = process.phase == .ready ? cassettePress : cassetteTouch
         process.update(rawTouch: touch, pressedTouch: cassettePress)
         cassettePress = nil
@@ -3252,7 +3330,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateClock() {
-        guard var process = clock, let renderer = clockRenderer else { return haltMissingProcessState() }
+        guard var process = clock, let renderer = clockRenderer else { return recoverMissingProcessState() }
         clockUpdates += 1
         let tick = UInt64(Double(clockUpdates) / Self.updatesPerSecond)
         if process.update(tick: tick, draw: clockUpdates % 2 == 0) {
@@ -3297,7 +3375,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCabinetDial() {
-        guard var puzzle = cabinetDial, cabinetDialRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = cabinetDial, cabinetDialRenderer != nil else { return recoverMissingProcessState() }
         let complete = !cabinetDialScreenEffects.brightness[0].active
         cabinetDialScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3341,7 +3419,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCrowbar() {
-        guard var puzzle = crowbar, crowbarRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = crowbar, crowbarRenderer != nil else { return recoverMissingProcessState() }
         let complete = !crowbarScreenEffects.brightness[0].active
         crowbarScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3390,7 +3468,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateMemoDrawing() {
-        guard var process = memoDrawing, memoDrawingRenderer != nil else { return haltMissingProcessState() }
+        guard var process = memoDrawing, memoDrawingRenderer != nil else { return recoverMissingProcessState() }
         let complete = !memoDrawingScreenEffects.brightness[0].active
         memoDrawingScreenEffects.advanceOriginalFrame()
         let previous = process.drawing
@@ -3432,7 +3510,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateMemoPull() {
-        guard var puzzle = memoPull, memoPullRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = memoPull, memoPullRenderer != nil else { return recoverMissingProcessState() }
         let complete = !memoPullScreenEffects.brightness[0].active
         memoPullScreenEffects.advanceOriginalFrame()
         let touch = memoPullTouch.flatMap { OriginalMemoPullProjection.touch(page: $0, paper: puzzle.position) }
@@ -3476,7 +3554,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updatePaperclip() {
-        guard var puzzle = paperclip, paperclipRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = paperclip, paperclipRenderer != nil else { return recoverMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let touch = paperclipTouch.flatMap { OriginalPaperclipProjection.hit(page: $0) }
@@ -3514,7 +3592,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateHanger() {
-        guard var puzzle = hanger, hangerRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = hanger, hangerRenderer != nil else { return recoverMissingProcessState() }
         let complete = !hangerScreenEffects.brightness[0].active
         hangerScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3555,7 +3633,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSuitcaseContents() {
-        guard var process = suitcaseContents, suitcaseContentsRenderer != nil else { return haltMissingProcessState() }
+        guard var process = suitcaseContents, suitcaseContentsRenderer != nil else { return recoverMissingProcessState() }
         let complete = !suitcaseContentsScreenEffects.brightness[0].active
         suitcaseContentsScreenEffects.advanceOriginalFrame()
         do {
@@ -3603,7 +3681,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateFountainPen() {
-        guard var puzzle = fountainPen, fountainPenRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = fountainPen, fountainPenRenderer != nil else { return recoverMissingProcessState() }
         let complete = !fountainPenScreenEffects.brightness[0].active
         fountainPenScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3644,7 +3722,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateToiletTank() {
-        guard var puzzle = toiletTank, toiletTankRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = toiletTank, toiletTankRenderer != nil else { return recoverMissingProcessState() }
         let complete = !toiletTankScreenEffects.brightness[0].active
         toiletTankScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3685,7 +3763,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateDifferences() {
-        guard var puzzle = differences, differencesRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = differences, differencesRenderer != nil else { return recoverMissingProcessState() }
         let complete = !differencesScreenEffects.brightness[0].active
         differencesScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3726,7 +3804,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateLinenWagon() {
-        guard var puzzle = linenWagon, linenWagonRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = linenWagon, linenWagonRenderer != nil else { return recoverMissingProcessState() }
         let complete = !linenWagonScreenEffects.brightness[0].active
         linenWagonScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3764,7 +3842,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateMatchsticks() {
-        guard var puzzle = matchsticks, matchsticksRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = matchsticks, matchsticksRenderer != nil else { return recoverMissingProcessState() }
         let complete = !matchsticksScreenEffects.brightness[0].active
         matchsticksScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3799,7 +3877,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCoinPuzzle() {
-        guard var puzzle = coinPuzzle, coinPuzzleRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = coinPuzzle, coinPuzzleRenderer != nil else { return recoverMissingProcessState() }
         let complete = !coinPuzzleScreenEffects.brightness[0].active
         coinPuzzleScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3833,8 +3911,48 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
 
+    private func updateCoinEdgePuzzle() {
+        guard var puzzle = coinEdgePuzzle, let renderer = coinPuzzleRenderer else {
+            return recoverMissingProcessState()
+        }
+        let previous = puzzle
+        if let touch = coinPuzzleTouch, !coinEdgeTouchActive {
+            if puzzle.select(atPagePoint: .init(x: Int(touch.x), y: Int(touch.y))) != nil {
+                coinEdgeSelectionFrames = 41
+            }
+            coinEdgeTouchActive = true
+        }
+        if puzzle.inFlightEdge != nil {
+            coinEdgeSelectionFrames -= 1
+            if coinEdgeSelectionFrames <= 0 {
+                puzzle.finishSelection()
+                coinEdgeSelectionFrames = 0
+            }
+        }
+        coinEdgePuzzle = puzzle
+        do {
+            if previous != puzzle { coinEdgePuzzleImage = try renderer.render(puzzle) }
+            if puzzle.canCheckResult {
+                // Overlay 29 exits after its result check even when the board
+                // predicate fails. The System event has no failure transition.
+                coinEdgePuzzle = nil
+                coinEdgePuzzleImage = nil
+                coinPuzzleRenderer = nil
+                coinPuzzleTouch = nil
+                coinEdgeTouchActive = false
+                coinEdgeSelectionFrames = 0
+                stopTimer()
+                runner.finishProcess(returnValue: 2)
+                return settle()
+            }
+        } catch {
+            runner.halt("The coin edge puzzle could not be drawn: \(error)")
+            settle()
+        }
+    }
+
     private func updateDollRepair() {
-        guard var puzzle = dollRepair, dollRepairRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = dollRepair, dollRepairRenderer != nil else { return recoverMissingProcessState() }
         let complete = !dollRepairScreenEffects.brightness[0].active
         dollRepairScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3868,7 +3986,7 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
     private func updateBookmarkBox() {
-        guard var puzzle = bookmarkBox else { return haltMissingProcessState() }
+        guard var puzzle = bookmarkBox else { return recoverMissingProcessState() }
         let complete = !bookmarkBoxScreenEffects.brightness[0].active
         bookmarkBoxScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3905,7 +4023,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSwitchboard() {
-        guard var puzzle = switchboard, switchboardRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = switchboard, switchboardRenderer != nil else { return recoverMissingProcessState() }
         let complete = !switchboardScreenEffects.brightness[0].active
         switchboardScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3947,7 +4065,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateLabelPeel() {
-        guard var puzzle = labelPeel, labelPeelRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = labelPeel, labelPeelRenderer != nil else { return recoverMissingProcessState() }
         let complete = !labelPeelScreenEffects.brightness[0].active
         labelPeelScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3965,6 +4083,8 @@ public final class OriginalPlaySession: ObservableObject {
                     _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 44, fadeFrames: 5))
                 case .completed(let result):
                     labelPeelFollowupPending = result == 2
+                    runner.storeWineLabelPeelState(UInt16(truncatingIfNeeded:
+                        puzzle.sourcePosition + OriginalLabelPeelProcess.peelPositionBias))
                     labelPeel = nil
                     labelPeelImage = nil
                     labelPeelRenderer = nil
@@ -3983,7 +4103,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateAfterConfess() {
-        guard var process = afterConfess, afterConfessRenderer != nil else { return haltMissingProcessState() }
+        guard var process = afterConfess, afterConfessRenderer != nil else { return recoverMissingProcessState() }
         let previousPhase = process.phase
         let completed = process.update()
         afterConfess = process
@@ -4005,7 +4125,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateVSScene() {
-        guard var process = vsScene, vsSceneRenderer != nil else { return haltMissingProcessState() }
+        guard var process = vsScene, vsSceneRenderer != nil else { return recoverMissingProcessState() }
         let completed = process.update()
         vsScene = process
         guard completed else { return }
@@ -4018,7 +4138,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updatePicturePeel() {
-        guard var process = picturePeel, let renderer = picturePeelRenderer else { return haltMissingProcessState() }
+        guard var process = picturePeel, let renderer = picturePeelRenderer else { return recoverMissingProcessState() }
         let previous = process
         let effects = process.update(touch: picturePeelTouch)
         picturePeel = process
@@ -4037,7 +4157,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateChristmasTree() {
-        guard var process = christmasTree, christmasTreeRenderer != nil else { return haltMissingProcessState() }
+        guard var process = christmasTree, christmasTreeRenderer != nil else { return recoverMissingProcessState() }
         let fadeComplete = !christmasTreeScreenEffects.brightness[0].active
         christmasTreeScreenEffects.advanceOriginalFrame()
         let effects = process.update(fadeComplete: fadeComplete)
@@ -4068,7 +4188,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSearchShed() {
-        guard var process = searchShed, searchShedRenderer != nil else { return haltMissingProcessState() }
+        guard var process = searchShed, searchShedRenderer != nil else { return recoverMissingProcessState() }
         let fadeComplete = !searchShedScreenEffects.brightness[0].active
         searchShedScreenEffects.advanceOriginalFrame()
         let effects = process.update(fadeComplete: fadeComplete)
@@ -4077,7 +4197,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateBagSearch() {
-        guard var process = bagSearch, bagSearchRenderer != nil else { return haltMissingProcessState() }
+        guard var process = bagSearch, bagSearchRenderer != nil else { return recoverMissingProcessState() }
         let fadeComplete = !bagSearchScreenEffects.brightness[0].active
         bagSearchScreenEffects.advanceOriginalFrame()
         let effects = process.update(fadeComplete: fadeComplete)
@@ -4136,7 +4256,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateThinWire() {
-        guard var puzzle = thinWire, thinWireRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = thinWire, thinWireRenderer != nil else { return recoverMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let previous = puzzle
@@ -4175,7 +4295,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSuitcaseKey() {
-        guard var puzzle = suitcaseKey, suitcaseRenderer != nil else { return haltMissingProcessState() }
+        guard var puzzle = suitcaseKey, suitcaseRenderer != nil else { return recoverMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let previous = puzzle
@@ -4210,7 +4330,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// One update of process 24. Status 2 hands the result to the event runner.
     private func updateBell() {
-        guard var current = bellProcess else { return haltMissingProcessState() }
+        guard var current = bellProcess else { return recoverMissingProcessState() }
         let input = OriginalBellProcess.Input(newTouch: pendingTouch.map { .init(x: $0.x, y: $0.y) },
             leftHanded: false, screen0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
         pendingTouch = nil
@@ -4256,7 +4376,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// Advances a sign-card process. Status 2 hands the result to the event runner.
     private func updateSign() {
-        guard var current = signProcess else { return haltMissingProcessState() }
+        guard var current = signProcess else { return recoverMissingProcessState() }
         let input = OriginalSignProcess.Input(heldTouch: heldTouch.map { .init(x: $0.x, y: $0.y) },
             newTouch: pendingTouch.map { .init(x: $0.x, y: $0.y) }, leftHanded: false,
             screen0FadeComplete: (fadeRemaining[0] ?? 0) == 0)

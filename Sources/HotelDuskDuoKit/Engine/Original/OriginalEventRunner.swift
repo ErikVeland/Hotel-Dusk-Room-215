@@ -644,6 +644,13 @@ public struct OriginalEventRunner: Sendable {
     public mutating func saveRetryCheckpoint() { game.saveRetryCheckpoint() }
 
     /**
+     * Stores overlay 22's resumable wine-label position in the game state.
+     */
+    public mutating func storeWineLabelPeelState(_ value: UInt16) {
+        game.wineLabelPeelState = value
+    }
+
+    /**
      * Clears the original notebook notification without advancing the parent event.
      */
     public mutating func openNotebook() { game.openNotebook() }
@@ -1034,7 +1041,7 @@ public struct OriginalEventRunner: Sendable {
                     let following = operationIndex + 1 < operations.count ? operations[operationIndex + 1] : nil
                     let packet = try OriginalDialoguePacket(record: record, following: following, text: program.text)
                     // Game-over pages (`%r`) need the recovered failure screen and retry restore.
-                    if packet.pages.contains(where: { $0.tokens.contains { if case .control(.retry) = $0.kind { return true }; return false } }) {
+                    if packet.pages.contains(where: { $0.tokens.contains { if case .control(.retry(_)) = $0.kind { return true }; return false } }) {
                         return halt("The game-over retry sequence is not recovered", sourceOffset: record.sourceOffset)
                     }
                     if session.restoredFromNonDialogue {
@@ -1280,6 +1287,13 @@ public struct OriginalEventRunner: Sendable {
             result = try OriginalEventCompletion.stateOnlyExit(event: event, conditions: conditions,
                                                                processReturn: processReturn, game: game)
         } catch {
+            if scope == .system, (try? reader.u16(0)) == 15,
+               case OriginalDataError.invalid("Original process return exceeds transition table") = error {
+                // Shared System processes can be launched without a script exit row.
+                // Their source process return goes back to the owning interaction.
+                endTalkEvent()
+                return
+            }
             return halt("Event exit failed: \(error)", sourceOffset: event.sourceOffset)
         }
         switch result {

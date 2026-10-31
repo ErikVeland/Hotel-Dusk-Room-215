@@ -54,6 +54,7 @@ enum OriginalProgressInput: Codable, Equatable, Sendable {
     case selectAppleWordLetter(index: Int)
     case activateCassetteDeckControl
     case exitCassetteDeck
+    case loungeTV(action: OriginalLoungeTVProcess.Action)
     case quitSuitcaseKey
     case holdThinWireTouch(x: Float, y: Float)
     case holdFountainPenTouch(x: Float, y: Float)
@@ -299,6 +300,7 @@ extension OriginalPlaySession {
         case let .selectAppleWordLetter(index): selectAppleWordLetter(at: index)
         case .activateCassetteDeckControl: activateCassetteDeckControl()
         case .exitCassetteDeck: exitCassetteDeck()
+        case let .loungeTV(action): loungeTVAction(action)
         case .quitSuitcaseKey: quitSuitcaseKey()
         case let .holdThinWireTouch(x, y): holdThinWireTouch(x: x, y: y)
         case let .holdFountainPenTouch(x, y): holdFountainPenTouch(x: x, y: y)

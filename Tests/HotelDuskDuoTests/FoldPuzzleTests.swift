@@ -4,6 +4,41 @@ import SwiftUI
 
 @MainActor
 final class FoldPuzzleTests: XCTestCase {
+    private final class SilentMusicOutput: OriginalMusicOutput {
+        var outputVolume: Float = 0
+        var isActive = true
+        var position: TimeInterval = 0
+        func seek(to seconds: TimeInterval) throws { position = seconds }
+        func resume() throws { isActive = true }
+        func pause() { isActive = false }
+        func stop() { isActive = false }
+    }
+
+    func testUnavailableJigsawManifestDoesNotBlockTheOriginalGame() throws {
+        let puzzle = JigsawPuzzleManager(manifestLoader: {
+            throw OriginalDataError.missing("Test jigsaw manifest")
+        })
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let audio = AudioController(musicOutputFactory: { _, _, _ in SilentMusicOutput() })
+        audio.isMuted = true
+        let session = GameSession(
+            audioController: audio,
+            jigsawPuzzleManager: puzzle,
+            saveStore: OriginalChapterFileStore(directory: directory.appendingPathComponent("chapters")),
+            resumeStore: OriginalResumeFileStore(directory: directory.appendingPathComponent("resume")),
+            safePlaceStore: OriginalResumeFileStore(directory: directory.appendingPathComponent("safe-place")))
+        defer { session.endOriginalGame() }
+
+        XCTAssertNotNil(puzzle.manifestLoadError)
+        XCTAssertTrue(puzzle.manifest.pieces.isEmpty)
+        session.startOriginalGame()
+
+        XCTAssertNotNil(session.play)
+        if case .halted(let halt) = session.play?.runner.phase {
+            XCTFail("The original game must remain playable: \(halt.reason)")
+        }
+    }
+
     func testOriginalAnimationBufferSurvivesClosingAndFirstPartialOpening() throws {
         let session = GameSession()
         try session.openAnimationPreview("Hy_hanas_")

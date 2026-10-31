@@ -80,7 +80,10 @@ struct OriginalPlayPage: View {
                 retainedNotes
             }
         case .process:
-            if play.vsScene != nil {
+            if play.loungeTV != nil {
+                if screen == 0 { OriginalLoungeTVView(play: play) }
+                else { retainedNotes }
+            } else if play.vsScene != nil {
                 OriginalVSScenePageView(play: play, screen: screen)
             } else if play.afterConfess != nil {
                 OriginalAfterConfessPageView(play: play, screen: screen)
@@ -148,6 +151,9 @@ struct OriginalPlayPage: View {
                 else { retainedNotes }
             } else if play.jukebox != nil {
                 if screen == 0 { OriginalJukeboxView(play: play) }
+                else { retainedNotes }
+            } else if play.coinEdgePuzzle != nil {
+                if screen == 0 { OriginalCoinEdgeView(play: play) }
                 else { retainedNotes }
             } else if play.coinPuzzle != nil {
                 if screen == 0 { OriginalCoinView(play: play) }

@@ -62,20 +62,16 @@ final class OriginalChapterTenPicturePeelFlowTests: XCTestCase {
     }
 
     @MainActor
-    func testMissingProcess61StateReportsARecoverableStop() throws {
+    func testMissingProcess61StateRequestsSafePlaceRecovery() throws {
         let play = try makePicturePeelSession()
         defer { play.stop() }
-        var reportedHalt: OriginalEventRunner.Halt?
-        play.onRecoverableStop = { reportedHalt = $0 }
 
-        play.haltMissingProcessState()
+        play.recoverMissingProcessState()
 
         guard case .halted(let halt) = play.runner.phase else {
-            return XCTFail("Missing picture-peel state must halt process 61")
+            return XCTFail("Missing process state must request safe-place recovery")
         }
-        XCTAssertEqual(reportedHalt, halt)
-        XCTAssertEqual(halt.program, "EP10_R302")
-        XCTAssertTrue(halt.reason.contains("Process 61"))
+        XCTAssertTrue(halt.reason.contains("lost its native state"))
     }
 
     @MainActor

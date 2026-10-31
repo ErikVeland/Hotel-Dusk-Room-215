@@ -1605,14 +1605,18 @@ final class OriginalStoryContinuationTests: XCTestCase {
         play.advanceDialogue()
         XCTAssertEqual(play.labelPeel?.stage, .peel)
         for _ in 0..<65 { play.advanceFrame() }
-        for _ in 0..<5 {
-            play.holdLabelPeelTouch(x: 150, y: 70)
-            play.advanceFrame()
-            play.holdLabelPeelTouch(x: 132, y: 88)
-            play.advanceFrame()
-            play.releaseLabelPeelTouch()
-            play.advanceFrame()
-        }
+        play.holdLabelPeelTouch(x: 150, y: 75)
+        play.advanceFrame()
+        play.holdLabelPeelTouch(x: 145, y: 75)
+        play.advanceFrame()
+        play.releaseLabelPeelTouch()
+        play.advanceFrame()
+        play.holdLabelPeelTouch(x: 150, y: 75)
+        play.advanceFrame()
+        play.holdLabelPeelTouch(x: 132, y: 75)
+        play.advanceFrame()
+        play.releaseLabelPeelTouch()
+        play.advanceFrame()
         for _ in 0..<65 where play.labelPeel != nil { play.advanceFrame() }
         XCTAssertEqual(play.runner.session.selection.eventID, 10)
         play.advanceDialogue()
