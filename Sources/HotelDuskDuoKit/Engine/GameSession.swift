@@ -172,7 +172,7 @@ public final class GameSession: ObservableObject {
         catch { saveError = "The safe-place checkpoint could not be saved: \(error)" }
     }
 
-    private func recoverFromStop(_ halt: OriginalEventRunner.Halt) {
+    func recoverFromStop(_ halt: OriginalEventRunner.Halt) {
         guard !restoringAfterStop else { return }
         restoringAfterStop = true
         defer { restoringAfterStop = false }

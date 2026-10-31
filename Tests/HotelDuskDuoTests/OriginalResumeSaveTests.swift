@@ -33,10 +33,10 @@ final class OriginalResumeSaveTests: XCTestCase {
         }
     }
 
-    private func session(_ store: any OriginalResumeSaveStore = Store(), chapterStore: any OriginalChapterSaveStore = ChapterStore()) -> GameSession {
+    private func session(_ store: any OriginalResumeSaveStore = Store(), safePlaceStore: any OriginalResumeSaveStore = Store(), chapterStore: any OriginalChapterSaveStore = ChapterStore()) -> GameSession {
         let audio = AudioController(musicOutputFactory: { _, _, _ in ProgressMusicOutput() })
         audio.isMuted = true
-        return GameSession(audioController: audio, saveStore: chapterStore, resumeStore: store,
+        return GameSession(audioController: audio, saveStore: chapterStore, resumeStore: store, safePlaceStore: safePlaceStore,
             mapRendererFactory: { name, _ in try MapRenderer(name) })
     }
 
@@ -112,6 +112,35 @@ final class OriginalResumeSaveTests: XCTestCase {
         XCTAssertNotNil(game.play)
         XCTAssertEqual(game.audioController.currentSequenceID, 17)
         XCTAssertNil(game.audioController.lastError)
+    }
+
+    func testRecoverableStopReturnsToLastSafeWalkingPlace() throws {
+        let safePlaceStore = Store()
+        let game = session(safePlaceStore: safePlaceStore)
+        defer { game.endOriginalGame() }
+        let play = try enterLobby(game)
+        let checkpoint = try XCTUnwrap(safePlaceStore.checkpoint)
+        let position = play.lobby?.position
+
+        game.recoverFromStop(.init(reason: "Test halt", program: "fixture", eventIndex: 3, sourceOffset: nil))
+
+        let restored = try XCTUnwrap(game.play)
+        XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
+        XCTAssertEqual(restored.lobby?.position, position)
+        XCTAssertEqual(safePlaceStore.checkpoint, checkpoint)
+        XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
+    }
+
+    func testRecoverableStopWithoutSafePlaceStartsChapterOne() throws {
+        let game = session()
+        defer { game.endOriginalGame() }
+
+        game.recoverFromStop(.init(reason: "Test halt", program: "fixture", eventIndex: 3, sourceOffset: nil))
+
+        let play = try XCTUnwrap(game.play)
+        if case .halted = play.runner.phase { XCTFail("Chapter 1 fallback must not remain halted") }
+        XCTAssertEqual(play.runner.game.chapter, 0)
+        XCTAssertTrue(game.recoveryNotice?.contains("beginning") == true)
     }
 
     func testInspectionCannotReplaceLastWalkingCheckpoint() throws {
