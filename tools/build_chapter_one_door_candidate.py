@@ -5,6 +5,7 @@ The 3D mapping must be checked in game before these files enter a pack.
 """
 import json
 import hashlib
+import argparse
 from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
@@ -14,11 +15,18 @@ EXPORT = ROOT / '.cache/original-art-export'
 PLAQUE = ROOT / '.cache/plaque-test-output'
 KNOB = ROOT / '.cache/door-correction-output'
 DEST = ROOT / '.cache/chapter1-door-candidate'
-STUDY = ROOT / 'generated_images/exec-893677cf-294d-4e94-a6ad-d77025bb9252.png'
-WALL_STUDY = ROOT / 'generated_images/exec-d227b590-40ee-47b1-9a17-9961751be795.png'
-WALL_STUDY_LIT = ROOT / 'generated_images/exec-3b764aca-ec2d-401a-8c12-acbe6843a837.png'
-WALL_STUDY_NARROW = ROOT / 'generated_images/exec-c968c4bb-6d8d-4801-aa4e-a7497e0cd09c.png'
-INSPECTION_WALL_STUDY = ROOT / 'generated_images/exec-d004fb5c-4f7b-42fc-843d-d9a5e32e270a.png'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--door-study', type=Path, required=True)
+parser.add_argument('--wall-study', type=Path, required=True)
+parser.add_argument('--lit-wall-study', type=Path, required=True)
+parser.add_argument('--narrow-wall-study', type=Path, required=True)
+parser.add_argument('--inspection-wall-study', type=Path, required=True)
+args = parser.parse_args()
+STUDY = args.door_study
+WALL_STUDY = args.wall_study
+WALL_STUDY_LIT = args.lit_wall_study
+WALL_STUDY_NARROW = args.narrow_wall_study
+INSPECTION_WALL_STUDY = args.inspection_wall_study
 manifest = json.loads((EXPORT / 'ExportManifest.json').read_text())
 DEST.mkdir(parents=True, exist_ok=True)
 models = {}

@@ -100,7 +100,7 @@ The next production steps are to establish a frame-faithful, temporally consiste
 
 ## Approved art direction
 
-Use the detailed graphite linework and dry, uneven hatching in `generated_images/exec-ece1ac39-9351-4091-a16f-05242448c5fb.png` and the warm, illustrated material treatment in `generated_images/exec-ea5b4d3e-b741-4521-9887-41e99478ee5e.png`. Preserve original poses, timing, crop and scene geometry. The door study is a style reference: its plaque and handle differ from the original and must not replace those details. The original room 215 sign has its own frame and separated digits, and the inspection view crops the lower part of the tall door.
+Use detailed graphite linework, dry uneven hatching and warm illustrated materials. Preserve original poses, timing, crop and scene geometry. Style studies are references only; their plaque and handle differ from the original and must not replace those details. The original Room 215 sign has its own frame and separated digits, and the inspection view crops the lower part of the tall door.
 
 The offline artwork job selects the Chapter 1 room archives, expressions referenced by the Chapter 1 scripts (including paired dialogue), opening and shared artwork. The selection is deliberately conservative and includes additional shared assets. Source files remain unchanged. Records are keyed by the original decoded pixels so unavailable assets fall back to the original.
 
@@ -116,6 +116,6 @@ The texture-only job writes an incomplete manifest, so the game continues to use
 
 A local reference-guided video-sketch trial was run on two character frames. The 512-pixel style pass exceeded the available GPU memory. Smaller trials reconstructed the pose, but the transferred pencil shading was too flat or distorted the face, so their output is not production artwork. The 4× texture bases are intermediates and still need the approved illustrative finish and visual checks.
 
-A further single-frame reference-guided study of `Hy_hanas_.anm#0` is saved as `generated_images/exec-d22b6e99-0c35-4b6c-8a62-e1b375f5fff5.png`. It improves pencil definition but invents or changes details including the ear and jacket, and it provides no evidence of frame-to-frame consistency. It is a style experiment only, not an animation replacement or a basis for claiming clip coverage.
+A further single-frame reference-guided study of `Hy_hanas_.anm#0` improves pencil definition but invents or changes details including the ear and jacket, and provides no evidence of frame-to-frame consistency. It is a style experiment only, not an animation replacement or a basis for claiming clip coverage.
 
 The script selection and automated image checks do not replace a full Chapter 1 playthrough or a performance check on the target device. The original export also lists unrecovered or non-image resources in its `excluded` field.

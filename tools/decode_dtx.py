@@ -104,7 +104,7 @@ def main():
     parser.add_argument("--bundle", type=Path)
     parser.add_argument("--report", type=Path, default=ROOT / "docs/original-texture-report.json")
     parser.add_argument("--preview-prefix", action="append", default=[])
-    parser.add_argument("--preview-directory", type=Path, default=ROOT / "docs/previews/original-textures")
+    parser.add_argument("--preview-directory", type=Path, default=ROOT / ".cache/previews/original-textures")
     args = parser.parse_args()
     entries = []
     stats = Counter()

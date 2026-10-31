@@ -91,6 +91,5 @@ if __name__ == "__main__":
     parser.add_argument("--input", type=Path, default=ROOT / ".cache/original-art-export")
     parser.add_argument("--output", type=Path, default=ROOT / "tools/artwork-overrides")
     parser.add_argument("--models", type=Path, default=ROOT / ".cache/upscale-models")
-    parser.add_argument("--door-study", type=Path, default=ROOT / "generated_images/exec-893677cf-294d-4e94-a6ad-d77025bb9252.png")
     torch.set_num_threads(4)
     main(parser.parse_args())
