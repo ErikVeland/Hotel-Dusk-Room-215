@@ -32,9 +32,6 @@ public struct OriginalClockProcess: Equatable, Sendable {
               ["AM", "PM"].contains(String(label.suffix(2))) else {
             throw OriginalDataError.unsupported("Clock label \(label)")
         }
-        guard label != "08:00AM" else {
-            throw OriginalDataError.unsupported("The morning clock transition")
-        }
         let h = Int(bytes[0] - 48) * 10 + Int(bytes[1] - 48)
         let m = Int(bytes[3] - 48) * 10 + Int(bytes[4] - 48)
         guard (1...12).contains(h), (0..<60).contains(m) else {

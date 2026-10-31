@@ -39,8 +39,17 @@ final class OriginalClockProcessTests: XCTestCase {
         XCTAssertNil(clock.labelDraw)
     }
 
-    func testUnsupportedMorningAndMalformedLabelsStayExplicit() {
-        for label in ["08:00AM", "NONE", "13:10PM", "05:60PM", "5:10 PM"] {
+    @MainActor
+    func testMorningClockTransitionUsesItsOriginalBitmap() throws {
+        let clock = try OriginalClockProcess(label: "08:00AM")
+        XCTAssertEqual(clock.bitmapName, "0800am")
+        XCTAssertEqual([clock.hour, clock.minute, clock.second], [7, 59, 58])
+        let renderer = try OriginalClockRenderer(process: clock, library: .bundled())
+        XCTAssertEqual(try renderer.render(clock).width, 192)
+    }
+
+    func testMalformedClockLabelsStayExplicit() {
+        for label in ["NONE", "13:10PM", "05:60PM", "5:10 PM"] {
             XCTAssertThrowsError(try OriginalClockProcess(label: label), label)
         }
     }

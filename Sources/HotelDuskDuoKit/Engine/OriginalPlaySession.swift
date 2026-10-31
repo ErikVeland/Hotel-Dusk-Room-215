@@ -146,7 +146,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var bookmarkBox: OriginalBookmarkBoxProcess?
     @Published public private(set) var bookmarkBoxImage: CGImage?
     @Published public private(set) var bookmarkBoxScreenEffects = OriginalScreenEffects()
-    private var bookmarkBoxRenderer: OriginalBookmarkBoxRenderer?
+    private let bookmarkBoxRender: @MainActor (OriginalBookmarkBoxProcess) throws -> CGImage
     private var bookmarkBoxTouch: SIMD2<Int>?
     @Published public private(set) var switchboard: OriginalSwitchboardProcess?
     @Published public private(set) var switchboardImage: CGImage?
@@ -284,6 +284,8 @@ public final class OriginalPlaySession: ObservableObject {
     var onWalkingCheckpoint: ((OriginalResumeSave) -> Void)?
     var onProgressCheckpoint: ((OriginalResumeSave) -> Void)?
     var onProgressSaveError: ((Error) -> Void)?
+    var onRecoverableStop: ((OriginalEventRunner.Halt) -> Void)?
+    private var didReportRecoverableStop = false
     private var progressJournal: OriginalPlayProgress?
     private var routeTrace: OriginalRouteTraceLog?
     private var progressInputActive = false
@@ -360,7 +362,8 @@ public final class OriginalPlaySession: ObservableObject {
                 bowlingRendererFactory: OriginalBowlingRendererFactory? = nil,
                 searchShedRendererFactory: OriginalSearchShedRendererFactory? = nil,
                 toiletTankRendererFactory: @escaping OriginalToiletTankRendererFactory = { try OriginalToiletTankRenderer() },
-                bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() }) {
+                bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() },
+                bookmarkBoxRender: (@MainActor (OriginalBookmarkBoxProcess) throws -> CGImage)? = nil) {
         self.runner = runner
         self.audio = audio
         usesLegacyInteractionPacing = audio.restoresLegacyInteractions
@@ -387,6 +390,16 @@ public final class OriginalPlaySession: ObservableObject {
         self.searchShedRendererFactory = searchShedRendererFactory ?? { try OriginalSearchShedRenderer() }
         self.toiletTankRendererFactory = toiletTankRendererFactory
         self.bagSearchRendererFactory = bagSearchRendererFactory
+        if let bookmarkBoxRender {
+            self.bookmarkBoxRender = bookmarkBoxRender
+        } else {
+            var renderer: OriginalBookmarkBoxRenderer?
+            self.bookmarkBoxRender = { puzzle in
+                if renderer == nil { renderer = try OriginalBookmarkBoxRenderer() }
+                guard let renderer else { throw OriginalDataError.invalid("Bookmark box renderer") }
+                return try renderer.render(puzzle)
+            }
+        }
         lobby = restoredExploration
         if chapterTransition?.stage == .title {
             do { chapterTitleImages = try OriginalChapterTitleImages(library: .bundled(), chapter: runner.game.chapter) }
@@ -806,6 +819,30 @@ public final class OriginalPlaySession: ObservableObject {
         pencilSharpener = process
     }
 
+    /**
+     * Holds the pencil while the player grinds its lead on the file.
+     */
+    public func holdPencilSharpenerTouch(pageX: Int, pageY: Int) {
+        let recordsProgress = beginProgressInput(
+            .holdPencilSharpenerTouch(pageX: pageX, pageY: pageY))
+        defer { endProgressInput(recordsProgress) }
+        guard !isPaused, case .process(59) = runner.phase,
+              var process = pencilSharpener else { return }
+        process.holdTouch(pageX: pageX, pageY: pageY)
+        pencilSharpener = process
+    }
+
+    /**
+     * Releases the held pencil.
+     */
+    public func releasePencilSharpenerTouch() {
+        let recordsProgress = beginProgressInput(.releasePencilSharpenerTouch)
+        defer { endProgressInput(recordsProgress) }
+        guard case .process(59) = runner.phase, var process = pencilSharpener else { return }
+        process.releaseTouch()
+        pencilSharpener = process
+    }
+
     /// The held touch on the touch page, in rotated page pixels; nil on release.
     public func holdTouch(pageX: Int, pageY: Int) {
         let recordsProgress = beginProgressInput(.holdTouch(pageX: pageX, pageY: pageY))
@@ -830,7 +867,7 @@ public final class OriginalPlaySession: ObservableObject {
               x.isFinite, y.isFinite, (0..<192).contains(x), (0..<256).contains(y) else { return }
         let point = SIMD2(x, y)
         if brickWallTouch == nil {
-            let hammerAvailable = (try? runner.game.inventory.items.contains(0x3b)) == true
+            let hammerAvailable = (try? runner.game.inventory.items.contains(0x47)) == true
             guard process.beginDrag(at: point, hammerAvailable: hammerAvailable) else { return }
         }
         process.drag(to: point)
@@ -1365,14 +1402,14 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, case .process(61) = runner.phase,
               var process = picturePeel,
-              process.requestExit() != nil else { return }
+              case .returned(let returnValue) = process.requestExit() else { return }
         picturePeel = nil
         picturePeelImage = nil
         picturePeelUpperImage = nil
         picturePeelRenderer = nil
         picturePeelTouch = nil
         stopTimer()
-        runner.finishProcess(returnValue: 2)
+        runner.finishProcess(returnValue: returnValue)
         settle()
     }
 
@@ -1776,6 +1813,7 @@ public final class OriginalPlaySession: ObservableObject {
         onWalkingCheckpoint = nil
         onProgressCheckpoint = nil
         onProgressSaveError = nil
+        onRecoverableStop = nil
         dialogueNotebook.onSaveProgress = nil
         lobbyTouch = nil
         firstPersonMovement = nil
@@ -1814,6 +1852,13 @@ public final class OriginalPlaySession: ObservableObject {
     private func settle() {
         defer {
             dialogueNotebook.record(runner.phase, program: runner.program.name)
+        }
+        if case .halted(let halt) = runner.phase {
+            stopTimer()
+            guard !didReportRecoverableStop else { return }
+            didReportRecoverableStop = true
+            onRecoverableStop?(halt)
+            return
         }
         if chapterTransition != nil { startTimer(); return }
         if notebook != nil { startTimer(); return }
@@ -1955,7 +2000,7 @@ public final class OriginalPlaySession: ObservableObject {
             startTimer()
         case .process(75):
             if brickWall == nil {
-                brickWall = OriginalBrickWallProcess(seed: puzzleSeed())
+                brickWall = OriginalBrickWallProcess(seed: nextProgressSeed(jigsaw: false))
                 processReturn = 2
             }
             startTimer()
@@ -2250,8 +2295,7 @@ public final class OriginalPlaySession: ObservableObject {
             if bookmarkBox == nil {
                 do {
                     let puzzle = OriginalBookmarkBoxProcess()
-                    bookmarkBoxRenderer = try OriginalBookmarkBoxRenderer()
-                    bookmarkBoxImage = try bookmarkBoxRenderer?.render(puzzle)
+                    bookmarkBoxImage = try bookmarkBoxRender(puzzle)
                     bookmarkBoxScreenEffects = OriginalScreenEffects()
                     bookmarkBox = puzzle
                 } catch {
@@ -2677,7 +2721,13 @@ public final class OriginalPlaySession: ObservableObject {
                 doorImage = nil
                 return departThroughDoor(to: destination)
             }
-            if door != nil { return }
+            if door != nil {
+                let requestsDeparture = runner.processRequests.dropFirst(handledMapRequests)
+                    .contains { $0.kind == 1 }
+                guard requestsDeparture else { return }
+                door = nil
+                doorImage = nil
+            }
             if applyFixture() { return settle() }
             if let departure = pendingDeparture {
                 pendingDeparture = nil
@@ -3788,7 +3838,6 @@ public final class OriginalPlaySession: ObservableObject {
                 case .completed(let result):
                     bookmarkBox = nil
                     bookmarkBoxImage = nil
-                    bookmarkBoxRenderer = nil
                     bookmarkBoxTouch = nil
                     bookmarkBoxScreenEffects = OriginalScreenEffects()
                     stopTimer()
@@ -3796,7 +3845,7 @@ public final class OriginalPlaySession: ObservableObject {
                     return settle()
                 }
             }
-            if previous != puzzle { bookmarkBoxImage = try bookmarkBoxRenderer?.render(puzzle) }
+            if previous != puzzle { bookmarkBoxImage = try bookmarkBoxRender(puzzle) }
         } catch {
             runner.halt("The bookmark box could not be updated: \(error)")
             settle()
@@ -4420,6 +4469,15 @@ public final class OriginalPlaySession: ObservableObject {
             routeTrace?.write(kind: "roomObjectHit", fields: routeTraceFields(extra: [
                 "pickedNode": node, "area": String(area), "subarea": String(subarea)
             ]))
+            if lobby.mapID == 12, node == "obj9999",
+               runner.game.value(for: .eventFlag(group: 23, index: 4)) == true {
+                routeTrace?.write(kind: "storyDispatch", fields: routeTraceFields(extra: [
+                    "trigger": "chapter9-pantry-quiz", "pickedNode": node
+                ]))
+                try startChapterNinePantryQuiz()
+                settle()
+                return
+            }
             let table = try OriginalSearchTable.bundled(map: lobby.mapName)
             if let view = table.upViewID(area: area, subarea: subarea), view != .max {
                 pendingCloseup = (area, subarea, view)
@@ -4428,6 +4486,18 @@ public final class OriginalPlaySession: ObservableObject {
             try startSearchFallback()
             settle()
         } catch { runner.halt("The room object selection failed: \(error)"); settle() }
+    }
+
+    /**
+     * Starts Quiz 9 from the pantry's hidden door hit masks after the birthday cards are read.
+     */
+    private func startChapterNinePantryQuiz() throws {
+        let context = OriginalEventSelectionContext(sceneID: 1, blockID: 0, modeID: 24,
+            eventID: 2, nowTime: runner.game.nowTime, mapID: 7)
+        var review = try OriginalEventRunner(program: catalog.loadProgram("EP9_R107"),
+            game: runner.game, selection: context)
+        review.attachRouteTrace(routeTrace)
+        runner = review
     }
 
     public func useItemInSearchView(_ item: UInt8?) {
@@ -4631,7 +4701,8 @@ public final class OriginalPlaySession: ObservableObject {
                                  cassetteDeckRendererFactory: OriginalCassetteDeckRendererFactory? = nil,
                                  bowlingRendererFactory: OriginalBowlingRendererFactory? = nil,
                                  toiletTankRendererFactory: @escaping OriginalToiletTankRendererFactory = { try OriginalToiletTankRenderer() },
-                                 bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() }) throws -> OriginalPlaySession {
+                                 bagSearchRendererFactory: @escaping OriginalBagSearchRendererFactory = { try OriginalBagSearchRenderer() },
+                                 bookmarkBoxRender: (@MainActor (OriginalBookmarkBoxProcess) throws -> CGImage)? = nil) throws -> OriginalPlaySession {
         if let journal = checkpoint.progress {
             _ = try checkpoint.gameState()
             let wasMuted = audio.isMuted
@@ -4679,7 +4750,8 @@ public final class OriginalPlaySession: ObservableObject {
                 cassetteDeckRendererFactory: cassetteDeckRendererFactory,
                 bowlingRendererFactory: bowlingRendererFactory,
                 toiletTankRendererFactory: toiletTankRendererFactory,
-                bagSearchRendererFactory: bagSearchRendererFactory)
+                bagSearchRendererFactory: bagSearchRendererFactory,
+                bookmarkBoxRender: bookmarkBoxRender)
             case .chapter:
                 let base = try JSONDecoder().decode(OriginalChapterSave.self, from: journal.base)
                 play = try restoring(base, audio: audio, saveStore: saveStore,
@@ -4761,7 +4833,8 @@ public final class OriginalPlaySession: ObservableObject {
                                        cassetteDeckRendererFactory: cassetteDeckRendererFactory,
                                        bowlingRendererFactory: bowlingRendererFactory,
                                        toiletTankRendererFactory: toiletTankRendererFactory,
-                                       bagSearchRendererFactory: bagSearchRendererFactory)
+                                       bagSearchRendererFactory: bagSearchRendererFactory,
+                                       bookmarkBoxRender: bookmarkBoxRender)
         play.lobbyRenderer = renderer
         play.lobbyMap = renderer.map
         try play.renderLobby()

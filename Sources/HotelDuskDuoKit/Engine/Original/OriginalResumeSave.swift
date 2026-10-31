@@ -71,6 +71,11 @@ public struct OriginalResumeFileStore: OriginalResumeSaveStore {
             .appendingPathComponent("HotelDuskDuo/Resume", isDirectory: true))
     }
 
+    public static var safePlaceApplication: Self {
+        Self(directory: FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("HotelDuskDuo/SafePlace", isDirectory: true))
+    }
+
     public func load() throws -> OriginalResumeSave? { try instantLog.load() }
 
     public func save(_ checkpoint: OriginalResumeSave) throws { try instantLog.save(checkpoint) }
