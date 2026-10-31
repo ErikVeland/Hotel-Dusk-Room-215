@@ -3075,8 +3075,9 @@ public final class OriginalPlaySession: ObservableObject {
     private func updateCassetteRewind() {
         guard var process = cassetteRewind else { return }
         let touch = process.phase == .ready ? cassettePress : cassetteTouch
-        process.update(rawTouch: touch)
+        process.update(rawTouch: touch, pressedTouch: cassettePress)
         cassettePress = nil
+        cassetteOpacity = process.opacity
         cassetteRewind = process
         guard process.phase == .complete else { return }
         cassetteTouch = nil

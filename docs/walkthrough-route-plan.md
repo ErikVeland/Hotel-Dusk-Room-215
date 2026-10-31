@@ -362,8 +362,9 @@ it does not identify the normal item-selection condition. A separate quit
 probe confirms the overlay's slot-5 return path: without input, variant 0 stays
 at main phase 1 and input phase 5; a tap at raw `(15, 170)` sets the main
 return gate, and the process fields reset after the 60-frame exit fade. This
-is modified-checkpoint evidence only. The session uses this slot 5 target and a
-60-update fade before it returns. See
+is modified-checkpoint evidence only. The native process now recognises this
+slot-5 tap, fades for 60 updates and returns value 2. This covers the captured
+exit path; it does not verify the normal parent event. See
 [`process-45-quit-path.json`](../Tests/Fixtures/Cassette/process-45-quit-path.json).
 
 Overlay 25 loads `bg.bin` and `table.bin` as textures, then loads `pencil.mdf`,
