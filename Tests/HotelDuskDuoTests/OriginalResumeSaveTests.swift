@@ -153,6 +153,52 @@ final class OriginalResumeSaveTests: XCTestCase {
         XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
     }
 
+    func testRunnerHaltDuringArrivalAutomaticallyRestartsPlay() throws {
+        let resumeStore = Store(), safePlaceStore = Store()
+        let audio = AudioController(musicOutputFactory: { _, _, _ in ProgressMusicOutput() })
+        audio.isMuted = true
+        var mapRenderAttempts = 0
+        let game = GameSession(audioController: audio, saveStore: ChapterStore(), resumeStore: resumeStore,
+            safePlaceStore: safePlaceStore, mapRendererFactory: { name, _ in
+                mapRenderAttempts += 1
+                if mapRenderAttempts == 1 {
+                    throw OriginalDataError.invalid("Injected first map render failure")
+                }
+                return try MapRenderer(name)
+            })
+        defer { game.endOriginalGame() }
+
+        game.startOriginalGame()
+        var sawAutomaticRecovery = false
+        for _ in 0..<2400 {
+            guard let play = game.play else { return XCTFail("Recovery removed the active game") }
+            switch play.runner.phase {
+            case .dialogue:
+                play.advanceDialogue()
+            case .process(56):
+                if play.entrance?.awaitingHandle == true { play.touchEntrance(pageX: 92, pageY: 175) }
+                play.advanceFrame()
+            case .waiting:
+                play.advanceFrame()
+            case .exploration:
+                XCTAssertTrue(sawAutomaticRecovery)
+                XCTAssertGreaterThanOrEqual(mapRenderAttempts, 2)
+                XCTAssertNotNil(play.lobby)
+                return
+            case .halted(let halt):
+                XCTFail("Attached runner remained halted: \(halt.reason)")
+                return
+            default:
+                XCTFail("Arrival stopped at \(play.runner.phase)")
+                return
+            }
+            sawAutomaticRecovery = sawAutomaticRecovery
+                || game.recoveryNotice?.contains("returned to the beginning") == true
+        }
+
+        XCTFail("Automatic recovery did not resume the opening route")
+    }
+
     func testPausedPlayerCanReturnToLastSafePlaceFromAnActiveInteraction() throws {
         let resumeStore = Store(), safePlaceStore = Store()
         let game = session(resumeStore, safePlaceStore: safePlaceStore)

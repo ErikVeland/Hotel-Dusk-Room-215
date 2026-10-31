@@ -22,7 +22,7 @@ final class OriginalCassetteTouchRegionTests: XCTestCase {
         XCTAssertFalse(OriginalCassetteTouchRegion.containsStartTap(SIMD2(-1, 130), rotated: false))
     }
 
-    func testPencilRewindMatchesCapturedSwipeAndReturnTiming() {
+    func testInferredPencilRewindGestureReturnsSuccess() {
         var process = OriginalCassetteRewindProcess()
         process.update(rawTouch: SIMD2(141, 130))
         for x in stride(from: 140, through: 135, by: -1) {
