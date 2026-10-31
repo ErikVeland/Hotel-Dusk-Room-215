@@ -35,7 +35,9 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var notebookImage: CGImage?
     @Published public private(set) var nativeNotebookPages: [String: Data] = [:]
     private var notebookTouch: SIMD2<Int>?
-    @Published public private(set) var runner: OriginalEventRunner
+    @Published public private(set) var runner: OriginalEventRunner {
+        didSet { reportRecoverableStopIfNeeded() }
+    }
     @Published public private(set) var entrance: EntranceScene?
     @Published public private(set) var bell: BellScene?
 
@@ -220,6 +222,7 @@ public final class OriginalPlaySession: ObservableObject {
     public private(set) var closeupDetailImage: OriginalUpViewImage?
     private var pendingCloseupDetail: (event: Int16, asset: String)?
     private var searchParent: OriginalEventRunner?
+    private var shownItemParent: OriginalEventRunner?
     /// The conversation that a notebook memo response interrupts.
     private var memoParent: OriginalEventRunner?
     private var pendingCloseup: (area: UInt16, subarea: UInt16, view: UInt16)?
@@ -291,7 +294,7 @@ public final class OriginalPlaySession: ObservableObject {
         guard case .exploration(let map) = runner.phase else { return false }
         return lobby?.mapID == map && lobby?.mode == .walking && chapterTransition == nil
             && notebook == nil && door == nil && closeup == nil && searchParent == nil && memoParent == nil
-            && jigsawParent == nil && toiletTankParent == nil && differencesParent == nil && switchboardParent == nil && suitcaseContentsParent == nil && pendingDeparture == nil
+            && shownItemParent == nil && jigsawParent == nil && toiletTankParent == nil && differencesParent == nil && switchboardParent == nil && suitcaseContentsParent == nil && pendingDeparture == nil
             && pendingDoorOpen == nil && pendingCloseup == nil && pendingChildCloseup == nil
             && handledMapRequests == runner.processRequests.count
     }
@@ -299,6 +302,7 @@ public final class OriginalPlaySession: ObservableObject {
     var canReviewConversations: Bool {
         guard !dialogueNotebook.ink.isEmpty, chapterTransition == nil, notebook == nil,
               process == nil, bellProcess == nil, signProcess == nil, codeNotice == nil, picturePeel == nil, jigsaw == nil,
+              shownItemParent == nil,
               clock == nil, suitcaseKey == nil, thinWire == nil, hanger == nil, switchboard == nil, fountainPen == nil, bookmarkBox == nil, dollRepair == nil, coinPuzzle == nil, matchsticks == nil, jukebox == nil, linenWagon == nil, differences == nil, toiletTank == nil,
               suitcaseContents == nil, memoPull == nil, cabinetDial == nil,
               crowbar == nil, memoDrawing == nil, paperclip == nil, labelPeel == nil, christmasTree == nil, searchShed == nil,
@@ -576,7 +580,11 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.showItemInConversation(item: item))
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, case .questions = runner.phase else { return }
-        runner.showItem(item)
+        if let response = runner.showItem(item, catalog: catalog) {
+            shownItemParent = runner
+            runner = response
+            presentedPacketOffset = nil
+        }
         settle()
     }
 
@@ -1775,6 +1783,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     public func stop() {
         isPaused = true
+        shownItemParent = nil
         onWalkingCheckpoint = nil
         onProgressCheckpoint = nil
         onProgressSaveError = nil
@@ -1808,12 +1817,10 @@ public final class OriginalPlaySession: ObservableObject {
     private func settle() {
         defer {
             dialogueNotebook.record(runner.phase, program: runner.program.name)
+            reportRecoverableStopIfNeeded()
         }
         if case .halted(let halt) = runner.phase {
-            stopTimer()
-            guard !didReportRecoverableStop else { return }
-            didReportRecoverableStop = true
-            onRecoverableStop?(halt)
+            reportRecoverableStopIfNeeded(for: halt)
             return
         }
         if chapterTransition != nil { startTimer(); return }
@@ -2527,6 +2534,13 @@ public final class OriginalPlaySession: ObservableObject {
                 presentedPacketOffset = nil
                 return settle()
             }
+            if var parent = shownItemParent {
+                parent.resumeConversation(after: runner)
+                runner = parent
+                shownItemParent = nil
+                presentedPacketOffset = nil
+                return settle()
+            }
             if var parent = searchParent {
                 parent.resumeSearch(after: runner)
                 runner = parent
@@ -2695,6 +2709,21 @@ public final class OriginalPlaySession: ObservableObject {
         case .halted:
             stopTimer()
         }
+    }
+
+    private func reportRecoverableStopIfNeeded(for halt: OriginalEventRunner.Halt? = nil) {
+        let activeHalt: OriginalEventRunner.Halt
+        if let halt {
+            activeHalt = halt
+        } else if case .halted(let current) = runner.phase {
+            activeHalt = current
+        } else {
+            return
+        }
+        stopTimer()
+        guard !didReportRecoverableStop else { return }
+        didReportRecoverableStop = true
+        onRecoverableStop?(activeHalt)
     }
 
     /// Resolve original music and sound controls through the recovered tables.
@@ -4221,8 +4250,6 @@ public final class OriginalPlaySession: ObservableObject {
         self.door?.use(nil)
         if opensDoor {
             pendingDoorOpen = door.destination
-        } else if runner.eventIndex == nil {
-            runner.halt("The default door response is not recovered")
         }
         settle()
     }
@@ -4384,7 +4411,6 @@ public final class OriginalPlaySession: ObservableObject {
                 runner.useItemInSearchView(searchItem, area: lobby.searchAreaID, subarea: subarea)
                 self.searchItem = nil
                 try startSearchFallback()
-                if runner.eventIndex == nil { runner.halt("The default item response is not recovered") }
             } else {
                 let table = try OriginalSearchTable.bundled(map: lobby.mapName)
                 if let view = table.upViewID(area: lobby.searchAreaID, subarea: subarea), view != .max {

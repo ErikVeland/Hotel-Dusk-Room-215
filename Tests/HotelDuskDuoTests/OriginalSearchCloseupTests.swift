@@ -55,6 +55,45 @@ final class OriginalSearchCloseupTests: XCTestCase {
         XCTAssertEqual(try parent.game.inventory.items.filter { $0 == 8 }.count, 1)
     }
 
+    func testUnmatchedSearchItemReturnsToExplorationWithoutHalting() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
+        game.setMap(33, previous: 39)
+        try game.apply(.addInventory(id: 0))
+        var parent = try OriginalEventRunner(program: catalog.loadProgram("EP9_R207"), game: game,
+                                             deferArrival: true)
+
+        parent.useItemInSearchView(0, area: 3, subarea: 99)
+        XCTAssertNil(parent.eventIndex)
+        let response = try XCTUnwrap(parent.searchFallback(catalog: catalog))
+        XCTAssertEqual(response.program.name, "System")
+        XCTAssertNil(response.eventIndex)
+        XCTAssertEqual(response.phase, .exploration(mapID: 33))
+
+        parent.resumeSearch(after: response)
+        XCTAssertEqual(parent.program.name, "EP9_R207")
+        XCTAssertEqual(parent.phase, .exploration(mapID: 33))
+    }
+
+    func testUnmatchedDoorResponseReturnsToExplorationWithoutHalting() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
+        game.setMap(33, previous: 39)
+        var parent = try OriginalEventRunner(program: catalog.loadProgram("EP9_R207"), game: game,
+                                             deferArrival: true)
+
+        parent.interactWithDoor(area: 3, upView: 999)
+        XCTAssertNil(parent.eventIndex)
+        let response = try XCTUnwrap(parent.searchFallback(catalog: catalog))
+        XCTAssertEqual(response.program.name, "System")
+        XCTAssertNil(response.eventIndex)
+        XCTAssertEqual(response.phase, .exploration(mapID: 33))
+
+        parent.resumeSearch(after: response)
+        XCTAssertEqual(parent.program.name, "EP9_R207")
+        XCTAssertEqual(parent.phase, .exploration(mapID: 33))
+    }
+
     func testWrongParcelAndNotebookMatchOriginalState() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let initial = try state("wrong-parcel-bed4/inspect")

@@ -127,7 +127,8 @@ final class OriginalResumeSaveTests: XCTestCase {
         let restored = try XCTUnwrap(game.play)
         XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
         XCTAssertEqual(restored.lobby?.position, position)
-        XCTAssertEqual(safePlaceStore.checkpoint, checkpoint)
+        XCTAssertEqual(game.play?.runner.game.bytes, try checkpoint.gameState().bytes)
+        XCTAssertEqual(game.play?.lobby?.checkpointFacing, checkpoint.checkpointFacing)
         XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
     }
 

@@ -28,7 +28,7 @@ Melissa’s stairway conversation reaches event 35 and keyword 8, “A puzzle, h
 
 For simulator checks, a Debug build reads the environment variable `HOTEL_DUSK_FIXTURE`. `R102-bell-look` supplies the look result for area 2, subarea 2 at R102 exploration. `R102-sign` and `R102-event-N` play the original script with fixed inputs until process 25 or event N starts. These are isolated component inputs, like the reference runner's diagnostic writes. While one is set, a Debug build also ignores a closed hinge reading, because the iPhone Duo simulator can boot folded. Release builds ignore all of them, and the app shows no control for them.
 
-`OriginalEventRunner` connects the recovered selector, conditions, state commands, dialogue packets and event exits. It marks a completed event at (current map, event key), as `0x0203D61C` does through `0x02097FC0`. Opcodes that change only controller or display state continue without a drawing: 3, 26, 27, 28, 43, 44 and the empty dispatcher cases. All other unrecovered opcodes, exit modes and processes stop play and show the program, event and source offset.
+`OriginalEventRunner` connects the recovered selector, conditions, state commands, dialogue packets and event exits. It marks a completed event at (current map, event key), as `0x0203D61C` does through `0x02097FC0`. Opcodes that change only controller or display state continue without a drawing: 3, 26, 27, 28, 43, 44 and the empty dispatcher cases. An unrecovered opcode, exit mode or process still halts that interaction with its program, event and source offset. The host then restores the last safe walking place, or starts Chapter 1 if it cannot restore a safe place.
 
 These parts of the slice are approximations:
 
@@ -42,7 +42,7 @@ These parts of the slice are approximations:
 - Text colours 1 and 2 use approximate ink tones. Portraits, talk backgrounds and character animation are not drawn.
 - The bell page shows `bell02` with `bell01` on top. The bell target uses the sprite pixel mask with a two-pixel margin, excluded from the quit target. The bell swing angle, trick-button sprites and the talk background `R102_03` on the other screen are not drawn. Touch targets have no visible overlays.
 - The registration card shows `signnote` and reveals `signnote02` per field as the strokes grow. The pen sprite and fades are not drawn.
-- The choice prompt, the question menu and the interrupt icon use book typography, not the original menu graphics. The question menu now lists owned items. Melissa’s puzzle-piece return is checked. Shared responses for unrelated items remain unsupported and halt explicitly.
+- The choice prompt, the question menu and the interrupt icon use book typography, not the original menu graphics. The question menu now lists owned items. Melissa’s puzzle-piece return is checked. Showing an owned item with no chapter-specific response now tries the shared System event. If no shared event matches, the conversation menu returns without changing story state.
 - The menu's `+0x6C = -1` branch (a mode-26 answer from the partner's scene) is not recovered. Topic answers use the mode-1 branch.
 - The interrupt stays armed after a replay in the same way as `0x0203F57C`. When the original text window accepts a second press is not verified against the ROM.
 - The original shows a Chapter 1 title card after the entrance; the native slice does not.
