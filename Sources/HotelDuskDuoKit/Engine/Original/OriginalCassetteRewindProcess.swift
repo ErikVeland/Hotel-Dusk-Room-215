@@ -8,6 +8,7 @@ public struct OriginalCassetteRewindProcess: Equatable, Sendable {
         case ready
         case tracking
         case rewindAnimation
+        case quitFade
         case returnPending
         case complete
     }
@@ -16,10 +17,12 @@ public struct OriginalCassetteRewindProcess: Equatable, Sendable {
     public static let rewindTargetY = 100
     public static let completionCounter = 6
     public static let animationWaitUpdates = 20
+    public static let quitFadeUpdates = 60
 
     public private(set) var phase: Phase = .ready
     public private(set) var dragProgress = 100
     public private(set) var qualifyingTouchFrames = 0
+    public private(set) var quitFadeProgress = 0
     public private(set) var returnedProcessValue: Int16?
 
     private var lastPoint: SIMD2<Int>?
@@ -29,10 +32,24 @@ public struct OriginalCassetteRewindProcess: Equatable, Sendable {
 
     public init() {}
 
+    public var opacity: Double {
+        phase == .quitFade ? max(0, 1 - Double(quitFadeProgress) / Double(Self.quitFadeUpdates)) : 1
+    }
+
     /**
-     * Advances one source update using the raw DS touch point, or nil on release.
+     * Advances one source update from held input and an optional new raw DS press.
      */
-    public mutating func update(rawTouch: SIMD2<Int>?) {
+    public mutating func update(rawTouch: SIMD2<Int>?, pressedTouch: SIMD2<Int>? = nil) {
+        if phase != .quitFade, phase != .complete,
+           let pressedTouch,
+           OriginalBellProcess.hitsQuit(
+            OriginalBellProcess.Touch(x: pressedTouch.x, y: pressedTouch.y), leftHanded: false
+           ) {
+            phase = .quitFade
+            quitFadeProgress = 0
+            return
+        }
+
         switch phase {
         case .ready:
             guard let rawTouch,
@@ -51,6 +68,12 @@ public struct OriginalCassetteRewindProcess: Equatable, Sendable {
             animationUpdates += 1
             if animationUpdates >= Self.animationWaitUpdates {
                 phase = .returnPending
+            }
+        case .quitFade:
+            quitFadeProgress += 1
+            if quitFadeProgress >= Self.quitFadeUpdates {
+                returnedProcessValue = 2
+                phase = .complete
             }
         case .returnPending:
             returnUpdates += 1

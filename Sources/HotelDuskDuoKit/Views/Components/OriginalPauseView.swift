@@ -13,6 +13,11 @@ struct OriginalPauseView: View {
                         .font(NovelStyle.caption)
                     Button("Recall saved place") { session.continueSavedGame() }
                 }
+                if session.canReturnToSafePlace {
+                    Button("Return to last safe place") { session.returnToSafePlace() }
+                    Text("This leaves the current interaction. You may need to repeat it.")
+                        .font(NovelStyle.caption)
+                }
                 if let error = session.saveError {
                     Text(error).font(NovelStyle.caption).foregroundStyle(NovelStyle.redInk)
                     Button("Retry save") { session.saveCurrentPlace() }

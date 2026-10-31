@@ -189,7 +189,7 @@ struct OriginalPlayPage: View {
                 if screen == 0 { OriginalSuitcaseKeyView(play: play) }
                 else { retainedNotes }
             } else if play.jigsaw != nil {
-                if screen == 0 || play.jigsaw?.variant == .reverse { OriginalJigsawPageView(play: play, upper: screen == 1) }
+                if screen == 0 || play.jigsaw?.variant == .reverse { OriginalJigsawPageView(play: play, hingeManager: hingeManager, upper: screen == 1) }
                 else { retainedNotes }
             } else if play.sign != nil {
                 if screen == 0 { OriginalSignPageView(play: play, upper: false) }

@@ -73,7 +73,7 @@ The notebook picture, empty question menu and returned hallway snapshots were in
 
 - Complete later grouped notes and the wider notebook menu. Melissa’s drawing and three writable pages are now connected. See [Original notebook](notebook.md).
 - Mila and Rosa now pass the native route through the 5:20 time change. Continue with Jeff at Room 213. See [Mila and Rosa](mila-rosa.md).
-- Recover shared System responses for unrelated shown items. These currently halt explicitly.
+- The runner now checks System for a shared response when a partner has no chapter response for an owned item. Tests cover Dunning's item 0 response. Check other person and item pairs.
 - Compare alternate answers, missed interrupts and other shown-item transitions.
 - Connect original portraits, character backgrounds, item presentation, animation, fades and scene audio.
 - Check iOS and physical Duo touch, hinge and lifecycle behaviour.

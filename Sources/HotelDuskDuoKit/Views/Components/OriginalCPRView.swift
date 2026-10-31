@@ -12,7 +12,7 @@ struct OriginalCPRView: View {
             Text(screen == 0 ? "Mila needs help." : "CPR")
                 .font(.headline)
             if screen == 0 {
-                Text("Close and reopen the Duo to perform CPR.")
+                Text(hingeManager.hasHardwareHinge ? "Close and reopen the Duo to perform CPR." : "Perform CPR to help Mila.")
                     .multilineTextAlignment(.center)
                 if !hingeManager.hasHardwareHinge {
                     Button("Perform CPR") {

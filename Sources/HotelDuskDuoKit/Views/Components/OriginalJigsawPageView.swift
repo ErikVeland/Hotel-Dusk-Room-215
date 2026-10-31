@@ -5,6 +5,7 @@ import SwiftUI
  */
 struct OriginalJigsawPageView: View {
     @ObservedObject var play: OriginalPlaySession
+    @ObservedObject var hingeManager: DuoHingeManager
     let upper: Bool
 
     var body: some View {
@@ -38,6 +39,14 @@ struct OriginalJigsawPageView: View {
                 .clipped()
                 .notebookPhotograph()
                 .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+            }
+            .overlay(alignment: .bottom) {
+                if !upper, !hingeManager.hasHardwareHinge, puzzle.awaitsFold {
+                    Button("Fold book") { hingeManager.performFoldGesture() }
+                        .buttonStyle(BookTextButtonStyle())
+                        .frame(minHeight: 44)
+                        .disabled(hingeManager.isSimulatingFold)
+                }
             }
         }
     }
