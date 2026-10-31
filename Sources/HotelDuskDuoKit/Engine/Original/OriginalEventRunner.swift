@@ -931,10 +931,7 @@ public struct OriginalEventRunner: Sendable {
             case .unresolved: enter(outcome)
             case .noMatch:
                 guard scope == .normal, let catalog,
-                      var response = try sharedShownItemResponse(item, catalog: catalog) else {
-                    halt("The shared response for showing this item is not recovered")
-                    return nil
-                }
+                      var response = try sharedShownItemResponse(item, catalog: catalog) else { return nil }
                 response.game.markItemShown(item, person: partner)
                 return response
             }

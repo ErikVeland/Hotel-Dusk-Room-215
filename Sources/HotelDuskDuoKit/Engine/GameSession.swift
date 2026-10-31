@@ -39,6 +39,7 @@ public final class GameSession: ObservableObject {
     public let scriptCatalog: OriginalScriptCatalog?
     public var isBookClosed: Bool { hingeManager.foldState == .closed }
     public var canStartOriginalGame: Bool { scriptCatalog != nil }
+    public var canReturnToSafePlace: Bool { play != nil && safePlaceSave != nil }
     private var cancellables = Set<AnyCancellable>()
     private var playCancellable: AnyCancellable?
     private var animationDecoder: OriginalAnimationDecoder?
@@ -199,6 +200,28 @@ public final class GameSession: ObservableObject {
     }
 
     public func dismissRecoveryNotice() { recoveryNotice = nil }
+
+    /**
+     * Leaves the active interaction and restores the most recent walking checkpoint.
+     */
+    public func returnToSafePlace() {
+        guard isPauseMenuOpen, let checkpoint = safePlaceSave else { return }
+        do {
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController,
+                saveStore: saveStore, mapRendererFactory: mapRendererFactory)
+            if case .halted(let halt) = next.runner.phase {
+                throw OriginalDataError.invalid("Safe-place restore stopped at \(halt.program)")
+            }
+            play?.stop()
+            saveError = nil
+            recoveryNotice = "Play returned to the last safe place. The unfinished interaction may need to be repeated."
+            attachPlay(next)
+        } catch {
+            recoveryNotice = "The last safe place could not be restored. Play returned to the beginning."
+            saveError = "The safe-place checkpoint could not be restored: \(error)"
+            startOriginalGame()
+        }
+    }
 
     private func persist(_ checkpoint: OriginalResumeSave) {
         guard checkpoint.state != resumeSave?.state || checkpoint.checkpointFacing != resumeSave?.checkpointFacing ||
