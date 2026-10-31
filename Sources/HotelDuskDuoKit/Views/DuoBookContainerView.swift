@@ -124,6 +124,7 @@ struct BookSettingsMenu: View {
     @ObservedObject var session: GameSession
     var tint: Color = NovelStyle.ink
     @AppStorage("modernNavigation") private var modernNavigation = true
+    @AppStorage("pencilCharacterAnimations") private var pencilCharacterAnimations = true
 
     var body: some View {
         Menu {
@@ -138,6 +139,7 @@ struct BookSettingsMenu: View {
                 Toggle("Modern navigation", isOn: $modernNavigation)
             }
             MusicSourcePicker(audio: session.audioController)
+            Toggle("Pencil character animations", isOn: $pencilCharacterAnimations)
             Button {
                 session.hingeManager.toggleHandedness()
             } label: {

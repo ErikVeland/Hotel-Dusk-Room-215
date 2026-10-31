@@ -60,8 +60,8 @@ final class OriginalClockProcessTests: XCTestCase {
         for frame in 1...240 { clock.update(tick: UInt64(frame / 60), draw: frame % 2 == 0) }
         let renderer = try OriginalClockRenderer(process: clock, library: .bundled())
         let image = try renderer.render(clock)
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
         let pixels = try XCTUnwrap(image.dataProvider?.data) as Data
         let white = 90 * image.bytesPerRow + 80 * 4
         XCTAssertTrue(pixels[white..<(white + 3)].allSatisfy { $0 > 235 })

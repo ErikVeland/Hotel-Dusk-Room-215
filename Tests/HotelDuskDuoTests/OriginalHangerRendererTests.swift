@@ -27,8 +27,8 @@ final class OriginalHangerRendererTests: XCTestCase {
         var puzzle = OriginalHangerProcess()
         func capture(_ name: String) throws {
             let image = try renderer.render(puzzle)
-            XCTAssertEqual(image.width, 192)
-            XCTAssertEqual(image.height, 256)
+            XCTAssertEqual(image.width, 768)
+            XCTAssertEqual(image.height, 1024)
             if let directory = ProcessInfo.processInfo.environment["SNAPSHOT_DIR"] {
                 try FileManager.default.createDirectory(atPath: directory, withIntermediateDirectories: true)
                 let url = URL(fileURLWithPath: directory).appendingPathComponent("hanger_\(name).png")

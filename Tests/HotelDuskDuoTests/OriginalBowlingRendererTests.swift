@@ -18,8 +18,8 @@ final class OriginalBowlingRendererTests: XCTestCase {
         let renderer = try OriginalBowlingRenderer()
         let image = try renderer.render(state)
 
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
         XCTAssertTrue(try renderer.selectsBall(pagePoint: SIMD2(105, 240), state: state))
         XCTAssertFalse(try renderer.selectsBall(pagePoint: SIMD2(40, 30), state: state))
     }

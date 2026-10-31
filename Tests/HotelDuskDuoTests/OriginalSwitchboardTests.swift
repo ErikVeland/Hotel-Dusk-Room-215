@@ -86,8 +86,8 @@ final class OriginalSwitchboardTests: XCTestCase {
         _ = puzzle.update(pageTouch: .init(96, 170))
         _ = puzzle.update(pageTouch: .init(96, 160))
         let on = try renderer.render(puzzle)
-        XCTAssertEqual(on.width, 192)
-        XCTAssertEqual(on.height, 256)
+        XCTAssertEqual(on.width, 768)
+        XCTAssertEqual(on.height, 1024)
         XCTAssertNotEqual(off.dataProvider?.data as Data?, on.dataProvider?.data as Data?)
         if let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_PUZZLE_PREVIEWS"] {
             for (name, image) in [("switchboard-off", off), ("switchboard-on", on)] {

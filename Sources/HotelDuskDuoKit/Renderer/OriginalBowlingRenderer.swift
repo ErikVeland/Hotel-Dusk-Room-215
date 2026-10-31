@@ -74,7 +74,7 @@ public final class OriginalBowlingRenderer: OriginalBowlingRendering {
                 * Self.rotationX(value.rotation)
         }
         let pinNodes = Dictionary(uniqueKeysWithValues: pin.model.nodes.indices.map { ($0, pinInstances) })
-        let scene = try OriginalModelMetalPreview.render(width: 512, height: 384,
+        let scene = try OriginalModelMetalPreview.render(width: 1024, height: 768,
             device: device, queue: queue) { encoder in
                 lane.encode(encoder: encoder, viewProjection: camera,
                             visibleNodes: Set(lane.model.nodes.indices))

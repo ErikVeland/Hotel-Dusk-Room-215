@@ -6,8 +6,8 @@ final class OriginalMemoPullTests: XCTestCase {
     @MainActor func testRendererUsesOriginalCabinetAndPaper() throws {
         let renderer = try OriginalMemoPullRenderer()
         let image = try renderer.render(ready())
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let source = root.appendingPathComponent("extracted/reference/chapter-two-memo-pull-ready/page9-bottom.ppm")
         guard FileManager.default.fileExists(atPath: source.path) else { throw XCTSkip("The original memo image is unavailable") }

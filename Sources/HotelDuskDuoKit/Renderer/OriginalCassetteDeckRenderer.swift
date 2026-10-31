@@ -77,7 +77,7 @@ final class OriginalCassetteDeckRenderer: OriginalCassetteDeckRendering {
     }
 
     func render(camera: OriginalCassetteDeckCamera, state: SceneState) throws -> CGImage {
-        let scene = try OriginalModelMetalPreview.render(width: 512, height: 384,
+        let scene = try OriginalModelMetalPreview.render(width: 1024, height: 768,
             device: device, queue: queue) { encoder in
                 radio.encode(encoder: encoder, viewProjection: camera.viewProjection,
                     visibleNodes: Set(radio.model.nodes.indices), modelTransform: state.radio.matrix)

@@ -8,8 +8,8 @@ final class OriginalThickWireRendererTests: XCTestCase {
         let puzzle = OriginalThinWireProcess(variant: .thick)
         let image = try OriginalThinWireRenderer(variant: .thick).render(puzzle)
         let bytes = try XCTUnwrap(image.dataProvider?.data) as Data
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
         for y in [215, 225, 235, 245] {
             let wire = Int(bytes[(y * 192 + 110) * 4])
             let background = Int(bytes[(y * 192 + 107) * 4])

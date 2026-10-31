@@ -9,8 +9,8 @@ final class OriginalCassetteRendererTests: XCTestCase {
         guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
         try exportSourceTexturesIfRequested()
         let image = try OriginalCassetteRenderer(tool: .pencil).render()
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
         let pixels = try XCTUnwrap(image.dataProvider?.data) as Data
         XCTAssertGreaterThan(Set(pixels).count, 16)
         if let output = ProcessInfo.processInfo.environment["HOTEL_DUSK_CASSETTE_PREVIEW"] {

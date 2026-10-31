@@ -133,8 +133,8 @@ final class OriginalBagSearchRendererTests: XCTestCase {
         let process = OriginalBagSearchProcess()
         let image = try renderer.render(process)
 
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
 
         let treeBox = try XCTUnwrap(process.objects.firstIndex { $0.type == 3 })
         let touches = stride(from: 0, to: 256, by: 4).flatMap { y in

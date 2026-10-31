@@ -251,9 +251,10 @@ public struct OriginalAnimationFrame: Sendable {
     }
 }
 
-/// An unfiltered original frame for the native book page compositor.
+/// A decoded frame, using its enhanced master when one is available.
 public struct OriginalAnimationFrameView: View {
     public let frame: OriginalAnimationFrame
+    @AppStorage("pencilCharacterAnimations") private var pencilCharacterAnimations = true
 
     public init(frame: OriginalAnimationFrame) { self.frame = frame }
 
@@ -261,8 +262,11 @@ public struct OriginalAnimationFrameView: View {
         if let image = frame.makeCGImage() {
             Image(decorative: image, scale: 1)
                 .resizable()
-                .interpolation(.none)
+                .interpolation(pencilCharacterAnimations || image.width > frame.width ? .high : .none)
                 .scaledToFit()
+                .saturation(pencilCharacterAnimations ? 0 : 1)
+                .opacity(pencilCharacterAnimations ? 0.88 : 1)
+                .blendMode(pencilCharacterAnimations ? .multiply : .normal)
                 .accessibilityHidden(true)
         }
     }

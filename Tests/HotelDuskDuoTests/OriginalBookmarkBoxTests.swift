@@ -123,7 +123,7 @@ final class OriginalBookmarkBoxTests: XCTestCase {
         for (name, extract) in [("box", false), ("bookmark", true)] {
             if extract { extraction(&puzzle) }
             let image = try renderer.render(puzzle)
-            XCTAssertEqual(image.width, 192); XCTAssertEqual(image.height, 256)
+            XCTAssertEqual(image.width, 768); XCTAssertEqual(image.height, 1024)
             let url = URL(fileURLWithPath: "/tmp/hotel-\(name).png")
             let destination = try XCTUnwrap(CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil))
             CGImageDestinationAddImage(destination, image, nil)

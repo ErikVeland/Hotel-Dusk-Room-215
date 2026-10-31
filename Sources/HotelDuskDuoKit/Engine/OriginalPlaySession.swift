@@ -35,9 +35,15 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var notebookImage: CGImage?
     @Published public private(set) var nativeNotebookPages: [String: Data] = [:]
     private var notebookTouch: SIMD2<Int>?
+<<<<<<< Updated upstream
     @Published public private(set) var runner: OriginalEventRunner {
         didSet { reportRecoverableStopIfNeeded() }
     }
+=======
+    @Published public private(set) var runner: OriginalEventRunner
+    @Published private(set) var encounterPortraits: [OriginalEncounterAnimations.Portrait] = []
+    private var encounterAnimations: OriginalEncounterAnimations?
+>>>>>>> Stashed changes
     @Published public private(set) var entrance: EntranceScene?
     @Published public private(set) var bell: BellScene?
 

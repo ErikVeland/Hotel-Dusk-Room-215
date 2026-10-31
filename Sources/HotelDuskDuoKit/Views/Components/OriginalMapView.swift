@@ -29,9 +29,7 @@ struct OriginalMapView: View {
                         ZStack {
                             Color.black
                             if screen == 0, lobby.mode == .walking, let map = play.lobbyMap {
-                                Image(decorative: map, scale: 1).interpolation(.none)
-                                    .frame(width: 192, height: 256, alignment: .topLeading)
-                                    .offset(x: CGFloat(lobby.mapBitmapOffset.x), y: CGFloat(lobby.mapBitmapOffset.y))
+                                OriginalFloorPlanView(image: map, exploration: lobby)
                             } else if let image = play.lobbyImage {
                                 Image(decorative: image, scale: 1).resizable().interpolation(.high)
                                     .frame(width: 192, height: 256)
@@ -72,7 +70,7 @@ struct OriginalMapView: View {
                             })
                         .notebookPhotograph()
                         .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
-                        .accessibilityLabel(lobby.mode == .walking ? (screen == 0 ? "Floor plan" : "3D view. Drag to look around.") : "Search view")
+                        .accessibilityLabel(lobby.mode == .walking ? (screen == 0 ? "Floor plan. The red marker shows Kyle's position; the arrow and cone show where you are looking. Hold a direction to walk." : "3D view. Drag to look around.") : "Search view")
                     }
                     if screen == 1, lobby.mode == .walking {
                         Text("Hold a direction on the floor plan to walk.")

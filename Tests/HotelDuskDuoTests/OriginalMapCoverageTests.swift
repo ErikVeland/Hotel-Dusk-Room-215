@@ -39,8 +39,8 @@ final class OriginalMapCoverageTests: XCTestCase {
                 let map = try OriginalMapExploration.bundled(mapID: id, previousMapID: id, savedGame: game)
                 let renderer = try OriginalMapRenderer(mapName: name)
                 let image = try renderer.render(map, game: game)
-                XCTAssertEqual(image.width, 192, name)
-                XCTAssertEqual(image.height, 256, name)
+                XCTAssertEqual(image.width, 768, name)
+                XCTAssertEqual(image.height, 1024, name)
                 XCTAssertGreaterThan(renderer.map.width, 0, name)
             } catch { XCTFail("\(name): \(error)") }
         }

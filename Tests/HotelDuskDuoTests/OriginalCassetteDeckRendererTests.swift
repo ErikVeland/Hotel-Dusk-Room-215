@@ -24,7 +24,7 @@ final class OriginalCassetteDeckRendererTests: XCTestCase {
         }
         XCTAssertNotNil(try renderer.hitTest(pagePoint: SIMD2(156, 179), camera: camera, state: state))
         let image = try renderer.render(camera: camera, state: state)
-        XCTAssertEqual(image.width, 192)
-        XCTAssertEqual(image.height, 256)
+        XCTAssertEqual(image.width, 768)
+        XCTAssertEqual(image.height, 1024)
     }
 }

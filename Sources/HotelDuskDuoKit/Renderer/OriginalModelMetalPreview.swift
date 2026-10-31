@@ -35,7 +35,8 @@ public final class OriginalModelMetalPreview {
     /// The caller can preserve materials whose original runtime texture slot was unbound.
     public init(modelPath: String, models: OriginalModelLibrary, textures: OriginalTextureLibrary,
                 device: MTLDevice, textureLoader: ((String) throws -> OriginalTexture)? = nil,
-                untexturedMaterials: Set<Int> = [], gameplayOnly: Bool = false, smoothTextures: Bool = false) throws {
+                untexturedMaterials: Set<Int> = [], gameplayOnly: Bool = false, smoothTextures: Bool = false,
+                artwork: OriginalArtwork = .shared) throws {
         self.device = device
         model = try models.load(path: modelPath)
         guard let queue = device.makeCommandQueue() else { throw OriginalDataError.invalid("Metal command queue") }
@@ -91,7 +92,7 @@ public final class OriginalModelMetalPreview {
                         texture = try textures.load(path: path)
                         resolvedPaths[group.material] = path
                     }
-                    materialTextures[group.material] = (texture, try texture.makeMetalTexture(device: device))
+                    materialTextures[group.material] = (texture, try texture.makeMetalTexture(device: device, artwork: artwork))
                 }
                 let (texture, uploaded) = materialTextures[group.material]!
                 gpuTexture = uploaded

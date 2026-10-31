@@ -74,7 +74,7 @@ public final class OriginalCrowbarRenderer: OriginalCrowbarRendering {
                 * Self.rotation(-angles.x, axis: SIMD3(1, 0, 0))
                 * simd_float4x4(diagonal: SIMD4(scale, scale, scale, 1))
         }
-        return try OriginalModelMetalPreview.render(width: 384, height: 512, device: device, queue: queue) { encoder in
+        return try OriginalModelMetalPreview.render(width: 768, height: 1024, device: device, queue: queue) { encoder in
             cabinet.encode(encoder: encoder, viewProjection: projection, visibleNodes: Set(cabinet.model.nodes.indices),
                 modelTransform: scene * object(SIMD3(4915, -294, 0), angles: SIMD3(0, 0, puzzle.cabinetAngle), scale: 11428 / 4096))
             wall.encode(encoder: encoder, viewProjection: projection, visibleNodes: Set(wall.model.nodes.indices),

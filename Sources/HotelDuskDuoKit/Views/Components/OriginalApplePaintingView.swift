@@ -13,7 +13,7 @@ struct OriginalApplePaintingView: View {
                 ZStack {
                     Color.black
                     if let image = play.applePaintingImage {
-                        Image(decorative: image, scale: 1).interpolation(.high)
+                        Image(decorative: image, scale: 1).resizable().interpolation(.high).frame(width: 192, height: 256)
                     }
                 }
                 .frame(width: 192, height: 256)

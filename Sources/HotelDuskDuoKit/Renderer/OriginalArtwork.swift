@@ -14,6 +14,7 @@ public final class OriginalArtwork: @unchecked Sendable {
             let file: String
             let pngSHA256: String
             let sources: [String]
+            let scale: Int?
         }
         let formatVersion: Int
         let scale: Int
@@ -24,6 +25,7 @@ public final class OriginalArtwork: @unchecked Sendable {
     private let root: URL?
     private let records: [String: Manifest.Record]
     private let namedRecords: [String: Manifest.Record]
+    private let defaultScale: Int
     private let cache = NSCache<NSString, CGImage>()
     private final class Size: NSObject {
         let value: CGSize
@@ -37,16 +39,18 @@ public final class OriginalArtwork: @unchecked Sendable {
         if let url = resourceRoot?.appendingPathComponent("ArtworkManifest.json"),
            let data = try? Data(contentsOf: url),
            let manifest = try? JSONDecoder().decode(Manifest.self, from: data),
-           manifest.formatVersion == 1, manifest.scale == 2, manifest.complete {
+           manifest.formatVersion == 1, (2...4).contains(manifest.scale), manifest.complete {
+            defaultScale = manifest.scale
             records = Dictionary(manifest.images.map { ($0.key, $0) }, uniquingKeysWith: { first, _ in first })
             namedRecords = Dictionary(manifest.images.flatMap { record in
                 record.sources.filter { $0.hasPrefix("Images/") }.map { ($0, record) }
             }, uniquingKeysWith: { first, _ in first })
         } else {
+            defaultScale = 1
             records = [:]
             namedRecords = [:]
         }
-        cache.totalCostLimit = 48 * 1024 * 1024
+        cache.totalCostLimit = 128 * 1024 * 1024
     }
 
     public func enhancedImage(rgba: Data, width: Int, height: Int) -> CGImage? {
@@ -63,12 +67,14 @@ public final class OriginalArtwork: @unchecked Sendable {
 
     private func load(_ record: Manifest.Record) -> CGImage? {
         if let image = cache.object(forKey: record.key as NSString) { return image }
-        guard record.file == record.key + ".png", let root,
+        let scale = record.scale ?? defaultScale
+        guard (1...8).contains(scale) else { return nil }
+        guard (record.file == record.key + ".png" || record.file == record.key + ".webp"), let root,
               let data = try? Data(contentsOf: root.appendingPathComponent(record.file)),
               OriginalAnimationClip.digest(data) == record.pngSHA256,
               let source = CGImageSourceCreateWithData(data as CFData, nil),
               let image = CGImageSourceCreateImageAtIndex(source, 0, [kCGImageSourceShouldCacheImmediately: true] as CFDictionary),
-              image.width == record.width * 2, image.height == record.height * 2 else { return nil }
+              image.width == record.width * scale, image.height == record.height * scale else { return nil }
         remember(image, size: CGSize(width: record.width, height: record.height))
         cache.setObject(image, forKey: record.key as NSString, cost: image.bytesPerRow * image.height)
         return image
@@ -184,10 +190,10 @@ public final class OriginalArtwork: @unchecked Sendable {
     }
 
     static func pageContext(width: Int = 192, height: Int = 256) -> CGContext? {
-        guard let context = CGContext(data: nil, width: width * 2, height: height * 2,
+        guard let context = CGContext(data: nil, width: width * 4, height: height * 4,
             bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
-        context.scaleBy(x: 2, y: 2)
+        context.scaleBy(x: 4, y: 4)
         context.interpolationQuality = .high
         return context
     }

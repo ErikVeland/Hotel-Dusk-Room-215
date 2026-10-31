@@ -12,7 +12,7 @@ struct OriginalClockView: View {
             ZStack {
                 Color.black
                 if let image = play.clockImage {
-                    Image(decorative: image, scale: 1).interpolation(.none)
+                    Image(decorative: image, scale: 1).resizable().interpolation(.high).frame(width: 192, height: 256)
                 }
             }
             .frame(width: 192, height: 256)
