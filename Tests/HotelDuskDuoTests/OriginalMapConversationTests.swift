@@ -100,6 +100,34 @@ final class OriginalMapConversationTests: XCTestCase {
         XCTAssertEqual(runner.game.bytes, sharedResponse.game.bytes)
     }
 
+    func testItemWithoutChapterOrSystemResponseLeavesQuestionMenuOpen() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let chapter = try catalog.loadProgram("EP1_R102").blocks
+        let system = try catalog.loadProgram("System").blocks
+        var unmatched: UInt8?
+        for rawItem in 0..<88 {
+            let item = UInt8(rawItem)
+            let chapterOutcome = try OriginalShownItemSelector.select(graph: chapter, person: 2,
+                item: item, nowTime: 0) { _ in .pass }
+            let systemOutcome = try OriginalShownItemSelector.select(graph: system, person: 2,
+                item: item, nowTime: 0, scope: .system) { _ in .pass }
+            if chapterOutcome == .noMatch, systemOutcome == .noMatch {
+                unmatched = item
+                break
+            }
+        }
+        let item = try XCTUnwrap(unmatched, "Expected a bundled item with no response row")
+        var runner = try afterRegistration(holding: [item])
+        let gameBefore = runner.game.bytes
+        guard case .questions = runner.phase else { return XCTFail("Expected Dunning's question menu") }
+
+        XCTAssertNil(runner.showItem(item, catalog: catalog))
+        guard case .questions = runner.phase else {
+            return XCTFail("An unmatched item must leave the question menu open")
+        }
+        XCTAssertEqual(runner.game.bytes, gameBefore)
+    }
+
     @MainActor
     func testPlaySessionShowsSystemResponseAndRestoresConversationMenu() throws {
         let catalog = try OriginalScriptCatalog.bundled()

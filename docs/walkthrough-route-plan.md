@@ -198,6 +198,17 @@ current drag position plus `0x1000` in the story-state word and starts the
 fade. The isolated captures have not reached that event. The capture now
 records the follow-up flag and both handler timers alongside the phase and drag
 position.
+
+The source handler ignores a touch move of 16 raw DS pixels or less before it
+tests four transformed hit regions. It stores progress in two `0x2c`-byte
+records. The follow-up phase also checks the live transformed record positions
+against a `0.25` world-unit boundary, then waits for both records before it
+returns to the parent event. These checks depend on the process-entry geometry.
+They do not map to page pixels in the current captures. The native model
+completes the peel after 78 pixels of page movement. This is an inferred
+shortcut, not a recovered source rule. A normal Chapter 6 ROM state is still
+needed to capture the transforms, input path and returned event together.
+
 The walkthrough describes this phase as peeling from the lifted top-right
 corner towards the lower-left, with slow movement and re-grabs near the lifted
 edge. A probe from raw `(195, 160)` selected object 0. Moving diagonally one
