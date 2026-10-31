@@ -310,6 +310,14 @@ public struct OriginalMapExploration {
         checkpointFacing = facing
     }
 
+    /**
+     * Changes only the displayed heading during a room-entry transition.
+     */
+    mutating func setTransitionFacing(_ value: Float) {
+        guard mode == .walking, value.isFinite else { return }
+        facing = atan2(sin(value), cos(value))
+    }
+
     /// Smooth movement relative to the camera; backwards and strafing retain the view direction.
     public mutating func update(firstPersonMovement input: SIMD2<Float>, people: [SIMD3<Float>] = [], modernPace: Bool = true) {
         checkpointFacing = facing
@@ -575,9 +583,9 @@ public struct OriginalMapExploration {
         let view = simd_float4x4(columns: (
             SIMD4(right.x, up.x, back.x, 0), SIMD4(right.y, up.y, back.y, 0),
             SIMD4(right.z, up.z, back.z, 0), SIMD4(-simd_dot(right, eye), -simd_dot(up, eye), -simd_dot(back, eye), 1)))
-        // 0x0202FED8: 25-degree half-angle; DS aspect 255/191; near 0.1, far 40.
+        // Keep distant room geometry visible in the native walking view.
         let sx: Float = 1 / tan(Self.walkingHorizontalFieldOfView / 2), sy = sx * 191 / 255
-        let near: Float = 0.1, far: Float = 40
+        let near: Float = 0.1, far: Float = 256
         let projection = simd_float4x4(columns: (
             SIMD4(sx, 0, 0, 0), SIMD4(0, sy, 0, 0),
             SIMD4(0, 0, far / (near - far), -1), SIMD4(0, 0, near * far / (near - far), 0)))

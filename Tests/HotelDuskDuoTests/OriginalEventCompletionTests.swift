@@ -2,14 +2,17 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalEventCompletionTests: XCTestCase {
-    func testUnrecoveredLateChapterInspectionCounterStaysExplicit() throws {
+    func testLateChapterModeTenInspectionReturnsToTheSearchView() throws {
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R205")
         var bytes = Data(repeating: 0, count: OriginalGameState.byteCount)
         bytes[0] = 9
         bytes[4] = 40
         let result = try OriginalEventCompletion.stateOnlyExit(event: program.blocks.tables[2][16],
             conditions: program.conditions, game: OriginalGameState(snapshot: bytes))
-        XCTAssertEqual(result, .requiresOriginalHandler(mode: 10))
+        guard case .completed(let completion) = result else {
+            return XCTFail("A mode-10 inspection without a CHK transition returns to the retained search view")
+        }
+        XCTAssertNil(completion.transition)
     }
 
     func testOriginalNarrativeLaunchesItsEmbeddedProcessAndReturnsToItsNextEvent() throws {

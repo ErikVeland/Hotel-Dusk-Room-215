@@ -3,12 +3,13 @@ import SwiftUI
 struct OriginalFloorPlanView: View {
     let image: CGImage
     let exploration: OriginalMapExploration
+    @AppStorage("hdGraphicsEnabled") private var hdGraphicsEnabled = true
 
     var body: some View {
         ZStack {
             Color.black
             Image(decorative: image, scale: 1)
-                .resizable().interpolation(.high)
+                .resizable().interpolation(hdGraphicsEnabled ? .high : .none)
                 .frame(width: CGFloat(image.artworkWidth), height: CGFloat(image.artworkHeight))
                 .frame(width: 192, height: 256, alignment: .topLeading)
                 .offset(x: CGFloat(exploration.mapBitmapOffset.x), y: CGFloat(exploration.mapBitmapOffset.y))

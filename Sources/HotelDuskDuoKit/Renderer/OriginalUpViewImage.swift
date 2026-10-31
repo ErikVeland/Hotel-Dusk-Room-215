@@ -10,6 +10,8 @@ public struct OriginalUpViewImage {
     public let sourcePackedHitMap: [UInt8]
     public let packedHitMap: [UInt8]
     public let image: CGImage
+    private let bitmaps: [OriginalLinearBitmap]
+    private let visible: [Bool]
 
     static let hitMargin = 2
 
@@ -18,6 +20,8 @@ public struct OriginalUpViewImage {
               bitmaps.allSatisfy({ $0.width == 256 && $0.height == 192 && [3, 4].contains($0.kind) }) else {
             throw OriginalDataError.invalid("Close-up bitmap layers")
         }
+        self.bitmaps = bitmaps
+        self.visible = visible
         var pixels = [UInt8](repeating: 0, count: 256 * 192 * 4)
         var hits = [UInt8](repeating: 0, count: 256 * 192 / 2)
         for (layer, bitmap) in bitmaps.enumerated() where visible[layer] {
@@ -46,6 +50,10 @@ public struct OriginalUpViewImage {
         }
         guard let rendered = context.makeImage() else { throw OriginalDataError.invalid("Close-up composite") }
         image = rendered
+    }
+
+    public func refreshedForGraphicsPreference() throws -> Self {
+        try Self(bitmaps: bitmaps, visible: visible)
     }
 
     /**

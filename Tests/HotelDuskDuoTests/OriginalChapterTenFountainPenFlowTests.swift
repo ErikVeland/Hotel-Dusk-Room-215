@@ -24,11 +24,16 @@ final class OriginalChapterTenTypewriterFlowTests: XCTestCase {
 
         XCTAssertEqual(play.runner.phase, .process(id: 74))
         XCTAssertNotNil(play.typewriter)
-        XCTAssertEqual(play.typewriterUpperImage?.width, 192)
-        XCTAssertEqual(play.typewriterUpperImage?.height, 256)
-        XCTAssertEqual(play.typewriterImage?.width, 192)
-        XCTAssertEqual(play.typewriterImage?.height, 256)
+        XCTAssertNotNil(play.typewriterUpperImage)
+        XCTAssertNotNil(play.typewriterImage)
+        XCTAssertEqual(play.typewriterUpperImage.map { Double($0.width) / Double($0.height) } ?? 0,
+                       0.75, accuracy: 0.001)
+        XCTAssertEqual(play.typewriterImage.map { Double($0.width) / Double($0.height) } ?? 0,
+                       0.75, accuracy: 0.001)
         XCTAssertNil(play.fountainPen)
+        play.advanceFrame()
+        XCTAssertEqual(play.runner.phase, .process(id: 74))
+        XCTAssertNotNil(play.typewriter)
     }
 
     @MainActor
@@ -87,6 +92,9 @@ final class OriginalChapterTenTypewriterFlowTests: XCTestCase {
 
         let cipher = try XCTUnwrap(play.typewriter?.cipher)
         XCTAssertEqual(cipher.variant, .memento)
+        play.advanceFrame()
+        XCTAssertEqual(play.runner.phase, .process(id: 90))
+        XCTAssertNotNil(play.typewriter)
         play.adjustTypewriterShift(by: cipher.expectedShift)
         try enter("A MEMENTO IN", into: play, shift: cipher.expectedShift)
         tapSubmit(in: play)
@@ -105,6 +113,9 @@ final class OriginalChapterTenTypewriterFlowTests: XCTestCase {
 
         let cipher = try XCTUnwrap(play.typewriter?.cipher)
         XCTAssertEqual(cipher.variant, .final)
+        play.advanceFrame()
+        XCTAssertEqual(play.runner.phase, .process(id: 91))
+        XCTAssertNotNil(play.typewriter)
         play.adjustTypewriterShift(by: cipher.expectedShift)
         try enter("OSTERZONE IS", into: play, shift: cipher.expectedShift)
         tapSubmit(in: play)
@@ -123,6 +134,9 @@ final class OriginalChapterTenTypewriterFlowTests: XCTestCase {
 
         let cipher = try XCTUnwrap(play.typewriter?.cipher)
         XCTAssertEqual(cipher.variant, .opening)
+        play.advanceFrame()
+        XCTAssertEqual(play.runner.phase, .process(id: 86))
+        XCTAssertNotNil(play.typewriter)
         play.adjustTypewriterShift(by: cipher.expectedShift)
         try enter("OSTERZONE IS", into: play, shift: cipher.expectedShift)
         tapSubmit(in: play)

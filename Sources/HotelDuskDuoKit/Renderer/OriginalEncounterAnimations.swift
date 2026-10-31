@@ -71,6 +71,7 @@ final class OriginalEncounterAnimations {
         let pose: Int
         let animationID: String
         let frame: OriginalAnimationFrame
+        let contour: OriginalAnimationContour
     }
 
     private struct Player {
@@ -78,6 +79,7 @@ final class OriginalEncounterAnimations {
         let pose: Int
         var decoder: OriginalAnimationDecoder
         var frame: OriginalAnimationFrame
+        let contour: OriginalAnimationContour
         var updates = 0
     }
 
@@ -104,7 +106,7 @@ final class OriginalEncounterAnimations {
         players.keys.sorted().compactMap { screen in
             guard let player = players[screen] else { return nil }
             return Portrait(screen: screen, person: player.person, pose: player.pose,
-                animationID: player.decoder.clip.id, frame: player.frame)
+                animationID: player.decoder.clip.id, frame: player.frame, contour: player.contour)
         }
     }
 
@@ -133,7 +135,8 @@ final class OriginalEncounterAnimations {
             }
             var decoder = OriginalAnimationDecoder(clip: clip)
             guard let frame = try decoder.advance() else { throw OriginalAnimationError.invalid("Empty character animation") }
-            players[screen] = Player(person: person, pose: pose, decoder: decoder, frame: frame)
+            players[screen] = Player(person: person, pose: pose, decoder: decoder, frame: frame,
+                contour: OriginalAnimationContour(frame: frame))
         }
         lastProgram = program
         lastPacketOffset = packet.sourceOffset

@@ -48,7 +48,10 @@ public final class GameSession: ObservableObject {
     public var animationCheckpoint: OriginalAnimationCheckpoint? { animationDecoder?.checkpoint() }
 
     /// Refreshes book views after a display preference changes.
-    public func refreshGraphics() { graphicsRevision &+= 1 }
+    public func refreshGraphics() {
+        play?.refreshGraphics()
+        graphicsRevision &+= 1
+    }
 
     public init(hingeManager: DuoHingeManager? = nil,
                 audioController: AudioController = AudioController(),

@@ -51,6 +51,21 @@ final class OriginalGameStateTests: XCTestCase {
         XCTAssertEqual(restored.bytes[0xDA..<0xDC], [0, 0])
     }
 
+    func testWineLabelPeelStateUsesOverlay22OffsetAndPersistsInResumeSave() throws {
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        game.setMap(2, previous: 1)
+        game.wineLabelPeelState = 0x15C3
+
+        XCTAssertEqual(Array(game.bytes[0x13DC..<0x13DE]), [0xC3, 0x15])
+        XCTAssertEqual(Array(game.bytes[0xDC..<0xDE]), [0, 0])
+
+        let checkpoint = try OriginalResumeSave(game: game, checkpointFacing: game.facing,
+            musicSequenceID: nil, savedAt: Date(timeIntervalSince1970: 0))
+        let restored = try checkpoint.gameState()
+
+        XCTAssertEqual(restored.wineLabelPeelState, 0x15C3)
+    }
+
     func testApplePaintingFlagsUseOverlay38SavedOffset() throws {
         var bytes = [UInt8](repeating: 0, count: OriginalGameState.byteCount)
         bytes[0x13D9] = 0xA0

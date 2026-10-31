@@ -8,7 +8,7 @@ public final class OriginalArtwork: @unchecked Sendable {
     public static let shared = OriginalArtwork(resourceRoot: Bundle.module.resourceURL?
         .appendingPathComponent("EnhancedArtwork"))
 
-    private static var hdGraphicsEnabled: Bool {
+    public static var isHDGraphicsEnabled: Bool {
         UserDefaults.standard.object(forKey: hdGraphicsPreferenceKey) as? Bool ?? true
     }
 
@@ -60,7 +60,7 @@ public final class OriginalArtwork: @unchecked Sendable {
     }
 
     public func enhancedImage(rgba: Data, width: Int, height: Int) -> CGImage? {
-        guard Self.hdGraphicsEnabled, width > 0, height > 0,
+        guard Self.isHDGraphicsEnabled, width > 0, height > 0,
               rgba.count == width * height * 4, !records.isEmpty else { return nil }
         let key = "\(width)x\(height)-\(OriginalAnimationClip.digest(rgba))"
         guard let record = records[key], record.width == width, record.height == height else { return nil }
@@ -68,7 +68,7 @@ public final class OriginalArtwork: @unchecked Sendable {
     }
 
     func namedImage(source: String) -> CGImage? {
-        guard Self.hdGraphicsEnabled else { return nil }
+        guard Self.isHDGraphicsEnabled else { return nil }
         guard let record = namedRecords[source] else { return nil }
         return load(record)
     }
@@ -198,10 +198,11 @@ public final class OriginalArtwork: @unchecked Sendable {
     }
 
     static func pageContext(width: Int = 192, height: Int = 256) -> CGContext? {
-        guard let context = CGContext(data: nil, width: width * 4, height: height * 4,
+        let scale = isHDGraphicsEnabled ? 4 : 1
+        guard let context = CGContext(data: nil, width: width * scale, height: height * scale,
             bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
-        context.scaleBy(x: 4, y: 4)
+        context.scaleBy(x: CGFloat(scale), y: CGFloat(scale))
         context.interpolationQuality = .high
         return context
     }

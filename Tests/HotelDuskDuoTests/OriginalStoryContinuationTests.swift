@@ -604,9 +604,11 @@ final class OriginalStoryContinuationTests: XCTestCase {
     }
 
     @MainActor func testChapterNineAcceptsHitOnlyDunningRoomHelperMask() throws {
-        let directory = try XCTUnwrap(ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"])
-        let checkpoint = try XCTUnwrap(OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-            .appendingPathComponent("chapter9-dunning-room")).load())
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter9-dunning-room")).load() else {
+            throw XCTSkip("The Chapter 9 Dunning-room checkpoint is not available")
+        }
         let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)),
@@ -615,7 +617,7 @@ final class OriginalStoryContinuationTests: XCTestCase {
         play.resume()
         guard let room = play.lobby,
               let index = room.room.nodes.firstIndex(where: { $0.name == "obj9998" }) else {
-            return XCTFail("The original back-room door helper mask should be present")
+            return XCTFail("The source hit-only helper mask should be present")
         }
         let node = room.room.nodes[index]
         let target = SIMD2(Float(node.worldFixed[12]), Float(node.worldFixed[14]))
@@ -627,10 +629,18 @@ final class OriginalStoryContinuationTests: XCTestCase {
         let visible = lobby.objectVisibility.visibleNodes(in: lobby.room, map: lobby.mapID, area: nil, game: play.runner.game)
         XCTAssertTrue(visible.contains(index), "The helper remains available to the original hit pass")
         XCTAssertEqual(try lobby.pickedRoomObject(page: SIMD2(52, 0), visibleNodes: visible), "obj9998")
+        let gameBeforeHit = play.runner.game
         play.selectLobbyRoomObject(x: 52, y: 0)
         XCTAssertEqual(play.runner.session.selection.modeID, 10)
         XCTAssertEqual(play.runner.session.selection.areaID, 3)
         XCTAssertEqual(play.runner.session.selection.subareaID, 99)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 33))
+        XCTAssertEqual(play.runner.program.name, "EP9_R207")
+        XCTAssertEqual(play.runner.game.bytes, gameBeforeHit.bytes,
+                       "The unmatched helper hit must not change story or inventory state")
+        try OriginalChapterThreeRouteChecks.exit(play, to: 39, interrupt: true)
+        XCTAssertEqual(play.runner.game.mapID, 39, "The player must still be able to leave for R213")
     }
 
     @MainActor func testChapterNineWalksFromDunningRoomToPantry() throws {

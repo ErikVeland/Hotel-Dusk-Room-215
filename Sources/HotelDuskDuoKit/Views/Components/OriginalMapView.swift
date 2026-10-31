@@ -8,6 +8,7 @@ struct OriginalMapView: View {
     @Environment(\.displayScale) private var displayScale
     let screen: UInt8
     @AppStorage("modernNavigation") private var modernNavigation = true
+    @AppStorage("hdGraphicsEnabled") private var hdGraphicsEnabled = true
     @State private var showsInventory = false
     @State private var lastLookTranslation: CGFloat = 0
 
@@ -32,8 +33,13 @@ struct OriginalMapView: View {
                             if screen == 0, lobby.mode == .walking, let map = play.lobbyMap {
                                 OriginalFloorPlanView(image: map, exploration: lobby)
                             } else if let image = play.lobbyImage {
-                                Image(decorative: image, scale: 1).resizable().interpolation(.high)
+                                Image(decorative: image, scale: 1).resizable()
+                                    .interpolation(hdGraphicsEnabled ? .high : .none)
                                     .frame(width: 192, height: 256)
+                            }
+                            if screen == 1, lobby.mode == .walking, play.roomTransitionOpacity > 0 {
+                                (play.roomTransitionIsBright ? Color.white : Color.black)
+                                    .opacity(play.roomTransitionOpacity)
                             }
                         }
                         .frame(width: 192, height: 256)
@@ -122,9 +128,13 @@ struct OriginalMapView: View {
                     Color.black
                     if let image = play.lobbyImage {
                         Image(decorative: image, scale: 1)
-                            .resizable().interpolation(.high)
+                            .resizable().interpolation(hdGraphicsEnabled ? .high : .none)
                             .frame(width: input.size.width, height: input.size.height)
                             .frame(width: proxy.size.width, height: proxy.size.height)
+                    }
+                    if play.roomTransitionOpacity > 0 {
+                        (play.roomTransitionIsBright ? Color.white : Color.black)
+                            .opacity(play.roomTransitionOpacity)
                     }
                     Color.clear
                         .contentShape(Rectangle())

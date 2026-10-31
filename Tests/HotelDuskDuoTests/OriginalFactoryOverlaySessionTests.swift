@@ -49,8 +49,9 @@ final class OriginalFactoryOverlaySessionTests: XCTestCase {
         defer { play.stop() }
 
         XCTAssertNotNil(play.applePainting)
-        XCTAssertEqual(play.applePaintingImage?.width, 192)
-        XCTAssertEqual(play.applePaintingImage?.height, 256)
+        XCTAssertNotNil(play.applePaintingImage)
+        XCTAssertEqual(play.applePaintingImage.map { Double($0.width) / Double($0.height) } ?? 0,
+                       0.75, accuracy: 0.001)
         XCTAssertNil(play.memoDrawing)
         if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
     }
@@ -121,6 +122,9 @@ final class OriginalFactoryOverlaySessionTests: XCTestCase {
             catalog: catalog, game: game, programName: "EP9_R125",
             sourceOffset: 164, processID: 81, mapID: 39)
         defer { wordPlay.stop() }
+        XCTAssertEqual(wordPlay.runner.phase, .process(id: 81))
+        XCTAssertNotNil(wordPlay.appleWordEntry)
+        wordPlay.advanceFrame()
         XCTAssertEqual(wordPlay.runner.phase, .process(id: 81))
         XCTAssertNotNil(wordPlay.appleWordEntry)
 

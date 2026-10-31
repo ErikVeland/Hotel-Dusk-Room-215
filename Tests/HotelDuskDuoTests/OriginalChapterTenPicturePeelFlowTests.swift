@@ -54,11 +54,28 @@ final class OriginalChapterTenPicturePeelFlowTests: XCTestCase {
         defer { play.stop() }
 
         XCTAssertEqual(play.runner.phase, .process(id: 61))
-        XCTAssertEqual(play.picturePeelImage?.width, 192)
-        XCTAssertEqual(play.picturePeelImage?.height, 256)
-        XCTAssertEqual(play.picturePeelUpperImage?.width, 192)
-        XCTAssertEqual(play.picturePeelUpperImage?.height, 256)
+        let lower = try XCTUnwrap(play.picturePeelImage)
+        let upper = try XCTUnwrap(play.picturePeelUpperImage)
+        XCTAssertEqual(lower.width * 4, lower.height * 3)
+        XCTAssertEqual(upper.width * 4, upper.height * 3)
         XCTAssertNil(play.typewriter)
+    }
+
+    @MainActor
+    func testMissingProcess61StateReportsARecoverableStop() throws {
+        let play = try makePicturePeelSession()
+        defer { play.stop() }
+        var reportedHalt: OriginalEventRunner.Halt?
+        play.onRecoverableStop = { reportedHalt = $0 }
+
+        play.haltMissingProcessState()
+
+        guard case .halted(let halt) = play.runner.phase else {
+            return XCTFail("Missing picture-peel state must halt process 61")
+        }
+        XCTAssertEqual(reportedHalt, halt)
+        XCTAssertEqual(halt.program, "EP10_R302")
+        XCTAssertTrue(halt.reason.contains("Process 61"))
     }
 
     @MainActor

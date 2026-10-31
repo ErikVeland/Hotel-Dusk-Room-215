@@ -65,6 +65,9 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
 
         XCTAssertNotNil(play.brickWall)
         XCTAssertEqual(play.brickWall?.objects, OriginalBrickWallLayout.objects(seed: seed))
+        play.advanceFrame()
+        XCTAssertEqual(play.runner.phase, .process(id: 75))
+        XCTAssertNotNil(play.brickWall)
         if case .halted(let halt) = play.runner.phase {
             XCTFail("Process 75 must run its brick puzzle: \(halt.reason)")
         }

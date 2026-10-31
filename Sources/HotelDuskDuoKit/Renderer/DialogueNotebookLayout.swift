@@ -9,7 +9,9 @@ struct DialogueNotebookLayout {
     let pages: [NSRange]
     private let frames: [Int: CTFrame]
 
-    init(runs: [OriginalDialogueLines.Run], size: CGSize, fontSize: CGFloat) {
+    init(runs: [OriginalDialogueLines.Run], size: CGSize, fontSize: CGFloat,
+         portraitContours: [UInt8: OriginalAnimationContour] = [:], portraitSize: CGSize = .zero,
+         singlePage: Bool = false) {
         self.size = size
         let text = NSMutableAttributedString(string: "")
         let font = CTFontCreateWithName("Georgia" as CFString, fontSize, nil)
@@ -39,11 +41,14 @@ struct DialogueNotebookLayout {
             return
         }
         let setter = CTFramesetterCreateWithAttributedString(text)
-        let path = CGPath(rect: CGRect(origin: .zero, size: size), transform: nil)
         var ranges: [NSRange] = []
         var frames: [Int: CTFrame] = [:]
         var offset = 0
+        var pageIndex = 0
         while offset < text.length {
+            let screen: UInt8 = singlePage ? 0 : pageIndex.isMultiple(of: 2) ? 1 : 0
+            let path = Self.framePath(size: size,
+                portraitSize: portraitSize, contour: portraitContours[screen], screen: screen)
             let frame = CTFramesetterCreateFrame(setter, CFRange(location: offset, length: 0), path, nil)
             let visible = CTFrameGetVisibleStringRange(frame)
             guard visible.length > 0 else { break }
@@ -55,9 +60,52 @@ struct DialogueNotebookLayout {
             while end < text.length, string.character(at: end) == 10 { end += 1 }
             ranges.append(NSRange(location: offset, length: end - offset))
             offset = end
+            pageIndex += 1
         }
         pages = ranges
         self.frames = frames
+    }
+
+    private static func framePath(size: CGSize, portraitSize: CGSize, contour: OriginalAnimationContour?,
+                                  screen: UInt8) -> CGPath {
+        let path = CGMutablePath()
+        guard let contour, !contour.leftEdge.isEmpty, !contour.rightEdge.isEmpty,
+              portraitSize.width > 0, portraitSize.height > 0 else {
+            path.addRect(CGRect(origin: .zero, size: size))
+            return path
+        }
+        let scale = min(portraitSize.width / CGFloat(contour.width), portraitSize.height / CGFloat(contour.height))
+        let imageSize = CGSize(width: CGFloat(contour.width) * scale, height: CGFloat(contour.height) * scale)
+        let imageOrigin = CGPoint(x: screen == 1 ? (portraitSize.width - imageSize.width) / 2
+                                                  : size.width - portraitSize.width + (portraitSize.width - imageSize.width) / 2,
+                                  y: size.height - portraitSize.height + (portraitSize.height - imageSize.height) / 2)
+        func point(_ source: CGPoint) -> CGPoint {
+            CGPoint(x: imageOrigin.x + source.x * imageSize.width,
+                    y: size.height - imageOrigin.y - source.y * imageSize.height)
+        }
+        let padding: CGFloat = 8
+        if screen == 1 {
+            let edge = contour.rightEdge
+            guard let bottom = edge.last.map(point), let top = edge.first.map(point) else { return path }
+            path.move(to: CGPoint(x: bottom.x + padding, y: bottom.y))
+            path.addLine(to: CGPoint(x: size.width, y: 0))
+            path.addLine(to: CGPoint(x: size.width, y: size.height))
+            path.addLine(to: CGPoint(x: 0, y: size.height))
+            path.addLine(to: CGPoint(x: 0, y: top.y))
+            path.addLine(to: CGPoint(x: top.x + padding, y: top.y))
+            for source in edge { path.addLine(to: point(source).applying(CGAffineTransform(translationX: padding, y: 0))) }
+        } else {
+            let edge = contour.leftEdge.reversed()
+            guard let bottom = edge.first.map(point), let top = edge.last.map(point) else { return path }
+            path.move(to: .zero)
+            path.addLine(to: CGPoint(x: max(0, bottom.x - padding), y: bottom.y))
+            for source in edge { path.addLine(to: point(source).applying(CGAffineTransform(translationX: -padding, y: 0))) }
+            path.addLine(to: CGPoint(x: size.width, y: top.y))
+            path.addLine(to: CGPoint(x: size.width, y: size.height))
+            path.addLine(to: CGPoint(x: 0, y: size.height))
+        }
+        path.closeSubpath()
+        return path
     }
 
     /// Stable source identities keep their ink across scenes and physical pages.

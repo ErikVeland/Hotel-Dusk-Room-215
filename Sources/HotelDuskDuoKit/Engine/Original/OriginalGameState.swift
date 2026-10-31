@@ -168,6 +168,13 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
     /// Overlay 13 stores the Christmas tree decoration order at state offset 0x13DA.
     public var christmasTreeDecorationOrder: UInt16 { read16(0x13DA) }
     public mutating func storeChristmasTreeDecorationOrder(_ value: UInt16) { write16(0x13DA, value) }
+    /**
+     * Overlay 22 stores the wine-label peel position plus 0x1000 at state offset 0x13DC.
+     */
+    public var wineLabelPeelState: UInt16 {
+        get { read16(0x13DC) }
+        set { write16(0x13DC, newValue) }
+    }
     /// The notebook and overlay 38 use the same five apple-painting bits.
     public var appleNotebookPageMask: UInt16 { applePaintingFoundMask }
     public var cashboxDialRetainedValue: UInt16 { read16(0x13DE) }

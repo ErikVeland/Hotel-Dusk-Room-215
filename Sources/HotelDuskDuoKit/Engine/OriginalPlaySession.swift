@@ -243,9 +243,18 @@ public final class OriginalPlaySession: ObservableObject {
     private let doorTable = try? OriginalStateDefaults.bundled().doorTable
     @Published public private(set) var lobby: OriginalMapExploration?
     @Published public private(set) var lobbyImage: CGImage?
+    @Published public private(set) var roomTransitionOpacity = 0.0
+    @Published public private(set) var roomTransitionIsBright = false
     public private(set) var lobbyMap: CGImage?
     private var lobbyRenderer: (any OriginalMapRendering)?
     private var lobbyRenderScale = 4
+    private let lobbyRenderQueue = OriginalMapRenderQueue()
+    private var lobbyRenderRequestID: UInt64 = 0
+    private var pendingRoomBrightness: Float?
+    private var roomTransitionFacing: (start: Float, target: Float, remaining: Int, total: Int)?
+    private var roomExposureFramesRemaining = 0
+    private var roomExposureFramesTotal = 0
+    private var roomExposureStartOpacity = 0.0
     private let mapRendererFactory: OriginalMapRendererFactory
     private let suitcaseRendererFactory: OriginalSuitcaseRendererFactory
     private let hangerRendererFactory: OriginalHangerRendererFactory
@@ -2792,6 +2801,7 @@ public final class OriginalPlaySession: ObservableObject {
                     hasReturnedFromDunningIntroduction = true
                 }
                 try renderLobby()
+                beginRoomTransitionIfNeeded()
                 if lobby?.mode == .walking { audio.playWalkingMusic(mapID: map, game: runner.game) }
                 checkpointWalking()
                 startTimer()
@@ -2825,7 +2835,7 @@ public final class OriginalPlaySession: ObservableObject {
     /**
      * Returns to the last safe place if an active process loses its native state.
      */
-    private func haltMissingProcessState() {
+    func haltMissingProcessState() {
         let interaction: String
         if case .process(let processID) = runner.phase {
             interaction = "Process \(processID)"
@@ -2885,6 +2895,7 @@ public final class OriginalPlaySession: ObservableObject {
         }
         if case .exploration = runner.phase, lobby != nil {
             guard !isPaused else { return }
+            advanceRoomTransition()
             let people = lobby?.people(in: runner.game).map(\.position) ?? []
             let previousPosition = lobby?.position
             if let movement = firstPersonMovement {
@@ -2912,8 +2923,7 @@ public final class OriginalPlaySession: ObservableObject {
                 }
                 return moveToMap(destination)
             }
-            do { try renderLobby() }
-            catch { runner.halt("The map could not be drawn: \(error)"); stopTimer() }
+            renderLobbyAsynchronously()
             return
         }
         if case .waiting = runner.phase {
@@ -2971,6 +2981,8 @@ public final class OriginalPlaySession: ObservableObject {
             applyJigsawEffects(jigsaw?.update(screen0FadeComplete: complete) ?? [])
             return
         }
+        // These interactions respond directly to input and do not need frame updates.
+        if typewriter != nil || brickWall != nil || appleWordEntry != nil { return }
         guard var current = process else { return haltMissingProcessState() }
         let input = OriginalEntranceProcess.Input(newTouch: pendingTouch, leftHanded: false,
             page0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
@@ -3172,7 +3184,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCassetteBallpoint() {
-        guard var process = cassetteBallpoint else { return }
+        guard var process = cassetteBallpoint else { return haltMissingProcessState() }
         let previousPhase = process.phase
         process.update(newRawTouch: cassettePress)
         cassettePress = nil
@@ -3191,7 +3203,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCassetteDeck() {
-        guard var process = cassetteDeck, let renderer = cassetteDeckRenderer else { return }
+        guard var process = cassetteDeck, let renderer = cassetteDeckRenderer else { return haltMissingProcessState() }
         let oldCamera = process.camera
         let oldState = process.sceneState
         let press = cassettePress
@@ -3222,7 +3234,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCassetteRewind() {
-        guard var process = cassetteRewind else { return }
+        guard var process = cassetteRewind else { return haltMissingProcessState() }
         let touch = process.phase == .ready ? cassettePress : cassetteTouch
         process.update(rawTouch: touch, pressedTouch: cassettePress)
         cassettePress = nil
@@ -3240,13 +3252,13 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateClock() {
-        guard var process = clock else { return }
+        guard var process = clock, let renderer = clockRenderer else { return haltMissingProcessState() }
         clockUpdates += 1
         let tick = UInt64(Double(clockUpdates) / Self.updatesPerSecond)
         if process.update(tick: tick, draw: clockUpdates % 2 == 0) {
             try? audio.playOriginalEffect(archiveID: 0, entryID: 0x43)
         }
-        do { clockImage = try clockRenderer?.render(process) }
+        do { clockImage = try renderer.render(process) }
         catch { runner.halt("The clock could not be drawn: \(error)"); stopTimer(); return }
         clock = process
         if process.isComplete {
@@ -3285,7 +3297,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCabinetDial() {
-        guard var puzzle = cabinetDial else { return }
+        guard var puzzle = cabinetDial, cabinetDialRenderer != nil else { return haltMissingProcessState() }
         let complete = !cabinetDialScreenEffects.brightness[0].active
         cabinetDialScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3329,7 +3341,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCrowbar() {
-        guard var puzzle = crowbar else { return }
+        guard var puzzle = crowbar, crowbarRenderer != nil else { return haltMissingProcessState() }
         let complete = !crowbarScreenEffects.brightness[0].active
         crowbarScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3378,7 +3390,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateMemoDrawing() {
-        guard var process = memoDrawing else { return }
+        guard var process = memoDrawing, memoDrawingRenderer != nil else { return haltMissingProcessState() }
         let complete = !memoDrawingScreenEffects.brightness[0].active
         memoDrawingScreenEffects.advanceOriginalFrame()
         let previous = process.drawing
@@ -3420,7 +3432,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateMemoPull() {
-        guard var puzzle = memoPull else { return }
+        guard var puzzle = memoPull, memoPullRenderer != nil else { return haltMissingProcessState() }
         let complete = !memoPullScreenEffects.brightness[0].active
         memoPullScreenEffects.advanceOriginalFrame()
         let touch = memoPullTouch.flatMap { OriginalMemoPullProjection.touch(page: $0, paper: puzzle.position) }
@@ -3464,7 +3476,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updatePaperclip() {
-        guard var puzzle = paperclip else { return }
+        guard var puzzle = paperclip, paperclipRenderer != nil else { return haltMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let touch = paperclipTouch.flatMap { OriginalPaperclipProjection.hit(page: $0) }
@@ -3502,7 +3514,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateHanger() {
-        guard var puzzle = hanger else { return }
+        guard var puzzle = hanger, hangerRenderer != nil else { return haltMissingProcessState() }
         let complete = !hangerScreenEffects.brightness[0].active
         hangerScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3543,7 +3555,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSuitcaseContents() {
-        guard var process = suitcaseContents else { return }
+        guard var process = suitcaseContents, suitcaseContentsRenderer != nil else { return haltMissingProcessState() }
         let complete = !suitcaseContentsScreenEffects.brightness[0].active
         suitcaseContentsScreenEffects.advanceOriginalFrame()
         do {
@@ -3591,7 +3603,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateFountainPen() {
-        guard var puzzle = fountainPen else { return }
+        guard var puzzle = fountainPen, fountainPenRenderer != nil else { return haltMissingProcessState() }
         let complete = !fountainPenScreenEffects.brightness[0].active
         fountainPenScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3632,7 +3644,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateToiletTank() {
-        guard var puzzle = toiletTank else { return }
+        guard var puzzle = toiletTank, toiletTankRenderer != nil else { return haltMissingProcessState() }
         let complete = !toiletTankScreenEffects.brightness[0].active
         toiletTankScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3673,7 +3685,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateDifferences() {
-        guard var puzzle = differences else { return }
+        guard var puzzle = differences, differencesRenderer != nil else { return haltMissingProcessState() }
         let complete = !differencesScreenEffects.brightness[0].active
         differencesScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3714,7 +3726,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateLinenWagon() {
-        guard var puzzle = linenWagon else { return }
+        guard var puzzle = linenWagon, linenWagonRenderer != nil else { return haltMissingProcessState() }
         let complete = !linenWagonScreenEffects.brightness[0].active
         linenWagonScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3752,7 +3764,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateMatchsticks() {
-        guard var puzzle = matchsticks else { return }
+        guard var puzzle = matchsticks, matchsticksRenderer != nil else { return haltMissingProcessState() }
         let complete = !matchsticksScreenEffects.brightness[0].active
         matchsticksScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3787,7 +3799,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCoinPuzzle() {
-        guard var puzzle = coinPuzzle else { return }
+        guard var puzzle = coinPuzzle, coinPuzzleRenderer != nil else { return haltMissingProcessState() }
         let complete = !coinPuzzleScreenEffects.brightness[0].active
         coinPuzzleScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3822,7 +3834,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateDollRepair() {
-        guard var puzzle = dollRepair else { return }
+        guard var puzzle = dollRepair, dollRepairRenderer != nil else { return haltMissingProcessState() }
         let complete = !dollRepairScreenEffects.brightness[0].active
         dollRepairScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3856,7 +3868,7 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
     private func updateBookmarkBox() {
-        guard var puzzle = bookmarkBox else { return }
+        guard var puzzle = bookmarkBox else { return haltMissingProcessState() }
         let complete = !bookmarkBoxScreenEffects.brightness[0].active
         bookmarkBoxScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3893,7 +3905,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSwitchboard() {
-        guard var puzzle = switchboard else { return }
+        guard var puzzle = switchboard, switchboardRenderer != nil else { return haltMissingProcessState() }
         let complete = !switchboardScreenEffects.brightness[0].active
         switchboardScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3935,7 +3947,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateLabelPeel() {
-        guard var puzzle = labelPeel else { return }
+        guard var puzzle = labelPeel, labelPeelRenderer != nil else { return haltMissingProcessState() }
         let complete = !labelPeelScreenEffects.brightness[0].active
         labelPeelScreenEffects.advanceOriginalFrame()
         let previous = puzzle
@@ -3971,7 +3983,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateAfterConfess() {
-        guard var process = afterConfess else { return }
+        guard var process = afterConfess, afterConfessRenderer != nil else { return haltMissingProcessState() }
         let previousPhase = process.phase
         let completed = process.update()
         afterConfess = process
@@ -3993,7 +4005,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateVSScene() {
-        guard var process = vsScene else { return }
+        guard var process = vsScene, vsSceneRenderer != nil else { return haltMissingProcessState() }
         let completed = process.update()
         vsScene = process
         guard completed else { return }
@@ -4006,7 +4018,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updatePicturePeel() {
-        guard var process = picturePeel, let renderer = picturePeelRenderer else { return }
+        guard var process = picturePeel, let renderer = picturePeelRenderer else { return haltMissingProcessState() }
         let previous = process
         let effects = process.update(touch: picturePeelTouch)
         picturePeel = process
@@ -4025,7 +4037,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateChristmasTree() {
-        guard var process = christmasTree else { return }
+        guard var process = christmasTree, christmasTreeRenderer != nil else { return haltMissingProcessState() }
         let fadeComplete = !christmasTreeScreenEffects.brightness[0].active
         christmasTreeScreenEffects.advanceOriginalFrame()
         let effects = process.update(fadeComplete: fadeComplete)
@@ -4056,7 +4068,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSearchShed() {
-        guard var process = searchShed else { return }
+        guard var process = searchShed, searchShedRenderer != nil else { return haltMissingProcessState() }
         let fadeComplete = !searchShedScreenEffects.brightness[0].active
         searchShedScreenEffects.advanceOriginalFrame()
         let effects = process.update(fadeComplete: fadeComplete)
@@ -4065,7 +4077,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateBagSearch() {
-        guard var process = bagSearch else { return }
+        guard var process = bagSearch, bagSearchRenderer != nil else { return haltMissingProcessState() }
         let fadeComplete = !bagSearchScreenEffects.brightness[0].active
         bagSearchScreenEffects.advanceOriginalFrame()
         let effects = process.update(fadeComplete: fadeComplete)
@@ -4124,7 +4136,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateThinWire() {
-        guard var puzzle = thinWire else { return }
+        guard var puzzle = thinWire, thinWireRenderer != nil else { return haltMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let previous = puzzle
@@ -4163,7 +4175,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateSuitcaseKey() {
-        guard var puzzle = suitcaseKey else { return }
+        guard var puzzle = suitcaseKey, suitcaseRenderer != nil else { return haltMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let previous = puzzle
@@ -4198,7 +4210,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// One update of process 24. Status 2 hands the result to the event runner.
     private func updateBell() {
-        guard var current = bellProcess else { return }
+        guard var current = bellProcess else { return haltMissingProcessState() }
         let input = OriginalBellProcess.Input(newTouch: pendingTouch.map { .init(x: $0.x, y: $0.y) },
             leftHanded: false, screen0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
         pendingTouch = nil
@@ -4244,7 +4256,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// Advances a sign-card process. Status 2 hands the result to the event runner.
     private func updateSign() {
-        guard var current = signProcess else { return }
+        guard var current = signProcess else { return haltMissingProcessState() }
         let input = OriginalSignProcess.Input(heldTouch: heldTouch.map { .init(x: $0.x, y: $0.y) },
             newTouch: pendingTouch.map { .init(x: $0.x, y: $0.y) }, leftHanded: false,
             screen0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
@@ -4295,13 +4307,13 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, !isBrowsingInventory, canSaveWalkingCheckpoint, radians.isFinite else { return }
         lobby?.turnView(by: radians)
-        redrawLobby()
+        renderLobbyAsynchronously()
     }
 
     public func finishFirstPersonLook() {
         let recordsProgress = beginProgressInput(.finishFirstPersonLook)
         defer { endProgressInput(recordsProgress) }
-        if canSaveWalkingCheckpoint { redrawLobby() }
+        if canSaveWalkingCheckpoint { renderLobbyAsynchronously() }
         checkpointWalking()
     }
 
@@ -4311,7 +4323,7 @@ public final class OriginalPlaySession: ObservableObject {
         lobbyTouch = nil
         firstPersonMovement = nil
         if case .exploration = runner.phase { lobby?.update(heldPageTouch: nil) }
-        if canSaveWalkingCheckpoint { redrawLobby() }
+        if canSaveWalkingCheckpoint { renderLobbyAsynchronously() }
         checkpointWalking()
     }
 
@@ -4470,7 +4482,7 @@ public final class OriginalPlaySession: ObservableObject {
             searchItem = nil
             lobbyTouch = nil
             firstPersonMovement = nil
-            redrawLobby()
+            renderLobbyAsynchronously()
         } catch { runner.halt("The search view could not be loaded: \(error)"); stopTimer() }
     }
 
@@ -4479,7 +4491,7 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase, closeup == nil, lobby?.mode == .counter else { return }
         lobby?.setPan(value)
-        redrawLobby()
+        renderLobbyAsynchronously()
     }
 
     public func leaveLobbyCounter() {
@@ -4488,7 +4500,7 @@ public final class OriginalPlaySession: ObservableObject {
         guard !isPaused, chapterTransition == nil, case .exploration = runner.phase else { return }
         lobby?.leaveCounter()
         searchItem = nil
-        redrawLobby()
+        renderLobbyAsynchronously()
     }
 
     public func selectLobbyObject(x: Float, y: Float, confirmImmediately: Bool = false) {
@@ -4706,7 +4718,110 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func renderLobby() throws {
+        lobbyRenderRequestID &+= 1
         if let lobby { lobbyImage = try lobbyRenderer?.render(lobby, game: runner.game) }
+    }
+
+    private func beginRoomTransitionIfNeeded() {
+        guard let oldBrightness = pendingRoomBrightness, let image = lobbyImage else { return }
+        pendingRoomBrightness = nil
+        let newBrightness = Self.averageLuminance(of: image)
+        guard let newBrightness else { return }
+        let difference = newBrightness - oldBrightness
+        guard abs(difference) >= 0.07 else { return }
+        roomTransitionIsBright = difference > 0
+        roomExposureStartOpacity = min(0.58, max(0.16, Double(abs(difference)) * 1.25))
+        roomTransitionOpacity = roomExposureStartOpacity
+        roomExposureFramesTotal = 48
+        roomExposureFramesRemaining = roomExposureFramesTotal
+    }
+
+    private func advanceRoomTransition() {
+        var shouldRender = false
+        if var transition = roomTransitionFacing, transition.remaining > 0 {
+            transition.remaining -= 1
+            let progress = 1 - Float(transition.remaining) / Float(transition.total)
+            let eased = progress * progress * (3 - 2 * progress)
+            let delta = atan2(sin(transition.target - transition.start), cos(transition.target - transition.start))
+            lobby?.setTransitionFacing(transition.start + delta * eased)
+            roomTransitionFacing = transition.remaining == 0 ? nil : transition
+            shouldRender = true
+        }
+        if roomExposureFramesRemaining > 0 {
+            roomExposureFramesRemaining -= 1
+            let progress = 1 - Double(roomExposureFramesRemaining) / Double(roomExposureFramesTotal)
+            let eased = progress * progress * (3 - 2 * progress)
+            roomTransitionOpacity = roomExposureStartOpacity * (1 - eased)
+            if roomExposureFramesRemaining == 0 { roomTransitionOpacity = 0 }
+        }
+        if shouldRender { renderLobbyAsynchronously() }
+    }
+
+    private static func averageLuminance(of image: CGImage) -> Float? {
+        let side = 8
+        let bytesPerRow = side * 4
+        guard let context = CGContext(data: nil, width: side, height: side, bitsPerComponent: 8,
+                                      bytesPerRow: bytesPerRow, space: CGColorSpaceCreateDeviceRGB(),
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
+              let data = context.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
+        context.interpolationQuality = .medium
+        context.draw(image, in: CGRect(x: 0, y: 0, width: side, height: side))
+        var total: Float = 0
+        for index in 0..<(side * side) {
+            let offset = index * 4
+            total += 0.2126 * Float(data[offset]) / 255
+                + 0.7152 * Float(data[offset + 1]) / 255
+                + 0.0722 * Float(data[offset + 2]) / 255
+        }
+        return total / Float(side * side)
+    }
+
+    /**
+     * Queues the latest walking view without waiting for GPU readback.
+     */
+    private func renderLobbyAsynchronously() {
+        guard let lobby, let renderer = lobbyRenderer as? OriginalMapRenderer else {
+            redrawLobby()
+            return
+        }
+        lobbyRenderRequestID &+= 1
+        let requestID = lobbyRenderRequestID
+        let request = OriginalMapRenderQueue.Request(id: requestID, renderer: renderer, state: lobby,
+            game: runner.game, scale: CGFloat(lobbyRenderScale)) { [weak self] id, image, failure in
+                guard let self, id == self.lobbyRenderRequestID else { return }
+                if let image {
+                    self.lobbyImage = image
+                } else if let failure {
+                    self.runner.halt("The map could not be drawn: \(failure)")
+                    self.stopTimer()
+                    self.settle()
+                }
+            }
+        lobbyRenderQueue.submit(request)
+    }
+
+    /**
+     * Rebuilds the active map renderer after the graphics preference changes.
+     */
+    public func refreshGraphics() {
+        do {
+            if let lobby {
+                let area = lobby.mode == .counter ? lobby.searchAreaID : nil
+                let renderer = try mapRendererFactory(lobby.mapName, area)
+                renderer.setDisplayScale(CGFloat(lobbyRenderScale))
+                lobbyRenderer = renderer
+                lobbyMap = renderer.map
+                renderLobbyAsynchronously()
+            }
+            if let doorImage { self.doorImage = try doorImage.refreshedForGraphicsPreference() }
+            if let closeupImage { self.closeupImage = try closeupImage.refreshedForGraphicsPreference() }
+            if let closeupDetailImage { self.closeupDetailImage = try closeupDetailImage.refreshedForGraphicsPreference() }
+            objectWillChange.send()
+        } catch {
+            runner.halt("Graphics could not be refreshed: \(error)")
+            stopTimer()
+            settle()
+        }
     }
 
     public func setDisplayScale(_ scale: CGFloat) {
@@ -4714,8 +4829,7 @@ public final class OriginalPlaySession: ObservableObject {
         let next = min(16, max(4, Int(ceil(scale))))
         guard next != lobbyRenderScale else { return }
         lobbyRenderScale = next
-        lobbyRenderer?.setDisplayScale(CGFloat(next))
-        redrawLobby()
+        renderLobbyAsynchronously()
     }
 
     private func moveToMap(_ map: Int16, relocationMarker: Int? = nil) {
@@ -4731,8 +4845,21 @@ public final class OriginalPlaySession: ObservableObject {
             if restoresCurrentPosition, let lobby {
                 runner.setMapPosition(lobby.position, facing: lobby.checkpointFacing)
             }
+            let outgoingFacing = lobby?.facing
+            let outgoingBrightness = lobbyImage.flatMap(Self.averageLuminance(of:))
+            let shouldBlendEntry = lobby != nil && lobby?.mapID != map && relocationMarker == nil
             var exploration = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.mapID,
                 savedGame: restoresCurrentPosition ? runner.game : nil)
+            if shouldBlendEntry, let outgoingFacing {
+                roomTransitionFacing = (start: outgoingFacing, target: exploration.facing, remaining: 20, total: 20)
+                exploration.setTransitionFacing(outgoingFacing)
+                pendingRoomBrightness = outgoingBrightness
+            } else {
+                roomTransitionFacing = nil
+                pendingRoomBrightness = nil
+                roomTransitionOpacity = 0
+                roomExposureFramesRemaining = 0
+            }
             let renderer = try mapRendererFactory(name, nil)
             renderer.setDisplayScale(CGFloat(lobbyRenderScale))
             audio.stopWalkingAudio()

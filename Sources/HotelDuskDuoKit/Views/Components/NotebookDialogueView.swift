@@ -12,6 +12,10 @@ struct DialogueSpreadMetrics: Equatable {
         CGSize(width: max(0, pageSize.width - margin * 2),
                height: max(0, pageSize.height - textOrigin.y - bottom - 56 - (itemArtworkSize > 0 ? itemArtworkSize + 12 : 0)))
     }
+    var portraitSize: CGSize {
+        CGSize(width: min(pageSize.width * 0.5, textSize.width * 0.62),
+               height: min(pageSize.height * 0.48, textSize.height * 0.58))
+    }
     init(size: CGSize, safeArea: EdgeInsets = EdgeInsets(), showsItem: Bool = false, stacked: Bool = false) {
         self.stacked = stacked
         pageSize = stacked ? CGSize(width: size.width, height: size.height / 2) : CGSize(width: size.width / 2, height: size.height)
@@ -41,6 +45,8 @@ struct NotebookDialogueSpread: View {
         let ink: [OriginalDialogueLines.Run]
         let visible: Bool
         let singlePage: Bool
+        let portraitSignature: [String]
+        let portraitSize: CGSize
     }
     private struct WritingKey: Equatable {
         let end: Int
@@ -55,7 +61,11 @@ struct NotebookDialogueSpread: View {
             let inspection = !notebook.isReviewing && play.hasInspectionArtwork
             let metrics = DialogueSpreadMetrics(size: proxy.size, safeArea: safeArea, stacked: stacked)
             let key = LayoutKey(size: metrics.textSize, font: fontSize, ink: notebook.ink,
-                visible: isVisible && scenePhase == .active, singlePage: inspection)
+                visible: isVisible && scenePhase == .active, singlePage: inspection,
+                portraitSignature: notebook.isReviewing ? [] : play.encounterPortraits.map {
+                    "\($0.screen):\($0.person):\($0.pose)"
+                }.sorted(),
+                portraitSize: metrics.portraitSize)
             let writing = WritingKey(end: notebook.reader.spreadEnd, revision: notebook.passageRevision,
                 paused: play.isPaused || notebook.isReviewing || scenePhase != .active || !isVisible,
                 instant: reduceMotion || voiceOver, turning: notebook.isTurning)
@@ -87,7 +97,11 @@ struct NotebookDialogueSpread: View {
             .environment(\.layoutDirection, .leftToRight)
             .onChange(of: key, initial: true) { _, value in
                 guard value.visible else { return }
-                notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font),
+                let contours = notebook.isReviewing ? [:] : Dictionary(uniqueKeysWithValues:
+                    play.encounterPortraits.map { ($0.screen, $0.contour) })
+                notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font,
+                    portraitContours: contours, portraitSize: value.portraitSize,
+                    singlePage: value.singlePage),
                                    singlePage: value.singlePage)
             }
             .onChange(of: notebook.turnRevision) { _, revision in
@@ -129,7 +143,6 @@ struct NotebookDialogueLeaf: View {
     let metrics: DialogueSpreadMetrics
     let pageIndex: Int
     var inspection = false
-    @AppStorage("pencilCharacterAnimations") private var pencilCharacterAnimations = true
 
     private func bindingShade(right: Bool) -> some View {
         LinearGradient(colors: [.black.opacity(0.28), .black.opacity(0.08), .clear],
@@ -185,12 +198,12 @@ struct NotebookDialogueLeaf: View {
                 .accessibilityHidden(true)
             if !notebook.isReviewing, let portrait = play.encounterPortraits.first(where: { $0.screen == (right ? 0 : 1) }) {
                 OriginalAnimationFrameView(frame: portrait.frame)
-                    .frame(width: min(metrics.pageSize.width * 0.34, 150),
-                           height: min(metrics.pageSize.height * 0.34, 190))
-                    .opacity(pencilCharacterAnimations ? 0.42 : 0.22)
+                    .frame(width: metrics.portraitSize.width, height: metrics.portraitSize.height)
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
-                    .position(x: metrics.pageSize.width * 0.78, y: metrics.pageSize.height * 0.34)
+                    .position(x: right ? metrics.pageSize.width - metrics.margin - metrics.portraitSize.width / 2
+                                       : metrics.margin + metrics.portraitSize.width / 2,
+                              y: metrics.pageSize.height - metrics.bottom - 56 - metrics.portraitSize.height / 2)
             }
             Canvas { context, _ in
                 context.withCGContext { layout.draw(page: page, revealedEnd: notebook.reader.revealedEnd, in: $0) }

@@ -251,6 +251,44 @@ public struct OriginalAnimationFrame: Sendable {
     }
 }
 
+/**
+ * A stable pair of silhouette edges for text wrapping around an animation.
+ */
+struct OriginalAnimationContour {
+    let width: Int
+    let height: Int
+    let leftEdge: [CGPoint]
+    let rightEdge: [CGPoint]
+
+    init(frame: OriginalAnimationFrame) {
+        width = frame.width
+        height = frame.height
+        let pixels = [UInt8](frame.rgba)
+        guard width > 0, height > 0, pixels.count >= width * height * 4 else {
+            leftEdge = []
+            rightEdge = []
+            return
+        }
+        let rowStep = max(1, height / 72)
+        var left: [CGPoint] = []
+        var right: [CGPoint] = []
+        for y in stride(from: 0, to: height, by: rowStep) {
+            var first: Int?
+            var last: Int?
+            for x in 0..<width where pixels[(y * width + x) * 4 + 3] > 24 {
+                if first == nil { first = x }
+                last = x
+            }
+            guard let first, let last else { continue }
+            let pointY = CGFloat(y) / CGFloat(max(1, height - 1))
+            left.append(CGPoint(x: CGFloat(first) / CGFloat(max(1, width - 1)), y: pointY))
+            right.append(CGPoint(x: CGFloat(last) / CGFloat(max(1, width - 1)), y: pointY))
+        }
+        leftEdge = left
+        rightEdge = right
+    }
+}
+
 /// A decoded frame, using its enhanced master when one is available.
 public struct OriginalAnimationFrameView: View {
     public let frame: OriginalAnimationFrame

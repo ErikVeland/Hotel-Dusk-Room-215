@@ -46,11 +46,16 @@ final class OriginalResumeSaveTests: XCTestCase {
         }
     }
 
-    private func session(_ store: any OriginalResumeSaveStore = Store(), safePlaceStore: any OriginalResumeSaveStore = Store(), chapterStore: any OriginalChapterSaveStore = ChapterStore()) -> GameSession {
+    private func session(
+        _ store: any OriginalResumeSaveStore = Store(),
+        safePlaceStore: any OriginalResumeSaveStore = Store(),
+        chapterStore: any OriginalChapterSaveStore = ChapterStore(),
+        renderFailure: RenderFailure? = nil
+    ) -> GameSession {
         let audio = AudioController(musicOutputFactory: { _, _, _ in ProgressMusicOutput() })
         audio.isMuted = true
         return GameSession(audioController: audio, saveStore: chapterStore, resumeStore: store, safePlaceStore: safePlaceStore,
-            mapRendererFactory: { name, _ in try MapRenderer(name) })
+            mapRendererFactory: { name, _ in try MapRenderer(name, renderFailure: renderFailure) })
     }
 
     private func enterLobby(_ session: GameSession) throws -> OriginalPlaySession {
@@ -163,6 +168,53 @@ final class OriginalResumeSaveTests: XCTestCase {
         XCTAssertEqual(restored.lobby?.position, position)
         XCTAssertEqual(game.play?.runner.game.bytes, try checkpoint.gameState().bytes)
         XCTAssertEqual(game.play?.lobby?.checkpointFacing, checkpoint.checkpointFacing)
+        XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
+    }
+
+    func testMissingNativeProcessStateReturnsToLastSafeWalkingPlace() throws {
+        let safePlaceStore = Store()
+        let game = session(safePlaceStore: safePlaceStore)
+        defer { game.endOriginalGame() }
+        let play = try enterLobby(game)
+        play.holdLobbyTouch(x: 140, y: 80)
+        for _ in 0..<80 { play.advanceFrame() }
+        play.holdLobbyTouch(x: 70, y: 75)
+        for _ in 0..<46 { play.advanceFrame() }
+        play.releaseLobbyTouch()
+        play.inspectLobbyCounter()
+        play.panLobbyCounter(0)
+        play.selectLobbyObject(x: 126, y: 195)
+        play.confirmLobbyObject()
+        play.advanceDialogue()
+        XCTAssertEqual(play.runner.phase, .process(id: 24))
+
+        play.haltMissingProcessState()
+
+        let restored = try XCTUnwrap(game.play)
+        XCTAssertFalse(restored === play)
+        XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
+        XCTAssertEqual(restored.runner.program.name, "EP1_R102")
+        XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
+    }
+
+    func testMapRenderFailureReturnsToLastSafeWalkingPlace() throws {
+        let safePlaceStore = Store()
+        let renderFailure = RenderFailure()
+        let game = session(safePlaceStore: safePlaceStore, renderFailure: renderFailure)
+        defer { game.endOriginalGame() }
+        let play = try enterLobby(game)
+        play.holdLobbyTouch(x: 140, y: 80)
+        for _ in 0..<80 { play.advanceFrame() }
+        play.holdLobbyTouch(x: 70, y: 75)
+        for _ in 0..<46 { play.advanceFrame() }
+        play.releaseLobbyTouch()
+        renderFailure.shouldFailNextRender = true
+        play.inspectLobbyCounter()
+
+        let restored = try XCTUnwrap(game.play)
+        XCTAssertFalse(restored === play)
+        XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
+        XCTAssertEqual(restored.runner.program.name, "EP1_R102")
         XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
     }
 
