@@ -41,17 +41,12 @@ final class OriginalChapterFiveRouteTests: XCTestCase {
 
     /// Rachel's call, Jeff and Dunning in the hallway, Mila's memos, and Melissa's doll.
     func testChapterFiveMilaAndDoll() throws {
-        guard let chapter = try OriginalChapterFileStore(directory: URL(fileURLWithPath: try directory)).load(slot: 1) else {
+        guard let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: try directory)
+            .appendingPathComponent("chapter5-normal-entry")).load() else {
             throw XCTSkip("Complete Chapter 4 through the native route first")
         }
-        let audio = originalRouteTestAudio()
-        let play = try OriginalPlaySession.restoring(chapter, audio: audio,
-            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
-            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
-            suitcaseContentsRendererFactory: { try OriginalRouteBitmapSuitcaseContentsRenderer() },
-            toiletTankRendererFactory: { try OriginalRouteBitmapToiletTankRenderer() })
+        let play = try session(checkpoint)
         defer { play.stop() }
-        play.continueChapterTitle()
         Route.drain(play, interrupt: true)
         XCTAssertEqual(play.runner.game.chapter, 4)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
@@ -169,10 +164,13 @@ final class OriginalChapterFiveRouteTests: XCTestCase {
         try Route.choose(play, "You wanted it found.", interrupt: true)
         try Route.conversation(play, answers: ["Jeff Damon.", "Did Dunning say anything?", "Robert Evans", "A gun",
                                                "Jeff's Student ID", "Lawyer"], topics: Array(0..<128))
-        XCTAssertEqual(play.chapterTransition?.stage, .prompt)
+        XCTAssertTrue(play.chapterTransition?.stage == .prompt || play.chapterTransition?.stage == .title)
         XCTAssertEqual(play.runner.game.chapter, 5)
-        let chapter = try OriginalChapterSave(game: play.runner.game, savedAt: Date())
-        try OriginalChapterFileStore(directory: URL(fileURLWithPath: try directory).appendingPathComponent("chapter6"))
-            .save(chapter, slot: 0)
+        if play.chapterTransition?.stage == .prompt { play.answerChapterSave(false) }
+        play.continueChapterTitle()
+        Route.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: try directory)
+            .appendingPathComponent("chapter6-entry")).save(play.walkingCheckpoint())
     }
 }

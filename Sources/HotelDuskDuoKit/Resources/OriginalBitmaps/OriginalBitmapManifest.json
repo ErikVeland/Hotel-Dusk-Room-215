@@ -1,10 +1,16 @@
 {
   "formatVersion": 1,
   "coverage": {
-    "files": 1937,
+    "files": 1938,
     "decoded": 439,
-    "unresolved": 1498
+    "unresolved": 1499
   },
+  "dataFiles": [
+    {
+      "source": "trick/jukebox/JK_USA.txt",
+      "payloadSHA256": "d49020626c107ab4968b9b248e595ddc16489a73cf21e115fd8af804d70a0d22"
+    }
+  ],
   "images": [
     {
       "source": "check/StilBG/BG01-02L1.bin",
@@ -12747,6 +12753,13 @@
       "payloadSHA256": "667958422f949e0348371ae5c3ae48bb1834f1d86de4f7c3b88b453253bdbb5e",
       "status": "unresolved",
       "error": "Not a recovered tiled bitmap format"
+    },
+    {
+      "source": "trick/sticktex.bin",
+      "payloadSHA256": "c40877aa607858217e45f3cacb0e5dcde711b94ea4d969118f33e4c24b41ef9e",
+      "status": "unresolved",
+      "error": "DTX texture; decoded by OriginalTexture",
+      "standaloneSource": "data/trick/sticktex.bin"
     },
     {
       "source": "trick/switchboard/paneloff.bin",

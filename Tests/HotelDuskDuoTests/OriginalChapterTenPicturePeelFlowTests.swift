@@ -81,10 +81,18 @@ final class OriginalChapterTenPicturePeelFlowTests: XCTestCase {
         play.quitPicturePeel()
 
         XCTAssertNil(play.picturePeel)
-        guard case .dialogue(let packet) = play.runner.phase else {
-            return XCTFail("Expected picture peel's return dialogue, got \(play.runner.phase)")
-        }
-        XCTAssertEqual(packet.sourceOffset, 4500)
+        XCTAssertTrue(play.runner.eventTrail.contains(9), "A completed peel must select the revealed-painting event")
+    }
+
+    @MainActor
+    func testLeavingAnIncompletePicturePeelSelectsTheExitBranch() throws {
+        let play = try makePicturePeelSession()
+        defer { play.stop() }
+
+        play.quitPicturePeel()
+
+        XCTAssertNil(play.picturePeel)
+        XCTAssertTrue(play.runner.eventTrail.contains(11), "An incomplete peel must select the exit branch")
     }
 
     @MainActor

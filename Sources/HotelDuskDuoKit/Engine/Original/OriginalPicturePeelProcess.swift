@@ -69,12 +69,13 @@ public struct OriginalPicturePeelProcess: Equatable, Sendable {
     }
 
     /**
-     * Returns the source's value 2 when the player leaves the picture interaction.
+     * Returns success after the player clears the cover, or the exit result when it remains.
      */
     public mutating func requestExit() -> Effect? {
         guard result == nil else { return nil }
-        result = 2
-        return .returned(2)
+        let returnValue: Int16 = completionTriggered ? 0 : 2
+        result = returnValue
+        return .returned(returnValue)
     }
 
     private static func contains(_ point: SIMD2<Int>) -> Bool {

@@ -2,11 +2,11 @@
 
 Process 75 selects overlay 40 in mode 0. The source event is `EP10_R304`,
 source offset 672. The event maps process returns 0, 1 and 2 to events 25, 26
-and 27. The native session now runs an isolated brick-wall interaction and
-returns 0 when its doorway gate is clear, or 2 when the player leaves. Result 0
-selects the source success event. The trigger for source result 1 remains
-unverified. The session does not yet verify the normal Chapter 10 route or the
-original DS hit map.
+and 27. The native session now reaches the wall through the normal R304 route
+and moves a brick with Hammer item 71. It returns 0 when its doorway gate is
+clear, or 2 when the player leaves. Result 0 selects the source success event.
+The normal solve and R302 entry now pass through the route test. The source
+result 1 trigger and original DS hit map remain unverified.
 
 ## Recovered interaction shape
 
@@ -48,11 +48,12 @@ returns 1. Another completed path returns 2 before the final callback. Other
 calls return 0 while the overlay is still running. The exact player actions
 that reach each script branch still need original execution evidence.
 
-The brick update helper checks inventory item `0x3b`, which is the Hammer
-entry, and checks counts of one and two. It also compares each selected
-object's vertical position with `-1.0` before it updates the object's
-transform. This ties the Hammer to the brick interaction, but it does not by
-itself identify which of the three script branches follows each player action.
+An isolated ROM run found that setting item-state node `0x3b` enables the brick
+move path. The normal R301 toolbox route awards Hammer as inventory item 71.
+The native route now checks item 71 and moves a brick. These two observations
+do not yet explain the original runtime's item-state mapping. Capture a normal
+story run before claiming source parity. The helper also checks item counts of
+one and two and tests each selected object's vertical position against `-1.0`.
 
 The native engine builds the 90 source transforms from a deterministic seed.
 It uses the recovered linear random generator, alternating row offsets, the
@@ -169,13 +170,13 @@ Hammer and cannot exercise the hammer-enabled move path. Holding the touch for
 stays set for two frames after `release` and clears on the third. Wait for that
 clear before injecting another tap, or the next touch has no fresh input edge.
 
-The original overlay creates a valid item-list node for item `0x3b` after the
-first hit. In an isolated run, changing that node's state from zero to one
-enabled the Hammer path. After the touch reset, a second press on brick 44
-lifted it. Moving the raw touch from `(120, 96)` through `(80, 96)` to `(40, 96)`
-and releasing moved the brick to `y = -1.06` within 40 more frames. The source
-render showed the cleared cell. This used a direct item-state write, so it is
-evidence for the interaction mechanic, not the normal Chapter 10 route.
+The original overlay creates a valid item-list node for `0x3b` after the first
+hit. In an isolated run, changing that node's state from zero to one enabled a
+brick move. After the touch reset, a second press on brick 44 lifted it. Moving
+the raw touch from `(120, 96)` through `(80, 96)` to `(40, 96)` and releasing
+moved the brick to `y = -1.06` within 40 more frames. The source render showed
+the cleared cell. This direct item-state write does not prove the normal
+Chapter 10 item mapping.
 
 The completion gate checks inner columns 1–4 in rows 0–11. With Hammer state
 one, a source diagnostic that moved all 48 of those objects below `y = -1`
@@ -327,10 +328,10 @@ plane, ray-line, segment-bound, and winding checks for both accepted and
 rejected points. The probe selects the correct object at all 68 coarse-grid
 ROM hits but accepts 668 additional points, while the focused border touches
 still have four incorrect object IDs. This is evidence of a hit-validation or
-Q12 ray-conversion mismatch; it does not isolate which check is wrong. The
-float mask remains diagnostic and must stay disconnected from Process 75 until
-the comparison matches. This evidence does not establish a normal Chapter 10
-route or a completed end-to-end game.
+Q12 ray-conversion mismatch; it does not isolate which check is wrong. Process
+75 now supports a normal native solve path and sets the doorway flag, but its
+hit geometry does not yet match the ROM scan. The comparison remains an open
+fidelity check; it does not block the verified native route through Chapter 10.
 
 A trial removed the aspect multiplier from the ray's vertical component,
 following the renderer's conventional projection matrix. The four captured

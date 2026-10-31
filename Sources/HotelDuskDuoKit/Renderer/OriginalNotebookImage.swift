@@ -6,11 +6,7 @@ extension OriginalBitmapLibrary {
      * Notebook ink uses packed bits rather than a palette bitmap header.
      */
     public func loadNotebookData(path: String) throws -> Data {
-        guard let record = manifest.images.first(where: { $0.source == path }) else { throw OriginalDataError.missing(path) }
-        let url = resourceRoot.appendingPathComponent(path).standardizedFileURL
-        guard url.path.hasPrefix(resourceRoot.path + "/") else { throw OriginalDataError.invalid("Notebook path leaves source directory") }
-        let data = try Data(contentsOf: url)
-        guard OriginalScriptCatalog.digest(data) == record.payloadSHA256 else { throw OriginalDataError.checksum(path) }
+        let data = try checkedPayload(path: path, includeDataFiles: true)
         return try OriginalContainer.decode(data, hasDirectoryRecord: false)
     }
 }

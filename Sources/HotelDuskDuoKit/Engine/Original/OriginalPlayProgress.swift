@@ -31,6 +31,8 @@ enum OriginalProgressInput: Codable, Equatable, Sendable {
     case adjustTypewriterShift(amount: Int)
     case quitTypewriter
     case tapPencilSharpener(pageX: Int, pageY: Int)
+    case holdPencilSharpenerTouch(pageX: Int, pageY: Int)
+    case releasePencilSharpenerTouch
     case holdTouch(pageX: Int, pageY: Int)
     case releaseTouch
     case holdBrickWallTouch(x: Float, y: Float)
@@ -273,6 +275,9 @@ extension OriginalPlaySession {
         case let .adjustTypewriterShift(amount): adjustTypewriterShift(by: amount)
         case .quitTypewriter: quitTypewriter()
         case let .tapPencilSharpener(pageX, pageY): tapPencilSharpener(pageX: pageX, pageY: pageY)
+        case let .holdPencilSharpenerTouch(pageX, pageY):
+            holdPencilSharpenerTouch(pageX: pageX, pageY: pageY)
+        case .releasePencilSharpenerTouch: releasePencilSharpenerTouch()
         case let .holdTouch(pageX, pageY): holdTouch(pageX: pageX, pageY: pageY)
         case .releaseTouch: releaseTouch()
         case let .holdBrickWallTouch(x, y): holdBrickWallTouch(x: x, y: y)
