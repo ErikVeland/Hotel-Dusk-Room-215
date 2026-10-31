@@ -2,55 +2,49 @@ import XCTest
 @testable import HotelDuskDuoKit
 
 final class OriginalSearchShedProcessTests: XCTestCase {
-    func testEntryAndDragPreserveTheGrabOffsetAndVerticalPosition() {
+    func testModeOneUsesNinetyRecoveredOverlayFortyTransforms() {
+        let seed: UInt32 = 0x0F2B89E1
+        let expected = OriginalBrickWallLayout.objects(seed: seed)
+        let process = OriginalSearchShedProcess(seed: seed)
+
+        XCTAssertEqual(process.objects.count, 90)
+        XCTAssertEqual(process.objects.map(\.position), expected.map(\.position))
+        XCTAssertEqual(process.objects.map(\.scale), expected.map(\.scale))
+        XCTAssertEqual(process.objects[32].position.y, Float(bitPattern: 0xBF8CCCCD))
+        XCTAssertEqual(process.objects[43].position.z, Float(bitPattern: 0x3F8CCCCD))
+    }
+
+    func testModeOneOnlyCountsAcceptedInteriorHits() {
+        XCTAssertFalse(OriginalSearchShedProcess.isAcceptedIndex(-1))
+        XCTAssertFalse(OriginalSearchShedProcess.isAcceptedIndex(0))
+        XCTAssertTrue(OriginalSearchShedProcess.isAcceptedIndex(1))
+        XCTAssertTrue(OriginalSearchShedProcess.isAcceptedIndex(70))
+        XCTAssertFalse(OriginalSearchShedProcess.isAcceptedIndex(72))
+        XCTAssertFalse(OriginalSearchShedProcess.isAcceptedIndex(73))
+
         var process = OriginalSearchShedProcess()
-        XCTAssertEqual(process.objects.count, 26)
         XCTAssertEqual(process.update(), [.fadeIn(60)])
-        XCTAssertEqual(process.phase, .arranging)
+        XCTAssertEqual(process.phase, .searching)
+        XCTAssertFalse(process.registerHit(object: 0))
+        for _ in 0..<4 { XCTAssertTrue(process.registerHit(object: 1)) }
+        XCTAssertEqual(process.hitCount, 4)
+        XCTAssertEqual(process.phase, .searching)
+        XCTAssertTrue(process.registerHit(object: 2))
+        XCTAssertEqual(process.phase, .responding)
+        XCTAssertFalse(process.registerHit(object: 3))
+        XCTAssertEqual(process.hitCount, 5)
 
-        let original = process.objects[0].position
-        process.beginDrag(object: 0, at: .init(original.x - 0.25, original.z + 0.5))
-        process.drag(to: .init(2, -4))
-        process.endDrag()
-
-        XCTAssertEqual(process.objects[0].position.x, 2.25, accuracy: 0.0001)
-        XCTAssertEqual(process.objects[0].position.y, original.y, accuracy: 0.0001)
-        XCTAssertEqual(process.objects[0].position.z, -4.5, accuracy: 0.0001)
-        XCTAssertNil(process.draggedObject)
-    }
-
-    func testTreeBoxRequiresAnUnobstructedSourceHit() {
-        var process = OriginalSearchShedProcess()
-        _ = process.update()
-
-        XCTAssertTrue(process.select(object: 8, targetIsUnobstructed: true).isEmpty)
-        XCTAssertTrue(process.select(object: 9, targetIsUnobstructed: false).isEmpty)
-        process.beginDrag(object: 9, at: .init(0, 0))
-        XCTAssertTrue(process.select(object: 9, targetIsUnobstructed: true).isEmpty)
-        process.endDrag()
-
-        XCTAssertEqual(process.select(object: 9, targetIsUnobstructed: true), [.foundTreeBox])
-        XCTAssertEqual(process.phase, .found)
-    }
-
-    func testOpeningTheFoundTreeBoxReturnsTheOnlyStoryTransitionResult() {
-        var process = OriginalSearchShedProcess()
-        _ = process.update()
-
-        XCTAssertFalse(process.canOpenFoundBox)
-        XCTAssertTrue(process.openFoundBox().isEmpty)
-        _ = process.select(object: 9, targetIsUnobstructed: true)
-        XCTAssertTrue(process.canOpenFoundBox)
-
-        XCTAssertEqual(process.openFoundBox(), [.completed(0)])
+        for _ in 0..<29 { XCTAssertTrue(process.update().isEmpty) }
+        XCTAssertEqual(process.update(), [.successReady])
+        XCTAssertTrue(process.canConfirmFoundSearch)
+        XCTAssertEqual(process.confirmFoundSearch(), [.completed(0)])
         XCTAssertEqual(process.result, 0)
-        XCTAssertFalse(process.canOpenFoundBox)
-        XCTAssertTrue(process.openFoundBox().isEmpty)
     }
 
-    func testMenuExitReturnsTheOnlyStoryTransitionResult() {
+    func testMenuExitRemainsAvailableBeforeTheSearchIsComplete() {
         var process = OriginalSearchShedProcess()
         _ = process.update()
+        XCTAssertTrue(process.canOpenMenu)
         process.openMenu()
 
         XCTAssertEqual(process.update(), [.fadeOut(60)])

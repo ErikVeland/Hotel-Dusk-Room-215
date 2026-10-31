@@ -39,8 +39,21 @@ final class OriginalChapterTenSearchShedSessionTests: XCTestCase {
         defer { play.stop() }
 
         XCTAssertEqual(play.runner.phase, .process(id: 79))
-        XCTAssertEqual(play.searchShed?.objects.count, 26)
+        XCTAssertEqual(play.searchShed?.objects.count, 90)
         XCTAssertEqual(play.searchShedImage?.width, 192)
         XCTAssertEqual(play.searchShedImage?.height, 256)
+
+        for _ in 0..<5 {
+            play.holdSearchShedTouch(x: 96, y: 128)
+            play.releaseSearchShedTouch()
+        }
+        XCTAssertEqual(play.searchShed?.hitCount, 5)
+        XCTAssertEqual(play.searchShed?.phase, .responding)
+        for _ in 0..<30 { play.advanceFrame() }
+        XCTAssertTrue(play.searchShed?.canConfirmFoundSearch == true)
+        play.openSearchShedTreeBox()
+
+        XCTAssertNil(play.searchShed)
+        XCTAssertNotEqual(play.runner.phase, .process(id: 79))
     }
 }

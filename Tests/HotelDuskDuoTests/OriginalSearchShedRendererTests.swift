@@ -40,24 +40,6 @@ final class OriginalSearchShedRendererTests: XCTestCase {
 
         XCTAssertGreaterThan(hitObjects.count, 1)
         XCTAssertTrue(hitObjects.allSatisfy(process.objects.indices.contains))
-
-        for index in process.objects.indices where index != 9 {
-            let position = process.objects[index].position
-            process.beginDrag(object: index, at: SIMD2(position.x, position.z))
-            process.drag(to: SIMD2(position.x + 100, position.z))
-            process.endDrag()
-        }
-        var targetIsSelectable = false
-        for y in stride(from: 4, to: 256, by: 8) {
-            for x in stride(from: 4, to: 192, by: 8) {
-                if OriginalSearchShedRenderer.object(
-                    at: SIMD2(Float(x), Float(y)), process: process, model: model) == 9 {
-                    targetIsSelectable = true
-                    break
-                }
-            }
-            if targetIsSelectable { break }
-        }
-        XCTAssertTrue(targetIsSelectable)
+        XCTAssertTrue(hitObjects.contains(where: OriginalSearchShedProcess.isAcceptedIndex))
     }
 }

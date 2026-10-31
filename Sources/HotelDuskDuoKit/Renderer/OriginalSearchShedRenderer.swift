@@ -10,7 +10,6 @@ import simd
 public protocol OriginalSearchShedRendering: AnyObject {
     func render(_ process: OriginalSearchShedProcess) throws -> CGImage
     func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess) -> Int?
-    func planePoint(at point: SIMD2<Float>, height: Float) -> SIMD2<Float>?
 }
 
 public typealias OriginalSearchShedRendererFactory = @MainActor () throws -> any OriginalSearchShedRendering
@@ -21,7 +20,6 @@ public typealias OriginalSearchShedRendererFactory = @MainActor () throws -> any
 @MainActor
 final class OriginalSearchShedRenderer: OriginalSearchShedRendering {
     private let model: OriginalModelMetalPreview
-    private let viewProjection: simd_float4x4
 
     init() throws {
         guard let device = MTLCreateSystemDefaultDevice() else {
@@ -31,12 +29,11 @@ final class OriginalSearchShedRenderer: OriginalSearchShedRendering {
         model = try OriginalModelMetalPreview(modelPath: "trick/searchshed/soko.mdf",
             models: .bundled(), textures: .bundled(), device: device,
             textureLoader: { name in try bitmaps.loadTexture(path: "trick/searchshed/\(name).bin") })
-        viewProjection = Self.projection
     }
 
     public func render(_ process: OriginalSearchShedProcess) throws -> CGImage {
         let instances = process.objects.map { Self.translation($0.position) * Self.scale($0.scale) }
-        return try model.render(width: 384, height: 512, viewProjection: viewProjection,
+        return try model.render(width: 384, height: 512, viewProjection: Self.projection,
                                 visibleNodes: [2], nodeInstances: [2: instances])
     }
 
@@ -70,21 +67,6 @@ final class OriginalSearchShedRenderer: OriginalSearchShedRendering {
         return closest?.object
     }
 
-    /**
-     * Maps a screen touch to the horizontal plane of the selected object.
-     */
-    public func planePoint(at point: SIMD2<Float>, height: Float) -> SIMD2<Float>? {
-        let inverse = simd_inverse(viewProjection)
-        let near = Self.unproject(point, depth: 0, inverse: inverse)
-        let far = Self.unproject(point, depth: 1, inverse: inverse)
-        let direction = far - near
-        guard direction.y.isFinite, abs(direction.y) > 0.00001 else { return nil }
-        let amount = (height - near.y) / direction.y
-        guard amount.isFinite, amount >= 0 else { return nil }
-        let hit = near + direction * amount
-        return SIMD2(hit.x, hit.z)
-    }
-
     private static func project(_ world: SIMD4<Float>) -> SIMD3<Float> {
         let clip = projection * world
         guard clip.w > 0 else { return SIMD3(repeating: .infinity) }
@@ -102,12 +84,6 @@ final class OriginalSearchShedRenderer: OriginalSearchShedRendering {
         let v = (v0.x * v2.y - v2.x * v0.y) / denominator
         guard u >= 0, v >= 0, u + v <= 1 else { return nil }
         return a.z + u * (b.z - a.z) + v * (c.z - a.z)
-    }
-
-    private static func unproject(_ point: SIMD2<Float>, depth: Float, inverse: simd_float4x4) -> SIMD3<Float> {
-        let clip = SIMD4(point.x / 96 - 1, 1 - point.y / 128, depth, 1)
-        let world = inverse * clip
-        return SIMD3(world.x, world.y, world.z) / world.w
     }
 
     private static func vertex(_ data: Data, _ index: Int) -> SIMD3<Float> {

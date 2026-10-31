@@ -2,89 +2,79 @@ import Foundation
 import simd
 
 /**
- * Owns the recovered object positions and completion rule for overlay 40.
- * Touch projection and scene drawing stay at the renderer boundary.
+ * Tracks the five valid searches in overlay 40's mode-one board.
  */
 public struct OriginalSearchShedProcess: Equatable, Sendable {
     public enum Effect: Equatable, Sendable {
         case fadeIn(Int)
         case fadeOut(Int)
-        case foundTreeBox
+        case successReady
         case completed(Int16)
+    }
+
+    public enum Phase: Equatable, Sendable {
+        case entering
+        case searching
+        case responding
+        case found
+        case exiting
+    }
+
+    public struct Object: Equatable, Sendable {
+        public let position: SIMD3<Float>
+        public let scale: SIMD3<Float>
     }
 
     public private(set) var objects: [Object]
     public private(set) var phase: Phase = .entering
     public private(set) var result: Int16?
-    private var activeDrag: Drag?
+    public private(set) var hitCount = 0
+    private var responseFrames = 0
     private var menuExitPending = false
     private var fadeOutStarted = false
 
-    public struct Object: Equatable, Sendable {
-        public var position: SIMD3<Float>
-        public let scale: SIMD3<Float>
-    }
+    public static let requiredHitCount = 5
+    private static let successDelayFrames = 30
 
-    public enum Phase: Equatable, Sendable {
-        case entering
-        case arranging
-        case found
-        case exiting
-    }
-
-    private struct Drag: Equatable, Sendable {
-        let object: Int
-        let offset: SIMD2<Float>
-    }
-
-    public init() {
-        objects = OriginalSearchShedLayout.objects.map {
+    public init(seed: UInt32 = 0x0F2B89E1) {
+        objects = OriginalBrickWallLayout.objects(seed: seed).map {
             Object(position: $0.position, scale: $0.scale)
         }
     }
 
-    public var draggedObject: Int? { activeDrag?.object }
-    public var canOpenMenu: Bool { (phase == .arranging || phase == .found) && activeDrag == nil && result == nil }
-    public var canOpenFoundBox: Bool { phase == .found && activeDrag == nil && result == nil }
-
-    /**
-     * Starts a drag after the renderer reports an original object hit.
-     */
-    public mutating func beginDrag(object: Int, at point: SIMD2<Float>) {
-        guard phase == .arranging, result == nil, objects.indices.contains(object),
-              point.x.isFinite, point.y.isFinite else { return }
-        let position = objects[object].position
-        activeDrag = Drag(object: object, offset: SIMD2(position.x, position.z) - point)
+    public var canOpenMenu: Bool {
+        (phase == .searching || phase == .responding || phase == .found) && result == nil
     }
+    public var canConfirmFoundSearch: Bool { phase == .found && result == nil }
 
     /**
-     * Moves the selected object on the horizontal plane used by the overlay.
-     */
-    public mutating func drag(to point: SIMD2<Float>) {
-        guard let activeDrag, point.x.isFinite, point.y.isFinite else { return }
-        objects[activeDrag.object].position.x = point.x + activeDrag.offset.x
-        objects[activeDrag.object].position.z = point.y + activeDrag.offset.y
-    }
-
-    public mutating func endDrag() { activeDrag = nil }
-
-    /**
-     * The original process accepts object 9 when its ray check finds no
-     * intervening object. The renderer supplies that hit-test result.
-     */
-    public mutating func select(object: Int, targetIsUnobstructed: Bool) -> [Effect] {
-        guard phase == .arranging, activeDrag == nil, result == nil, object == 9,
-              targetIsUnobstructed else { return [] }
-        phase = .found
-        return [.foundTreeBox]
-    }
-
-    /**
-     * Completes the recovered tree-box search after the player confirms it.
+     * Records a hit when the source mode accepts its board index.
      */
     @discardableResult
-    public mutating func openFoundBox() -> [Effect] {
-        guard canOpenFoundBox else { return [] }
+    public mutating func registerHit(object index: Int) -> Bool {
+        guard phase == .searching, result == nil,
+              Self.isAcceptedIndex(index), hitCount < Self.requiredHitCount else { return false }
+        hitCount += 1
+        if hitCount == Self.requiredHitCount {
+            phase = .responding
+            responseFrames = Self.successDelayFrames
+        }
+        return true
+    }
+
+    /**
+     * Returns true for an interior slot in rows zero through twelve.
+     */
+    public static func isAcceptedIndex(_ index: Int) -> Bool {
+        index >= 0 && index < 73 && (1...4).contains(index % 6)
+    }
+
+    /**
+     * Confirms the source success response and returns process result zero.
+     */
+    @discardableResult
+    public mutating func confirmFoundSearch() -> [Effect] {
+        guard canConfirmFoundSearch else { return [] }
         phase = .exiting
         result = 0
         return [.completed(0)]
@@ -97,7 +87,7 @@ public struct OriginalSearchShedProcess: Equatable, Sendable {
     }
 
     /**
-     * Advances the source fade and returns process result 0 after the menu exit.
+     * Advances the fade and success response used by the overlay.
      */
     public mutating func update(fadeComplete: Bool = false) -> [Effect] {
         guard result == nil else { return [] }
@@ -113,10 +103,16 @@ public struct OriginalSearchShedProcess: Equatable, Sendable {
             return []
         }
         if phase == .entering {
-            phase = .arranging
+            phase = .searching
             return [.fadeIn(60)]
+        }
+        if phase == .responding {
+            responseFrames -= 1
+            if responseFrames <= 0 {
+                phase = .found
+                return [.successReady]
+            }
         }
         return []
     }
-
 }
