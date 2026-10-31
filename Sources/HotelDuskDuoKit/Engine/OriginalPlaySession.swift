@@ -35,15 +35,11 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var notebookImage: CGImage?
     @Published public private(set) var nativeNotebookPages: [String: Data] = [:]
     private var notebookTouch: SIMD2<Int>?
-<<<<<<< Updated upstream
     @Published public private(set) var runner: OriginalEventRunner {
         didSet { reportRecoverableStopIfNeeded() }
     }
-=======
-    @Published public private(set) var runner: OriginalEventRunner
     @Published private(set) var encounterPortraits: [OriginalEncounterAnimations.Portrait] = []
     private var encounterAnimations: OriginalEncounterAnimations?
->>>>>>> Stashed changes
     @Published public private(set) var entrance: EntranceScene?
     @Published public private(set) var bell: BellScene?
 
@@ -237,7 +233,6 @@ public final class OriginalPlaySession: ObservableObject {
     private var shownItemParent: OriginalEventRunner?
     /// The conversation that a notebook memo response interrupts.
     private var memoParent: OriginalEventRunner?
-    private var shownItemParent: OriginalEventRunner?
     private var pendingCloseup: (area: UInt16, subarea: UInt16, view: UInt16)?
     private var pendingChildCloseup: (view: UInt16, requestStart: Int)?
     private var closeupParents: [(scene: OriginalSearchCloseup, bitmaps: [OriginalLinearBitmap])] = []
