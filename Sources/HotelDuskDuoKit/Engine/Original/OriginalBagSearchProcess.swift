@@ -2,7 +2,8 @@ import Foundation
 import simd
 
 /**
- * Tracks the 20 drag objects and found state from overlay 3.
+ * Provisional tree-box model. Factory process 55 loads overlay 30, so this
+ * 20-object drag model does not match the recovered original interaction.
  */
 public struct OriginalBagSearchProcess: Equatable, Sendable {
     public enum Effect: Equatable, Sendable {

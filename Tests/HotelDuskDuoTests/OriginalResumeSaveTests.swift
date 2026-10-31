@@ -4,12 +4,25 @@ import CoreGraphics
 
 @MainActor
 final class OriginalResumeSaveTests: XCTestCase {
+    private final class RenderFailure {
+        var shouldFailNextRender = false
+    }
+
     private final class MapRenderer: OriginalMapRendering {
         let map: CGImage
-        init(_ name: String) throws {
+        private let renderFailure: RenderFailure?
+
+        init(_ name: String, renderFailure: RenderFailure? = nil) throws {
+            self.renderFailure = renderFailure
             map = try XCTUnwrap(OriginalBitmapLibrary.bundled().loadMap(path: "map/fmapscr/\(name).bin").makeCGImage())
         }
-        func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage { map }
+        func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage {
+            if renderFailure?.shouldFailNextRender == true {
+                renderFailure?.shouldFailNextRender = false
+                throw OriginalDataError.invalid("Injected map render failure")
+            }
+            return map
+        }
     }
     private final class Store: OriginalResumeSaveStore {
         var checkpoint: OriginalResumeSave?
@@ -197,6 +210,32 @@ final class OriginalResumeSaveTests: XCTestCase {
         }
 
         XCTFail("Automatic recovery did not resume the opening route")
+    }
+
+    func testRunnerHaltDuringMapRenderRestoresLastSafePlaceAutomatically() throws {
+        let safePlaceStore = Store()
+        let failure = RenderFailure()
+        let audio = AudioController(musicOutputFactory: { _, _, _ in ProgressMusicOutput() })
+        audio.isMuted = true
+        let game = GameSession(audioController: audio, saveStore: ChapterStore(), resumeStore: Store(),
+            safePlaceStore: safePlaceStore, mapRendererFactory: { name, _ in
+                try MapRenderer(name, renderFailure: failure)
+            })
+        defer { game.endOriginalGame() }
+
+        let original = try enterLobby(game)
+        let safePosition = original.lobby?.position
+        XCTAssertNotNil(safePlaceStore.checkpoint)
+        failure.shouldFailNextRender = true
+        original.holdLobbyTouch(x: 140, y: 80)
+
+        original.advanceFrame()
+
+        let restored = try XCTUnwrap(game.play)
+        XCTAssertFalse(restored === original)
+        XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
+        XCTAssertEqual(restored.lobby?.position, safePosition)
+        XCTAssertTrue(game.recoveryNotice?.contains("last safe place") == true)
     }
 
     func testPausedPlayerCanReturnToLastSafePlaceFromAnActiveInteraction() throws {

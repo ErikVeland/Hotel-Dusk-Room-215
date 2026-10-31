@@ -41,7 +41,7 @@ def snapshot(path):
     def signed16(offset):
         return struct.unpack_from("<h", data, base + offset)[0]
 
-    return {
+    state = {
         "processPresent": True,
         "processBase": hex(base + 0x02000000),
         "variant": signed16(0x2A8),
@@ -61,6 +61,10 @@ def snapshot(path):
         "interactionGateMode": data[0x10BDA5],
         "sourceCounter4E4": signed16(0x4E4),
     }
+    if signed16(0x2A8) == 0:
+        state["spoolCounter195E"] = signed16(0x195E)
+        state["spoolScale4E0"] = struct.unpack_from("<f", data, base + 0x4E0)[0]
+    return state
 
 
 def capture_variant(process_id, name):
@@ -231,6 +235,8 @@ def capture_matched_variant45_path():
     commands.append("capture x-edge")
     for y in range(129, 99, -1):
         commands.extend([f"touch 135 {y}", "frames 1"])
+        if y in (124, 119, 114, 109, 104, 100):
+            commands.append(f"capture raw-y-{y}")
     commands.extend([
         "capture y-edge",
         "frames 65",
@@ -242,7 +248,8 @@ def capture_matched_variant45_path():
         "capture after-idle",
     ])
     directory = run("component-cassette-45-matched-rewind-path", commands)
-    states = ("ready", "start", "x-edge", "y-edge", "held-65", "released", "after-idle")
+    states = ("ready", "start", "x-edge", *(f"raw-y-{y}" for y in
+              (124, 119, 114, 109, 104, 100)), "y-edge", "held-65", "released", "after-idle")
     result = {
         "processID": 45,
         "variant": 0,
