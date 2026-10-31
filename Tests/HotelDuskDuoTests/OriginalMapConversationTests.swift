@@ -5,8 +5,14 @@ final class OriginalMapConversationTests: XCTestCase {
     /**
      * Diagnostic story setup. Embedded processes return success in this state-only check.
      */
-    private func afterRegistration() throws -> OriginalEventRunner {
-        var runner = try OriginalEventRunner.chapterOneArrival(catalog: .bundled(), defaults: .bundled())
+    private func afterRegistration(holding items: [UInt8] = []) throws -> OriginalEventRunner {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: nil)
+        for item in items { try game.apply(.addInventory(id: UInt16(item))) }
+        game.setMap(2, previous: 1)
+        let program = try catalog.loadProgram("EP1_R102")
+        let keywords = try OriginalKeywordTable(decoded: catalog.decodedFile("EP1_.ttk"))
+        var runner = try OriginalEventRunner(program: program, game: game, keywords: keywords)
         for _ in 0..<600 {
             switch runner.phase {
             case .dialogue, .itemNotice: runner.acknowledgeDialogue()
@@ -22,6 +28,18 @@ final class OriginalMapConversationTests: XCTestCase {
         }
         XCTFail("Registration did not reach its question menu")
         return runner
+    }
+
+    private func advanceToExploration(_ runner: inout OriginalEventRunner) {
+        for _ in 0..<300 {
+            switch runner.phase {
+            case .dialogue, .itemNotice: runner.acknowledgeDialogue()
+            case .waiting: runner.advanceWait()
+            case .exploration: return
+            default: XCTFail("Shared response stopped at \(runner.phase)"); return
+            }
+        }
+        XCTFail("Shared response did not return to exploration")
     }
 
     func testMapConversationResumesSavedPersonBlock() throws {
@@ -60,6 +78,55 @@ final class OriginalMapConversationTests: XCTestCase {
         game.rememberConversationBlock(scene: 0xFFFE, block: 7)
         XCTAssertEqual(game.conversationBlock(map: 2, person: 0), 7)
         XCTAssertEqual(game.conversationBlock(map: 2, person: 2), 6)
+    }
+
+    func testOwnedUnrelatedItemUsesSystemResponseAndReturnsToDunningMenu() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var runner = try afterRegistration(holding: [0])
+        guard case .questions = runner.phase else { return XCTFail("Expected Dunning's question menu") }
+        XCTAssertTrue(try runner.game.inventory.items.contains(0))
+
+        let response = try XCTUnwrap(runner.showItem(0, catalog: catalog))
+        XCTAssertEqual(response.program.name, "System")
+        XCTAssertEqual(response.eventIndex, 32)
+        var sharedResponse = response
+        advanceToExploration(&sharedResponse)
+        XCTAssertEqual(sharedResponse.phase, .exploration(mapID: 2))
+
+        runner.resumeConversation(after: sharedResponse)
+        guard case .questions = runner.phase else {
+            return XCTFail("The shared item response must return to Dunning's question menu")
+        }
+        XCTAssertEqual(runner.game.bytes, sharedResponse.game.bytes)
+    }
+
+    @MainActor
+    func testPlaySessionShowsSystemResponseAndRestoresConversationMenu() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let runner = try afterRegistration(holding: [0])
+        let audio = AudioController()
+        try audio.applyOriginalCommand(.disableMusic(true))
+        try audio.applyOriginalCommand(.disableNewEffects(true))
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
+        defer { play.stop() }
+
+        play.showItemInConversation(0)
+        XCTAssertEqual(play.runner.program.name, "System")
+        XCTAssertEqual(play.runner.eventIndex, 32)
+        for _ in 0..<300 {
+            switch play.runner.phase {
+            case .dialogue, .itemNotice: play.advanceDialogue()
+            case .waiting: play.advanceFrame()
+            case .exploration: play.advanceFrame()
+            default: XCTFail("Shared response stopped at \(play.runner.phase)"); return
+            }
+            if case .questions = play.runner.phase { break }
+        }
+
+        XCTAssertEqual(play.runner.program.name, "EP1_R102")
+        guard case .questions = play.runner.phase else {
+            return XCTFail("The player must return to Dunning's question menu")
+        }
     }
 
     func testNearbyPersonUsesOriginalPlacementDistanceAndFacing() throws {

@@ -907,9 +907,10 @@ public struct OriginalEventRunner: Sendable {
     /**
      * 0x02045724 selects a shown-item response before returning from the inventory menu.
      */
-    public mutating func showItem(_ item: UInt8) {
+    @discardableResult
+    public mutating func showItem(_ item: UInt8, catalog: OriginalScriptCatalog? = nil) -> Self? {
         guard case .questions = phase, let partner,
-              (try? game.inventory.items.contains(item)) == true else { return }
+              (try? game.inventory.items.contains(item)) == true else { return nil }
         var evaluating = session
         let state = game, checks = conditions
         do {
@@ -928,9 +929,52 @@ public struct OriginalEventRunner: Sendable {
                 interrupt = Interrupt()
                 selectNext()
             case .unresolved: enter(outcome)
-            case .noMatch: halt("The shared response for showing this item is not recovered")
+            case .noMatch:
+                guard scope == .normal, let catalog,
+                      var response = try sharedShownItemResponse(item, catalog: catalog) else {
+                    halt("The shared response for showing this item is not recovered")
+                    return nil
+                }
+                response.game.markItemShown(item, person: partner)
+                return response
             }
         } catch { halt("The shown-item response could not be selected: \(error)") }
+        return nil
+    }
+
+    /**
+     * Runs the matching System response when the active chapter has no item row.
+     */
+    private mutating func sharedShownItemResponse(_ item: UInt8, catalog: OriginalScriptCatalog) throws -> Self? {
+        guard let partner else { return nil }
+        let sharedProgram = try catalog.loadProgram("System")
+        let graph = try sharedProgram.blocks
+        var evaluating = session
+        let state = game, checks = try sharedProgram.conditions
+        let outcome = try OriginalShownItemSelector.select(graph: graph,
+            person: UInt16(bitPattern: partner), item: item, nowTime: game.nowTime, scope: .system) {
+                try evaluating.evaluate($0, conditions: checks, game: state)
+            }
+        guard case .selected(let selected) = outcome else { return nil }
+
+        let block = graph.tables[1][selected.blockIndex]
+        let event = graph.tables[2][selected.eventIndex]
+        let blockReader = OriginalBytes(block.raw), eventReader = OriginalBytes(event.raw)
+        var response = try Self(program: sharedProgram, game: game, keywords: keywords,
+                                scope: .system, deferArrival: true)
+        response.session = evaluating
+        response.session.selection.sceneID = UInt16(bitPattern: partner)
+        response.session.selection.blockID = try blockReader.u16(0)
+        response.session.selection.modeID = try eventReader.u16(0)
+        response.session.selection.eventID = try eventReader.u16(2)
+        response.session.selection.areaID = .max
+        response.session.selection.subareaID = .max
+        response.session.selection.checkItemID = Int16(item)
+        response.session.operationIndex = 0
+        response.session.eventCommitted = true
+        response.partner = partner
+        response.begin(eventIndex: selected.eventIndex)
+        return response
     }
 
     /// State 0x6F with no keyword (+0x68 = -1): the partner's mode-4 event in
