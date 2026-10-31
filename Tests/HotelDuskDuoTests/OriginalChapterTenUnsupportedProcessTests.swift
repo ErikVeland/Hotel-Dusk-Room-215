@@ -19,7 +19,6 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
 
         func render(_ process: OriginalSearchShedProcess) throws -> CGImage { image }
         func object(at point: SIMD2<Float>, process: OriginalSearchShedProcess) -> Int? { 9 }
-        func planePoint(at point: SIMD2<Float>, height: Float) -> SIMD2<Float>? { nil }
     }
 
     func testR304BrickProcessHasThreeSourceReturnBranches() throws {
@@ -104,7 +103,7 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         }
     }
 
-    func testProcess79SearchShedCompletesThroughItsSourceEventWithoutMetal() throws {
+    func testProcess79SearchShedCompletesAfterFiveValidHitsWithoutMetal() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let program = try catalog.loadProgram("EP10_R304")
         let event = try XCTUnwrap(program.blocks.tables[2].first {
@@ -129,7 +128,12 @@ final class OriginalChapterTenUnsupportedProcessTests: XCTestCase {
         XCTAssertEqual(play.runner.phase, .process(id: 79))
         XCTAssertNotNil(play.searchShed)
         play.advanceFrame()
-        play.holdSearchShedTouch(x: 96, y: 128)
+        for _ in 0..<5 {
+            play.holdSearchShedTouch(x: 96, y: 128)
+            play.releaseSearchShedTouch()
+        }
+        XCTAssertEqual(play.searchShed?.phase, .responding)
+        for _ in 0..<30 { play.advanceFrame() }
         XCTAssertEqual(play.searchShed?.phase, .found)
         play.openSearchShedTreeBox()
         XCTAssertNil(play.searchShed)
