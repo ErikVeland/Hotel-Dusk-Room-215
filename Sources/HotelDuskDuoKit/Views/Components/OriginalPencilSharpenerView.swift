@@ -15,13 +15,25 @@ struct OriginalPencilSharpenerView: View {
                     .resizable()
                     .interpolation(.none)
                     .frame(width: input.size.width, height: input.size.height)
-                    .onPageTap { location in
-                        guard let point = input.point(location) else { return }
-                        play.tapPencilSharpener(pageX: Int(point.x), pageY: Int(point.y))
-                    }
+                    .contentShape(Rectangle())
+                    .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                        .onChanged { value in
+                            guard let point = input.point(value.location) else { return }
+                            play.holdPencilSharpenerTouch(pageX: Int(point.x.rounded()),
+                                                          pageY: Int(point.y.rounded()))
+                        }
+                        .onEnded { value in
+                            play.releasePencilSharpenerTouch()
+                            guard OriginalPageInput.isTap(from: value.startLocation,
+                                                          to: value.location),
+                                  let point = input.point(value.startLocation) else { return }
+                            play.tapPencilSharpener(pageX: Int(point.x.rounded()),
+                                                    pageY: Int(point.y.rounded()))
+                        })
                     .notebookPhotograph()
                     .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
             }
         }
+        .onDisappear { play.releasePencilSharpenerTouch() }
     }
 }

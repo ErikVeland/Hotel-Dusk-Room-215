@@ -1,6 +1,6 @@
 # Chapter 3 progress
 
-The main native route now finishes Chapter 2 and starts Chapter 3. The full ten-chapter game remains unfinished.
+The fresh-game normal-input test chain starts at Chapter 1 arrival, reaches the Chapter 3 checkpoints, and continues through the Chapter 10 ending. Focused route tests restore instant-save checkpoints between sections, so this confirms the connected route rather than one uninterrupted app session.
 
 ## Checked story path
 
@@ -25,7 +25,7 @@ The catalog enables 37 rooms with original collision data and floor plans. Every
 
 ## Remaining work
 
-Native handlers now cover the full, reverse and restored jigsaws (39, 40, 84), electrical panel (41), fountain pen (42), bookmark box (47) and four-pin door lock (77). Input and source-event tests cover these additions. Continuation replays reach the rooftop route, and the checked main route now completes Chapters 1–4. Chapter 5 has normal-input route tests in source, but this checkout has no generated Chapter 4 save to run them. Chapters 6–10 still need route implementation and checks. Alternate branches, failure paths, endings, original character presentation and physical Duo testing also remain incomplete.
+Native handlers cover the full, reverse and restored jigsaws (39, 40, 84), electrical panel (41), fountain pen (42), bookmark box (47) and four-pin door lock (77). Input and source-event tests cover these additions. The fresh-game checkpoint chain now reaches the Chapter 10 ending. Alternate branches, failure paths, game-over retries, original character presentation, original-device fidelity and physical Duo testing remain incomplete. See the [route tracing workbench](route-tracing-workbench.md) for remaining fidelity checks.
 
 The author walkthrough identifies the route and dependencies: [neeker's walkthrough](https://gamefaqs.gamespot.com/ds/933043-hotel-dusk-room-215/faqs/46777). Recovered game scripts and native source determine state changes. New continuation checks establish native playability, not a complete byte-for-byte comparison with a matching original run.
 

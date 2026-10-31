@@ -4,7 +4,7 @@ Hotel Dusk: Room 215 is an unfinished native Swift and SwiftUI port for a two-pa
 
 The app reads recovered game data and runs Swift implementations of recovered behaviour. It does not execute Nintendo DS ARM code or embed an emulator. The separate reference runner executes the ROM for comparison.
 
-This document describes the working tree on 18 October 2026. The macOS debug app builds. The checked new-game route reaches Chapter 2 office search, crowbar lifting, cabinet unlocking, red-box acquisition and the following Louie and Rosa conversations. Complete game fidelity remains unverified.
+This document describes the working tree on 31 October 2026. The macOS debug app builds. A fresh-game native-input test chain now reaches the Chapter 10 ending through instant-save checkpoints, with focused tests restoring checkpoints between route sections. This verifies the connected route, not one uninterrupted app session. Original-device fidelity remains open for selected interactions and audio. See the [route tracing workbench](docs/route-tracing-workbench.md) for current evidence.
 
 The map controller uses the recovered trigonometric lookup and rounded fixed-point product for walking steps. Original frame captures cover the diagonal approach to Louie and character collision. The existing event runner handles the Nile and Rosa branches through ordinary choices, interrupts and questions. See [Nile route and movement evidence](docs/chapter-two-louie-office.md).
 

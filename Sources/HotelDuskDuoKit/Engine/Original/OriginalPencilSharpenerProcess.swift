@@ -12,9 +12,17 @@ public struct OriginalPencilSharpenerProcess: Equatable, Sendable {
 
     public static let exitAnimationFrames = 60
     private static let exitMask = CGRect(x: 3, y: 3, width: 33, height: 25)
+    private static let pencilAxisMinimum = 38.0
+    private static let pencilAxisMaximum = 130.0
+    private static let pencilHalfWidth = 26.0
+    private static let powderProgressRequired = 500.0
 
     public private(set) var phase: Phase = .sharpening
+    public private(set) var powderProgress = 0.0
     private var remainingExitFrames = 0
+    private var touchIsHeld = false
+    private var previousTouch: SIMD2<Double>?
+    private var processReturnValue: Int16?
 
     public init() {}
 
@@ -32,9 +40,46 @@ public struct OriginalPencilSharpenerProcess: Equatable, Sendable {
     @discardableResult
     public mutating func tap(pageX: Int, pageY: Int) -> Bool {
         guard phase == .sharpening, Self.containsExitMask(pageX: pageX, pageY: pageY) else { return false }
+        releaseTouch()
         phase = .exitAnimation
         remainingExitFrames = Self.exitAnimationFrames
+        processReturnValue = 2
         return true
+    }
+
+    /**
+     * Holds the pencil and records movement across its lead.
+     */
+    public mutating func holdTouch(pageX: Int, pageY: Int) {
+        guard phase == .sharpening,
+              (0..<192).contains(pageX), (0..<256).contains(pageY) else { return }
+        let point = SIMD2(Double(pageX), Double(pageY))
+        guard touchIsHeld else {
+            guard Self.containsPencilMask(pageX: pageX, pageY: pageY) else { return }
+            touchIsHeld = true
+            previousTouch = point
+            return
+        }
+        if let previousTouch {
+            let delta = point - previousTouch
+            powderProgress += abs(delta.x - delta.y) / sqrt(2)
+            if powderProgress >= Self.powderProgressRequired {
+                powderProgress = Self.powderProgressRequired
+                phase = .complete
+                processReturnValue = 0
+                self.previousTouch = point
+                return
+            }
+        }
+        previousTouch = point
+    }
+
+    /**
+     * Releases the held pencil.
+     */
+    public mutating func releaseTouch() {
+        touchIsHeld = false
+        previousTouch = nil
     }
 
     /**
@@ -46,7 +91,18 @@ public struct OriginalPencilSharpenerProcess: Equatable, Sendable {
         if remainingExitFrames == 0 { phase = .complete }
     }
 
-    public var returnedProcessValue: Int16? { phase == .complete ? 2 : nil }
+    public var returnedProcessValue: Int16? { processReturnValue }
+
+    /**
+     * Tests the diagonal pencil mask measured from the source hit region.
+     */
+    public static func containsPencilMask(pageX: Int, pageY: Int) -> Bool {
+        guard (0..<192).contains(pageX), (0..<256).contains(pageY) else { return false }
+        let axisPosition = (Double(pageX) + Double(pageY) + 1) / 2
+        let distanceFromAxis = abs(Double(pageY - pageX + 1)) / sqrt(2)
+        return (pencilAxisMinimum...pencilAxisMaximum).contains(axisPosition)
+            && distanceFromAxis <= pencilHalfWidth
+    }
 
     /**
      * Tests the rounded icon mask from the rotated 192×256 scene capture.

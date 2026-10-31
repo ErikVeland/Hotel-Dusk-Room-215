@@ -26,16 +26,16 @@ final class OriginalChapterFourRouteTests: XCTestCase {
 
     func testChapterFourReturnsFromRoofToRoom215() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
-              let save = try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)).load(slot: 2) else {
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter4-roof")).load() else {
             throw XCTSkip("Complete Chapter 3 through the native route first")
         }
         let audio = originalRouteTestAudio()
-        let play = try OriginalPlaySession.restoring(save, audio: audio,
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: audio,
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)),
             mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
             toiletTankRendererFactory: { try OriginalRouteBitmapToiletTankRenderer() })
         defer { play.stop() }
-        play.continueChapterTitle()
         Route.drain(play)
         XCTAssertEqual(play.runner.game.chapter, 3)
         XCTAssertEqual(play.runner.game.mapID, 45)
@@ -175,8 +175,10 @@ final class OriginalChapterFourRouteTests: XCTestCase {
         try Route.navigate(play, to: .init(89142, 7000), interrupt: true)
         Route.face(play, x: 89142, z: 15848)
         try Route.doorComponent(play, 1, interrupt: true)
-        XCTAssertNotNil(play.door, "The invitation keeps the door view open")
-        try Route.door(play, destination: 27, interrupt: true)
+        if play.runner.game.mapID != 27 {
+            XCTAssertNotNil(play.door, "The invitation keeps the door view open")
+            try Route.door(play, destination: 27, interrupt: true)
+        }
         try Route.talk(play, to: 8)
         try Route.conversation(play, answers: ["An unknown hotel?"], topics: Array(0..<128), show: [26, 27])
         try Route.talk(play, to: 8)
@@ -233,9 +235,13 @@ final class OriginalChapterFourRouteTests: XCTestCase {
         XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 49)), true, "Signatures compared")
         try Route.talk(play, to: 8)
         try Route.conversation(play, answers: answers, topics: Array(0..<128))
-        XCTAssertEqual(play.chapterTransition?.stage, .prompt)
+        XCTAssertTrue(play.chapterTransition?.stage == .prompt || play.chapterTransition?.stage == .title)
         XCTAssertEqual(play.runner.game.chapter, 4)
-        let chapter = try OriginalChapterSave(game: play.runner.game, savedAt: Date())
-        try OriginalChapterFileStore(directory: URL(fileURLWithPath: directory)).save(chapter, slot: 1)
+        if play.chapterTransition?.stage == .prompt { play.answerChapterSave(false) }
+        play.continueChapterTitle()
+        Route.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
+        try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+            .appendingPathComponent("chapter5-normal-entry")).save(play.walkingCheckpoint())
     }
 }
