@@ -2822,6 +2822,20 @@ public final class OriginalPlaySession: ObservableObject {
         onRecoverableStop?(activeHalt)
     }
 
+    /**
+     * Returns to the last safe place if an active process loses its native state.
+     */
+    private func haltMissingProcessState() {
+        let interaction: String
+        if case .process(let processID) = runner.phase {
+            interaction = "Process \(processID)"
+        } else {
+            interaction = "The active interaction"
+        }
+        stopTimer()
+        runner.halt("\(interaction) lost its native state")
+    }
+
     /// Resolve original music and sound controls through the recovered tables.
     private func applyAudioControls(_ packet: OriginalDialoguePacket) {
         audio.applyDialogueAudio(packet)
@@ -2957,7 +2971,7 @@ public final class OriginalPlaySession: ObservableObject {
             applyJigsawEffects(jigsaw?.update(screen0FadeComplete: complete) ?? [])
             return
         }
-        guard var current = process else { return stopTimer() }
+        guard var current = process else { return haltMissingProcessState() }
         let input = OriginalEntranceProcess.Input(newTouch: pendingTouch, leftHanded: false,
             page0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
         pendingTouch = nil
@@ -3034,7 +3048,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateBowling() {
-        guard var match = bowlingMatch, let renderer = bowlingRenderer else { return stopTimer() }
+        guard var match = bowlingMatch, let renderer = bowlingRenderer else { return haltMissingProcessState() }
         if let requestID = match.nextCommentaryRequest {
             do {
                 let response = try runner.processHint(catalog: catalog, pairA: 21, pairB: requestID)
@@ -3091,7 +3105,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updatePencilSharpener() {
-        guard var current = pencilSharpener else { return stopTimer() }
+        guard var current = pencilSharpener else { return haltMissingProcessState() }
         current.updateOneFrame()
         pencilSharpener = current
         guard let returnValue = current.returnedProcessValue else { return }
@@ -3103,7 +3117,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateVendingMachine() {
-        guard var process = vendingMachine else { return stopTimer() }
+        guard var process = vendingMachine else { return haltMissingProcessState() }
         if let sound = process.update() {
             try? audio.playOriginalEffect(archiveID: 52, entryID: sound)
         }
@@ -3118,7 +3132,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateNumberSeal() {
-        guard var process = numberSeal else { return stopTimer() }
+        guard var process = numberSeal else { return haltMissingProcessState() }
         let previous = process.phase
         process.update(touch: numberSealTouch)
         numberSealTouch = nil
@@ -3135,7 +3149,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func updateCodeNotice() {
-        guard var process = codeNotice else { return stopTimer() }
+        guard var process = codeNotice else { return haltMissingProcessState() }
         let controlFinished = process.phase == .waitingForExitControl
         let effects = process.update(pageTouch: pendingCodeNoticeTouch,
                                      exitControlFinished: controlFinished)

@@ -25,6 +25,8 @@ Each page has 6,144 packed bytes and 49,152 expanded pixels. Writable pages star
 
 `OriginalBitmapLibrary.loadNotebookData` checks the existing manifest hash and decodes the CiNG container. These assets have no palette-bitmap header. `OriginalNotebookImage` converts their tile order to upright page pixels.
 
+Overlay 38's constructor reads the 16-bit apple mask from the game substructure at `0x13D8`; its completion path merges the found letter and its destructor writes the mask back to the same offset. The notebook renderer reads that mask to reveal the apple overview regions and detail pages. The five notebook pages and apple-painting progress therefore share one source field. The generic Mila memo flags at `0x13D0` are separate.
+
 The session samples held ink at its existing original update rate. Pause releases the touch. Opening the notebook clears held walking input. Closing restores the retained parent phase. Writable ink survives notebook close and reopen within the running session.
 
 ## Original comparisons

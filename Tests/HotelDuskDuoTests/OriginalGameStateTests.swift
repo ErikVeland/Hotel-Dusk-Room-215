@@ -52,12 +52,16 @@ final class OriginalGameStateTests: XCTestCase {
     }
 
     func testApplePaintingFlagsUseOverlay38SavedOffset() throws {
-        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        var bytes = [UInt8](repeating: 0, count: OriginalGameState.byteCount)
+        bytes[0x13D9] = 0xA0
+        var game = try OriginalGameState(snapshot: Data(bytes))
         XCTAssertEqual(game.applePaintingFoundMask, 0)
 
         game.applePaintingFoundMask = 0xFFFF
         XCTAssertEqual(game.applePaintingFoundMask, 0x1F)
-        XCTAssertEqual(Array(game.bytes[0xD8..<0xDA]), [0x1F, 0])
+        XCTAssertEqual(Array(game.bytes[0x13D8..<0x13DA]), [0x1F, 0xA0])
+        XCTAssertEqual(Array(game.bytes[0xD8..<0xDA]), [0, 0])
+        XCTAssertEqual(game.appleNotebookPageMask, 0x1F)
         XCTAssertEqual(try OriginalGameState(snapshot: game.snapshot).applePaintingFoundMask, 0x1F)
     }
 

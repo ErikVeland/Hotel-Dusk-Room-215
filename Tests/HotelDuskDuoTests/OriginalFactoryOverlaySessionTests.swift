@@ -82,8 +82,8 @@ final class OriginalFactoryOverlaySessionTests: XCTestCase {
         let catalog = try OriginalScriptCatalog.bundled()
         let calls: [(program: String, offset: Int, mapID: Int16,
                      touch: SIMD2<Int>, successEventID: UInt16)] = [
-            ("EP9_R117", 84, 11, SIMD2(82, 157), 4),
-            ("EP9_R125", 104, 39, SIMD2(67, 163), 4),
+            ("EP9_R117", 84, 11, SIMD2(82, 157), 2),
+            ("EP9_R125", 104, 39, SIMD2(67, 163), 3),
             ("EP9_R205", 248, 17, SIMD2(119, 151), 5),
             ("EP9_R207", 84, 33, SIMD2(109, 113), 4),
             ("EP9_R213", 84, 31, SIMD2(118, 113), 4)
@@ -108,6 +108,7 @@ final class OriginalFactoryOverlaySessionTests: XCTestCase {
             play.acknowledgeApplePaintingLetter()
             game = play.runner.game
             XCTAssertEqual(game.applePaintingFoundMask, UInt16((1 << (index + 1)) - 1))
+            XCTAssertEqual(game.appleNotebookPageMask, game.applePaintingFoundMask)
             XCTAssertEqual(play.runner.session.selection.eventID, call.successEventID)
             XCTAssertNotEqual(play.runner.phase, .process(id: 64))
             if case .halted(let halt) = play.runner.phase {

@@ -41,7 +41,8 @@ public enum OriginalAlphabetProcessContext {
         -> Int? {
         guard mode(for: invocation) == .paintingSearch else { return nil }
         // R125 is the Room 111 back room, which supplies the remaining J slot.
-        if invocation.programName == "EP9_R125" && invocation.eventSourceOffset == 104 {
+        if invocation.programName == "EP9_R125" && invocation.eventSourceOffset == 104
+            && invocation.selection.mapID == 25 {
             return 0
         }
         return OriginalApplePaintingSearch.paintingMapIDs.firstIndex(of: invocation.selection.mapID)

@@ -1,6 +1,6 @@
 # Chapter 2 thick-wire suitcase lock
 
-The native overlay-12 controller now supports process 33, the thick-wire variant. It inserts the wire, latches all three pins, turns the lock and opens the suitcase. The original script then starts process 35 for the suitcase contents. That process remains unrecovered. Cash collection and client-list storage are not yet playable.
+The native overlay-12 controller supports process 33, the thick-wire variant. It inserts the wire, latches all three pins, turns the lock and opens the suitcase. Process 35 now runs the suitcase contents interaction, including object movement and cash collection. The client list can then be stored through the existing item-use script. See [Suitcase contents recovery](chapter-two-suitcase-contents.md).
 
 ## Route evidence
 
@@ -57,7 +57,7 @@ Process 35 uses overlay 24, selected by factory overlay index 23. Its object pos
 
 The Chapter 2 route and five focused controller checks passed without failures or skips. A subsequent 11-check run passed the new-game route, thin-wire regressions and shared Metal rendering. The final 13-check run passed both wire controllers, wire visibility and hanger rendering, including the exact sampled wall colours. `git diff --check` passed.
 
-The opening and insertion images were visually inspected. At that verification run, the route checks expected a halt at process 35. The newer contents route removes that halt. They establish suitcase unlocking and the correct next process, not playable suitcase contents or full-game completion.
+The opening and insertion images were visually inspected. The earlier route checks stopped at process 35. The current contents route removes that stop and covers cash collection and client-list storage. Original presentation and device-input comparisons remain open; this route does not establish full-game completion.
 
 ```sh
 SNAPSHOT_DIR=/tmp/hotel-thick-wire-final DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test --filter 'OriginalThinWireProcessTests|OriginalThickWireProcessTests|OriginalModelMetalTests|LayoutSnapshotTests.testRenderRequiredDunningQuestionsAndDeliveryKnock'
