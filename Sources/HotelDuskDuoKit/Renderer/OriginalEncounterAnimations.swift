@@ -55,6 +55,10 @@ struct OriginalEncounterAnimationCatalog {
         return id
     }
 
+    func poses(person: Int) -> [Int] {
+        (expressions[person]?.keys.sorted() ?? []).filter { (try? animationID(person: person, pose: $0)) != nil }
+    }
+
     func initialPose(person: Int) throws -> Int {
         if (try? animationID(person: person, pose: 2)) != nil { return 2 }
         guard let pose = expressions[person]?.keys.sorted().first(where: {
@@ -79,8 +83,12 @@ final class OriginalEncounterAnimations {
         let pose: Int
         var decoder: OriginalAnimationDecoder
         var frame: OriginalAnimationFrame
+        /// First frame, held when a one-shot clip clears the figure.
+        let staticFrame: OriginalAnimationFrame
         let contour: OriginalAnimationContour
         var updates = 0
+        /// Set when a one-shot clip (a collapse or exit) clears the figure.
+        var holdsStaticFrame = false
     }
 
     private final class CachedClip: NSObject {
@@ -92,6 +100,7 @@ final class OriginalEncounterAnimations {
     private let library: OriginalAnimationLibrary
     private let clips = NSCache<NSString, CachedClip>()
     private var players: [UInt8: Player] = [:]
+    private var contours: [Int: OriginalAnimationContour] = [:]
     private var lastProgram: String?
     private var lastPacketOffset: Int?
     private let updatesPerFrame = 6
@@ -117,7 +126,13 @@ final class OriginalEncounterAnimations {
             let person = Int(presentation.person)
             if person == -1 || person == -3 { continue }
             guard (1...17).contains(person) else {
-                players.removeValue(forKey: screen)
+                // Written pages keep the wrap around the departed figure, so
+                // its static portrait stays instead of a blank outline.
+                if var player = players[screen] {
+                    player.frame = player.staticFrame
+                    player.holdsStaticFrame = true
+                    players[screen] = player
+                }
                 continue
             }
             var pose = Int(presentation.pose)
@@ -136,28 +151,57 @@ final class OriginalEncounterAnimations {
             var decoder = OriginalAnimationDecoder(clip: clip)
             guard let frame = try decoder.advance() else { throw OriginalAnimationError.invalid("Empty character animation") }
             players[screen] = Player(person: person, pose: pose, decoder: decoder, frame: frame,
-                contour: OriginalAnimationContour(frame: frame))
+                staticFrame: frame, contour: try contour(person: person))
         }
         lastProgram = program
         lastPacketOffset = packet.sourceOffset
+    }
+
+    /// One outline per character covers every expression and frame, so a
+    /// change of pose leaves the wrapped text where it is.
+    private func contour(person: Int) throws -> OriginalAnimationContour {
+        if let contour = contours[person] { return contour }
+        var extents = OriginalAnimationContour.Extents()
+        for pose in expressions.poses(person: person) {
+            let id = try expressions.animationID(person: person, pose: pose)
+            let clip = try clips.object(forKey: id as NSString)?.clip ?? library.load(id: id)
+            var decoder = OriginalAnimationDecoder(clip: clip)
+            while let frame = try decoder.advance(loop: false) { extents.include(frame) }
+        }
+        let contour = OriginalAnimationContour(extents: extents)
+        contours[person] = contour
+        return contour
     }
 
     @discardableResult
     func advance() throws -> Bool {
         var changed = false
         for screen in players.keys.sorted() {
-            guard var player = players[screen] else { continue }
+            guard var player = players[screen], !player.holdsStaticFrame else { continue }
             player.updates += 1
             if player.updates >= updatesPerFrame {
                 player.updates = 0
                 if let frame = try player.decoder.advance() {
-                    player.frame = frame
+                    // The page text still wraps the silhouette, so keep the
+                    // static portrait instead of leaving a blank outline.
+                    if Self.isBlank(frame) {
+                        player.frame = player.staticFrame
+                        player.holdsStaticFrame = true
+                    } else {
+                        player.frame = frame
+                    }
                     changed = true
                 }
             }
             players[screen] = player
         }
         return changed
+    }
+
+    private static func isBlank(_ frame: OriginalAnimationFrame) -> Bool {
+        frame.rgba.withUnsafeBytes { bytes in
+            stride(from: 3, to: bytes.count, by: 4).allSatisfy { bytes[$0] == 0 }
+        }
     }
 
     func clear() {

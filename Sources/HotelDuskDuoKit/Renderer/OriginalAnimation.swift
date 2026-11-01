@@ -29,6 +29,8 @@ public struct OriginalAnimationClip: Sendable {
     public let lastFrameNumber: Int
     public let loopFrameNumber: Int
     public let payloadSHA256: String
+    /// Path of the ANM inside `OriginalAnimations`, used to name enhanced frames.
+    public internal(set) var source = ""
 
     fileprivate let bytes: [UInt8]
     fileprivate let descriptors: [FrameDescriptor]
@@ -226,7 +228,8 @@ public struct OriginalAnimationDecoder: Sendable {
         }
         return .init(width: clip.nativeHeight, height: clip.nativeWidth,
                      frameIndex: frameIndex, rgba: Data(rgba),
-                     originalIndexData: Data(pixels), originalPaletteData: Data(palette))
+                     originalIndexData: Data(pixels), originalPaletteData: Data(palette),
+                     artworkSource: clip.source.isEmpty ? nil : "OriginalAnimations/\(clip.source)#\(frameIndex)")
     }
 }
 
@@ -245,14 +248,25 @@ public struct OriginalAnimationFrame: Sendable {
     public let rgba: Data
     public let originalIndexData: Data
     public let originalPaletteData: Data
+    /// Enhanced-artwork name of this frame's first decoded pass, `<anm>#<frame>`.
+    public var artworkSource: String? = nil
 
     public func makeCGImage() -> CGImage? {
-        OriginalArtwork.shared.image(rgba: rgba, width: width, height: height)
+        // Looped passes apply delta frames to the clip's last frame, so their
+        // pixels can differ from the first pass the enhanced set was built from.
+        if OriginalArtwork.shared.enhancedImage(rgba: rgba, width: width, height: height) == nil,
+           let artworkSource,
+           let enhanced = OriginalArtwork.shared.animationFrameImage(source: artworkSource, width: width, height: height) {
+            return enhanced
+        }
+        return OriginalArtwork.shared.image(rgba: rgba, width: width, height: height)
     }
 }
 
 /**
  * A stable pair of silhouette edges for text wrapping around an animation.
+ * The edges enclose every frame included, so a moving pose never reaches into
+ * text that was wrapped around a quieter frame.
  */
 struct OriginalAnimationContour {
     let width: Int
@@ -260,29 +274,59 @@ struct OriginalAnimationContour {
     let leftEdge: [CGPoint]
     let rightEdge: [CGPoint]
 
+    /// Row extents gathered one frame at a time, so a whole cast never sits in memory.
+    struct Extents {
+        private(set) var width = 0
+        private(set) var height = 0
+        fileprivate var first: [Int] = []
+        fileprivate var last: [Int] = []
+
+        mutating func include(_ frame: OriginalAnimationFrame) {
+            let pixels = [UInt8](frame.rgba)
+            guard frame.width > 0, frame.height > 0, pixels.count >= frame.width * frame.height * 4 else { return }
+            if first.isEmpty {
+                width = frame.width
+                height = frame.height
+                first = [Int](repeating: .max, count: height)
+                last = [Int](repeating: -1, count: height)
+            }
+            // Frames of another size would need resampling; one character's clips share a canvas.
+            guard frame.width == width, frame.height == height else { return }
+            for y in 0..<height {
+                let row = y * width * 4
+                if let x = (0..<width).first(where: { pixels[row + $0 * 4 + 3] > 24 }) { first[y] = min(first[y], x) }
+                if let x = (0..<width).last(where: { pixels[row + $0 * 4 + 3] > 24 }) { last[y] = max(last[y], x) }
+            }
+        }
+    }
+
     init(frame: OriginalAnimationFrame) {
-        width = frame.width
-        height = frame.height
-        let pixels = [UInt8](frame.rgba)
-        guard width > 0, height > 0, pixels.count >= width * height * 4 else {
+        var extents = Extents()
+        extents.include(frame)
+        self.init(extents: extents)
+    }
+
+    init(extents: Extents) {
+        width = extents.width
+        height = extents.height
+        guard width > 0, height > 0 else {
             leftEdge = []
             rightEdge = []
             return
         }
+        // Each sample covers the rows out to its neighbours, so the straight
+        // segment between two samples never cuts across the silhouette.
         let rowStep = max(1, height / 72)
         var left: [CGPoint] = []
         var right: [CGPoint] = []
         for y in stride(from: 0, to: height, by: rowStep) {
-            var first: Int?
-            var last: Int?
-            for x in 0..<width where pixels[(y * width + x) * 4 + 3] > 24 {
-                if first == nil { first = x }
-                last = x
-            }
-            guard let first, let last else { continue }
+            let band = max(0, y - rowStep)...min(height - 1, y + rowStep)
+            let low = band.map { extents.first[$0] }.min() ?? .max
+            let high = band.map { extents.last[$0] }.max() ?? -1
+            guard low <= high else { continue }
             let pointY = CGFloat(y) / CGFloat(max(1, height - 1))
-            left.append(CGPoint(x: CGFloat(first) / CGFloat(max(1, width - 1)), y: pointY))
-            right.append(CGPoint(x: CGFloat(last) / CGFloat(max(1, width - 1)), y: pointY))
+            left.append(CGPoint(x: CGFloat(low) / CGFloat(max(1, width - 1)), y: pointY))
+            right.append(CGPoint(x: CGFloat(high) / CGFloat(max(1, width - 1)), y: pointY))
         }
         leftEdge = left
         rightEdge = right

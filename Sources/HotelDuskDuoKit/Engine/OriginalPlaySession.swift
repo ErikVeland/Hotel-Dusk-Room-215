@@ -2726,6 +2726,10 @@ public final class OriginalPlaySession: ObservableObject {
                 searchParent = nil
                 presentedPacketOffset = nil
             }
+            // The encounter is over. A departed figure held on its written
+            // page must not reappear in the next conversation.
+            encounterAnimations?.clear()
+            encounterPortraits = []
             if resumesWalkingAfterClock {
                 /**
                  * 0x02031944, state 0x10, closes search after the clock clears the talk renderer.

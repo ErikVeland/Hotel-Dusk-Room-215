@@ -45,6 +45,7 @@ struct NotebookDialogueSpread: View {
         let ink: [OriginalDialogueLines.Run]
         let visible: Bool
         let singlePage: Bool
+        let reviewing: Bool
         let portraitSignature: [String]
         let portraitSize: CGSize
     }
@@ -62,8 +63,10 @@ struct NotebookDialogueSpread: View {
             let metrics = DialogueSpreadMetrics(size: proxy.size, safeArea: safeArea, stacked: stacked)
             let key = LayoutKey(size: metrics.textSize, font: fontSize, ink: notebook.ink,
                 visible: isVisible && scenePhase == .active, singlePage: inspection,
+                reviewing: notebook.isReviewing,
+                // A character's outline covers all of their poses, so only the cast matters.
                 portraitSignature: notebook.isReviewing ? [] : play.encounterPortraits.map {
-                    "\($0.screen):\($0.person):\($0.pose)"
+                    "\($0.screen):\($0.person)"
                 }.sorted(),
                 portraitSize: metrics.portraitSize)
             let writing = WritingKey(end: notebook.reader.spreadEnd, revision: notebook.passageRevision,
@@ -95,13 +98,18 @@ struct NotebookDialogueSpread: View {
                 }
             }
             .environment(\.layoutDirection, .leftToRight)
-            .onChange(of: key, initial: true) { _, value in
+            .onChange(of: key, initial: true) { old, value in
                 guard value.visible else { return }
+                // Review drops the portraits, so its pages start fresh on the way in and out.
+                let previous = old.reviewing == value.reviewing && !value.reviewing
+                    && old.singlePage == value.singlePage && old.portraitSize == value.portraitSize
+                    ? notebook.layout : nil
                 let contours = notebook.isReviewing ? [:] : Dictionary(uniqueKeysWithValues:
                     play.encounterPortraits.map { ($0.screen, $0.contour) })
                 notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font,
                     portraitContours: contours, portraitSize: value.portraitSize,
-                    singlePage: value.singlePage),
+                    singlePage: value.singlePage, preserving: previous,
+                    revealedEnd: notebook.reader.revealedEnd),
                                    singlePage: value.singlePage)
             }
             .onChange(of: notebook.turnRevision) { _, revision in

@@ -50,19 +50,72 @@ final class OriginalEncounterAnimationTests: XCTestCase {
         XCTAssertEqual(animations.portraits.map { $0.frame.frameIndex }, frames)
     }
 
+    func testWrapOutlineCoversEveryPoseAndFrameOfTheCharacter() throws {
+        let animations = try OriginalEncounterAnimations(catalog: .bundled())
+        try animations.present(packet(person: 6, pose: 1), program: "Jeff")
+        let outline = try XCTUnwrap(animations.portraits.first?.contour)
+        try animations.present(packet(person: 6, pose: 2, offset: 20), program: "Jeff")
+        let next = try XCTUnwrap(animations.portraits.first)
+        XCTAssertEqual(next.contour.leftEdge, outline.leftEdge, "A new pose must not reshape the wrap")
+        XCTAssertEqual(next.contour.rightEdge, outline.rightEdge)
+        // Every frame of every pose stays inside the outline.
+        let expressions = try OriginalEncounterAnimationCatalog(catalog: .bundled())
+        let library = try OriginalAnimationLibrary.bundled()
+        func extent(_ edge: [CGPoint], at y: CGFloat) -> CGFloat? { edge.min { abs($0.y - y) < abs($1.y - y) }?.x }
+        for pose in expressions.poses(person: 6) {
+            var decoder = OriginalAnimationDecoder(clip: try library.load(id: expressions.animationID(person: 6, pose: pose)))
+            while let frame = try decoder.advance(loop: false) {
+                let single = OriginalAnimationContour(frame: frame)
+                for point in single.leftEdge { XCTAssertLessThanOrEqual(try XCTUnwrap(extent(outline.leftEdge, at: point.y)), point.x + 0.001) }
+                for point in single.rightEdge { XCTAssertGreaterThanOrEqual(try XCTUnwrap(extent(outline.rightEdge, at: point.y)), point.x - 0.001) }
+            }
+        }
+    }
+
     func testHideAndKeepCommandsDoNotShowAStaleCharacterInTheNextEncounter() throws {
         let animations = try OriginalEncounterAnimations(catalog: .bundled())
         try animations.present(packet(person: 6, pose: 1), program: "Jeff")
         try animations.present(packet(person: -1, pose: -1, offset: 20), program: "Jeff")
         XCTAssertEqual(animations.portraits.first?.person, 6)
+        for _ in 0..<12 { try animations.advance() }
         try animations.present(packet(person: -2, pose: -1, offset: 30), program: "Jeff")
-        XCTAssertTrue(animations.portraits.isEmpty)
+        // Written text still wraps the departed figure, so its static portrait stays.
+        XCTAssertEqual(animations.portraits.first?.person, 6)
+        XCTAssertEqual(animations.portraits.first?.frame.frameIndex, 0)
+        for _ in 0..<12 { try animations.advance() }
+        XCTAssertEqual(animations.portraits.first?.frame.frameIndex, 0, "A held portrait does not animate")
         try animations.present(packet(person: 5, pose: 1, offset: 40), program: "Mila")
+        XCTAssertEqual(animations.portraits.map(\.person), [5])
         animations.clear()
         XCTAssertTrue(animations.portraits.isEmpty)
         try animations.present(packet(person: 6, pose: 2), program: "Jeff")
         XCTAssertEqual(animations.portraits.map(\.animationID), ["Jf_kikuA_"])
         XCTAssertEqual(animations.portraits.first?.frame.frameIndex, 0)
+    }
+
+    func testOneShotClipThatClearsTheFigureHoldsTheStaticPortrait() throws {
+        let animations = try OriginalEncounterAnimations(catalog: .bundled())
+        // Br_taoreru_ (Bradley collapsing) ends on fully transparent frames.
+        try animations.present(packet(person: 14, pose: 2), program: "Bradley")
+        XCTAssertEqual(animations.portraits.map(\.animationID), ["Br_taoreru_"])
+        for _ in 0..<(6 * 20) { try animations.advance() }
+        let portrait = try XCTUnwrap(animations.portraits.first)
+        XCTAssertEqual(portrait.frame.frameIndex, 0)
+        XCTAssertTrue(portrait.frame.rgba.contains { $0 != 0 }, "The wrapped outline must not be left empty")
+    }
+
+    func testLoopedFramesKeepTheirEnhancedResolution() throws {
+        let library = try OriginalAnimationLibrary.bundled()
+        // Kyle's listening clip loops from frame 8; its first looped frames
+        // differ from the first pass the enhanced set was built from.
+        let clip = try library.load(id: "Hy_kikuA_")
+        var decoder = OriginalAnimationDecoder(clip: clip)
+        for _ in 0..<(clip.frameCount * 3) {
+            let frame = try XCTUnwrap(try decoder.advance())
+            let image = try XCTUnwrap(frame.makeCGImage())
+            XCTAssertEqual(image.width, frame.width * 8,
+                           "Frame \(frame.frameIndex), loop \(decoder.loopCount), fell back to native resolution")
+        }
     }
 
     func testEveryExplicitCharacterPoseInEveryBundledDialogueHasADecodableClip() throws {

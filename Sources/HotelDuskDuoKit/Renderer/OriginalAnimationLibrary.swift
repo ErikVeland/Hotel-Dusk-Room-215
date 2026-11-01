@@ -27,7 +27,9 @@ public struct OriginalAnimationLibrary: Sendable {
             throw OriginalAnimationError.unsupported(record.error ?? id)
         }
         let data = try verifiedPayload(path: record.source, sha256: record.payloadSHA256)
-        return try .init(data: data, id: id)
+        var clip = try OriginalAnimationClip(data: data, id: id)
+        clip.source = record.source
+        return clip
     }
 
     public func loadColourGrid(id: String) throws -> OriginalAnimationColourGrid {

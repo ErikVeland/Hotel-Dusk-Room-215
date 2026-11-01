@@ -31,6 +31,7 @@ public final class OriginalArtwork: @unchecked Sendable {
     private let root: URL?
     private let records: [String: Manifest.Record]
     private let namedRecords: [String: Manifest.Record]
+    private let animationFrameRecords: [String: Manifest.Record]
     private let defaultScale: Int
     private let cache = NSCache<NSString, CGImage>()
     private final class Size: NSObject {
@@ -51,10 +52,14 @@ public final class OriginalArtwork: @unchecked Sendable {
             namedRecords = Dictionary(manifest.images.flatMap { record in
                 record.sources.filter { $0.hasPrefix("Images/") }.map { ($0, record) }
             }, uniquingKeysWith: { first, _ in first })
+            animationFrameRecords = Dictionary(manifest.images.flatMap { record in
+                record.sources.filter { $0.hasPrefix("OriginalAnimations/") }.map { ($0, record) }
+            }, uniquingKeysWith: { first, _ in first })
         } else {
             defaultScale = 1
             records = [:]
             namedRecords = [:]
+            animationFrameRecords = [:]
         }
         cache.totalCostLimit = 128 * 1024 * 1024
     }
@@ -64,6 +69,13 @@ public final class OriginalArtwork: @unchecked Sendable {
               rgba.count == width * height * 4, !records.isEmpty else { return nil }
         let key = "\(width)x\(height)-\(OriginalAnimationClip.digest(rgba))"
         guard let record = records[key], record.width == width, record.height == height else { return nil }
+        return load(record)
+    }
+
+    /// The enhanced first-pass image of an animation frame named `<anm>#<frame>`.
+    func animationFrameImage(source: String, width: Int, height: Int) -> CGImage? {
+        guard Self.isHDGraphicsEnabled, let record = animationFrameRecords[source],
+              record.width == width, record.height == height else { return nil }
         return load(record)
     }
 

@@ -72,6 +72,31 @@ final class DialogueNotebookTests: XCTestCase {
         }
     }
 
+    func testWrittenInkKeepsItsWrapWhenThePortraitChanges() throws {
+        func outline(_ inset: CGFloat) -> OriginalAnimationContour {
+            // A solid block whose edges sit `inset` of the canvas in from each side.
+            var rgba = Data(repeating: 0, count: 64 * 64 * 4)
+            for y in 0..<64 { for x in Int(inset * 64)..<Int((1 - inset) * 64) { rgba[(y * 64 + x) * 4 + 3] = 255 } }
+            return OriginalAnimationContour(frame: OriginalAnimationFrame(width: 64, height: 64, frameIndex: 0,
+                rgba: rgba, originalIndexData: Data(), originalPaletteData: Data()))
+        }
+        let runs: [OriginalDialogueLines.Run] = [.init(text: String(repeating: "Room two fifteen keeps its secrets. ", count: 40), colour: 0)]
+        let size = CGSize(width: 260, height: 320), portrait = CGSize(width: 160, height: 200)
+        let narrow = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.4)], portraitSize: portrait)
+        let wide = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.05)], portraitSize: portrait)
+        XCTAssertNotEqual(narrow.pages.first, wide.pages.first, "The fixture must change the wrap")
+        let written = try XCTUnwrap(narrow.pages.first).length / 2
+        let kept = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.05)], portraitSize: portrait, preserving: narrow, revealedEnd: written)
+        XCTAssertEqual(kept.pages.first, narrow.pages.first, "Ink on the page must not reflow")
+        XCTAssertEqual(kept.pages.dropFirst().first?.location, narrow.pages.dropFirst().first?.location)
+        let fresh = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.05)], portraitSize: portrait, preserving: narrow, revealedEnd: 0)
+        XCTAssertEqual(fresh.pages, wide.pages, "Unwritten pages take the new outline")
+    }
+
     private func phase(_ text: String, screen: UInt8 = 1) -> OriginalEventRunner.Phase {
         let tokens = Array(text.utf8).enumerated().map {
             OriginalDialogueToken(textIndex: 0, byteOffset: $0.offset, kind: .glyph($0.element))

@@ -7,12 +7,16 @@ struct DialogueNotebookLayout {
     let text: NSAttributedString
     let size: CGSize
     let pages: [NSRange]
+    let fontSize: CGFloat
     private let frames: [Int: CTFrame]
+    /// The wrap shape each page was set in, keyed by its first character.
+    private let paths: [Int: CGPath]
 
     init(runs: [OriginalDialogueLines.Run], size: CGSize, fontSize: CGFloat,
          portraitContours: [UInt8: OriginalAnimationContour] = [:], portraitSize: CGSize = .zero,
-         singlePage: Bool = false) {
+         singlePage: Bool = false, preserving previous: DialogueNotebookLayout? = nil, revealedEnd: Int = 0) {
         self.size = size
+        self.fontSize = fontSize
         let text = NSMutableAttributedString(string: "")
         let font = CTFontCreateWithName("Georgia" as CFString, fontSize, nil)
         var lineSpacing: CGFloat = 6
@@ -38,21 +42,36 @@ struct DialogueNotebookLayout {
         guard size.width > 0, size.height >= CTFontGetAscent(font) + CTFontGetDescent(font) else {
             pages = []
             frames = [:]
+            paths = [:]
             return
         }
         let setter = CTFramesetterCreateWithAttributedString(text)
         var ranges: [NSRange] = []
         var frames: [Int: CTFrame] = [:]
+        var paths: [Int: CGPath] = [:]
+        // Pages that already hold ink keep their wrap shape, so a new pose or
+        // speaker never moves words the reader has seen.
+        let frozen: [Int: CGPath]
+        if let previous, previous.size == size, previous.fontSize == fontSize,
+           revealedEnd > 0, revealedEnd <= min(text.length, previous.text.length),
+           text.attributedSubstring(from: NSRange(location: 0, length: revealedEnd))
+               .isEqual(to: previous.text.attributedSubstring(from: NSRange(location: 0, length: revealedEnd))) {
+            frozen = previous.paths.filter { $0.key < revealedEnd }
+        } else {
+            frozen = [:]
+        }
         var offset = 0
         var pageIndex = 0
         while offset < text.length {
             let screen: UInt8 = singlePage ? 0 : pageIndex.isMultiple(of: 2) ? 1 : 0
-            let path = Self.framePath(size: size,
-                portraitSize: portraitSize, contour: portraitContours[screen], screen: screen)
+            let path = frozen[offset] ?? Self.framePath(size: size,
+                padding: max(14, fontSize * 0.8), portraitSize: portraitSize,
+                contour: portraitContours[screen], screen: screen)
             let frame = CTFramesetterCreateFrame(setter, CFRange(location: offset, length: 0), path, nil)
             let visible = CTFrameGetVisibleStringRange(frame)
             guard visible.length > 0 else { break }
             frames[offset] = frame
+            paths[offset] = path
             var end = offset + visible.length
             // Keep paragraph separators on the preceding leaf so the next
             // passage starts at the top margin, even at an exact page break.
@@ -64,10 +83,11 @@ struct DialogueNotebookLayout {
         }
         pages = ranges
         self.frames = frames
+        self.paths = paths
     }
 
-    private static func framePath(size: CGSize, portraitSize: CGSize, contour: OriginalAnimationContour?,
-                                  screen: UInt8) -> CGPath {
+    private static func framePath(size: CGSize, padding: CGFloat, portraitSize: CGSize,
+                                  contour: OriginalAnimationContour?, screen: UInt8) -> CGPath {
         let path = CGMutablePath()
         guard let contour, !contour.leftEdge.isEmpty, !contour.rightEdge.isEmpty,
               portraitSize.width > 0, portraitSize.height > 0 else {
@@ -83,7 +103,6 @@ struct DialogueNotebookLayout {
             CGPoint(x: imageOrigin.x + source.x * imageSize.width,
                     y: size.height - imageOrigin.y - source.y * imageSize.height)
         }
-        let padding: CGFloat = 8
         if screen == 1 {
             let edge = contour.rightEdge
             guard let bottom = edge.last.map(point), let top = edge.first.map(point) else { return path }
@@ -91,8 +110,10 @@ struct DialogueNotebookLayout {
             path.addLine(to: CGPoint(x: size.width, y: 0))
             path.addLine(to: CGPoint(x: size.width, y: size.height))
             path.addLine(to: CGPoint(x: 0, y: size.height))
-            path.addLine(to: CGPoint(x: 0, y: top.y))
-            path.addLine(to: CGPoint(x: top.x + padding, y: top.y))
+            // The head gets the same clearance as the sides; Core Text's y axis points up.
+            let head = min(size.height, top.y + padding)
+            path.addLine(to: CGPoint(x: 0, y: head))
+            path.addLine(to: CGPoint(x: top.x + padding, y: head))
             for source in edge { path.addLine(to: point(source).applying(CGAffineTransform(translationX: padding, y: 0))) }
         } else {
             let edge = contour.leftEdge.reversed()
@@ -100,7 +121,9 @@ struct DialogueNotebookLayout {
             path.move(to: .zero)
             path.addLine(to: CGPoint(x: max(0, bottom.x - padding), y: bottom.y))
             for source in edge { path.addLine(to: point(source).applying(CGAffineTransform(translationX: -padding, y: 0))) }
-            path.addLine(to: CGPoint(x: size.width, y: top.y))
+            let head = min(size.height, top.y + padding)
+            path.addLine(to: CGPoint(x: max(0, top.x - padding), y: head))
+            path.addLine(to: CGPoint(x: size.width, y: head))
             path.addLine(to: CGPoint(x: size.width, y: size.height))
             path.addLine(to: CGPoint(x: 0, y: size.height))
         }
