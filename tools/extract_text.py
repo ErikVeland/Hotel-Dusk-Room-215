@@ -1,7 +1,27 @@
 #!/usr/bin/env python3
 import json
 import os
+import struct
 import sys
+
+def parse_map_strings(path):
+    # Map records contain a two-byte ID and a 32-byte name after the count.
+    with open(path, "rb") as f:
+        data = f.read()
+    if len(data) < 4:
+        raise ValueError("Map text header is incomplete.")
+    count, = struct.unpack_from("<I", data)
+    if len(data) != 4 + count * 34:
+        raise ValueError("Map text record count does not match the file size.")
+    strings = [""] * count
+    seen = set()
+    for offset in range(4, len(data), 34):
+        map_id, name = struct.unpack_from("<H32s", data, offset)
+        if not 1 <= map_id <= count or map_id in seen:
+            raise ValueError("Map text contains an invalid or duplicate map ID.")
+        seen.add(map_id)
+        strings[map_id - 1] = name.split(b"\0", 1)[0].decode("latin-1")
+    return strings
 
 def parse_txt_file(path):
     lines = []
@@ -62,7 +82,7 @@ def export_all_text(data_dir, output_json):
 
     map_path = os.path.join(data_dir, "local/us/maptext.dat")
     if os.path.exists(map_path):
-        catalog["maps"] = parse_dat_strings(map_path)
+        catalog["maps"] = parse_map_strings(map_path)
 
     with open(output_json, "w", encoding="utf-8") as f:
         json.dump(catalog, f, indent=2, ensure_ascii=False)

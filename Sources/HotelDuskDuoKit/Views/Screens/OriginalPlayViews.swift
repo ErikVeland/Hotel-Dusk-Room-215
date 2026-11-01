@@ -524,7 +524,8 @@ struct OriginalQuestionMenuView: View {
     @State private var showsInventory = false
 
     var body: some View {
-        if showsInventory {
+        // Items chosen from the notebook page open the same picker here.
+        if showsInventory || play.isBrowsingInventory {
             OriginalInventoryView(play: play, actionTitle: "Show item", onSelect: { item in
                 showsInventory = false
                 play.showItemInConversation(item)

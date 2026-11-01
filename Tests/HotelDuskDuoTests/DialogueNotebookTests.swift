@@ -72,6 +72,62 @@ final class DialogueNotebookTests: XCTestCase {
         }
     }
 
+    func testWrittenInkKeepsItsWrapWhenThePortraitChanges() throws {
+        func outline(_ inset: CGFloat) -> OriginalAnimationContour {
+            // A solid block whose edges sit `inset` of the canvas in from each side.
+            var rgba = Data(repeating: 0, count: 64 * 64 * 4)
+            for y in 0..<64 { for x in Int(inset * 64)..<Int((1 - inset) * 64) { rgba[(y * 64 + x) * 4 + 3] = 255 } }
+            return OriginalAnimationContour(frame: OriginalAnimationFrame(width: 64, height: 64, frameIndex: 0,
+                rgba: rgba, originalIndexData: Data(), originalPaletteData: Data()))
+        }
+        let runs: [OriginalDialogueLines.Run] = [.init(text: String(repeating: "Room two fifteen keeps its secrets. ", count: 40), colour: 0)]
+        let size = CGSize(width: 260, height: 320), portrait = CGSize(width: 160, height: 200)
+        let narrow = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.4)], portraitSize: portrait)
+        let wide = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.05)], portraitSize: portrait)
+        XCTAssertNotEqual(narrow.pages.first, wide.pages.first, "The fixture must change the wrap")
+        let written = try XCTUnwrap(narrow.pages.first).length / 2
+        let kept = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.05)], portraitSize: portrait, preserving: narrow, revealedEnd: written)
+        XCTAssertEqual(kept.pages.first, narrow.pages.first, "Ink on the page must not reflow")
+        XCTAssertEqual(kept.pages.dropFirst().first?.location, narrow.pages.dropFirst().first?.location)
+        let fresh = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            portraitContours: [1: outline(0.05)], portraitSize: portrait, preserving: narrow, revealedEnd: 0)
+        XCTAssertEqual(fresh.pages, wide.pages, "Unwritten pages take the new outline")
+    }
+
+    func testMenuFollowsTheInkWithoutBeingWrittenOrMovingIt() throws {
+        let runs: [OriginalDialogueLines.Run] = [.init(text: String(repeating: "A room. One night. ", count: 30), colour: 0)]
+        let size = CGSize(width: 260, height: 320)
+        let plain = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18)
+        let menu = [DialogueNotebookLayout.MenuEntry(text: "Ask about", selectable: false),
+                    .init(text: "Say, a suite sounds nice.", selectable: true),
+                    .init(text: "Suites are for chumps.", selectable: true)]
+        let withMenu = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
+            preserving: plain, revealedEnd: plain.text.length, menu: menu)
+        XCTAssertEqual(withMenu.inkLength, plain.text.length)
+        XCTAssertEqual(Array(withMenu.pages.prefix(plain.pages.count - 1)), Array(plain.pages.dropLast()),
+                       "Written pages must not reflow for a menu")
+        XCTAssertEqual(withMenu.menuRanges.count, 3)
+        XCTAssertEqual(NSMaxRange(try XCTUnwrap(withMenu.pages.last)), withMenu.text.length, "The whole menu is set")
+
+        let book = DialogueNotebook()
+        book.configure(withMenu)
+        XCTAssertEqual(book.reader.menuStart, withMenu.inkLength)
+        book.finishWriting()
+        XCTAssertLessThanOrEqual(book.reader.revealedEnd, withMenu.inkLength, "The clock never writes the menu")
+
+        // A tap on the second option's line selects it.
+        let option = withMenu.menuRanges[2]
+        let page = try XCTUnwrap(withMenu.pages.first { NSLocationInRange(option.location, $0) })
+        var hit: Int?
+        for y in stride(from: 0, to: size.height, by: 4) where hit == nil {
+            if let entry = withMenu.menuEntry(at: CGPoint(x: 30, y: y), page: page), entry == 2 { hit = entry }
+        }
+        XCTAssertEqual(hit, 2)
+    }
+
     private func phase(_ text: String, screen: UInt8 = 1) -> OriginalEventRunner.Phase {
         let tokens = Array(text.utf8).enumerated().map {
             OriginalDialogueToken(textIndex: 0, byteOffset: $0.offset, kind: .glyph($0.element))

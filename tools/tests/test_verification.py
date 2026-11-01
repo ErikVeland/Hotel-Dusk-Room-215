@@ -1,6 +1,7 @@
 import importlib.util
 from pathlib import Path
 import unittest
+import re
 
 spec = importlib.util.spec_from_file_location("verify", Path(__file__).parents[1] / "verify.py")
 verify = importlib.util.module_from_spec(spec)
@@ -8,6 +9,13 @@ spec.loader.exec_module(verify)
 
 
 class VerificationTests(unittest.TestCase):
+    def test_filter_matches_classes_without_matching_the_module_name(self):
+        pattern = verify.test_filter(['HotelDuskDuoTests', 'AudioControllerTests'])
+        self.assertIsNotNone(re.search(pattern, 'HotelDuskDuoTests.HotelDuskDuoTests/testTitle'))
+        self.assertIsNotNone(re.search(pattern, 'HotelDuskDuoTests.AudioControllerTests/testMute'))
+        self.assertIsNone(re.search(pattern, 'HotelDuskDuoTests.OriginalStoryContinuationTests/testRoute'))
+        self.assertIsNone(re.search(pattern, 'HotelDuskDuoTests.AudioControllerTestsExtra/testMute'))
+
     def test_xctest_cases_are_not_counted_again_in_suite_totals(self):
         text = """Test Case '-[KitTests.SourceTests testValid]' passed (0.1 seconds).
 Test Case '-[KitTests.SourceTests testMissingFixture]' skipped (0.0 seconds).

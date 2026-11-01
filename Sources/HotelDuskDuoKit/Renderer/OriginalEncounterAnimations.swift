@@ -79,8 +79,12 @@ final class OriginalEncounterAnimations {
         let pose: Int
         var decoder: OriginalAnimationDecoder
         var frame: OriginalAnimationFrame
+        /// First frame, held when a one-shot clip clears the figure.
+        let staticFrame: OriginalAnimationFrame
         let contour: OriginalAnimationContour
         var updates = 0
+        /// Set when a one-shot clip (a collapse or exit) clears the figure.
+        var holdsStaticFrame = false
     }
 
     private final class CachedClip: NSObject {
@@ -92,6 +96,7 @@ final class OriginalEncounterAnimations {
     private let library: OriginalAnimationLibrary
     private let clips = NSCache<NSString, CachedClip>()
     private var players: [UInt8: Player] = [:]
+    private var contours: [String: OriginalAnimationContour] = [:]
     private var lastProgram: String?
     private var lastPacketOffset: Int?
     private let updatesPerFrame = 6
@@ -117,7 +122,13 @@ final class OriginalEncounterAnimations {
             let person = Int(presentation.person)
             if person == -1 || person == -3 { continue }
             guard (1...17).contains(person) else {
-                players.removeValue(forKey: screen)
+                // Written pages keep the wrap around the departed figure, so
+                // its static portrait stays instead of a blank outline.
+                if var player = players[screen] {
+                    player.frame = player.staticFrame
+                    player.holdsStaticFrame = true
+                    players[screen] = player
+                }
                 continue
             }
             var pose = Int(presentation.pose)
@@ -136,28 +147,54 @@ final class OriginalEncounterAnimations {
             var decoder = OriginalAnimationDecoder(clip: clip)
             guard let frame = try decoder.advance() else { throw OriginalAnimationError.invalid("Empty character animation") }
             players[screen] = Player(person: person, pose: pose, decoder: decoder, frame: frame,
-                contour: OriginalAnimationContour(frame: frame))
+                staticFrame: frame, contour: try contour(clip: clip))
         }
         lastProgram = program
         lastPacketOffset = packet.sourceOffset
+    }
+
+    /// One outline covers every frame of a pose, so its motion stays clear of
+    /// the text. Staging clips (entrances, falls) are framed differently, so
+    /// sharing one outline across poses would leave wide gaps around the head.
+    private func contour(clip: OriginalAnimationClip) throws -> OriginalAnimationContour {
+        if let contour = contours[clip.id] { return contour }
+        var extents = OriginalAnimationContour.Extents()
+        var decoder = OriginalAnimationDecoder(clip: clip)
+        while let frame = try decoder.advance(loop: false) { extents.include(frame) }
+        let contour = OriginalAnimationContour(extents: extents)
+        contours[clip.id] = contour
+        return contour
     }
 
     @discardableResult
     func advance() throws -> Bool {
         var changed = false
         for screen in players.keys.sorted() {
-            guard var player = players[screen] else { continue }
+            guard var player = players[screen], !player.holdsStaticFrame else { continue }
             player.updates += 1
             if player.updates >= updatesPerFrame {
                 player.updates = 0
                 if let frame = try player.decoder.advance() {
-                    player.frame = frame
+                    // The page text still wraps the silhouette, so keep the
+                    // static portrait instead of leaving a blank outline.
+                    if Self.isBlank(frame) {
+                        player.frame = player.staticFrame
+                        player.holdsStaticFrame = true
+                    } else {
+                        player.frame = frame
+                    }
                     changed = true
                 }
             }
             players[screen] = player
         }
         return changed
+    }
+
+    private static func isBlank(_ frame: OriginalAnimationFrame) -> Bool {
+        frame.rgba.withUnsafeBytes { bytes in
+            stride(from: 3, to: bytes.count, by: 4).allSatisfy { bytes[$0] == 0 }
+        }
     }
 
     func clear() {

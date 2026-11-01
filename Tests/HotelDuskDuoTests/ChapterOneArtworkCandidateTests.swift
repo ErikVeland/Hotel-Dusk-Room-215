@@ -8,6 +8,13 @@ final class ChapterOneArtworkCandidateTests: XCTestCase {
             throw XCTSkip("Set HOTEL_DUSK_ARTWORK_CANDIDATE to the isolated verification pack")
         }
         let artwork = OriginalArtwork(resourceRoot: URL(fileURLWithPath: path))
+        let expectedScale: Int
+        if let value = ProcessInfo.processInfo.environment["HOTEL_DUSK_ARTWORK_ANIMATION_SCALE"] {
+            expectedScale = try XCTUnwrap(Int(value))
+            XCTAssertTrue([4, 8].contains(expectedScale))
+        } else {
+            expectedScale = 8
+        }
         let texture = try OriginalTextureLibrary.bundled().load(path: "map/R213/R213/door.dtx")
         let enhancedTexture = try XCTUnwrap(artwork.enhancedImage(rgba: texture.rgba,
             width: texture.storedWidth, height: texture.storedHeight))
@@ -19,8 +26,8 @@ final class ChapterOneArtworkCandidateTests: XCTestCase {
         let frame = try XCTUnwrap(decoder.advance(loop: false))
         let enhancedFrame = try XCTUnwrap(artwork.enhancedImage(rgba: frame.rgba,
             width: frame.width, height: frame.height))
-        XCTAssertEqual(enhancedFrame.width, frame.width * 8)
-        XCTAssertEqual(enhancedFrame.height, frame.height * 8)
+        XCTAssertEqual(enhancedFrame.width, frame.width * expectedScale)
+        XCTAssertEqual(enhancedFrame.height, frame.height * expectedScale)
         XCTAssertEqual(artwork.logicalSize(of: enhancedFrame), CGSize(width: frame.width, height: frame.height))
     }
 }

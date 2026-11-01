@@ -49,6 +49,8 @@ final class DialogueNotebook: ObservableObject {
         var spreadIndex = 0
         var revealedEnd = 0
         var passageEnd: Int?
+        /// A menu set after the ink is shown whole, never written.
+        var menuStart: Int?
         var pagesPerSpread = 2
         var leftIndex: Int { spreadIndex * pagesPerSpread }
         func page(at index: Int) -> NSRange {
@@ -56,7 +58,7 @@ final class DialogueNotebook: ObservableObject {
         }
         var spreadEnd: Int {
             let end = NSMaxRange(page(at: leftIndex + pagesPerSpread - 1))
-            return min(end, passageEnd ?? end)
+            return min(end, passageEnd ?? end, menuStart ?? end)
         }
         var isWriting: Bool { revealedEnd < spreadEnd }
         var hasNextSpread: Bool {
@@ -223,6 +225,7 @@ final class DialogueNotebook: ObservableObject {
         let anchor = readingAnchor
         var next = reader
         next.pages = layout.pages
+        next.menuStart = layout.menuRanges.isEmpty ? nil : layout.inkLength
         next.pagesPerSpread = singlePage ? 1 : 2
         let anchorPage = layout.pages.firstIndex { NSLocationInRange(anchor, $0) } ?? max(0, layout.pages.count - 1)
         next.spreadIndex = anchorPage / next.pagesPerSpread

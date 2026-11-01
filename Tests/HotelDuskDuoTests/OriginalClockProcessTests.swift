@@ -45,7 +45,8 @@ final class OriginalClockProcessTests: XCTestCase {
         XCTAssertEqual(clock.bitmapName, "0800am")
         XCTAssertEqual([clock.hour, clock.minute, clock.second], [7, 59, 58])
         let renderer = try OriginalClockRenderer(process: clock, library: .bundled())
-        XCTAssertEqual(try renderer.render(clock).width, 192)
+        // OriginalArtwork.pageContext() draws 192x256 page units at four times scale.
+        XCTAssertEqual(try renderer.render(clock).width, 192 * 4)
     }
 
     func testMalformedClockLabelsStayExplicit() {
@@ -63,7 +64,9 @@ final class OriginalClockProcessTests: XCTestCase {
         XCTAssertEqual(image.width, 768)
         XCTAssertEqual(image.height, 1024)
         let pixels = try XCTUnwrap(image.dataProvider?.data) as Data
-        let white = 90 * image.bytesPerRow + 80 * 4
+        // Page point (80, 90) on the clock face, at the context's four-times scale.
+        let scale = image.width / 192
+        let white = 90 * scale * image.bytesPerRow + 80 * scale * 4
         XCTAssertTrue(pixels[white..<(white + 3)].allSatisfy { $0 > 235 })
         if let directory = ProcessInfo.processInfo.environment["SNAPSHOT_DIR"] {
             let path = URL(fileURLWithPath: directory).appendingPathComponent("clock-render.png")

@@ -418,6 +418,8 @@
     "1F Central Hallway",
     "1F Right Hallway",
     "1F Left Hallway",
+    "---",
+    "---",
     "1F Storage",
     "1F Dunning's Room",
     "1F Rosa's Room",
@@ -438,8 +440,10 @@
     "2F Hallway",
     "BF Basement",
     "BF Secret Room",
+    "---",
     "BF Hallway",
     "BF Basement",
-    "RF Roof"
+    "RF Roof",
+    "---"
   ]
 }
