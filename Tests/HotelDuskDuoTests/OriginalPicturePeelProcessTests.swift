@@ -14,7 +14,7 @@ final class OriginalPicturePeelProcessTests: XCTestCase {
         XCTAssertEqual(effects, [.dragging(true), .sound(archive: 50, entry: 0)])
     }
 
-    func testSuccessRequiresMoreThanSourceThresholdAndReturnsTwoOnRelease() {
+    func testSuccessRequiresMoreThanSourceThresholdAndReturnsZeroOnRelease() {
         var incompleteMask = [UInt8](repeating: 1, count: 192 * 256)
         incompleteMask.replaceSubrange(0..<OriginalPicturePeelProcess.clearedPixelThreshold - 1,
                                        with: repeatElement(UInt8(0), count: OriginalPicturePeelProcess.clearedPixelThreshold - 1))
@@ -25,6 +25,7 @@ final class OriginalPicturePeelProcessTests: XCTestCase {
         _ = incomplete.update()
 
         XCTAssertNil(incomplete.result)
+        XCTAssertEqual(incomplete.requestExit(), .returned(2), "Leaving before the cover clears returns 2")
 
         let completeMask = [UInt8](repeating: 0, count: 192 * 256)
         var complete = OriginalPicturePeelProcess(mask: completeMask)
@@ -34,8 +35,8 @@ final class OriginalPicturePeelProcessTests: XCTestCase {
 
         XCTAssertEqual(effects, [.dragging(false), .peelCompleted])
         XCTAssertNil(complete.result)
-        XCTAssertEqual(complete.requestExit(), .returned(2))
-        XCTAssertEqual(complete.result, 2)
+        XCTAssertEqual(complete.requestExit(), .returned(0))
+        XCTAssertEqual(complete.result, 0)
     }
 
     func testStrokeInterpolatesAndStopsWhenTouchLeavesPicture() {

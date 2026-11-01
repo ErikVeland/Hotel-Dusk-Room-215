@@ -958,10 +958,19 @@ public struct OriginalEventRunner: Sendable {
         let graph = try sharedProgram.blocks
         var evaluating = session
         let state = game, checks = try sharedProgram.conditions
-        let outcome = try OriginalShownItemSelector.select(graph: graph,
+        // 0x0203A444 retries mode 16 with item zero when no item-specific System response passes.
+        var selectedItem = item
+        var outcome = try OriginalShownItemSelector.select(graph: graph,
             person: UInt16(bitPattern: partner), item: item, nowTime: game.nowTime, scope: .system) {
                 try evaluating.evaluate($0, conditions: checks, game: state)
             }
+        if case .noMatch = outcome, item != 0 {
+            selectedItem = 0
+            outcome = try OriginalShownItemSelector.select(graph: graph,
+                person: UInt16(bitPattern: partner), item: 0, nowTime: game.nowTime, scope: .system) {
+                    try evaluating.evaluate($0, conditions: checks, game: state)
+                }
+        }
         guard case .selected(let selected) = outcome else { return nil }
 
         let block = graph.tables[1][selected.blockIndex]
@@ -976,7 +985,7 @@ public struct OriginalEventRunner: Sendable {
         response.session.selection.eventID = try eventReader.u16(2)
         response.session.selection.areaID = .max
         response.session.selection.subareaID = .max
-        response.session.selection.checkItemID = Int16(item)
+        response.session.selection.checkItemID = Int16(selectedItem)
         response.session.operationIndex = 0
         response.session.eventCommitted = true
         response.partner = partner

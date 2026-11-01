@@ -100,7 +100,9 @@ final class OriginalMapConversationTests: XCTestCase {
         XCTAssertEqual(runner.game.bytes, sharedResponse.game.bytes)
     }
 
-    func testItemWithoutChapterOrSystemResponseLeavesQuestionMenuOpen() throws {
+    /// 0x0203A444 retries a failed mode-16 search with item and subarea zero, so an item
+    /// without a specific row uses the person's generic System response.
+    func testItemWithoutSpecificResponseUsesGenericSystemResponse() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         let chapter = try catalog.loadProgram("EP1_R102").blocks
         let system = try catalog.loadProgram("System").blocks
@@ -116,16 +118,15 @@ final class OriginalMapConversationTests: XCTestCase {
                 break
             }
         }
-        let item = try XCTUnwrap(unmatched, "Expected a bundled item with no response row")
+        let item = try XCTUnwrap(unmatched, "Expected a bundled item with no specific response row")
         var runner = try afterRegistration(holding: [item])
-        let gameBefore = runner.game.bytes
         guard case .questions = runner.phase else { return XCTFail("Expected Dunning's question menu") }
 
-        XCTAssertNil(runner.showItem(item, catalog: catalog))
-        guard case .questions = runner.phase else {
-            return XCTFail("An unmatched item must leave the question menu open")
-        }
-        XCTAssertEqual(runner.game.bytes, gameBefore)
+        let response = try XCTUnwrap(runner.showItem(item, catalog: catalog))
+        XCTAssertEqual(response.program.name, "System")
+        XCTAssertEqual(response.eventIndex, 32, "Dunning's System block ends with its item-zero response")
+        XCTAssertEqual(response.session.selection.checkItemID, 0)
+        guard case .dialogue = response.phase else { return XCTFail("Expected the generic dialogue: \(response.phase)") }
     }
 
     @MainActor
