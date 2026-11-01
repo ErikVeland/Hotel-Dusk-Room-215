@@ -19,13 +19,18 @@ final class OriginalChapterSaveTests: XCTestCase {
         }
     }
 
+    @MainActor private func progressAudio() -> AudioController {
+        AudioController(musicOutputFactory: { _, _, _ in ProgressMusicOutput() })
+    }
+
     @MainActor private func play(store: any OriginalChapterSaveStore) throws -> OriginalPlaySession {
         let catalog = try OriginalScriptCatalog.bundled()
         let runner = try OriginalEventRunner(program: catalog.loadProgram("EP2_R205"), game: state(), deferArrival: true)
-        let audio = AudioController()
+        let audio = progressAudio()
         audio.isMuted = true
         return OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, saveStore: store,
-            saveDate: { Date(timeIntervalSince1970: 100) }, chapterTransition: OriginalChapterTransition())
+            saveDate: { Date(timeIntervalSince1970: 100) }, chapterTransition: OriginalChapterTransition(),
+            mapRendererFactory: { name, _ in try OriginalRouteBitmapMapRenderer(mapName: name) })
     }
 
     func testFilesRetainAllStateAndRejectInvalidOrDamagedRecords() throws {
@@ -100,12 +105,13 @@ final class OriginalChapterSaveTests: XCTestCase {
         XCTAssertEqual(saving.chapterTransition?.stage, .title)
         let checkpoint = try XCTUnwrap(store.slots[1])
         XCTAssertEqual(try checkpoint.gameState(), try state())
-        let audio = AudioController()
+        let audio = progressAudio()
         audio.isMuted = true
         let resumeDirectory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: resumeDirectory) }
         let fresh = GameSession(audioController: audio, saveStore: store,
-            resumeStore: OriginalResumeFileStore(directory: resumeDirectory))
+            resumeStore: OriginalResumeFileStore(directory: resumeDirectory),
+            mapRendererFactory: { name, _ in try OriginalRouteBitmapMapRenderer(mapName: name) })
         XCTAssertEqual(fresh.chapterSaves[1], checkpoint)
         fresh.loadChapterSave(slot: 1)
         let restored = try XCTUnwrap(fresh.play)

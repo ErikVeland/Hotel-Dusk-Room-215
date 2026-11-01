@@ -491,7 +491,7 @@ final class LayoutSnapshotTests: XCTestCase {
                 XCTAssertEqual(play.runner.game.previousMapID, 2)
                 XCTAssertEqual(play.lobby?.mapID, 3)
                 XCTAssertEqual(play.lobby?.position, .init(28, 12288, 16679))
-                XCTAssertEqual(try XCTUnwrap(play.lobby?.facing), .pi, accuracy: 0.002)
+                XCTAssertEqual(abs(try XCTUnwrap(play.lobby?.facing)), .pi, accuracy: 0.002)
                 play.pause()
                 _ = try capture(pages(), size: size, name: "play_r103_entry")
                 play.resume()
@@ -503,6 +503,7 @@ final class LayoutSnapshotTests: XCTestCase {
                 XCTAssertEqual(play.runner.phase, .exploration(mapID: 2))
                 XCTAssertEqual(play.runner.game.previousMapID, 3)
                 XCTAssertEqual(play.lobby?.position, .init(-8190, 12288, -26467))
+                for _ in 0..<20 { play.advanceFrame() }
                 XCTAssertEqual(try XCTUnwrap(play.lobby?.facing), 0, accuracy: 0.002)
                 play.pause()
                 _ = try capture(pages(), size: size, name: "play_r102_return")

@@ -44,6 +44,8 @@ On 18 October 2026, 27 targeted checks passed with no failures or skips. They co
 
 On 1 November 2026, `OriginalChapterTwoRouteTests.testChapterTwoRosaLinensAndHelenGuideRoute` passed in 109 seconds. One native session continued from the final Chapter 1 review through the Chapter 2 puzzles and conversations to the Chapter 3 entry checkpoint. The test uses bitmap renderers for host-independent puzzle input; it does not verify Metal rendering or physical-device input.
 
+On 1 November 2026, `LayoutSnapshotTests.testRenderRequiredDunningQuestionsAndDeliveryKnock` passed in 174.6 seconds. It starts from a fresh game and checks the Chapter 1 and Chapter 2 interactions. The R102 return check waits for the 20-frame room-entry heading blend before it checks the destination heading.
+
 There is no package script for these Swift targets. Run the focused checks through SwiftPM:
 
 ```sh
@@ -53,4 +55,4 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test --filter 'Or
 
 ## Remaining work
 
-Continue to Room 215 for Ed's call, then follow Dunning's directions to Louie and complete the Chapter 2 review. Alternate branches, exhaustive movement boundary checks, original character composition, cinematic presentation, audio fidelity and physical Duo checks remain open. The complete game is not yet playable.
+The connected Chapter 1–2 route now reaches the Chapter 3 entry. The broader normal-input checkpoint chain continues from there through the Chapter 10 ending, as recorded in [Chapter 3 progress](chapter-three-progress.md). That chain restores checkpoints between sections, so it does not prove one uninterrupted app session. Alternate branches, exhaustive movement boundary checks, original character composition, cinematic presentation, audio fidelity and physical Duo checks remain open.
