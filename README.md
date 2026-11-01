@@ -77,6 +77,8 @@ The closed cover uses the weathered paperback treatment of `Source/Cover`, fills
 
 ## Build and verification
 
+See [TestFlight beta preparation](docs/testflight-beta.md) for signed archives, artwork packaging, and beta test notes.
+
 ```sh
 swift test
 swift run HotelDuskDuoApp

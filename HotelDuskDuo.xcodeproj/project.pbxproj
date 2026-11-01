@@ -3,19 +3,21 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A21500000000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A21500000000000000000002 /* Assets.xcassets */; };
+		3E10E1DD8BFE7171B0A74DEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C40EF2F819B304FA2D67567 /* Assets.xcassets */; };
+		783F034D76E03934C3ECF1F4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 0ECD29B77AE5F5A3511FD7A9 /* PrivacyInfo.xcprivacy */; };
 		98F3554BF390089E6FC66C38 /* HotelDuskDuoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 99E6802D5D467857B5D71480 /* HotelDuskDuoKit */; };
 		C6D20DA786F756CE45D36D59 /* HotelDuskDuoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FB88226230A4BD4F5451B68 /* HotelDuskDuoApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A21500000000000000000002 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = HotelDuskDuo/Resources/Assets.xcassets; sourceTree = SOURCE_ROOT; };
-		5F8910055F0C701D82DF4E9A /* Hotel Dusk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hotel Dusk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0ECD29B77AE5F5A3511FD7A9 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		5C40EF2F819B304FA2D67567 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8FB88226230A4BD4F5451B68 /* HotelDuskDuoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotelDuskDuoApp.swift; sourceTree = "<group>"; };
+		D7FCDBB3525636F86506C35E /* Hotel Dusk.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Hotel Dusk.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F57FFDF4C59592BA5783A64B /* Hotel Dusk Room 215 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Hotel Dusk Room 215"; path = .; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -34,7 +36,7 @@
 		084EB1003AC99D708B2F8BF3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5F8910055F0C701D82DF4E9A /* Hotel Dusk.app */,
+				D7FCDBB3525636F86506C35E /* Hotel Dusk.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,6 +50,16 @@
 			path = Sources/HotelDuskDuoApp;
 			sourceTree = "<group>";
 		};
+		2E60DA55333ECD2B3DC2F66E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5C40EF2F819B304FA2D67567 /* Assets.xcassets */,
+				0ECD29B77AE5F5A3511FD7A9 /* PrivacyInfo.xcprivacy */,
+			);
+			name = Resources;
+			path = HotelDuskDuo/Resources;
+			sourceTree = "<group>";
+		};
 		3441FA2BE5BBDF776B76D445 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -59,9 +71,9 @@
 		6AC7B045731B797118F11B22 = {
 			isa = PBXGroup;
 			children = (
-				A21500000000000000000002 /* Assets.xcassets */,
 				0B8B2BA7A363BCDED3A2DC45 /* HotelDuskDuoApp */,
 				3441FA2BE5BBDF776B76D445 /* Packages */,
+				2E60DA55333ECD2B3DC2F66E /* Resources */,
 				084EB1003AC99D708B2F8BF3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,8 +86,8 @@
 			buildConfigurationList = D90949998B897AFAD4962C23 /* Build configuration list for PBXNativeTarget "HotelDuskDuoiOS" */;
 			buildPhases = (
 				694D87418929BDB317997388 /* Sources */,
+				D4E7BEBBC19C4D67C22C47E1 /* Resources */,
 				3BE8DC6E4D7B5BEC559CC26E /* Frameworks */,
-				A21500000000000000000003 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -86,7 +98,7 @@
 				99E6802D5D467857B5D71480 /* HotelDuskDuoKit */,
 			);
 			productName = HotelDuskDuoiOS;
-			productReference = 5F8910055F0C701D82DF4E9A /* Hotel Dusk.app */;
+			productReference = D7FCDBB3525636F86506C35E /* Hotel Dusk.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -97,6 +109,12 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					1169FF0C5C97125272B33C99 = {
+						DevelopmentTeam = 54WU29TRTY;
+						ProvisioningStyle = Automatic;
+					};
+				};
 			};
 			buildConfigurationList = CB7D7B2A623551170CC1F162 /* Build configuration list for PBXProject "HotelDuskDuo" */;
 			compatibilityVersion = "Xcode 14.0";
@@ -111,6 +129,7 @@
 			packageReferences = (
 				338848465B3C6B203281355E /* XCLocalSwiftPackageReference "." */,
 			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -120,11 +139,12 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A21500000000000000000003 /* Resources */ = {
+		D4E7BEBBC19C4D67C22C47E1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A21500000000000000000001 /* Assets.xcassets in Resources */,
+				3E10E1DD8BFE7171B0A74DEE /* Assets.xcassets in Resources */,
+				783F034D76E03934C3ECF1F4 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -147,10 +167,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 54WU29TRTY;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Hotel Dusk";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Blow into the microphone to interact with puzzles. Audio is not saved.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
@@ -230,10 +252,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 54WU29TRTY;
+				ENABLE_TESTABILITY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Hotel Dusk";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Blow into the microphone to interact with puzzles. Audio is not saved.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;

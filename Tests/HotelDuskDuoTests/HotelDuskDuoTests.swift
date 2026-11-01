@@ -72,9 +72,9 @@ final class HotelDuskDuoTests: XCTestCase {
     func testRomBackgroundLoadsUpright() throws {
         let code = "R213"
         let image = try XCTUnwrap(RomImageCache.shared.image(named: "\(code)_L"))
-        // Decoded upright for book mode: portrait, 96×128
-        XCTAssertEqual(image.width, 96)
-        XCTAssertEqual(image.height, 128)
+        // Enhanced pixels retain the original upright book coordinates.
+        XCTAssertEqual(OriginalArtwork.shared.logicalSize(of: image), CGSize(width: 96, height: 128))
+        XCTAssertEqual(image.width * 128, image.height * 96)
     }
 }
 

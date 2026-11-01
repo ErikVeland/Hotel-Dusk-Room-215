@@ -9,10 +9,13 @@ packages:
 targets:
   HotelDuskDuoiOS:
     type: application
+    productName: Hotel Dusk
     platform: iOS
     sources:
       - Sources/HotelDuskDuoApp
       - path: HotelDuskDuo/Resources/Assets.xcassets
+        buildPhase: resources
+      - path: HotelDuskDuo/Resources/PrivacyInfo.xcprivacy
         buildPhase: resources
     dependencies:
       - package: HotelDuskDuo
@@ -20,10 +23,13 @@ targets:
     settings:
       base:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 54WU29TRTY
         PRODUCT_NAME: Hotel Dusk
         PRODUCT_BUNDLE_IDENTIFIER: com.veland.hoteldusk.duo
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Hotel Dusk
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         INFOPLIST_KEY_NSMicrophoneUsageDescription: Blow into the microphone to interact with puzzles. Audio is not saved.
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIStatusBarHidden: YES
@@ -33,3 +39,18 @@ targets:
         SWIFT_VERSION: "5.0"
         MARKETING_VERSION: "0.1"
         CURRENT_PROJECT_VERSION: "1"
+      configs:
+        Release:
+          DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+          ENABLE_TESTABILITY: NO
+schemes:
+  HotelDuskDuoiOS:
+    build:
+      targets:
+        HotelDuskDuoiOS: all
+    run:
+      config: Debug
+    profile:
+      config: Release
+    archive:
+      config: Release

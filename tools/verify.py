@@ -72,6 +72,11 @@ def group_status(exit_code, counts, strict=False):
     return "passed"
 
 
+def test_filter(classes):
+    # Swift test names use Module.Class/method. Match the class, not its module.
+    return r"\.(?:" + "|".join(re.escape(name) for name in classes) + r")/"
+
+
 def run_group(name, command, directory, env, strict, tests=True):
     print(f"Running {name}…", flush=True)
     started = time.monotonic()
@@ -125,7 +130,7 @@ def main():
         command = ["swift", "test", "--disable-sandbox"]
         if args.scratch_path:
             command += ["--scratch-path", str(args.scratch_path.resolve())]
-        command += ["--filter", "|".join(f"\\b{name}\\b" for name in selected)]
+        command += ["--filter", test_filter(selected)]
         results.append(run_group("swift", command, directory, env, args.strict))
     else:
         results.append({"name": "swift", "status": "failed", "exitCode": 1, "passed": 0, "failed": 0, "skipped": 0,
