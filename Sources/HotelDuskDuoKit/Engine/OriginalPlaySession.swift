@@ -1893,6 +1893,8 @@ public final class OriginalPlaySession: ObservableObject {
         case .dialogue, .itemNotice, .waiting:
             return acquiredItemImage != nil || touchPictureImages != nil || closeup != nil || door != nil
                 || suitcaseContents != nil || lobby?.mode == .counter
+        case .exploration:
+            return closeup != nil || door != nil || lobby?.mode == .counter
         default: return false
         }
     }

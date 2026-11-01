@@ -320,6 +320,15 @@ struct NotebookDialogueLeaf: View {
                         .buttonStyle(.plain)
                         .frame(minHeight: 44)
                         .disabled(!notebook.canTurnBack || !play.canReviewConversations)
+                } else if inspection, case .exploration = play.runner.phase {
+                    Button("Back") {
+                        if play.closeup != nil { play.leaveSearchCloseup() }
+                        else if play.door != nil { play.leaveDoor() }
+                        else if play.lobby?.mode == .counter { play.leaveLobbyCounter() }
+                    }
+                    .font(NovelStyle.caption)
+                    .buttonStyle(.plain)
+                    .frame(minHeight: 44)
                 }
                 Spacer(minLength: 0)
                 if right, notebook.isReviewing {
@@ -373,23 +382,50 @@ struct NotebookDialogueView: View {
 struct OriginalInspectionArtwork: View {
     @ObservedObject var play: OriginalPlaySession
 
+    private func scenePoint(_ point: CGPoint, pageSize: CGSize) -> CGPoint? {
+        let inset: CGFloat = 20
+        let artworkSize = CGSize(width: max(0, pageSize.width - inset * 2),
+                                 height: max(0, pageSize.height - inset * 2))
+        let input = OriginalPageInput(available: CGSize(width: max(0, artworkSize.width - 16),
+                                                        height: max(0, artworkSize.height - 36)))
+        let origin = CGPoint(x: inset + (artworkSize.width - input.size.width) / 2,
+                             y: inset + (artworkSize.height - input.size.height) / 2)
+        return input.point(CGPoint(x: point.x - origin.x, y: point.y - origin.y))
+    }
+
     var body: some View {
-        ZStack {
-            PaperSurface()
-            Group {
-                if play.acquiredItemImage != nil || play.touchPictureImages != nil {
-                    OriginalTouchPictureView(play: play)
-                } else if play.suitcaseContents != nil {
-                    OriginalSuitcaseContentsView(play: play, interactive: false)
-                } else if play.closeup != nil {
-                    OriginalSearchCloseupView(play: play, interactive: false)
+        GeometryReader { proxy in
+            OriginalZoomableCanvas(contentSize: proxy.size, onTap: { location in
+                guard case .exploration = play.runner.phase,
+                      let point = scenePoint(location, pageSize: proxy.size) else { return }
+                if play.closeup != nil {
+                    play.selectCloseupComponent(x: Int(point.x), y: Int(point.y), confirmImmediately: true)
                 } else if play.door != nil {
-                    OriginalDoorView(play: play, interactive: false)
+                    play.selectDoorComponent(x: Int(point.x), y: Int(point.y), confirmImmediately: true)
                 } else if play.lobby?.mode == .counter {
-                    OriginalMapView(play: play, screen: 0)
+                    play.selectLobbyObject(x: Float(point.x), y: Float(point.y), confirmImmediately: true)
                 }
+            }) {
+                ZStack {
+                    PaperSurface()
+                    Group {
+                        if play.acquiredItemImage != nil || play.touchPictureImages != nil {
+                            OriginalTouchPictureView(play: play)
+                        } else if play.suitcaseContents != nil {
+                            OriginalSuitcaseContentsView(play: play, interactive: false)
+                        } else if play.closeup != nil {
+                            OriginalSearchCloseupView(play: play, interactive: false)
+                        } else if play.door != nil {
+                            OriginalDoorView(play: play, interactive: false)
+                        } else if play.lobby?.mode == .counter {
+                            OriginalMapView(play: play, screen: 0)
+                        }
+                    }
+                    .padding(20)
+                    .allowsHitTesting(false)
+                }
+                .frame(width: proxy.size.width, height: proxy.size.height)
             }
-            .padding(20)
         }
         .clipped()
     }
