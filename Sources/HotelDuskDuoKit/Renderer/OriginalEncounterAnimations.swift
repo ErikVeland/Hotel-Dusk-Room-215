@@ -55,10 +55,6 @@ struct OriginalEncounterAnimationCatalog {
         return id
     }
 
-    func poses(person: Int) -> [Int] {
-        (expressions[person]?.keys.sorted() ?? []).filter { (try? animationID(person: person, pose: $0)) != nil }
-    }
-
     func initialPose(person: Int) throws -> Int {
         if (try? animationID(person: person, pose: 2)) != nil { return 2 }
         guard let pose = expressions[person]?.keys.sorted().first(where: {
@@ -100,7 +96,7 @@ final class OriginalEncounterAnimations {
     private let library: OriginalAnimationLibrary
     private let clips = NSCache<NSString, CachedClip>()
     private var players: [UInt8: Player] = [:]
-    private var contours: [Int: OriginalAnimationContour] = [:]
+    private var contours: [String: OriginalAnimationContour] = [:]
     private var lastProgram: String?
     private var lastPacketOffset: Int?
     private let updatesPerFrame = 6
@@ -151,25 +147,22 @@ final class OriginalEncounterAnimations {
             var decoder = OriginalAnimationDecoder(clip: clip)
             guard let frame = try decoder.advance() else { throw OriginalAnimationError.invalid("Empty character animation") }
             players[screen] = Player(person: person, pose: pose, decoder: decoder, frame: frame,
-                staticFrame: frame, contour: try contour(person: person))
+                staticFrame: frame, contour: try contour(clip: clip))
         }
         lastProgram = program
         lastPacketOffset = packet.sourceOffset
     }
 
-    /// One outline per character covers every expression and frame, so a
-    /// change of pose leaves the wrapped text where it is.
-    private func contour(person: Int) throws -> OriginalAnimationContour {
-        if let contour = contours[person] { return contour }
+    /// One outline covers every frame of a pose, so its motion stays clear of
+    /// the text. Staging clips (entrances, falls) are framed differently, so
+    /// sharing one outline across poses would leave wide gaps around the head.
+    private func contour(clip: OriginalAnimationClip) throws -> OriginalAnimationContour {
+        if let contour = contours[clip.id] { return contour }
         var extents = OriginalAnimationContour.Extents()
-        for pose in expressions.poses(person: person) {
-            let id = try expressions.animationID(person: person, pose: pose)
-            let clip = try clips.object(forKey: id as NSString)?.clip ?? library.load(id: id)
-            var decoder = OriginalAnimationDecoder(clip: clip)
-            while let frame = try decoder.advance(loop: false) { extents.include(frame) }
-        }
+        var decoder = OriginalAnimationDecoder(clip: clip)
+        while let frame = try decoder.advance(loop: false) { extents.include(frame) }
         let contour = OriginalAnimationContour(extents: extents)
-        contours[person] = contour
+        contours[clip.id] = contour
         return contour
     }
 

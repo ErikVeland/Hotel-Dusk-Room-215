@@ -50,24 +50,22 @@ final class OriginalEncounterAnimationTests: XCTestCase {
         XCTAssertEqual(animations.portraits.map { $0.frame.frameIndex }, frames)
     }
 
-    func testWrapOutlineCoversEveryPoseAndFrameOfTheCharacter() throws {
+    func testWrapOutlineCoversEveryFrameOfThePose() throws {
         let animations = try OriginalEncounterAnimations(catalog: .bundled())
-        try animations.present(packet(person: 6, pose: 1), program: "Jeff")
-        let outline = try XCTUnwrap(animations.portraits.first?.contour)
-        try animations.present(packet(person: 6, pose: 2, offset: 20), program: "Jeff")
-        let next = try XCTUnwrap(animations.portraits.first)
-        XCTAssertEqual(next.contour.leftEdge, outline.leftEdge, "A new pose must not reshape the wrap")
-        XCTAssertEqual(next.contour.rightEdge, outline.rightEdge)
-        // Every frame of every pose stays inside the outline.
-        let expressions = try OriginalEncounterAnimationCatalog(catalog: .bundled())
         let library = try OriginalAnimationLibrary.bundled()
         func extent(_ edge: [CGPoint], at y: CGFloat) -> CGFloat? { edge.min { abs($0.y - y) < abs($1.y - y) }?.x }
-        for pose in expressions.poses(person: 6) {
-            var decoder = OriginalAnimationDecoder(clip: try library.load(id: expressions.animationID(person: 6, pose: pose)))
+        for (pose, offset) in [(1, 10), (2, 20)] {
+            try animations.present(packet(person: 6, pose: Int8(pose), offset: offset), program: "Jeff")
+            let portrait = try XCTUnwrap(animations.portraits.first)
+            var decoder = OriginalAnimationDecoder(clip: try library.load(id: portrait.animationID))
             while let frame = try decoder.advance(loop: false) {
                 let single = OriginalAnimationContour(frame: frame)
-                for point in single.leftEdge { XCTAssertLessThanOrEqual(try XCTUnwrap(extent(outline.leftEdge, at: point.y)), point.x + 0.001) }
-                for point in single.rightEdge { XCTAssertGreaterThanOrEqual(try XCTUnwrap(extent(outline.rightEdge, at: point.y)), point.x - 0.001) }
+                for point in single.leftEdge {
+                    XCTAssertLessThanOrEqual(try XCTUnwrap(extent(portrait.contour.leftEdge, at: point.y)), point.x + 0.001)
+                }
+                for point in single.rightEdge {
+                    XCTAssertGreaterThanOrEqual(try XCTUnwrap(extent(portrait.contour.rightEdge, at: point.y)), point.x - 0.001)
+                }
             }
         }
     }

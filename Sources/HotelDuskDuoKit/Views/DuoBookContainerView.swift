@@ -114,6 +114,9 @@ public struct DuoBookContainerView: View {
         switch play.runner.phase {
         case .dialogue, .itemNotice: return true
         case .waiting: return !play.dialogueNotebook.ink.isEmpty
+        case .choice, .questions:
+            // The menu is written after the ink, beside the portraits.
+            return !play.dialogueNotebook.ink.isEmpty && DialogueMenu(play: play) != nil
         default: return false
         }
     }

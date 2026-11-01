@@ -4,7 +4,17 @@ import CoreGraphics
 
 /// Core Text measures and draws the same glyphs, including pages split mid-passage.
 struct DialogueNotebookLayout {
+    /// A line of a choice or question menu. Menus follow the ink like another
+    /// passage, but they are never typed out or saved.
+    struct MenuEntry: Equatable {
+        let text: String
+        let selectable: Bool
+    }
+
     let text: NSAttributedString
+    /// Characters of conversation ink; any menu follows them.
+    let inkLength: Int
+    let menuRanges: [NSRange]
     let size: CGSize
     let pages: [NSRange]
     let fontSize: CGFloat
@@ -14,7 +24,8 @@ struct DialogueNotebookLayout {
 
     init(runs: [OriginalDialogueLines.Run], size: CGSize, fontSize: CGFloat,
          portraitContours: [UInt8: OriginalAnimationContour] = [:], portraitSize: CGSize = .zero,
-         singlePage: Bool = false, preserving previous: DialogueNotebookLayout? = nil, revealedEnd: Int = 0) {
+         singlePage: Bool = false, preserving previous: DialogueNotebookLayout? = nil, revealedEnd: Int = 0,
+         menu: [MenuEntry] = []) {
         self.size = size
         self.fontSize = fontSize
         let text = NSMutableAttributedString(string: "")
@@ -38,6 +49,38 @@ struct DialogueNotebookLayout {
                 NSAttributedString.Key(kCTParagraphStyleAttributeName as String): paragraph
             ]))
         }
+        inkLength = text.length
+        var menuRanges: [NSRange] = []
+        if !menu.isEmpty {
+            var spacing: CGFloat = 6, before = fontSize * 0.45
+            let entryStyle = withUnsafePointer(to: &spacing) { spacing in
+                withUnsafePointer(to: &before) { before in
+                    var settings = [
+                        CTParagraphStyleSetting(spec: .lineSpacingAdjustment, valueSize: MemoryLayout<CGFloat>.size, value: spacing),
+                        CTParagraphStyleSetting(spec: .paragraphSpacingBefore, valueSize: MemoryLayout<CGFloat>.size, value: before)
+                    ]
+                    return CTParagraphStyleCreate(&settings, settings.count)
+                }
+            }
+            let heading = CTFontCreateWithName("Georgia-Italic" as CFString, fontSize * 0.85, nil)
+            for (index, entry) in menu.enumerated() {
+                let separator = index > 0 ? "\n" : text.length > 0 ? "\n\n" : ""
+                text.append(NSAttributedString(string: separator, attributes: [
+                    NSAttributedString.Key(kCTFontAttributeName as String): font,
+                    NSAttributedString.Key(kCTParagraphStyleAttributeName as String): paragraph
+                ]))
+                let label = entry.selectable ? "– " + entry.text : entry.text
+                menuRanges.append(NSRange(location: text.length, length: (label as NSString).length))
+                text.append(NSAttributedString(string: label, attributes: [
+                    NSAttributedString.Key(kCTFontAttributeName as String): entry.selectable ? font : heading,
+                    NSAttributedString.Key(kCTForegroundColorAttributeName as String): entry.selectable
+                        ? CGColor(red: 0.48, green: 0.19, blue: 0.15, alpha: 1)
+                        : CGColor(red: 0.20, green: 0.17, blue: 0.14, alpha: 0.6),
+                    NSAttributedString.Key(kCTParagraphStyleAttributeName as String): entryStyle
+                ]))
+            }
+        }
+        self.menuRanges = menuRanges
         self.text = text
         guard size.width > 0, size.height >= CTFontGetAscent(font) + CTFontGetDescent(font) else {
             pages = []
@@ -159,6 +202,8 @@ struct DialogueNotebookLayout {
 
     func draw(page: NSRange, revealedEnd: Int, in context: CGContext) {
         guard let frame = frames[page.location], page.length > 0 else { return }
+        // A menu appears whole once the ink before it is written.
+        let revealedEnd = !menuRanges.isEmpty && revealedEnd >= inkLength ? text.length : revealedEnd
         let lines = CTFrameGetLines(frame) as? [CTLine] ?? []
         var origins = [CGPoint](repeating: .zero, count: lines.count)
         CTFrameGetLineOrigins(frame, CFRange(location: 0, length: 0), &origins)
@@ -184,6 +229,25 @@ struct DialogueNotebookLayout {
             context.restoreGState()
         }
         context.restoreGState()
+    }
+
+    /// The selectable menu entry under a point in page coordinates (y down).
+    func menuEntry(at point: CGPoint, page: NSRange) -> Int? {
+        guard !menuRanges.isEmpty, let frame = frames[page.location] else { return nil }
+        let lines = CTFrameGetLines(frame) as? [CTLine] ?? []
+        var origins = [CGPoint](repeating: .zero, count: lines.count)
+        CTFrameGetLineOrigins(frame, CFRange(location: 0, length: 0), &origins)
+        let y = size.height - point.y
+        for (index, line) in lines.enumerated() {
+            var ascent: CGFloat = 0, descent: CGFloat = 0
+            let width = CGFloat(CTLineGetTypographicBounds(line, &ascent, &descent, nil))
+            // Reach into the gap between entries so each one is a fair target.
+            guard y >= origins[index].y - descent - 8, y <= origins[index].y + ascent + 8,
+                  point.x >= origins[index].x - 12, point.x <= origins[index].x + width + 12 else { continue }
+            let location = CTLineGetStringRange(line).location
+            return menuRanges.firstIndex { NSLocationInRange(location, $0) }
+        }
+        return nil
     }
 
     func accessibleText(page: NSRange) -> String {

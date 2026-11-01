@@ -26,6 +26,45 @@ struct DialogueSpreadMetrics: Equatable {
     }
 }
 
+/// A choice or question menu written into the notebook after the last line,
+/// so the conversation and its portraits stay in view while the player decides.
+struct DialogueMenu {
+    enum Action { case choose(UInt16), ask(Int16), notebook, items, leave }
+    let entries: [DialogueNotebookLayout.MenuEntry]
+    private let actions: [Action?]
+
+    @MainActor init?(play: OriginalPlaySession) {
+        // The item picker needs a full page; the menu returns when it closes.
+        guard !play.isBrowsingInventory else { return nil }
+        var menu: [(DialogueNotebookLayout.MenuEntry, Action?)]
+        switch play.runner.phase {
+        case .choice(let choices):
+            menu = choices.map { (.init(text: $0.label, selectable: true), .choose($0.id)) }
+        case .questions(let topics):
+            menu = [(.init(text: topics.isEmpty ? "No questions" : "Ask about", selectable: false), nil)]
+            menu += topics.map { (.init(text: $0.label, selectable: true), .ask($0.keyword)) }
+            menu += [(.init(text: "Notebook", selectable: true), .notebook),
+                     (.init(text: "Items", selectable: true), .items),
+                     (.init(text: "Leave", selectable: true), .leave)]
+        default: return nil
+        }
+        entries = menu.map(\.0)
+        actions = menu.map(\.1)
+    }
+
+    @MainActor func perform(_ entry: Int, play: OriginalPlaySession) {
+        guard actions.indices.contains(entry) else { return }
+        switch actions[entry] {
+        case .choose(let id): play.choose(id)
+        case .ask(let keyword): play.ask(keyword)
+        case .notebook: play.openNotebook()
+        case .items: play.beginInventoryBrowsing()
+        case .leave: play.leaveConversation()
+        case nil: break
+        }
+    }
+}
+
 /// The spread owns pagination and the only writing clock. Gameplay handedness
 /// never changes physical reading order.
 struct NotebookDialogueSpread: View {
@@ -48,6 +87,7 @@ struct NotebookDialogueSpread: View {
         let reviewing: Bool
         let portraitSignature: [String]
         let portraitSize: CGSize
+        let menu: [DialogueNotebookLayout.MenuEntry]
     }
     private struct WritingKey: Equatable {
         let end: Int
@@ -64,11 +104,12 @@ struct NotebookDialogueSpread: View {
             let key = LayoutKey(size: metrics.textSize, font: fontSize, ink: notebook.ink,
                 visible: isVisible && scenePhase == .active, singlePage: inspection,
                 reviewing: notebook.isReviewing,
-                // A character's outline covers all of their poses, so only the cast matters.
+                // Each pose has its own outline; pages with ink keep theirs.
                 portraitSignature: notebook.isReviewing ? [] : play.encounterPortraits.map {
-                    "\($0.screen):\($0.person)"
+                    "\($0.screen):\($0.animationID)"
                 }.sorted(),
-                portraitSize: metrics.portraitSize)
+                portraitSize: metrics.portraitSize,
+                menu: notebook.isReviewing ? [] : DialogueMenu(play: play)?.entries ?? [])
             let writing = WritingKey(end: notebook.reader.spreadEnd, revision: notebook.passageRevision,
                 paused: play.isPaused || notebook.isReviewing || scenePhase != .active || !isVisible,
                 instant: reduceMotion || voiceOver, turning: notebook.isTurning)
@@ -109,7 +150,7 @@ struct NotebookDialogueSpread: View {
                 notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font,
                     portraitContours: contours, portraitSize: value.portraitSize,
                     singlePage: value.singlePage, preserving: previous,
-                    revealedEnd: notebook.reader.revealedEnd),
+                    revealedEnd: notebook.reader.revealedEnd, menu: value.menu),
                                    singlePage: value.singlePage)
             }
             .onChange(of: notebook.turnRevision) { _, revision in
@@ -168,8 +209,32 @@ struct NotebookDialogueLeaf: View {
         }
     }
 
+    private var menu: DialogueMenu? { notebook.isReviewing ? nil : DialogueMenu(play: play) }
+
+    /// Selectable menu entries set on this leaf, once the ink before them is written.
+    private func menuEntries(on page: NSRange, menu: DialogueMenu?) -> [Int] {
+        guard let menu, !notebook.reader.isWriting, layout.menuRanges.count == menu.entries.count else { return [] }
+        return layout.menuRanges.indices.filter {
+            menu.entries[$0].selectable && NSIntersectionRange(layout.menuRanges[$0], page).length > 0
+        }
+    }
+
+    private func tap(_ point: CGPoint, page: NSRange) {
+        let menu = menu
+        if !notebook.isTurning, let entry = layout.menuEntry(at: point, page: page),
+           menuEntries(on: page, menu: menu).contains(entry) {
+            menu?.perform(entry, play: play)
+        } else if interactive {
+            play.advanceWrittenDialogue()
+        } else if menu != nil, !play.isPaused {
+            // Finish the ink or turn to the leaf that holds the menu.
+            _ = notebook.consumeTap()
+        }
+    }
+
     var body: some View {
         let page = notebook.reader.page(at: pageIndex)
+        let menu = menu
         let right = inspection || pageIndex % 2 == 1
         ZStack(alignment: .topLeading) {
             PaperSurface(side: right ? .right : .left)
@@ -218,9 +283,14 @@ struct NotebookDialogueLeaf: View {
             }
             .frame(width: metrics.textSize.width, height: metrics.textSize.height)
             .contentShape(Rectangle())
-            .onTapGesture { if interactive { play.advanceWrittenDialogue() } }
+            .gesture(SpatialTapGesture().onEnded { tap($0.location, page: page) })
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(layout.accessibleText(page: page))
+            .accessibilityActions {
+                ForEach(menuEntries(on: page, menu: menu), id: \.self) { entry in
+                    Button(menu?.entries[entry].text ?? "") { menu?.perform(entry, play: play) }
+                }
+            }
             .offset(x: metrics.textOrigin.x, y: metrics.textOrigin.y)
 
             if right, !inspection, !notebook.isReviewing, let item = play.acquiredItemImage, metrics.itemArtworkSize > 0 {
@@ -258,8 +328,10 @@ struct NotebookDialogueLeaf: View {
                         .buttonStyle(.plain)
                         .frame(minHeight: 44)
                         .disabled(!notebook.canTurnForward)
-                } else if right, interactive {
-                    Button { play.advanceWrittenDialogue() } label: {
+                } else if right, interactive || (menu != nil && (notebook.reader.isWriting || notebook.reader.hasNextSpread)) {
+                    Button {
+                        if interactive { play.advanceWrittenDialogue() } else if !play.isPaused { _ = notebook.consumeTap() }
+                    } label: {
                         Text(notebook.tapLabel + "  ›")
                             .font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
                             .lineLimit(1).minimumScaleFactor(0.8).frame(minHeight: 44)
