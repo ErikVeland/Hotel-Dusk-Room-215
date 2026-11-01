@@ -53,7 +53,7 @@ The chapter-nine apple-letter sequence also failed with legacy pacing explicitly
 | OriginalDifferencesTests.testSourceEventStartsPuzzleAndReturnsItsSuccessBranch | required condition is false: comp != nullptr (com.apple.coreaudio.avfaudio) |
 | OriginalDoorWireTests.testOriginalDoorArtLoadsAndRenders | failed: caught error: "missing("Metal device")" |
 | OriginalEventCompletionTests.testUnrecoveredLateChapterInspectionCounterStaysExplicit | XCTAssertEqual failed: ("completed(HotelDuskDuoKit.OriginalEventCompletion.Completion(transition: nil, preventContextRestore: false))") is not equal to ("requiresOriginalHandler(mode: 10)") |
-| OriginalFactoryOverlaySessionTests.testChapterNineAppleProcessSequenceCarriesAllLettersIntoWordEntry | XCTAssertEqual failed: ("2") is not equal to ("4") |
+| OriginalFactoryOverlaySessionTests.testChapterNineAppleProcessSequenceCarriesAllLettersIntoWordEntry | Passed on 2026-11-01 in the focused route run. |
 | OriginalHangerRendererTests.testRenderHangerAndCuttingStages | failed: caught error: "missing("Metal device")" |
 | OriginalJukeboxProcessTests.testBundledRecordTitlesLoadForTheNativeProcess | failed: caught error: "missing("trick/jukebox/JK_USA.txt")" |
 | OriginalJukeboxProcessTests.testChapterSixProcess58StartsJukeboxAndReturnsThroughItsStoryEvent | XCTAssertEqual failed: ("nil") is not equal to ("Optional(36)") |
@@ -80,7 +80,7 @@ The chapter-nine apple-letter sequence also failed with legacy pacing explicitly
 | OriginalStoryContinuationTests.testChapterNineReachesRosasRoomAndResumesInstantly | XCTUnwrap failed: expected non-nil value of type "String" |
 | OriginalStoryContinuationTests.testChapterNineReturnsTheKeyAndFindsTheFifthPainting | XCTUnwrap failed: expected non-nil value of type "String" |
 | OriginalStoryContinuationTests.testChapterNineReturnsToTheLobbyAfterTheFourthLetter | XCTUnwrap failed: expected non-nil value of type "String" |
-| OriginalStoryContinuationTests.testChapterNineRoom215ApplePaintingUsesNormalHitAndInstantRestores | XCTUnwrap failed: expected non-nil value of type "OriginalResumeSave" |
+| OriginalStoryContinuationTests.testChapterNineRoom215ApplePaintingUsesNormalHitAndInstantRestores | Passed on 2026-11-01 in the focused route run. |
 | OriginalStoryContinuationTests.testChapterNineViewlessLobbyDoorUsesOriginalDoorResponse | XCTUnwrap failed: expected non-nil value of type "String" |
 | OriginalStoryContinuationTests.testChapterNineWalksFromDunningRoomToPantry | XCTUnwrap failed: expected non-nil value of type "String" |
 | OriginalStoryContinuationTests.testChapterNineWalksThroughR118ToR213 | XCTUnwrap failed: expected non-nil value of type "String" |
@@ -88,4 +88,12 @@ The chapter-nine apple-letter sequence also failed with legacy pacing explicitly
 | OriginalToiletTankTests.testOriginalModelShowsMovingLid | failed: caught error: "missing("Metal device")" |
 | OriginalToiletTankTests.testSourceEventCompletesThroughTouchInput | XCTAssertEqual failed: ("halted(HotelDuskDuoKit.OriginalEventRunner.Halt(reason: "The toilet tank could not be loaded: missing(\"Metal device\")", program: "EP4_R205", eventIndex: Optional(11), sourceOffset: nil))") is not equal to ("process(id: 48)") |
 
-The full suite was not repeated after the focused fixes. No device build was installed or launched.
+## Focused route follow-up (2026-11-01)
+
+- `OriginalNotebookTests`: 6 passed, including the new unread-Mila-memo page case.
+- `OriginalStoryContinuationTests.testChapterEightBowlingResultBranchesReachPlantOrRepeat`: passed. This route previously stopped when notebook permissions did not include generated Mila memo pages.
+- `OriginalStoryContinuationTests.testChapterNineRoom215ApplePaintingUsesNormalHitAndInstantRestores`: passed.
+- `OriginalFactoryOverlaySessionTests.testChapterNineAppleProcessSequenceCarriesAllLettersIntoWordEntry`: passed.
+- `OriginalGameStateTests`: 7 passed, including the source-backed retry-buffer copy.
+
+A full suite rerun started but was stopped after UI snapshot tests produced no further output. The route-class run also exposed the notebook page-index crash above; the fixed bowling branch now passes in isolation. No device build was installed or launched.

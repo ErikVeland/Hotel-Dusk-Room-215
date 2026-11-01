@@ -77,8 +77,10 @@ struct OriginalVendingMachineView: View {
             Text(status(process)).font(.caption).frame(height: 32)
             HStack {
                 Button("Back") { play.vendingMachineAction(.quit) }
+                    .buttonStyle(BookTextButtonStyle())
                 Spacer()
                 Button("Return coin") { play.vendingMachineAction(.returnCoin) }
+                    .buttonStyle(BookTextButtonStyle())
                     .disabled(!process.coinInserted)
             }
             .disabled(process.phase != .acceptingInput)
@@ -88,7 +90,8 @@ struct OriginalVendingMachineView: View {
     private func control(_ label: String, action: OriginalVendingMachineProcess.Action,
                          width: CGFloat, height: CGFloat) -> some View {
         Button { play.vendingMachineAction(action) } label: {
-            Color.clear.frame(width: width, height: height).contentShape(Rectangle())
+            Color.clear.frame(width: max(48, width), height: max(48, height))
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)

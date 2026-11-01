@@ -13,7 +13,7 @@ public struct OriginalUpViewImage {
     private let bitmaps: [OriginalLinearBitmap]
     private let visible: [Bool]
 
-    static let hitMargin = 2
+    static let hitMargin = 24
 
     public init(bitmaps: [OriginalLinearBitmap], visible: [Bool], artwork: OriginalArtwork = .shared) throws {
         guard !bitmaps.isEmpty, bitmaps.count <= 16, visible.count == bitmaps.count, visible[0],
@@ -58,7 +58,7 @@ public struct OriginalUpViewImage {
 
     /**
      * 0x02059DEC uses page-X parity to select a nibble, including its original odd-row behaviour.
-     * The native hit map adds a two-pixel margin in transparent pixels around visible objects.
+     * The native hit map adds a finger-sized margin in transparent pixels around visible objects.
      */
     public func hit(pageX: Int, pageY: Int) -> Int? {
         guard (8...183).contains(pageX), (8...247).contains(pageY) else { return nil }
@@ -74,6 +74,45 @@ public struct OriginalUpViewImage {
             (packed[index / 2] >> ((index & 1) * 4)) & 15
         }
         let source = owners
+        if radius > 2 {
+            var distances = [Int](repeating: Int.max, count: owners.count)
+            var queue: [Int] = []
+            for owner in stride(from: 15, through: 1, by: -1) {
+                for index in source.indices where source[index] == UInt8(owner) {
+                    distances[index] = 0
+                    queue.append(index)
+                }
+            }
+            var next = 0
+            while next < queue.count {
+                let index = queue[next]
+                next += 1
+                let distance = distances[index]
+                guard distance < radius else { continue }
+                let x = index % width, y = index / width
+                let owner = owners[index]
+                for neighbour in [
+                    x > 0 ? index - 1 : -1,
+                    x + 1 < width ? index + 1 : -1,
+                    y > 0 ? index - width : -1,
+                    y + 1 < height ? index + width : -1
+                ] where neighbour >= 0 && source[neighbour] == 0 {
+                    let candidateDistance = distance + 1
+                    guard candidateDistance <= radius else { continue }
+                    if candidateDistance < distances[neighbour]
+                        || (candidateDistance == distances[neighbour] && owner > owners[neighbour]) {
+                        distances[neighbour] = candidateDistance
+                        owners[neighbour] = owner
+                        queue.append(neighbour)
+                    }
+                }
+            }
+            var expanded = [UInt8](repeating: 0, count: packed.count)
+            for (index, owner) in owners.enumerated() {
+                expanded[index / 2] |= owner << ((index & 1) * 4)
+            }
+            return expanded
+        }
         let radiusSquared = radius * radius
         for y in 0..<height {
             for x in 0..<width {

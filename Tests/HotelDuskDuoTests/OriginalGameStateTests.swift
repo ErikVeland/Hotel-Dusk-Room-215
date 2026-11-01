@@ -38,6 +38,25 @@ final class OriginalGameStateTests: XCTestCase {
         XCTAssertEqual(state.bytes[0x45], 255)
     }
 
+    func testRetryRestoreCopiesCheckpointAndKeepsCurrentEventFlags() throws {
+        var state = try OriginalGameState(snapshot: Data((0..<OriginalGameState.byteCount).map { UInt8(truncatingIfNeeded: $0) }))
+        state.saveRetryCheckpoint()
+        let checkpoint = Array(state.bytes[0..<0x1AAC])
+
+        var mutatedBytes = state.bytes
+        mutatedBytes.replaceSubrange(0..<0x1AAC, with: repeatElement(UInt8(0xA1), count: 0x1AAC))
+        let currentEventFlags = [UInt8](repeating: 0x33, count: 0x5E0)
+        mutatedBytes.replaceSubrange(0x14CC..<0x1AAC, with: currentEventFlags)
+        mutatedBytes[0x3558] = 0x55
+        state = try OriginalGameState(snapshot: Data(mutatedBytes))
+        state.restoreRetryCheckpoint()
+
+        XCTAssertEqual(Array(state.bytes[0..<0x14CC]), Array(checkpoint[0..<0x14CC]))
+        XCTAssertEqual(Array(state.bytes[0x14CC..<0x1AAC]), currentEventFlags)
+        XCTAssertEqual(state.bytes[0], checkpoint[0])
+        XCTAssertEqual(state.bytes[0x3558], 0x55)
+    }
+
     func testChristmasTreeOrderUsesOverlayStatePointerOffset() throws {
         var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
         XCTAssertEqual(game.christmasTreeDecorationOrder, 0)

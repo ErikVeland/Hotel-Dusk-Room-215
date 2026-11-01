@@ -28,15 +28,17 @@ struct OriginalJigsawPageView: View {
                     if !upper {
                         if puzzle.selected != nil, !puzzle.holding {
                             rotationButton(increasing: false, scale: scale)
-                                .position(x: 16 * scale, y: 16 * scale)
+                                .position(x: 24, y: 24)
                             rotationButton(increasing: true, scale: scale)
-                                .position(x: 176 * scale, y: 16 * scale)
+                                .position(x: 192 * scale - 24, y: 24)
                         }
                         Button("Back") { play.quitJigsaw() }
-                            .font(.system(size: 12 * scale))
-                            .buttonStyle(.bordered)
+                            .font(NovelStyle.caption)
+                            .frame(minWidth: 48, minHeight: 48)
+                            .background(NovelStyle.paper.opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
+                            .buttonStyle(.plain)
                             .disabled(puzzle.phase != 1 && puzzle.phase != 3)
-                            .position(x: 172 * scale, y: 240 * scale)
+                            .position(x: 192 * scale - 30, y: 256 * scale - 30)
                     }
                 }
                 .frame(width: 192 * scale, height: 256 * scale)
@@ -48,7 +50,7 @@ struct OriginalJigsawPageView: View {
                 if !upper, !hingeManager.hasHardwareHinge, puzzle.awaitsFold {
                     Button("Fold book") { hingeManager.performFoldGesture() }
                         .buttonStyle(BookTextButtonStyle())
-                        .frame(minHeight: 44)
+                        .frame(minHeight: 48)
                         .disabled(hingeManager.isSimulatingFold)
                 }
             }
@@ -84,6 +86,8 @@ struct OriginalJigsawPageView: View {
         Button { play.rotateJigsaw(increasing: increasing) } label: {
             artwork(increasing ? "JigsawRotateRight" : "JigsawRotateLeft")
                 .frame(width: 32 * scale, height: 32 * scale)
+                .frame(width: 48, height: 48)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .disabled(play.jigsaw?.acceptsInput != true)

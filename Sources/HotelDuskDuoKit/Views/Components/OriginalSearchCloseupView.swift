@@ -21,7 +21,7 @@ struct OriginalSearchCloseupView: View {
                     }
                 }
                 if interactive {
-                    Text("Tap an object to interact. Choose an item first to use it.")
+                    Text("Tap an object to inspect it. Choose an item, then tap a target to use it.")
                         .font(NovelStyle.caption)
                         .foregroundStyle(NovelStyle.fadedInk)
                     HStack {

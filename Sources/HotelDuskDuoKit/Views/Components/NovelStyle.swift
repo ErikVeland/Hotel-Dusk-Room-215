@@ -44,7 +44,7 @@ struct InkRule: View {
     }
 }
 
-/// An underlined text affordance with a full touch target, without a button tile.
+/// An underlined text affordance with a finger-sized touch target, without a button tile.
 struct BookTextButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
@@ -52,8 +52,8 @@ struct BookTextButtonStyle: ButtonStyle {
         configuration.label
             .font(NovelStyle.label)
             .foregroundStyle(NovelStyle.ink)
-            .padding(.horizontal, 8)
-            .frame(minHeight: 44)
+            .padding(.horizontal, 10)
+            .frame(minWidth: 48, minHeight: 48)
             .contentShape(Rectangle())
             .background(configuration.isPressed ? NovelStyle.ink.opacity(0.08) : .clear)
             .opacity(isEnabled ? 1 : 0.45)

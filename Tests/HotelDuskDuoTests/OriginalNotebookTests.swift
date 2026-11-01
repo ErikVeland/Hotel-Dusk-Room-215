@@ -134,6 +134,26 @@ final class OriginalNotebookTests: XCTestCase {
         XCTAssertEqual(completeNotebook.pageCount, 8)
     }
 
+    func testUnreadMilaMemoPageIsLockedAndHasNotebookPermissions() throws {
+        var bytes = [UInt8](repeating: 0, count: OriginalGameState.byteCount)
+        bytes[0x13CC] = 1
+        let game = try OriginalGameState(snapshot: Data(bytes))
+        let notebook = try OriginalNotebook(game: game) { path in
+            guard path == "system/note/memo/mila01_M.bin" else {
+                throw OriginalDataError.missing(path)
+            }
+            var memo = [UInt8](repeating: 0, count: 0x10 + OriginalNotebook.packedSize)
+            memo.replaceSubrange(0..<4, with: [0x4D, 0x49, 0x4C, 0x41])
+            memo[4] = 8
+            memo[5] = 1
+            return Data(memo)
+        }
+
+        XCTAssertEqual(notebook.pageCount, 4)
+        XCTAssertEqual(notebook.page, 3)
+        XCTAssertFalse(notebook.canEdit)
+    }
+
     func testAngledStrokesAndErasureMatchOriginalStorage() throws {
         var game = try state("melissa-notebook-open/opened")
         var notebook = try OriginalNotebook(game: game, load: OriginalBitmapLibrary.bundled().loadNotebookData)

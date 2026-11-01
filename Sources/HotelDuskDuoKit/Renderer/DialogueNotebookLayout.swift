@@ -24,6 +24,7 @@ struct DialogueNotebookLayout {
 
     init(runs: [OriginalDialogueLines.Run], size: CGSize, fontSize: CGFloat,
          portraitContours: [UInt8: OriginalAnimationContour] = [:], portraitSize: CGSize = .zero,
+         portraitBottomInset: CGFloat = 0,
          singlePage: Bool = false, preserving previous: DialogueNotebookLayout? = nil, revealedEnd: Int = 0,
          menu: [MenuEntry] = []) {
         self.size = size
@@ -109,6 +110,7 @@ struct DialogueNotebookLayout {
             let screen: UInt8 = singlePage ? 0 : pageIndex.isMultiple(of: 2) ? 1 : 0
             let path = frozen[offset] ?? Self.framePath(size: size,
                 padding: max(14, fontSize * 0.8), portraitSize: portraitSize,
+                portraitBottomInset: portraitBottomInset,
                 contour: portraitContours[screen], screen: screen)
             let frame = CTFramesetterCreateFrame(setter, CFRange(location: offset, length: 0), path, nil)
             let visible = CTFrameGetVisibleStringRange(frame)
@@ -130,6 +132,7 @@ struct DialogueNotebookLayout {
     }
 
     private static func framePath(size: CGSize, padding: CGFloat, portraitSize: CGSize,
+                                  portraitBottomInset: CGFloat,
                                   contour: OriginalAnimationContour?, screen: UInt8) -> CGPath {
         let path = CGMutablePath()
         guard let contour, !contour.leftEdge.isEmpty, !contour.rightEdge.isEmpty,
@@ -139,34 +142,34 @@ struct DialogueNotebookLayout {
         }
         let scale = min(portraitSize.width / CGFloat(contour.width), portraitSize.height / CGFloat(contour.height))
         let imageSize = CGSize(width: CGFloat(contour.width) * scale, height: CGFloat(contour.height) * scale)
-        let imageOrigin = CGPoint(x: screen == 1 ? (portraitSize.width - imageSize.width) / 2
-                                                  : size.width - portraitSize.width + (portraitSize.width - imageSize.width) / 2,
-                                  y: size.height - portraitSize.height + (portraitSize.height - imageSize.height) / 2)
-        func point(_ source: CGPoint) -> CGPoint {
-            CGPoint(x: imageOrigin.x + source.x * imageSize.width,
-                    y: size.height - imageOrigin.y - source.y * imageSize.height)
-        }
+        let frameX = screen == 1 ? 0 : size.width - portraitSize.width
+        let imageX = frameX + (portraitSize.width - imageSize.width) / 2
+        let imageY = size.height + portraitBottomInset - portraitSize.height
+            + (portraitSize.height - imageSize.height) / 2
+        let left = contour.leftEdge.map(\.x).min() ?? 0
+        let right = contour.rightEdge.map(\.x).max() ?? 1
+        let top = min(contour.leftEdge.first?.y ?? 0, contour.rightEdge.first?.y ?? 0)
+        let bottom = max(contour.leftEdge.last?.y ?? 1, contour.rightEdge.last?.y ?? 1)
+        let boxLeft = min(size.width, max(0, imageX + left * imageSize.width - padding))
+        let boxRight = min(size.width, max(0, imageX + right * imageSize.width + padding))
+        let boxTop = min(size.height, max(0, size.height - imageY - top * imageSize.height + padding))
+        let boxBottom = min(size.height, max(0, size.height - imageY - bottom * imageSize.height - padding))
+
+        // Keep text outside the portrait's padded bounds. The clear regions can
+        // follow the animation's silhouette without letting glyphs cross it.
         if screen == 1 {
-            let edge = contour.rightEdge
-            guard let bottom = edge.last.map(point), let top = edge.first.map(point) else { return path }
-            path.move(to: CGPoint(x: bottom.x + padding, y: bottom.y))
-            path.addLine(to: CGPoint(x: size.width, y: 0))
-            path.addLine(to: CGPoint(x: size.width, y: size.height))
+            path.move(to: CGPoint(x: 0, y: boxTop))
             path.addLine(to: CGPoint(x: 0, y: size.height))
-            // The head gets the same clearance as the sides; Core Text's y axis points up.
-            let head = min(size.height, top.y + padding)
-            path.addLine(to: CGPoint(x: 0, y: head))
-            path.addLine(to: CGPoint(x: top.x + padding, y: head))
-            for source in edge { path.addLine(to: point(source).applying(CGAffineTransform(translationX: padding, y: 0))) }
+            path.addLine(to: CGPoint(x: size.width, y: size.height))
+            path.addLine(to: CGPoint(x: size.width, y: boxBottom))
+            path.addLine(to: CGPoint(x: boxRight, y: boxBottom))
+            path.addLine(to: CGPoint(x: boxRight, y: boxTop))
         } else {
-            let edge = contour.leftEdge.reversed()
-            guard let bottom = edge.first.map(point), let top = edge.last.map(point) else { return path }
-            path.move(to: .zero)
-            path.addLine(to: CGPoint(x: max(0, bottom.x - padding), y: bottom.y))
-            for source in edge { path.addLine(to: point(source).applying(CGAffineTransform(translationX: -padding, y: 0))) }
-            let head = min(size.height, top.y + padding)
-            path.addLine(to: CGPoint(x: max(0, top.x - padding), y: head))
-            path.addLine(to: CGPoint(x: size.width, y: head))
+            path.move(to: CGPoint(x: 0, y: boxTop))
+            path.addLine(to: CGPoint(x: 0, y: 0))
+            path.addLine(to: CGPoint(x: boxLeft, y: 0))
+            path.addLine(to: CGPoint(x: boxLeft, y: boxBottom))
+            path.addLine(to: CGPoint(x: size.width, y: boxBottom))
             path.addLine(to: CGPoint(x: size.width, y: size.height))
             path.addLine(to: CGPoint(x: 0, y: size.height))
         }

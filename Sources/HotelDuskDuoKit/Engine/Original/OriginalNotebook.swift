@@ -68,6 +68,7 @@ public struct OriginalNotebook: Sendable {
             if !pageStarted || used + rows > 0x100 || group != Int(data[5]) {
                 pages.append(Array(repeating: 0, count: Self.packedSize))
                 inkLayers.append([])
+                editablePages.append(false)
                 pageStarted = true
                 used = 0
                 group = nil

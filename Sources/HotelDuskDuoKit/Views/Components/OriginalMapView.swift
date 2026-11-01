@@ -7,6 +7,7 @@ struct OriginalMapView: View {
     @ObservedObject var play: OriginalPlaySession
     @Environment(\.displayScale) private var displayScale
     let screen: UInt8
+    var showsActionButtons = true
     @AppStorage("modernNavigation") private var modernNavigation = true
     @AppStorage("hdGraphicsEnabled") private var hdGraphicsEnabled = true
     @State private var showsInventory = false
@@ -88,29 +89,38 @@ struct OriginalMapView: View {
                     if screen == 1, lobby.mode == .walking {
                         Text("Hold a direction on the floor plan to walk.")
                             .font(NovelStyle.caption)
-                        interactionButtons
+                        if showsActionButtons { interactionButtons }
                     }
                     if screen == 0 {
                         if lobby.mode == .walking {
-                            interactionButtons
-                            HStack {
-                                Button("Items") { showsInventory = true }
-                                Button("Notebook") { play.openNotebook() }
-                            }.buttonStyle(BookTextButtonStyle())
+                            if showsActionButtons {
+                                interactionButtons
+                                HStack {
+                                    Button("Items") { showsInventory = true }
+                                    Button("Notebook") { play.openNotebook() }
+                                }.buttonStyle(BookTextButtonStyle())
+                            }
                         } else {
-                            Text("Tap an object to interact. Choose an item first to use it.")
+                            Text("Tap an object to inspect it. Choose an item, then tap a target to use it.")
                                 .font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
                             if let item = play.searchItem {
                                 OriginalInventoryItemLabel(item: item)
                             }
                             Slider(value: Binding(get: { Double(play.lobby?.pan ?? 0) },
                                 set: { play.panLobbyCounter(Float($0)) }), in: 0...1)
+                                .frame(minHeight: 48)
                                 .accessibilityLabel("Look around")
-                            HStack {
-                                Button("Back") { play.leaveLobbyCounter() }
-                                Button("Items") { showsInventory = true }
-                                if play.searchItem != nil { Button("Cancel") { play.useItemInSearchView(nil) } }
-                            }.buttonStyle(BookTextButtonStyle())
+                            if showsActionButtons {
+                                if lobby.mapID == 2, lobby.searchAreaID == 2 {
+                                    Button("Inspect bell") { play.inspectLobbyBell() }
+                                        .buttonStyle(BookTextButtonStyle())
+                                }
+                                HStack {
+                                    Button("Back") { play.leaveLobbyCounter() }
+                                    Button("Items") { showsInventory = true }
+                                    if play.searchItem != nil { Button("Cancel") { play.useItemInSearchView(nil) } }
+                                }.buttonStyle(BookTextButtonStyle())
+                            }
                         }
                     }
                 }

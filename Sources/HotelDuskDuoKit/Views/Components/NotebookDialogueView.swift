@@ -144,11 +144,13 @@ struct NotebookDialogueSpread: View {
                 // Review drops the portraits, so its pages start fresh on the way in and out.
                 let previous = old.reviewing == value.reviewing && !value.reviewing
                     && old.singlePage == value.singlePage && old.portraitSize == value.portraitSize
+                    && old.portraitSignature == value.portraitSignature
                     ? notebook.layout : nil
                 let contours = notebook.isReviewing ? [:] : Dictionary(uniqueKeysWithValues:
                     play.encounterPortraits.map { ($0.screen, $0.contour) })
                 notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font,
                     portraitContours: contours, portraitSize: value.portraitSize,
+                    portraitBottomInset: metrics.itemArtworkSize > 0 ? metrics.itemArtworkSize + 12 : 0,
                     singlePage: value.singlePage, preserving: previous,
                     revealedEnd: notebook.reader.revealedEnd, menu: value.menu),
                                    singlePage: value.singlePage)
@@ -192,6 +194,7 @@ struct NotebookDialogueLeaf: View {
     let metrics: DialogueSpreadMetrics
     let pageIndex: Int
     var inspection = false
+    @State private var showsInspectionInventory = false
 
     private func bindingShade(right: Bool) -> some View {
         LinearGradient(colors: [.black.opacity(0.28), .black.opacity(0.08), .clear],
@@ -210,6 +213,23 @@ struct NotebookDialogueLeaf: View {
     }
 
     private var menu: DialogueMenu? { notebook.isReviewing ? nil : DialogueMenu(play: play) }
+
+    private var inspectionItemTargetAvailable: Bool {
+        play.closeup != nil || play.door != nil || play.lobby?.mode == .counter
+    }
+
+    private func selectInspectionItem(_ item: UInt8) {
+        showsInspectionInventory = false
+        if play.closeup != nil { play.useItemInCloseup(item) }
+        else if play.door != nil { play.useItemAtDoor(item) }
+        else if play.lobby?.mode == .counter { play.useItemInSearchView(item) }
+    }
+
+    private func cancelInspectionItem() {
+        if play.closeup != nil { play.useItemInCloseup(nil) }
+        else if play.door != nil { play.useItemAtDoor(nil) }
+        else if play.lobby?.mode == .counter { play.useItemInSearchView(nil) }
+    }
 
     /// Selectable menu entries set on this leaf, once the ink before them is written.
     private func menuEntries(on page: NSRange, menu: DialogueMenu?) -> [Int] {
@@ -272,7 +292,11 @@ struct NotebookDialogueLeaf: View {
             if !notebook.isReviewing, let portrait = play.encounterPortraits.first(where: { $0.screen == (right ? 0 : 1) }) {
                 OriginalAnimationFrameView(frame: portrait.frame)
                     .frame(width: metrics.portraitSize.width, height: metrics.portraitSize.height)
-                    .allowsHitTesting(false)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if interactive, !notebook.isTurning { play.advanceWrittenDialogue() }
+                    }
+                    .allowsHitTesting(interactive)
                     .accessibilityHidden(true)
                     .position(x: right ? metrics.pageSize.width - metrics.margin - metrics.portraitSize.width / 2
                                        : metrics.margin + metrics.portraitSize.width / 2,
@@ -309,7 +333,7 @@ struct NotebookDialogueLeaf: View {
                 if right, !notebook.isReviewing, play.runner.interruptAvailable {
                     Button { play.interrupt() } label: {
                         Image(systemName: "exclamationmark.bubble.fill")
-                            .foregroundStyle(NovelStyle.redInk).frame(width: 44, height: 44)
+                            .foregroundStyle(NovelStyle.redInk).frame(width: 48, height: 48)
                     }
                     .buttonStyle(.plain).disabled(notebook.isTurning)
                     .accessibilityLabel("Interrupt")
@@ -318,7 +342,7 @@ struct NotebookDialogueLeaf: View {
                     Button("‹  Previous pages") { notebook.turnBack() }
                         .font(NovelStyle.caption)
                         .buttonStyle(.plain)
-                        .frame(minHeight: 44)
+                        .frame(minHeight: 48)
                         .disabled(!notebook.canTurnBack || !play.canReviewConversations)
                 } else if inspection, case .exploration = play.runner.phase {
                     Button("Back") {
@@ -328,14 +352,42 @@ struct NotebookDialogueLeaf: View {
                     }
                     .font(NovelStyle.caption)
                     .buttonStyle(.plain)
-                    .frame(minHeight: 44)
+                    .frame(minHeight: 48)
+                }
+                if right, inspection, play.lobby?.mapID == 2, play.lobby?.searchAreaID == 2,
+                   case .exploration = play.runner.phase {
+                    Button("Inspect bell") { play.inspectLobbyBell() }
+                        .font(NovelStyle.caption)
+                        .buttonStyle(.plain)
+                        .frame(minHeight: 48)
+                }
+                if right, inspection, inspectionItemTargetAvailable,
+                   case .exploration = play.runner.phase {
+                    Button { showsInspectionInventory = true } label: {
+                        Label("Items", systemImage: "bag")
+                            .labelStyle(.titleAndIcon)
+                            .font(NovelStyle.caption)
+                            .frame(minHeight: 48)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Choose an item, then tap an object on the inspection view to use it.")
+                    if play.searchItem != nil {
+                        Button {
+                            cancelInspectionItem()
+                        } label: {
+                            Image(systemName: "xmark.circle")
+                                .frame(width: 48, height: 48)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Cancel selected item")
+                    }
                 }
                 Spacer(minLength: 0)
                 if right, notebook.isReviewing {
                     Button("Next pages  ›") { notebook.turnForward() }
                         .font(NovelStyle.caption)
                         .buttonStyle(.plain)
-                        .frame(minHeight: 44)
+                        .frame(minHeight: 48)
                         .disabled(!notebook.canTurnForward)
                 } else if right, interactive || (menu != nil && (notebook.reader.isWriting || notebook.reader.hasNextSpread)) {
                     Button {
@@ -343,13 +395,23 @@ struct NotebookDialogueLeaf: View {
                     } label: {
                         Text(notebook.tapLabel + "  ›")
                             .font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
-                            .lineLimit(1).minimumScaleFactor(0.8).frame(minHeight: 44)
+                            .lineLimit(1).minimumScaleFactor(0.8).frame(minHeight: 48)
                     }
                     .buttonStyle(.plain).disabled(notebook.isTurning)
                 }
             }
-            .frame(width: metrics.textSize.width, height: 44)
-            .offset(x: metrics.margin, y: metrics.pageSize.height - metrics.bottom - 44)
+            .frame(width: metrics.textSize.width, height: 48)
+            .offset(x: metrics.margin, y: metrics.pageSize.height - metrics.bottom - 48)
+
+            if right, inspection, showsInspectionInventory {
+                OriginalInventoryView(play: play, onSelect: selectInspectionItem,
+                                      onClose: { showsInspectionInventory = false })
+                    .padding(.horizontal, metrics.margin)
+                    .padding(.top, metrics.top + 28)
+                    .padding(.bottom, metrics.bottom + 52)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(PaperSurface(side: .right))
+            }
         }
         .frame(width: metrics.pageSize.width, height: metrics.pageSize.height)
         .clipped()
@@ -418,7 +480,7 @@ struct OriginalInspectionArtwork: View {
                         } else if play.door != nil {
                             OriginalDoorView(play: play, interactive: false)
                         } else if play.lobby?.mode == .counter {
-                            OriginalMapView(play: play, screen: 0)
+                            OriginalMapView(play: play, screen: 0, showsActionButtons: false)
                         }
                     }
                     .padding(20)

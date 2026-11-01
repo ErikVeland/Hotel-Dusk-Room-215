@@ -2,7 +2,7 @@
 
 The architecture is Swift and SwiftUI, with Metal for the Duo book material. The original ROM is the comparison reference. No emulator integration is planned or included.
 
-The native game remains incomplete. A fresh-game native-input test chain reaches the Chapter 10 ending through instant-save checkpoints. The Chapter 7 checkpoint route completes processes 55 and 43 through the normal session input APIs with CPU-projected touch points. It does not verify the visible target mapping or rendering against the original device. Focused tests restore checkpoints between route sections. Original-device checks remain open for selected route triggers, puzzle gestures, bowling scores and audio. Game-over retries and original presentation also remain unfinished. See the [route tracing workbench](route-tracing-workbench.md) and [walkthrough route plan](walkthrough-route-plan.md) for the current boundaries.
+The native game remains incomplete. A fresh-game native-input test chain reaches the Chapter 10 ending through instant-save checkpoints. The Chapter 7 checkpoint route completes processes 55 and 43 through the normal session input APIs with CPU-projected touch points. It does not verify the visible target mapping or rendering against the original device. Focused tests restore checkpoints between route sections. Original-device checks remain open for selected route triggers, puzzle gestures, bowling scores and audio. The game-over trigger now offers native retry and title actions; original screen artwork and timing remain unverified. See the [route tracing workbench](route-tracing-workbench.md) and [walkthrough route plan](walkthrough-route-plan.md) for the current boundaries.
 
 ## Shared interaction gaps
 
@@ -32,7 +32,7 @@ Melissa’s stairway conversation reaches event 35 and keyword 8, “A puzzle, h
 
 For simulator checks, a Debug build reads the environment variable `HOTEL_DUSK_FIXTURE`. `R102-bell-look` supplies the look result for area 2, subarea 2 at R102 exploration. `R102-sign` and `R102-event-N` play the original script with fixed inputs until process 25 or event N starts. These are isolated component inputs, like the reference runner's diagnostic writes. While one is set, a Debug build also ignores a closed hinge reading, because the iPhone Duo simulator can boot folded. Release builds ignore all of them, and the app shows no control for them.
 
-`OriginalEventRunner` connects the recovered selector, conditions, state commands, dialogue packets and event exits. It marks a completed event at (current map, event key), as `0x0203D61C` does through `0x02097FC0`. A test checks operation handlers across all chapter scripts. It does not prove that each handler matches the original game. Opcodes that change only controller or display state continue without a drawing: 3, 26, 27, 28, 43, 44 and the empty dispatcher cases. An unrecovered opcode, exit mode, game-over retry or process halts that interaction with its program, event and source offset. The host then restores the last safe walking place, or starts Chapter 1 if it cannot restore a safe place.
+`OriginalEventRunner` connects the recovered selector, conditions, state commands, dialogue packets and event exits. It marks a completed event at (current map, event key), as `0x0203D61C` does through `0x02097FC0`. A test checks operation handlers across all chapter scripts. It does not prove that each handler matches the original game. Opcodes that change only controller or display state continue without a drawing: 3, 26, 27, 28, 43, 44 and the empty dispatcher cases. An unrecovered opcode, exit mode or process halts that interaction with its program, event and source offset. The host then restores the last safe walking place, or starts Chapter 1 if it cannot restore a safe place.
 
 These parts of the slice are approximations:
 
@@ -43,7 +43,7 @@ These parts of the slice are approximations:
 - Turning HD graphics off rebuilds the active map and door or close-up images at source resolution. The artwork manifest has 4× enhancements for every decoded map texture and bitmap. Five map DTX files remain undecoded, and the enhancement images still need visual review.
 - Inspection controls and the counter slider use native controls. The other counter page remains blank until Kyle's portrait compositor is recovered. Metal rendering does not reproduce every DS rasterisation detail.
 - The opening cinematic does not run. Play starts at the arrival event that the reference runner reaches after the opening.
-- The entrance shows the original `u01`–`u03` and `d01`–`d03` panels, not the 3D R101 scene. The handle target is invisible. Fades are counted for timing but not drawn.
+- The entrance shows the original `u01`–`u03` and `d01`–`d03` panels, not the 3D R101 scene. The handle target is invisible. The shared brightness controller draws the recovered entrance fade.
 - Text control `%m0NN` starts `SEQ_BGM_NN`. The meaning of the other mode values is not known.
 - Text colours 1 and 2 use approximate ink tones. Portraits, talk backgrounds and character animation are not drawn.
 - The bell page shows `bell02` with `bell01` on top. The bell target uses the sprite pixel mask with a two-pixel margin, excluded from the quit target. The bell swing angle, trick-button sprites and the talk background `R102_03` on the other screen are not drawn. Touch targets have no visible overlays.
@@ -82,7 +82,7 @@ Passing these checks proves the covered transformations agree with recovered sou
 3. Recover original scene geometry, textures, collision, camera and touch behavior.
 4. Translate every original puzzle and its chapter prerequisites, including microphone and hinge interactions.
 5. Restore original audio event selection, effects, envelope/modulation behavior and measured timing.
-6. Recover notebook, original saves, failure states, all endings and chapter transitions.
+6. Recover notebook, DS save compatibility, original failure-screen artwork and animation, all endings and chapter transitions. The retry-state copy and kind-7 retry/title routing are now connected; device comparison remains open.
 7. Compare matching ROM/native input traces and screen/audio checkpoints throughout the complete game.
 
 The supplied ROM and source artifacts are retained locally. Unverified data stays available for recovery; unverified gameplay stays unavailable in the app.
@@ -118,4 +118,4 @@ See [Chapter 3 progress](chapter-three-progress.md) for the current route and re
 
 ## Chapter 4
 
-The native route now plays Chapter 4 from the roof to the review through normal input. Opcode 34 and departure clock requests are recovered. Game-over pages (`%r`) still lack the original failure screen and retry behaviour. If one is reached, the app now returns to the last safe walking place, or starts Chapter 1 when no safe place is available. See [Chapter 4 progress](chapter-four-progress.md).
+The native route now plays Chapter 4 from the roof to the review through normal input. Opcode 34 and departure clock requests are recovered. Game-over pages (`%r`) now open Retry and Back to Title actions. Retry uses the source-backed state buffer; original artwork and timing remain open. See [Chapter 4 progress](chapter-four-progress.md).

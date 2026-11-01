@@ -241,7 +241,8 @@ struct OriginalNumberSealPageView: View {
                             play.touchNumberSeal(pageX: 172, pageY: 240)
                         } label: {
                             Image(systemName: "arrow.uturn.backward")
-                                .frame(width: 32 * scale, height: 32 * scale)
+                                .frame(width: 48, height: 48)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel("Leave sticker")
@@ -505,7 +506,7 @@ private struct OriginalDialogueMenuButton: View {
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 8)
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: 48, alignment: .leading)
             .background(Color.black.opacity(0.82))
             .contentShape(Rectangle())
         }

@@ -18,7 +18,7 @@ Run the chain with `HOTEL_DUSK_ROUTE_CHECKPOINTS` set, in the order above, after
 
 - Opcode 34 (`0x0203C51C`) pushes a request with the record's kind and value. It then commits scene 1, mode 29 and block 0, with the value in session `+0x3A` (`0x02028240`, `0x020282EC`). Mode-29 events select on this value. Dunning's Room 217 scene and the R117 search use it.
 - A departure script's clock request (kind 3) now changes the time before the destination map selects its arrival events. Before this change, the request was lost when the runner moved to the new map.
-- Text control `%r` with four digits is decoded. It starts every game-over sequence in the original scripts (69 files). The original game-over screen and retry restore are not recovered. The host returns play to the last safe walking place, or to Chapter 1 if it cannot restore that place.
+- Text control `%r` with four digits is decoded and the native runner now lets the original warning text continue. The original text handler skips this marker. The retry-state byte restore matches the source copy and preserved event-flag range. Request kind 7 now opens native Retry and Back to Title choices; Retry restores that buffer, and Back to Title leaves the resume save intact.
 
 ## Route helpers
 
@@ -32,7 +32,7 @@ Run the chain with `HOTEL_DUSK_ROUTE_CHECKPOINTS` set, in the order above, after
 
 ## Limits
 
-- The original game-over screen and retry are not implemented. A wrong answer or failed search returns play to the last safe walking place, or to Chapter 1 when no safe place is available.
-- Request kind 7 from opcode 34 is recorded but not drawn. Its original presentation effect is not recovered.
+- The native game-over menu uses text controls; original menu artwork, animation and exact timing remain unverified. Unsupported interactions still return to the last safe walking place, or to Chapter 1 when no safe place is available.
+- Request kind 7 from opcode 34 enters controller state `0x7F`, substate `0x1C` (`0x0202C264`). Substate `0x1C` branches on controller offset `0x155D6`. A zero value enters substate `0x1D`, which restores the retry checkpoint with `0x02098770`. The original menu assets identify Retry and Back to Title; native controls now route those choices to the matching restore and title actions. Original-device confirmation remains open.
 - The route uses one set of answers. Other branches are not checked.
 - These are native playability checks. They are not byte-for-byte comparisons with a matching original run.

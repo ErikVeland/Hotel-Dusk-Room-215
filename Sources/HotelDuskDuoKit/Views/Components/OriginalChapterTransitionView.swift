@@ -12,9 +12,12 @@ struct OriginalChapterTransitionView: View {
             if transition.stage == .title {
                 if let chapter {
                     titlePage(chapter)
-                } else {
+                } else if screen == 0 {
                     Button("Continue") { play.continueChapterTitle() }
+                        .buttonStyle(BookTextButtonStyle())
                         .accessibilityLabel("Chapter title unavailable. Continue")
+                } else {
+                    Color.clear
                 }
             } else if screen == 0 {
                 Text("Your progress saves automatically.")
@@ -52,11 +55,13 @@ struct OriginalChapterTransitionView: View {
             .foregroundStyle(.black)
             .frame(width: 192, height: 256)
             .contentShape(Rectangle())
-            .onTapGesture { play.continueChapterTitle() }
+            .onTapGesture {
+                if screen == 0 { play.continueChapterTitle() }
+            }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(screen == 1 ? chapter.title : "\(chapter.dateLabel). \(chapter.timeRange)")
-            .accessibilityHint("Continue")
-            .accessibilityAddTraits(.isButton)
+            .accessibilityHint(screen == 0 ? "Continue" : "")
+            .accessibilityAddTraits(screen == 0 ? .isButton : [])
             .scaleEffect(scale)
             .frame(width: 192 * scale, height: 256 * scale)
             .notebookPhotograph()

@@ -217,6 +217,16 @@ public struct OriginalGameState: Equatable, Sendable, OriginalConditionContext {
         let current = Array(bytes[0..<0x1AAC])
         bytes.replaceSubrange(0x1AAC..<0x3558, with: current)
     }
+
+    /**
+     * 0x02098770 restores the saved state while retaining the current event flags.
+     */
+    public mutating func restoreRetryCheckpoint() {
+        let currentEventFlags = Array(bytes[0x14CC..<0x1AAC])
+        let checkpoint = Array(bytes[0x1AAC..<0x3558])
+        bytes.replaceSubrange(0..<0x1AAC, with: checkpoint)
+        bytes.replaceSubrange(0x14CC..<0x1AAC, with: currentEventFlags)
+    }
     public var chapter: UInt16 { read16(0) }
     public var nowTime: UInt16 { read16(2) }
     public var mapPosition: SIMD3<Float> {

@@ -643,6 +643,8 @@ public struct OriginalEventRunner: Sendable {
 
     public mutating func saveRetryCheckpoint() { game.saveRetryCheckpoint() }
 
+    public mutating func restoreRetryCheckpoint() { game.restoreRetryCheckpoint() }
+
     /**
      * Stores overlay 22's resumable wine-label position in the game state.
      */
@@ -1045,10 +1047,8 @@ public struct OriginalEventRunner: Sendable {
                 case 4:
                     let following = operationIndex + 1 < operations.count ? operations[operationIndex + 1] : nil
                     let packet = try OriginalDialoguePacket(record: record, following: following, text: program.text)
-                    // Game-over pages (`%r`) need the recovered failure screen and retry restore.
-                    if packet.pages.contains(where: { $0.tokens.contains { if case .control(.retry(_)) = $0.kind { return true }; return false } }) {
-                        return halt("The game-over retry sequence is not recovered", sourceOffset: record.sourceOffset)
-                    }
+                    // The original text renderer skips `%rNNNN`; retry restoration
+                    // is handled outside this dialogue command.
                     if session.restoredFromNonDialogue {
                         let skipped = skipReplayedPage(packet, following: following)
                         if interrupt.window || interrupt.keepShared { disarmInterrupt() }

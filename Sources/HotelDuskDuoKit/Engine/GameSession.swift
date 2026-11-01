@@ -141,6 +141,37 @@ public final class GameSession: ObservableObject {
         refreshChapterSaves()
     }
 
+    /// Restores the source game's retry buffer after the player selects Retry.
+    public func retryOriginalGameOver() {
+        guard let play, play.isGameOverPresented else { return }
+        do {
+            var game = play.runner.game
+            game.restoreRetryCheckpoint()
+            let checkpoint = try OriginalResumeSave(game: game, checkpointFacing: game.facing,
+                musicSequenceID: audioController.currentSequenceID, savedAt: Date())
+            let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController,
+                saveStore: saveStore, rumbleFeedback: rumbleFeedback,
+                mapRendererFactory: mapRendererFactory)
+            play.stop()
+            saveError = nil
+            attachPlay(next)
+        } catch {
+            saveError = "The retry checkpoint could not be restored: \(error)"
+        }
+    }
+
+    /// Leaves the failed run without saving its state over the current resume checkpoint.
+    public func returnToTitleAfterGameOver() {
+        guard let play, play.isGameOverPresented else { return }
+        play.stop()
+        playCancellable = nil
+        self.play = nil
+        isPauseMenuOpen = false
+        isReviewingConversations = false
+        audioController.stopAll()
+        refreshChapterSaves()
+    }
+
     private func refreshChapterSaves() {
         for slot in 0..<3 {
             do { chapterSaves[slot] = try saveStore.load(slot: slot) }

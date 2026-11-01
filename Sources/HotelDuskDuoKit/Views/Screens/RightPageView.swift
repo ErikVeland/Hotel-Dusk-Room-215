@@ -24,7 +24,8 @@ public struct RightPageView: View {
                     .foregroundStyle(NovelStyle.redInk)
             }
             if let play = session.play {
-                if session.isPauseMenuOpen { OriginalPauseView(session: session) }
+                if play.isGameOverPresented { OriginalGameOverView(session: session) }
+                else if session.isPauseMenuOpen { OriginalPauseView(session: session) }
                 else if play.chapterTransition != nil { OriginalChapterTransitionView(play: play, screen: 0) }
                 else if play.notebook != nil { OriginalNotebookView(play: play) }
                 else {
@@ -60,6 +61,27 @@ public struct RightPageView: View {
         }
         .padding(24)
         .foregroundStyle(NovelStyle.ink)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct OriginalGameOverView: View {
+    @ObservedObject var session: GameSession
+
+    var body: some View {
+        VStack(spacing: 18) {
+            Spacer()
+            Text("GAME OVER")
+                .font(NovelStyle.title)
+                .foregroundStyle(NovelStyle.redInk)
+            Text("Choose how to continue.")
+                .font(NovelStyle.body)
+            Button("Retry") { session.retryOriginalGameOver() }
+                .buttonStyle(BookTextButtonStyle())
+            Button("Back to Title") { session.returnToTitleAfterGameOver() }
+                .buttonStyle(BookTextButtonStyle())
+            Spacer()
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

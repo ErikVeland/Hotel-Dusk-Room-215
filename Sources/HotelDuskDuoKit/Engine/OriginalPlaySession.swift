@@ -41,6 +41,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var runner: OriginalEventRunner {
         didSet { reportRecoverableStopIfNeeded() }
     }
+    @Published public private(set) var isGameOverPresented = false
     @Published public private(set) var entrance: EntranceScene?
     @Published public private(set) var bell: BellScene?
 
@@ -1935,6 +1936,13 @@ public final class OriginalPlaySession: ObservableObject {
         defer {
             dialogueNotebook.record(runner.phase, program: runner.program.name)
             reportRecoverableStopIfNeeded()
+        }
+        if case .exploration = runner.phase,
+           runner.processRequests.dropFirst(handledMapRequests).contains(where: { $0.kind == 7 }) {
+            handledMapRequests = runner.processRequests.count
+            isGameOverPresented = true
+            stopTimer()
+            return
         }
         if case .halted(let halt) = runner.phase {
             reportRecoverableStopIfNeeded(for: halt)
@@ -4725,6 +4733,28 @@ public final class OriginalPlaySession: ObservableObject {
             ]))
             if repeated || (confirmImmediately && lobby?.selectedNode != nil) { confirmLobbyObject() }
         } catch { runner.halt("The counter selection failed: \(error)"); stopTimer() }
+    }
+
+    /**
+     * Starts the recovered R102 bell event from its counter search view.
+     */
+    public func inspectLobbyBell() {
+        let recordsProgress = beginProgressInput(.inspectLobbyBell)
+        defer { endProgressInput(recordsProgress) }
+        guard !isPaused, chapterTransition == nil, case .exploration = runner.phase,
+              closeup == nil, let lobby, lobby.mapID == 2, lobby.searchAreaID == 2,
+              lobby.mode == .counter else { return }
+        do {
+            let table = try OriginalSearchTable.bundled(map: lobby.mapName)
+            searchItem = nil
+            self.lobby?.clearSelection()
+            runner.lookInSearchView(area: 2, subarea: 2, table: table)
+            try startSearchFallback()
+            settle()
+        } catch {
+            runner.halt("The bell inspection could not start: \(error)")
+            stopTimer()
+        }
     }
 
     /**

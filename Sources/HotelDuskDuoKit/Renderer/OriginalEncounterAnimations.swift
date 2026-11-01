@@ -122,8 +122,8 @@ final class OriginalEncounterAnimations {
             let person = Int(presentation.person)
             if person == -1 || person == -3 { continue }
             guard (1...17).contains(person) else {
-                // Written pages keep the wrap around the departed figure, so
-                // its static portrait stays instead of a blank outline.
+                // Written pages keep a clear area around the departed figure,
+                // so its static portrait stays instead of a blank outline.
                 if var player = players[screen] {
                     player.frame = player.staticFrame
                     player.holdsStaticFrame = true
@@ -175,7 +175,7 @@ final class OriginalEncounterAnimations {
             if player.updates >= updatesPerFrame {
                 player.updates = 0
                 if let frame = try player.decoder.advance() {
-                    // The page text still wraps the silhouette, so keep the
+                    // The page text still clears the portrait, so keep the
                     // static portrait instead of leaving a blank outline.
                     if Self.isBlank(frame) {
                         player.frame = player.staticFrame

@@ -18,6 +18,7 @@ struct OriginalCPRView: View {
                     Button("Perform CPR") {
                         hingeManager.performFoldGesture()
                     }
+                    .buttonStyle(BookTextButtonStyle())
                 }
             }
         }

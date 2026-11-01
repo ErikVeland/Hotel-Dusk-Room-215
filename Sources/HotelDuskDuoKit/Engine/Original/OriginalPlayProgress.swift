@@ -151,6 +151,7 @@ enum OriginalProgressInput: Codable, Equatable, Sendable {
     case panLobbyCounter(value: Float)
     case leaveLobbyCounter
     case selectLobbyObject(x: Float, y: Float, confirmImmediately: Bool)
+    case inspectLobbyBell
     case selectLobbyRoomObject(x: Float, y: Float)
     case useItemInSearchView(item: UInt8?)
     case confirmLobbyObject
@@ -401,6 +402,7 @@ extension OriginalPlaySession {
         case let .panLobbyCounter(value): panLobbyCounter(value)
         case .leaveLobbyCounter: leaveLobbyCounter()
         case let .selectLobbyObject(x, y, confirmImmediately): selectLobbyObject(x: x, y: y, confirmImmediately: confirmImmediately)
+        case .inspectLobbyBell: inspectLobbyBell()
         case let .selectLobbyRoomObject(x, y): selectLobbyRoomObject(x: x, y: y)
         case let .useItemInSearchView(item): useItemInSearchView(item)
         case .confirmLobbyObject: confirmLobbyObject()

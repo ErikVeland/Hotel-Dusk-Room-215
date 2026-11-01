@@ -39,6 +39,7 @@ struct OriginalApplePaintingView: View {
             if case .revealed(let letter) = play.applePainting?.phase {
                 Text(verbatim: "Letter: \(letter)").font(.headline)
                 Button("Continue") { play.acknowledgeApplePaintingLetter() }
+                    .buttonStyle(BookTextButtonStyle())
             } else {
                 Text("Tap the letter hidden in the painting.")
             }

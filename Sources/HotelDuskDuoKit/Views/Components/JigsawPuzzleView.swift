@@ -65,7 +65,7 @@ public struct JigsawPuzzleView: View {
                 }
             }
             .padding(.horizontal, 8)
-            .frame(height: 44)
+            .frame(height: 48)
 
             GeometryReader { space in
                 let scale = max(0, min((space.size.width - 32) / puzzleManager.manifest.boardWidth,
@@ -92,7 +92,7 @@ public struct JigsawPuzzleView: View {
                 }
             }
             .buttonStyle(BookTextButtonStyle())
-            .frame(height: 44)
+            .frame(height: 48)
             .padding(.horizontal, 8)
         }
     }
@@ -123,7 +123,7 @@ public struct JigsawPuzzleView: View {
         Button { rotateSelected(clockwise: clockwise) } label: {
             artwork(named: clockwise ? puzzleManager.manifest.rotateRightImage : puzzleManager.manifest.rotateLeftImage)
                 .frame(width: 32, height: 32)
-                .frame(width: 44, height: 44)
+                .frame(width: 48, height: 48)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -193,6 +193,7 @@ private struct JigsawPieceView: View {
         .rotationEffect(.degrees(Double(placement.quarterTurns) * 90))
         .shadow(color: manager.selectedPieceID == piece.id ? .black.opacity(0.3) : .clear,
                 radius: 2, x: 0, y: 2)
+        .frame(minWidth: 48, minHeight: 48)
         .contentShape(Rectangle())
         .position(x: placement.centre.x * scale, y: placement.centre.y * scale)
         .onTapGesture { manager.selectPiece(piece.id) }

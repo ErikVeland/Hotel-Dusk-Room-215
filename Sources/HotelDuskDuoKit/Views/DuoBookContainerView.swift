@@ -76,7 +76,7 @@ public struct DuoBookContainerView: View {
                             if session.isReviewingConversations {
                                 Button("Return to game") { session.closeConversationHistory() }
                                     .font(NovelStyle.caption).buttonStyle(.plain)
-                                    .frame(minHeight: 44)
+                                    .frame(minHeight: 48)
                             }
                             BookSettingsMenu(session: session)
                         }
@@ -175,7 +175,7 @@ struct BookSettingsMenu: View {
                 .italic()
                 .underline()
                 .padding(.horizontal, 8)
-                .frame(minHeight: 44)
+                .frame(minHeight: 48)
                 .contentShape(Rectangle())
         }
         .menuIndicator(.hidden)
