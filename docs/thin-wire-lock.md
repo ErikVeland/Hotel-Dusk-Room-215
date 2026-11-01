@@ -42,7 +42,7 @@ The normal session route uses ordinary movement, item selection and held touches
 
 The session sends archive-0 effect 33 and its movement-dependent volume to the native audio adapter. Puzzle completion and quit stop this effect. Exact acoustic matching remains unverified.
 
-Native page snapshots show the insertion and pin stages. DS pixel equivalence is not established. The common puzzle caption remains a presentation gap. The rumble cue now maps to Core Haptics, but device timing and intensity remain unverified. Fade timers advance, but the visual fades are not drawn. Physical Duo touch, hinge and lifecycle behaviour remain unverified.
+Native page snapshots show the insertion and pin stages. The shared brightness controller now draws the recovered fades over the puzzle image. DS pixel equivalence is not established. The common puzzle caption remains a presentation gap. The rumble cue maps to Core Haptics, but device timing and intensity remain unverified. Physical Duo touch, hinge and lifecycle behaviour remain unverified.
 
 ## Reference inputs
 

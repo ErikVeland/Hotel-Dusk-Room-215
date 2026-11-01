@@ -22,6 +22,10 @@ struct OriginalJigsawPageView: View {
                         pieces(puzzle, scale: scale)
                     }
                     if !upper {
+                        OriginalProcessBrightnessOverlay(
+                            coefficient: play.processScreenEffects.brightness[0].coefficient)
+                    }
+                    if !upper {
                         if puzzle.selected != nil, !puzzle.holding {
                             rotationButton(increasing: false, scale: scale)
                                 .position(x: 16 * scale, y: 16 * scale)

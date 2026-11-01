@@ -15,6 +15,8 @@ struct OriginalPaperclipView: View {
                     if let image = play.paperclipImage {
                         Image(decorative: image, scale: 1).resizable().interpolation(.high).frame(width: 192, height: 256)
                     }
+                    OriginalProcessBrightnessOverlay(
+                        coefficient: play.processScreenEffects.brightness[0].coefficient)
                 }
                 .frame(width: 192, height: 256)
                 .contentShape(Rectangle())

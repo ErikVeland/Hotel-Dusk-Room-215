@@ -34,7 +34,7 @@ The session plays the original pin-latch effect from archive 1, entry 33. Openin
 
 Pixel inspection confirms that the thin source model remains visible during insertion. Its shading and edge coverage differ from the original. The `geometry` reference records the original submitted wire geometry and textures for further comparison.
 
-Exact model rasterisation, acoustic matching, visual fades, caption presentation and physical-device interaction remain unverified. The recovered fade durations control process transitions, but the wire view does not yet draw those fades.
+The shared brightness controller now draws the recovered opening, exit and completion fades over the puzzle image. Exact model rasterisation, acoustic matching, caption presentation and physical-device interaction remain unverified.
 
 ## Captures and checks
 

@@ -62,7 +62,7 @@ On 17 October 2026, 48 targeted Swift checks passed in one run with no failures 
 - Native trigonometry approximates the original touch-ray lookup. The fixed-point segment retains rounding, but complete per-frame position equivalence is unverified.
 - Metal texture filtering, rasterisation and scene lighting do not match every original pixel.
 - Original puzzle captions 2, 19, 20 and 29 are retained as unrendered presentation records. Their portraits and text are not yet drawn. Caption-related frame timing remains unverified.
-- Fade durations control process completion but are not yet applied to the displayed puzzle image.
+- The shared brightness controller draws the recovered opening, exit and completion fades over the puzzle image.
 - Original start and stop cues use the recovered effect bank. Acoustic output and precise playback timing still need comparison.
 - Inventory selection and the Back control use native text buttons.
 - Paperclip straightening, wire use, later story routes and persistent saves remain open. [Paperclip acquisition](paperclip.md) is now connected.

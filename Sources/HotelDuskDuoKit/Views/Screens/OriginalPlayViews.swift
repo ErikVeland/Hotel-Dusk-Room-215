@@ -141,6 +141,8 @@ struct OriginalEntrancePanelView: View {
                     } else {
                         Color.black
                     }
+                    OriginalProcessBrightnessOverlay(
+                        coefficient: play.processScreenEffects.brightness[upper ? 1 : 0].coefficient)
                 }
                 .frame(width: size.width, height: size.height)
                 .contentShape(Rectangle())
@@ -193,6 +195,8 @@ struct OriginalBellPageView: View {
                                     .frame(width: size.width, height: size.height)
                             }
                         }
+                        OriginalProcessBrightnessOverlay(
+                            coefficient: play.processScreenEffects.brightness[0].coefficient)
                     }
                     .frame(width: size.width, height: size.height)
                     .contentShape(Rectangle())
@@ -512,7 +516,8 @@ private struct OriginalDialogueMenuButton: View {
 
 /// Process 25. The blank card `signnote` is shown, and each field reveals the
 /// completed card `signnote02` up to its stroke length, as the draw at
-/// 0x021FD728 grows each field's quad. Fades and the pen sprite are not drawn.
+/// 0x021FD728 grows each field's quad. The recovered screen fades are drawn;
+/// the pen sprite is not.
 struct OriginalSignPageView: View {
     @ObservedObject var play: OriginalPlaySession
     let upper: Bool
@@ -543,6 +548,8 @@ struct OriginalSignPageView: View {
                             .frame(width: size.width, height: size.height)
                             .mask(alignment: .topLeading) { reveal(scene.strokes, scale: scale) }
                     }
+                    OriginalProcessBrightnessOverlay(
+                        coefficient: play.processScreenEffects.brightness[0].coefficient)
                 }
                 .frame(width: size.width, height: size.height)
                 .contentShape(Rectangle())

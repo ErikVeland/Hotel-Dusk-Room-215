@@ -219,6 +219,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var memoDrawing: OriginalMemoDrawingProcess?
     @Published public private(set) var memoDrawingImage: CGImage?
     @Published public private(set) var memoDrawingScreenEffects = OriginalScreenEffects()
+    @Published public private(set) var processScreenEffects = OriginalScreenEffects()
     private var memoDrawingRenderer: OriginalMemoDrawingImage?
     private var memoDrawingTouch: SIMD2<Int>?
     private let puzzleSeed: () -> UInt32
@@ -2011,7 +2012,10 @@ public final class OriginalPlaySession: ObservableObject {
                 }
                 bellProcess = OriginalBellProcess()
                 processReturn = 2
-                for fade in OriginalBellProcess.initialFades { fadeRemaining[fade.screen] = Int(fade.duration) }
+                for fade in OriginalBellProcess.initialFades {
+                    beginProcessFade(screen: fade.screen, mask: fade.mask, mode: UInt8(clamping: fade.mode),
+                                     from: Float(bitPattern: fade.targetBits), frames: Int(fade.duration))
+                }
                 bell = BellScene(angle: 0, awaitingTouch: false, quitEnabled: false)
             }
             startTimer()
@@ -2660,7 +2664,8 @@ public final class OriginalPlaySession: ObservableObject {
                 processReturn = 2
                 // The normal initializer starts this one-update fade.
                 let fade = OriginalEntranceProcess.initialFade
-                fadeRemaining[fade.screen] = Int(fade.duration)
+                beginProcessFade(screen: fade.screen, mask: fade.mask, mode: UInt8(clamping: fade.mode),
+                                 from: Float(bitPattern: fade.targetBits), frames: Int(fade.duration))
                 entrance = EntranceScene(panel: 0, sceneVisible: true, awaitingHandle: false)
             }
             startTimer()
@@ -3085,6 +3090,7 @@ public final class OriginalPlaySession: ObservableObject {
         if paperclip != nil { return updatePaperclip() }
         if jigsaw != nil {
             let complete = (fadeRemaining[0] ?? 0) == 0
+            processScreenEffects.advanceOriginalFrame()
             for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
             applyJigsawEffects(jigsaw?.update(screen0FadeComplete: complete) ?? [])
             return
@@ -3096,11 +3102,14 @@ public final class OriginalPlaySession: ObservableObject {
         let input = OriginalEntranceProcess.Input(newTouch: pendingTouch, leftHanded: false,
             page0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
         pendingTouch = nil
+        processScreenEffects.advanceOriginalFrame()
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let step = current.update(input)
         for effect in step.effects {
             switch effect {
-            case .fade(let fade): fadeRemaining[fade.screen] = Int(fade.duration)
+            case .fade(let fade):
+                beginProcessFade(screen: fade.screen, mask: fade.mask, mode: UInt8(clamping: fade.mode),
+                                 from: Float(bitPattern: fade.targetBits), frames: Int(fade.duration))
             case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
             case .optionalRumble: rumbleFeedback.playRumble(durationFrames: nil)
             case .processReturn(let value): processReturn = value
@@ -3120,6 +3129,7 @@ public final class OriginalPlaySession: ObservableObject {
             process = nil
             entrance = nil
             fadeRemaining = [:]
+            processScreenEffects = OriginalScreenEffects()
             stopTimer()
             runner.finishProcess(returnValue: processReturn)
             settle()
@@ -3385,11 +3395,34 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
 
+    private func beginProcessFade(screen: Int, mask: UInt16, mode: UInt8, from: Float, frames: Int) {
+        guard (0..<2).contains(screen), mode <= 4, frames > 0,
+              frames <= Int(UInt16.max), from.isFinite else { return }
+        fadeRemaining[screen] = frames
+        try? processScreenEffects.beginBrightness(screen: screen, mask: mask, mode: mode,
+                                                  from: from, frames: UInt16(frames))
+    }
+
+    private func beginProcessFade(_ effect: ProcessFadeCue, frames: Int) {
+        let mode: UInt8
+        let from: Float
+        let mask: UInt16
+        switch effect {
+        case .fadeIn: mode = 3; from = -16; mask = 1
+        case .fadeOut: mode = 2; from = 0; mask = 1
+        case .completion: mode = 3; from = 16; mask = 0x21
+        }
+        beginProcessFade(screen: 0, mask: mask, mode: mode, from: from, frames: frames)
+    }
+
+    private enum ProcessFadeCue { case fadeIn, fadeOut, completion }
+
     private func applyJigsawEffects(_ effects: [OriginalJigsawProcess.Effect]) {
         for effect in effects {
             switch effect {
-            case .fadeIn(let updates), .fadeOut(let updates), .completionFade(let updates):
-                fadeRemaining[0] = updates
+            case .fadeIn(let updates): beginProcessFade(.fadeIn, frames: updates)
+            case .fadeOut(let updates): beginProcessFade(.fadeOut, frames: updates)
+            case .completionFade(let updates): beginProcessFade(.completion, frames: updates)
             case .sound(let archive, let entry):
                 try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
             case .hint(let pairA, let pairB):
@@ -3404,6 +3437,7 @@ public final class OriginalPlaySession: ObservableObject {
                 let mask = jigsaw?.looseMask ?? 0
                 jigsaw = nil
                 fadeRemaining = [:]
+                processScreenEffects = OriginalScreenEffects()
                 stopTimer()
                 runner.finishJigsaw(returnValue: result, looseMask: mask)
                 settle()
@@ -3593,6 +3627,7 @@ public final class OriginalPlaySession: ObservableObject {
     private func updatePaperclip() {
         guard var puzzle = paperclip, paperclipRenderer != nil else { return recoverMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
+        processScreenEffects.advanceOriginalFrame()
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let touch = paperclipTouch.flatMap { OriginalPaperclipProjection.hit(page: $0) }
         let effects = puzzle.update(touch: touch, isTouchDown: paperclipTouch != nil, fadeComplete: complete)
@@ -3606,8 +3641,9 @@ public final class OriginalPlaySession: ObservableObject {
         }
         for effect in effects {
             switch effect {
-            case .fadeIn(let updates), .fadeOut(let updates), .completionFade(let updates):
-                fadeRemaining[0] = updates
+            case .fadeIn(let updates): beginProcessFade(.fadeIn, frames: updates)
+            case .fadeOut(let updates): beginProcessFade(.fadeOut, frames: updates)
+            case .completionFade(let updates): beginProcessFade(.completion, frames: updates)
             case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
             case .springBack: rumbleFeedback.playRumble(durationFrames: nil)
             case .completed(let result):
@@ -3616,6 +3652,7 @@ public final class OriginalPlaySession: ObservableObject {
                 paperclipRenderer = nil
                 paperclipTouch = nil
                 fadeRemaining = [:]
+                processScreenEffects = OriginalScreenEffects()
                 stopTimer()
                 do {
                     let response = try runner.finishInventoryProcess(returnValue: result, catalog: catalog)
@@ -4295,6 +4332,7 @@ public final class OriginalPlaySession: ObservableObject {
     private func updateThinWire() {
         guard var puzzle = thinWire, thinWireRenderer != nil else { return recoverMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
+        processScreenEffects.advanceOriginalFrame()
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let previous = puzzle
         let effects = puzzle.update(pageTouch: thinWireTouch, fadeComplete: complete)
@@ -4307,8 +4345,9 @@ public final class OriginalPlaySession: ObservableObject {
         }
         for effect in effects {
             switch effect {
-            case .fadeIn(let updates), .fadeOut(let updates), .completionFade(let updates):
-                fadeRemaining[0] = updates
+            case .fadeIn(let updates): beginProcessFade(.fadeIn, frames: updates)
+            case .fadeOut(let updates): beginProcessFade(.fadeOut, frames: updates)
+            case .completionFade(let updates): beginProcessFade(.completion, frames: updates)
             case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
             case .stopSound(let entry):
                 _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: entry, fadeFrames: 1))
@@ -4324,6 +4363,7 @@ public final class OriginalPlaySession: ObservableObject {
                 thinWireRenderer = nil
                 thinWireTouch = nil
                 fadeRemaining = [:]
+                processScreenEffects = OriginalScreenEffects()
                 stopTimer()
                 runner.finishThinWire(returnValue: result)
                 settle()
@@ -4334,6 +4374,7 @@ public final class OriginalPlaySession: ObservableObject {
     private func updateSuitcaseKey() {
         guard var puzzle = suitcaseKey, suitcaseRenderer != nil else { return recoverMissingProcessState() }
         let complete = (fadeRemaining[0] ?? 0) == 0
+        processScreenEffects.advanceOriginalFrame()
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let previous = puzzle
         let effects = puzzle.update(pageTouch: suitcaseTouch, fadeComplete: complete)
@@ -4346,8 +4387,9 @@ public final class OriginalPlaySession: ObservableObject {
         }
         for effect in effects {
             switch effect {
-            case .fadeIn(let updates), .fadeOut(let updates), .completionFade(let updates):
-                fadeRemaining[0] = updates
+            case .fadeIn(let updates): beginProcessFade(.fadeIn, frames: updates)
+            case .fadeOut(let updates): beginProcessFade(.fadeOut, frames: updates)
+            case .completionFade(let updates): beginProcessFade(.completion, frames: updates)
             case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
             case .stopSound(let entry):
                 _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: entry, fadeFrames: 1))
@@ -4358,6 +4400,7 @@ public final class OriginalPlaySession: ObservableObject {
                 suitcaseRenderer = nil
                 suitcaseTouch = nil
                 fadeRemaining = [:]
+                processScreenEffects = OriginalScreenEffects()
                 stopTimer()
                 runner.finishSuitcaseKey(returnValue: result)
                 settle()
@@ -4371,12 +4414,15 @@ public final class OriginalPlaySession: ObservableObject {
         let input = OriginalBellProcess.Input(newTouch: pendingTouch.map { .init(x: $0.x, y: $0.y) },
             leftHanded: false, screen0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
         pendingTouch = nil
+        processScreenEffects.advanceOriginalFrame()
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let step = current.update(input, mask: bellMask)
         var requestedHint: (pairA: Int16, pairB: Int16)?
         for effect in step.effects {
             switch effect {
-            case .fade(let fade): fadeRemaining[fade.screen] = Int(fade.duration)
+            case .fade(let fade):
+                beginProcessFade(screen: fade.screen, mask: fade.mask, mode: UInt8(clamping: fade.mode),
+                                 from: Float(bitPattern: fade.targetBits), frames: Int(fade.duration))
             case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
             case .processReturn(let value): processReturn = value
             case .hintTalk(let pairA, let pairB): requestedHint = (pairA, pairB)
@@ -4406,6 +4452,7 @@ public final class OriginalPlaySession: ObservableObject {
         bellProcess = nil
         bell = nil
         fadeRemaining = [:]
+        processScreenEffects = OriginalScreenEffects()
         stopTimer()
         runner.finishProcess(returnValue: processReturn)
         settle()
@@ -4418,11 +4465,14 @@ public final class OriginalPlaySession: ObservableObject {
             newTouch: pendingTouch.map { .init(x: $0.x, y: $0.y) }, leftHanded: false,
             screen0FadeComplete: (fadeRemaining[0] ?? 0) == 0)
         pendingTouch = nil
+        processScreenEffects.advanceOriginalFrame()
         for (screen, remaining) in fadeRemaining where remaining > 0 { fadeRemaining[screen] = remaining - 1 }
         let step = current.update(input)
         for effect in step.effects {
             switch effect {
-            case .fade(let fade): fadeRemaining[fade.screen] = Int(fade.duration)
+            case .fade(let fade):
+                beginProcessFade(screen: fade.screen, mask: fade.mask, mode: UInt8(fade.mode),
+                                 from: Float(bitPattern: fade.targetBits), frames: Int(fade.duration))
             case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
             case .processReturn(let value): processReturn = value
             case .hintTalk, .presentation: break
@@ -4436,6 +4486,7 @@ public final class OriginalPlaySession: ObservableObject {
         sign = nil
         heldTouch = nil
         fadeRemaining = [:]
+        processScreenEffects = OriginalScreenEffects()
         stopTimer()
         runner.finishProcess(returnValue: processReturn)
         settle()

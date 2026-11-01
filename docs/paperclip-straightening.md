@@ -70,7 +70,7 @@ The initial vertices and joint angles match within 0.00001. The captured drag se
 
 Remaining work:
 
-- Draw the visual fades. Their timers already control the process return.
+- Compare the shared brightness fades with the original timing and blend on hardware.
 - Compare DS brightness, lighting, marker blending and rasterisation. Native rendering currently looks brighter than the reference capture.
 - Check the mapped spring-back haptic on an iPhone Duo. The current Core Haptics pulse still needs device timing and intensity checks.
 - Draw the original item notice image and check sound timing. The System text and inventory replacement already run.

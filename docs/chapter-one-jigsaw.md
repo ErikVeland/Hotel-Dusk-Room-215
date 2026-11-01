@@ -52,7 +52,7 @@ Targeted checks cover initial RAM, randomisation, wrong rotation, snap threshold
 
 On 17 October 2026, 38 targeted Swift checks passed with no skips. They covered the jigsaw, event runner, game state, supported maps and normal-session page capture. Seven Python recovery checks and `git diff --check` also passed. The Swift run built the macOS app. This work did not check an iOS build or physical Duo input.
 
-The page projection approximates the original fixed-point rays and per-piece depth. Original rasterisation, piece seams, selected-piece glow and exact display scheduling remain unverified. The right-edge textures retain their narrower source width. Fades affect process timing but are not drawn. The quit control is native. Kyle's portrait and talk background on the other page remain absent.
+The page projection approximates the original fixed-point rays and per-piece depth. Original rasterisation, piece seams, selected-piece glow and exact display scheduling remain unverified. The right-edge textures retain their narrower source width. The shared brightness controller now draws process fades. The quit control is native. Kyle's portrait and talk background on the other page remain absent.
 
 The dropped-piece interaction now blocks R117 event 52 until the player selects and confirms the piece. The next opcode adds item 3 and shows its original enlarged image. See [Touch pictures](touch-pictures.md) for the recovered mask, decoder checks and reference inputs.
 
