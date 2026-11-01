@@ -4,6 +4,44 @@ The beta uses bundle ID `com.veland.hoteldusk.duo`, version `0.1`, and signing t
 The archive command sets the build number. Use a new number for each upload.
 The complete original game is not yet verified as playable. See [current game status](../README.md).
 
+## Preparation result — 1 November 2026
+
+Version `0.1 (4)` has a signed device archive at `.build/testflight/HotelDusk-4.xcarchive`.
+It uses merged revision `3ea2c37c`, including the corrected room labels.
+Its archived app size is 2,844,819,695 bytes, down from 6,393,473,687 bytes.
+Local metadata, privacy-manifest, crash-symbol, size, and code-signature checks pass.
+All 7,564 images in the beta pack pass file-hash, dimension, and recorded-pixel-hash checks.
+All 10 focused artwork, notebook, and startup tests pass with the beta pack.
+
+App Store export succeeded. The signed IPA is `.build/testflight/export-4/Hotel Dusk.ipa` (2,795,488,371 bytes).
+Its profile has `beta-reports-active` enabled and `get-task-allow` disabled, with no registered-device restriction.
+The build has not been uploaded to App Store Connect or assigned to testers.
+The source revision, sizes, SHA-256, and verification summary are recorded in `.build/testflight/build-4.json`.
+
+The archive log, export log, and artwork test log are under `.build/testflight`.
+Run the focused runtime checks against the beta pack with:
+
+```sh
+HOTEL_DUSK_ARTWORK_CANDIDATE="$PWD/.build/testflight/EnhancedArtwork" \
+HOTEL_DUSK_NOTEBOOK_CANDIDATE="$PWD/.build/testflight/EnhancedArtwork" \
+HOTEL_DUSK_ARTWORK_ANIMATION_SCALE=4 \
+swift test --disable-sandbox \
+  --filter '\.(ChapterOneArtworkCandidateTests|NotebookArtworkCandidateTests|HotelDuskDuoTests)/'
+```
+
+The gameplay verification is **not green**. The refreshed fast run recorded 303 passed Swift tests and one missing-reference skip.
+Strict mode reports incomplete coverage because the PNG/WebP comparison reference is absent.
+The earlier corrected native run recorded 201 passed tests and 12 failed tests before it was stopped during a lengthy restore test.
+The remaining native tests did not complete. These results do not establish full-game beta readiness.
+
+The native failures include lobby camera expectations, the Chapter 2 hanger/suitcase route, bag rendering and transitions,
+Chapter 10 shed selection, pamphlet rendering, label peeling, map indicators, and pencil-sharpener behaviour and image dimensions.
+Some failures compare original pixel dimensions with enhanced artwork dimensions. Others need route and behaviour investigation.
+Do not treat all failures as artwork-only issues.
+
+The detailed reports are in `.build/verification/testflight-merged-fast` and `.build/verification/testflight-native-corrected`.
+Resolve or explicitly scope these issues before inviting testers. The device checks below also remain open.
+
 ## Create an archive
 
 Use Xcode 27.1 or later to compile the hinge APIs. Use a release of Xcode accepted by App Store Connect.
@@ -27,7 +65,7 @@ The commands below select the installed stable Xcode without changing the system
 
    ```sh
    DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
-     bash tools/archive_testflight.sh 2
+     bash tools/archive_testflight.sh 5
    ```
 
 The command prepares a separate beta artwork pack, builds a signed Release archive, and checks its contents and size.
@@ -84,8 +122,8 @@ To export an IPA locally, use the prepared options:
 ```sh
 PATH=/usr/bin:/bin:/usr/sbin:/sbin \
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -exportArchive \
-  -archivePath .build/testflight/HotelDusk-2.xcarchive \
-  -exportPath .build/testflight/export-2 \
+  -archivePath .build/testflight/HotelDusk-4.xcarchive \
+  -exportPath .build/testflight/export-4 \
   -exportOptionsPlist HotelDuskDuo/ExportOptions-TestFlight.plist \
   -allowProvisioningUpdates
 ```
