@@ -143,10 +143,14 @@ public struct OriginalTexture: Sendable {
         OriginalArtwork.shared.image(rgba: rgba, width: storedWidth, height: storedHeight)
     }
 
-    /// Upload only stored texels. The original material/UV decoder must choose
-    /// sampling and placement; this function adds no border, filtering or fill.
-    public func makeMetalTexture(device: MTLDevice, artwork: OriginalArtwork = .shared) throws -> MTLTexture {
-        let enhanced = artwork.metalPixels(rgba: rgba, width: storedWidth, height: storedHeight)
+    /// Uploads source texels or a mapped inspection crop without changing model UVs.
+    public func makeMetalTexture(device: MTLDevice, artwork: OriginalArtwork = .shared,
+                                 sourcePath: String? = nil, paintingFoundMask: UInt16 = 0) throws -> MTLTexture {
+        let inspected = sourcePath.flatMap {
+            artwork.inspectionTexturePixels(sourcePath: $0, rgba: rgba, width: storedWidth, height: storedHeight,
+                                            paintingFoundMask: paintingFoundMask)
+        }
+        let enhanced = inspected ?? artwork.metalPixels(rgba: rgba, width: storedWidth, height: storedHeight)
         let width = enhanced?.width ?? storedWidth
         let height = enhanced?.height ?? storedHeight
         let pixels = enhanced?.data ?? rgba

@@ -36,7 +36,7 @@ public final class OriginalModelMetalPreview {
     public init(modelPath: String, models: OriginalModelLibrary, textures: OriginalTextureLibrary,
                 device: MTLDevice, textureLoader: ((String) throws -> OriginalTexture)? = nil,
                 untexturedMaterials: Set<Int> = [], gameplayOnly: Bool = false, smoothTextures: Bool = false,
-                artwork: OriginalArtwork = .shared) throws {
+                artwork: OriginalArtwork = .shared, paintingFoundMask: UInt16 = 0) throws {
         self.device = device
         model = try models.load(path: modelPath)
         guard let queue = device.makeCommandQueue() else { throw OriginalDataError.invalid("Metal command queue") }
@@ -64,6 +64,9 @@ public final class OriginalModelMetalPreview {
         }
         self.depthState = depthState
         let unboundNames = gameplayOnly ? OriginalTextureLibrary.unboundMapTextures(modelPath: modelPath) : []
+        let modelName = (modelPath as NSString).lastPathComponent
+        let mapDirectory = ((modelPath as NSString).deletingLastPathComponent as NSString).lastPathComponent
+        let isWalkingRoomModel = modelPath.hasPrefix("map/") && modelName == "\(mapDirectory).mdf"
         var materialTextures = [Int: (OriginalTexture, MTLTexture)]()
         var resolvedPaths = [Int: String]()
         var prepared = [Draw]()
@@ -79,6 +82,7 @@ public final class OriginalModelMetalPreview {
                 if materialTextures[group.material] == nil {
                     let requested = directory + "/" + material.texture + ".dtx"
                     let texture: OriginalTexture
+                    var artworkSourcePath: String?
                     if let textureLoader { texture = try textureLoader(material.texture) }
                     else {
                         let path: String
@@ -89,10 +93,13 @@ public final class OriginalModelMetalPreview {
                             guard matches.count == 1, let record = matches.first else { throw OriginalDataError.missing(requested) }
                             path = record.source
                         }
+                        if isWalkingRoomModel { artworkSourcePath = path }
                         texture = try textures.load(path: path)
                         resolvedPaths[group.material] = path
                     }
-                    materialTextures[group.material] = (texture, try texture.makeMetalTexture(device: device, artwork: artwork))
+                    materialTextures[group.material] = (texture, try texture.makeMetalTexture(
+                        device: device, artwork: artwork, sourcePath: artworkSourcePath,
+                        paintingFoundMask: paintingFoundMask))
                 }
                 let (texture, uploaded) = materialTextures[group.material]!
                 gpuTexture = uploaded

@@ -30,7 +30,7 @@ public final class OriginalArtwork: @unchecked Sendable {
 
     private let root: URL?
     private let records: [String: Manifest.Record]
-    private let namedRecords: [String: Manifest.Record]
+    private let sourceRecords: [String: Manifest.Record]
     private let animationFrameRecords: [String: Manifest.Record]
     private let defaultScale: Int
     private let cache = NSCache<NSString, CGImage>()
@@ -49,8 +49,8 @@ public final class OriginalArtwork: @unchecked Sendable {
            manifest.formatVersion == 1, (2...4).contains(manifest.scale), manifest.complete {
             defaultScale = manifest.scale
             records = Dictionary(manifest.images.map { ($0.key, $0) }, uniquingKeysWith: { first, _ in first })
-            namedRecords = Dictionary(manifest.images.flatMap { record in
-                record.sources.filter { $0.hasPrefix("Images/") }.map { ($0, record) }
+            sourceRecords = Dictionary(manifest.images.flatMap { record in
+                record.sources.map { ($0, record) }
             }, uniquingKeysWith: { first, _ in first })
             animationFrameRecords = Dictionary(manifest.images.flatMap { record in
                 record.sources.filter { $0.hasPrefix("OriginalAnimations/") }.map { ($0, record) }
@@ -58,7 +58,7 @@ public final class OriginalArtwork: @unchecked Sendable {
         } else {
             defaultScale = 1
             records = [:]
-            namedRecords = [:]
+            sourceRecords = [:]
             animationFrameRecords = [:]
         }
         cache.totalCostLimit = 128 * 1024 * 1024
@@ -81,8 +81,244 @@ public final class OriginalArtwork: @unchecked Sendable {
 
     func namedImage(source: String) -> CGImage? {
         guard Self.isHDGraphicsEnabled else { return nil }
-        guard let record = namedRecords[source] else { return nil }
+        guard let record = sourceRecords[source] else { return nil }
         return load(record)
+    }
+
+    /**
+     * Returns inspection artwork cropped to a matching flat room surface.
+     */
+    func inspectionTexturePixels(sourcePath: String, rgba: Data, width: Int, height: Int,
+                                paintingFoundMask: UInt16) -> (data: Data, width: Int, height: Int)? {
+        guard Self.isHDGraphicsEnabled, width > 0, height > 0,
+              let replacement = Self.inspectionTextureReplacements[sourcePath] else { return nil }
+        let sourcePath = replacement.revealedSource.flatMap { revealedSource in
+            replacement.paintingIndex.map { paintingIndex in
+                paintingFoundMask & (1 << paintingIndex) == 0 ? replacement.source : revealedSource
+            }
+        } ?? replacement.source
+        guard let source = namedImage(source: sourcePath),
+              let rotated = rotatedImage(source, logicalWidth: 256, logicalHeight: 192) else { return nil }
+
+        let scaleX = CGFloat(rotated.width) / 192
+        let scaleY = CGFloat(rotated.height) / 256
+        let outputWidth = width * 4
+        let outputHeight = height * 4
+        var sourcePixels = [UInt8](repeating: 0, count: rotated.width * rotated.height * 4)
+        let sourceRendered = sourcePixels.withUnsafeMutableBytes { storage -> Bool in
+            guard let context = CGContext(data: storage.baseAddress, width: rotated.width, height: rotated.height,
+                bitsPerComponent: 8, bytesPerRow: rotated.width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return false }
+            context.draw(rotated, in: CGRect(x: 0, y: 0, width: rotated.width, height: rotated.height))
+            return true
+        }
+        guard sourceRendered else { return nil }
+        let sourceQuad = replacement.quad ?? [
+            CGPoint(x: replacement.crop.minX, y: replacement.crop.minY),
+            CGPoint(x: replacement.crop.maxX, y: replacement.crop.minY),
+            CGPoint(x: replacement.crop.maxX, y: replacement.crop.maxY),
+            CGPoint(x: replacement.crop.minX, y: replacement.crop.maxY)
+        ]
+        let scaledQuad = sourceQuad.map { CGPoint(x: $0.x * scaleX, y: $0.y * scaleY) }
+        let destination = replacement.destination
+        let cropWidth = destination.map { max(1, Int((CGFloat(outputWidth) * $0.width).rounded())) } ?? outputWidth
+        let cropHeight = destination.map { max(1, Int((CGFloat(outputHeight) * $0.height).rounded())) } ?? outputHeight
+        guard var pixels = Self.projectiveCrop(sourcePixels, sourceWidth: rotated.width, sourceHeight: rotated.height,
+            quad: scaledQuad, outputWidth: cropWidth, outputHeight: cropHeight) else { return nil }
+        for offset in stride(from: 0, to: pixels.count, by: 4) {
+            let alpha = Int(pixels[offset + 3])
+            if alpha > 0 && alpha < 255 {
+                for channel in 0..<3 {
+                    pixels[offset + channel] = UInt8(min(255, (Int(pixels[offset + channel]) * 255 + alpha / 2) / alpha))
+                }
+            }
+        }
+        guard let destination else { return (Data(pixels), outputWidth, outputHeight) }
+        var composite = Self.upscale(rgba: rgba, width: width, height: height, scale: 4)
+        let originX = Int((CGFloat(outputWidth) * destination.minX).rounded())
+        let originY = Int((CGFloat(outputHeight) * destination.minY).rounded())
+        for row in 0..<cropHeight {
+            for column in 0..<cropWidth {
+                let targetOffset = ((originY + row) * outputWidth + originX + column) * 4
+                let sourceOffset = (row * cropWidth + column) * 4
+                let alpha = Int(pixels[sourceOffset + 3])
+                guard alpha > 0 else { continue }
+                let inverseAlpha = 255 - alpha
+                for channel in 0..<3 {
+                    composite[targetOffset + channel] = UInt8((Int(pixels[sourceOffset + channel]) * alpha
+                        + Int(composite[targetOffset + channel]) * inverseAlpha + 127) / 255)
+                }
+                composite[targetOffset + 3] = 255
+            }
+        }
+        return (Data(composite), outputWidth, outputHeight)
+    }
+
+    private struct InspectionTextureReplacement {
+        let source: String
+        let crop: CGRect
+        var quad: [CGPoint]? = nil
+        var destination: CGRect? = nil
+        var paintingIndex: Int? = nil
+        var revealedSource: String? = nil
+    }
+
+    private static func upscale(rgba: Data, width: Int, height: Int, scale: Int) -> [UInt8] {
+        let source = [UInt8](rgba)
+        var output = [UInt8](repeating: 0, count: width * height * scale * scale * 4)
+        for y in 0..<(height * scale) {
+            for x in 0..<(width * scale) {
+                let sourceOffset = ((y / scale) * width + x / scale) * 4
+                let targetOffset = (y * width * scale + x) * 4
+                output[targetOffset..<(targetOffset + 4)] = source[sourceOffset..<(sourceOffset + 4)]
+            }
+        }
+        return output
+    }
+
+    private static func projectiveCrop(_ source: [UInt8], sourceWidth: Int, sourceHeight: Int,
+                                       quad: [CGPoint], outputWidth: Int, outputHeight: Int) -> [UInt8]? {
+        guard quad.count == 4, source.count == sourceWidth * sourceHeight * 4,
+              sourceWidth > 0, sourceHeight > 0, outputWidth > 0, outputHeight > 0 else { return nil }
+        let x = quad.map { Double($0.x) }
+        let y = quad.map { Double($0.y) }
+        let dx1 = x[1] - x[2], dx2 = x[3] - x[2]
+        let dx3 = x[0] - x[1] + x[2] - x[3]
+        let dy1 = y[1] - y[2], dy2 = y[3] - y[2]
+        let dy3 = y[0] - y[1] + y[2] - y[3]
+        let denominator = dx1 * dy2 - dx2 * dy1
+        let g: Double, h: Double
+        if abs(dx3) + abs(dy3) < 0.0001 || abs(denominator) < 0.0001 {
+            g = 0
+            h = 0
+        } else {
+            g = (dx3 * dy2 - dx2 * dy3) / denominator
+            h = (dx1 * dy3 - dx3 * dy1) / denominator
+        }
+        let a = x[1] - x[0] + g * x[1], b = x[3] - x[0] + h * x[3], c = x[0]
+        let d = y[1] - y[0] + g * y[1], e = y[3] - y[0] + h * y[3], f = y[0]
+        var output = [UInt8](repeating: 0, count: outputWidth * outputHeight * 4)
+        for row in 0..<outputHeight {
+            let v = (Double(row) + 0.5) / Double(outputHeight)
+            for column in 0..<outputWidth {
+                let u = (Double(column) + 0.5) / Double(outputWidth)
+                let divisor = g * u + h * v + 1
+                guard abs(divisor) > 0.0001 else { continue }
+                let px = min(Double(sourceWidth - 1), max(0, (a * u + b * v + c) / divisor - 0.5))
+                let py = min(Double(sourceHeight - 1), max(0, (d * u + e * v + f) / divisor - 0.5))
+                let left = Int(px), top = Int(py)
+                let right = min(sourceWidth - 1, left + 1), bottom = min(sourceHeight - 1, top + 1)
+                let wx = px - Double(left), wy = py - Double(top)
+                let outputOffset = (row * outputWidth + column) * 4
+                for channel in 0..<4 {
+                    let topLeft = Double(source[(top * sourceWidth + left) * 4 + channel])
+                    let topRight = Double(source[(top * sourceWidth + right) * 4 + channel])
+                    let bottomLeft = Double(source[(bottom * sourceWidth + left) * 4 + channel])
+                    let bottomRight = Double(source[(bottom * sourceWidth + right) * 4 + channel])
+                    let upper = topLeft + (topRight - topLeft) * wx
+                    let lower = bottomLeft + (bottomRight - bottomLeft) * wx
+                    output[outputOffset + channel] = UInt8(min(255, max(0, upper + (lower - upper) * wy)))
+                }
+            }
+        }
+        return output
+    }
+
+    /**
+     * Maps front-facing inspection artwork to the matching room texture UVs.
+     */
+    private static let inspectionTextureReplacements: [String: InspectionTextureReplacement] = [
+        "map/R102/R102/poster.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/102poster.bin#opaque",
+            crop: CGRect(x: 8, y: 34, width: 142, height: 212)),
+        "map/R114/R114/photobred.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/114deskphoto.bin#opaque",
+            crop: .zero,
+            quad: [CGPoint(x: 42, y: 78), CGPoint(x: 178, y: 60),
+                   CGPoint(x: 185, y: 127), CGPoint(x: 51, y: 140)]),
+        "map/R115/R115/calander.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/115calenup.bin#opaque",
+            crop: .zero,
+            quad: [CGPoint(x: 12, y: 58), CGPoint(x: 181, y: 58),
+                   CGPoint(x: 181, y: 206), CGPoint(x: 12, y: 206)]),
+        "map/R117/R117/photo.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/117paintingbase.bin#opaque",
+            crop: CGRect(x: 7, y: 32, width: 144, height: 162), paintingIndex: 2,
+            revealedSource: "OriginalBitmaps/map/sdata/SearchUp/117paintingup.bin#opaque"),
+        "map/R117/R117/menuboard1.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/117blackboardup1.bin#opaque",
+            crop: .zero,
+            quad: [CGPoint(x: 13, y: 15), CGPoint(x: 177, y: 15),
+                   CGPoint(x: 166, y: 210), CGPoint(x: 48, y: 237)]),
+        "map/R117/R117/menuboard2.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/117blackboardup2.bin#opaque",
+            crop: .zero,
+            quad: [CGPoint(x: 13, y: 15), CGPoint(x: 177, y: 15),
+                   CGPoint(x: 166, y: 210), CGPoint(x: 48, y: 237)]),
+        "map/R117/R117/menuboard3.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/117blackboardup3.bin#opaque",
+            crop: .zero,
+            quad: [CGPoint(x: 13, y: 15), CGPoint(x: 177, y: 15),
+                   CGPoint(x: 166, y: 210), CGPoint(x: 48, y: 237)]),
+        "map/R123/R123/photo32.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/123photoup.bin#opaque",
+            crop: .zero,
+            quad: [CGPoint(x: 5, y: 75), CGPoint(x: 188, y: 75),
+                   CGPoint(x: 190, y: 228), CGPoint(x: 3, y: 228)]),
+        "map/R125/R125/poster05_l.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/125paintingbase.bin#opaque",
+            crop: CGRect(x: 11, y: 61, width: 169, height: 164), paintingIndex: 0,
+            revealedSource: "OriginalBitmaps/map/sdata/SearchUp/125paingup.bin#opaque"),
+        "map/R205/R205/photo.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/205paintingbase.bin#opaque",
+            crop: CGRect(x: 7, y: 32, width: 144, height: 162), paintingIndex: 4,
+            revealedSource: "OriginalBitmaps/map/sdata/SearchUp/205paintingup.bin#opaque"),
+        "map/R207/R207/photo.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/207paintingbase.bin#opaque",
+            crop: .zero,
+            quad: [CGPoint(x: 10, y: 79), CGPoint(x: 151, y: 82),
+                   CGPoint(x: 162, y: 213), CGPoint(x: 19, y: 210)],
+            paintingIndex: 3,
+            revealedSource: "OriginalBitmaps/map/sdata/SearchUp/207paintingup.bin#opaque"),
+        "map/R213/R213/photo.dtx": InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/213painting.bin#opaque",
+            crop: CGRect(x: 7, y: 32, width: 144, height: 162), paintingIndex: 1,
+            revealedSource: "OriginalBitmaps/map/sdata/SearchUp/213paintingup.bin#opaque"),
+        "map/R213/R213/211.dtx": doorPlateReplacement(211),
+        "map/R213/R213/212.dtx": doorPlateReplacement(212),
+        "map/R213/R213/213.dtx": doorPlateReplacement(213),
+        "map/R213/R213/214.dtx": doorPlateReplacement(214),
+        "map/R213/R213/215.dtx": doorPlateReplacement(215),
+        "map/R213/R213/216.dtx": doorPlateReplacement(216),
+        "map/R213/R213/217.dtx": doorPlateReplacement(217),
+        "map/R213/R213/218.dtx": doorPlateReplacement(218),
+        "map/R213/R213/219.dtx": doorPlateReplacement(219),
+        "map/R213/R213/220.dtx": doorPlateReplacement(220)
+    ]
+
+    private static func doorPlateReplacement(_ number: Int) -> InspectionTextureReplacement {
+        InspectionTextureReplacement(
+            source: "OriginalBitmaps/map/sdata/SearchUp/plate\(number).bin#transparent",
+            crop: .zero,
+            quad: [CGPoint(x: 72, y: 199), CGPoint(x: 119, y: 199),
+                   CGPoint(x: 119, y: 221), CGPoint(x: 72, y: 221)],
+            destination: CGRect(x: 0.31, y: 0.15, width: 0.38, height: 0.70))
+    }
+
+    /**
+     * Returns the saved Chapter 9 painting bit for a room with a mapped painting.
+     */
+    static func paintingStateBit(forMapName mapName: String) -> UInt16? {
+        let index: Int
+        switch mapName {
+        case "R125": index = 0
+        case "R117": index = 2
+        case "R205": index = 4
+        case "R207": index = 3
+        case "R213": index = 1
+        default: return nil
+        }
+        return 1 << index
     }
 
     private func load(_ record: Manifest.Record) -> CGImage? {

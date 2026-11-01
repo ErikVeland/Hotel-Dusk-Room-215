@@ -20,7 +20,10 @@ public typealias OriginalMapRendererFactory = @MainActor (String, UInt16?) throw
  */
 public final class OriginalMapRenderer: OriginalMapRendering, @unchecked Sendable {
     public let map: CGImage
-    nonisolated(unsafe) private let room: OriginalModelMetalPreview
+    private let device: MTLDevice
+    private let models: OriginalModelLibrary
+    private let textures: OriginalTextureLibrary
+    nonisolated(unsafe) private var roomVariants: [UInt16: OriginalModelMetalPreview]
     nonisolated(unsafe) private var counter: OriginalModelMetalPreview?
     private let mapName: String
     private let initialSearchArea: UInt16?
@@ -32,7 +35,13 @@ public final class OriginalMapRenderer: OriginalMapRendering, @unchecked Sendabl
         initialSearchArea = searchArea
         guard let device = MTLCreateSystemDefaultDevice() else { throw OriginalDataError.missing("Metal device") }
         let models = try OriginalModelLibrary.bundled(), textures = try OriginalTextureLibrary.bundled()
-        room = try OriginalModelMetalPreview(modelPath: "map/\(mapName)/\(mapName)/\(mapName).mdf", models: models, textures: textures, device: device, gameplayOnly: true, smoothTextures: OriginalArtwork.isHDGraphicsEnabled)
+        self.device = device
+        self.models = models
+        self.textures = textures
+        let room = try OriginalModelMetalPreview(modelPath: "map/\(mapName)/\(mapName)/\(mapName).mdf",
+            models: models, textures: textures, device: device, gameplayOnly: true,
+            smoothTextures: OriginalArtwork.isHDGraphicsEnabled)
+        roomVariants = [0: room]
         guard let image = try OriginalBitmapLibrary.bundled().loadMap(path: "map/fmapscr/\(mapName).bin").makeCGImage() else {
             throw OriginalDataError.invalid("Lobby map image")
         }
@@ -54,13 +63,25 @@ public final class OriginalMapRenderer: OriginalMapRendering, @unchecked Sendabl
         renderLock.lock()
         defer { renderLock.unlock() }
         let scene: OriginalModelMetalPreview
-        if state.mode == .walking { scene = room }
+        if state.mode == .walking {
+            let foundBit = OriginalArtwork.paintingStateBit(forMapName: mapName) ?? 0
+            let variant = game.applePaintingFoundMask & foundBit
+            if let cached = roomVariants[variant] {
+                scene = cached
+            } else {
+                let roomPath = "map/\(mapName)/\(mapName)/\(mapName).mdf"
+                let room = try OriginalModelMetalPreview(modelPath: roomPath, models: models, textures: textures,
+                    device: device, gameplayOnly: true, smoothTextures: OriginalArtwork.isHDGraphicsEnabled,
+                    paintingFoundMask: game.applePaintingFoundMask)
+                roomVariants[variant] = room
+                scene = room
+            }
+        }
         else {
             if counter == nil {
-                guard let device = MTLCreateSystemDefaultDevice() else { throw OriginalDataError.missing("Metal device") }
                 let area = String(format: "%02d", initialSearchArea ?? state.searchAreaID)
                 counter = try OriginalModelMetalPreview(modelPath: "map/\(mapName)/\(mapName)_s\(area)/\(mapName)_s\(area).mdf",
-                    models: .bundled(), textures: .bundled(), device: device, gameplayOnly: true,
+                    models: models, textures: textures, device: device, gameplayOnly: true,
                     smoothTextures: OriginalArtwork.isHDGraphicsEnabled)
             }
             guard let counter else { throw OriginalDataError.missing("Search scene") }
