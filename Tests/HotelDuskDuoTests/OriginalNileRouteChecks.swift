@@ -7,7 +7,8 @@ import XCTest
 @MainActor
 enum OriginalNileRouteChecks {
     static func run(_ play: OriginalPlaySession,
-                    compare: (OriginalGameState, String) throws -> Void = { _, _ in }) throws {
+                    compare: (OriginalGameState, String) throws -> Void = { _, _ in },
+                    compareLouieRoomDoorSnapshots: Bool = true) throws {
         play.holdLobbyTouch(x: 60, y: 70)
         for _ in 0..<43 { play.advanceFrame() }
         play.holdLobbyTouch(x: 20, y: 128)
@@ -60,7 +61,8 @@ enum OriginalNileRouteChecks {
         drain(play)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
         try compare(play.runner.game, "chapter-two-rosa-pager/page19")
-        try OriginalEdCallRouteChecks.run(play, compare: compare)
+        try OriginalEdCallRouteChecks.run(play, compare: compare,
+            compareLouieRoomDoorSnapshots: compareLouieRoomDoorSnapshots)
     }
 
     private static func choose(_ label: String, in play: OriginalPlaySession) throws {

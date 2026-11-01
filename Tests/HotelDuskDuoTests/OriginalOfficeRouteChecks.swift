@@ -286,7 +286,8 @@ enum OriginalOfficeRouteChecks {
         drain(play)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
         try compare(play.runner.game, "chapter-two-office-exit-approach/page9")
-        try OriginalNileRouteChecks.run(play, compare: compare)
+        // The continuous route retains prior event flags. These standalone door captures start from a different state.
+        try OriginalNileRouteChecks.run(play, compare: compare, compareLouieRoomDoorSnapshots: false)
     }
 
     private static func walk(_ play: OriginalPlaySession, x: Float, y: Float, frames: Int) {

@@ -38,7 +38,7 @@ final class OriginalChapterTwoRouteTests: XCTestCase {
             for index in offset { actualBytes[index] = 0; expected[index] = 0 }
         }
         let differences = actualBytes.indices.filter { actualBytes[$0] != expected[$0] }
-        XCTAssertEqual(differences, [], file: file, line: line)
+        XCTAssertEqual(differences, [], "Reference checkpoint: \(name)", file: file, line: line)
     }
 
     func testLinensMapUsesOriginalScaleAndFloorPlan() throws {

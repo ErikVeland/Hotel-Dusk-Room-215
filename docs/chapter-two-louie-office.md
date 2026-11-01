@@ -34,11 +34,15 @@ The original approach records 45 emulator frames at page point `(60,70)`, follow
 
 `OriginalNileRouteChecks` extends the ordinary office route. It selects the guide's choices by their original labels, uses the interruption control and asks keywords 11 and 12. Pause prevents choice selection and dialogue advancement. The checkpoint route compares all 32,088 original game-state bytes, including the retry checkpoint.
 
+The continuous Chapter 2 route checks the Louie door destination, `EP2_R114` arrival and conversation directly. It skips two standalone door RAM comparisons because those captures retain different event flags; the standalone route keeps its byte comparisons.
+
 `OriginalNileRouteTests` covers movement and the conversation from the captured office exit. The Chapter 2 checkpoint route and full new-game route also include this segment.
 
 ## Verification
 
 On 18 October 2026, 27 targeted checks passed with no failures or skips. They cover the two Nile checks, both complete story routes, nine lobby checks, five upstairs checks and nine earlier map-conversation checks. Both story routes now end after Rosa's departure and the pager reminder. Original choice screens and the returned floor plan were inspected. `git diff --check` also passed.
+
+On 1 November 2026, `OriginalChapterTwoRouteTests.testChapterTwoRosaLinensAndHelenGuideRoute` passed in 109 seconds. One native session continued from the final Chapter 1 review through the Chapter 2 puzzles and conversations to the Chapter 3 entry checkpoint. The test uses bitmap renderers for host-independent puzzle input; it does not verify Metal rendering or physical-device input.
 
 There is no package script for these Swift targets. Run the focused checks through SwiftPM:
 

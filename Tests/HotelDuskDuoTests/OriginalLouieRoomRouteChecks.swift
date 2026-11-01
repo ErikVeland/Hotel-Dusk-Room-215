@@ -7,7 +7,8 @@ import XCTest
 @MainActor
 enum OriginalLouieRoomRouteChecks {
     static func run(_ play: OriginalPlaySession,
-                    compare: (OriginalGameState, String) throws -> Void = { _, _ in }) throws {
+                    compare: (OriginalGameState, String) throws -> Void = { _, _ in },
+                    compareDoorSnapshots: Bool = true) throws {
         walk(play, x: 20, y: 128, frames: 100)
         walk(play, x: 96, y: 45, frames: 187)
         walk(play, x: 20, y: 128, frames: 10)
@@ -15,14 +16,14 @@ enum OriginalLouieRoomRouteChecks {
         play.inspectNearbyDoor()
         drain(play)
         XCTAssertEqual(play.door?.destination, 14)
-        try compare(play.runner.game, "chapter-two-louie-room-door/door")
+        if compareDoorSnapshots { try compare(play.runner.game, "chapter-two-louie-room-door/door") }
         play.selectDoorComponent(x: 96, y: 160)
         play.confirmDoorComponent()
         drain(play)
         // The normal component hit runs the knock and door transition in one action.
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 14))
         XCTAssertEqual(play.runner.program.name, "EP2_R114")
-        try compare(play.runner.game, "chapter-two-louie-room-knock/page23")
+        if compareDoorSnapshots { try compare(play.runner.game, "chapter-two-louie-room-knock/page23") }
         XCTAssertFalse(play.runner.game.keywordAvailable(13))
         walk(play, x: 20, y: 128, frames: 10)
         XCTAssertEqual(play.lobby?.nearbyPerson(in: play.runner.game), 4)

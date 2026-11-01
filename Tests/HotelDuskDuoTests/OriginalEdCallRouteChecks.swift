@@ -7,7 +7,8 @@ import XCTest
 @MainActor
 enum OriginalEdCallRouteChecks {
     static func run(_ play: OriginalPlaySession,
-                    compare: (OriginalGameState, String) throws -> Void = { _, _ in }) throws {
+                    compare: (OriginalGameState, String) throws -> Void = { _, _ in },
+                    compareLouieRoomDoorSnapshots: Bool = true) throws {
         walk(play, x: 96, y: 45, frames: 68)
         play.holdLobbyTouch(x: 20, y: 128)
         for _ in 0..<240 {
@@ -98,7 +99,8 @@ enum OriginalEdCallRouteChecks {
         drain(play)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 19))
         try compare(play.runner.game, "chapter-two-left-hallway-entry/entered")
-        try OriginalLouieRoomRouteChecks.run(play, compare: compare)
+        try OriginalLouieRoomRouteChecks.run(play, compare: compare,
+            compareDoorSnapshots: compareLouieRoomDoorSnapshots)
     }
 
     private static func walk(_ play: OriginalPlaySession, x: Float, y: Float, frames: Int) {
