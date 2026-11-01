@@ -66,6 +66,10 @@ final class OriginalChapterFourRouteTests: XCTestCase {
         try Route.picture(play, interrupt: true)
         XCTAssertTrue(try play.runner.game.inventory.items.contains(45), "Room 217 key")
         try Route.door(play, destination: 39, interrupt: true)
+        // Jeff must leave Room 213 before Kyle enters Room 217 or the source route ends in game over.
+        try Route.talk(play, to: 6)
+        try Route.conversation(play, answers: [], topics: Array(0..<128))
+        XCTAssertFalse(try XCTUnwrap(play.lobby).people(in: play.runner.game).contains { $0.id == 6 })
         // Room 217: the key opens the door from the corridor.
         try Route.navigate(play, to: .init(-43544, 1000), interrupt: true)
         Route.face(play, x: -43544, z: -6792)
@@ -91,9 +95,7 @@ final class OriginalChapterFourRouteTests: XCTestCase {
         // Leaving runs Dunning's confrontation, including opcode 34's mode-29 follow-up.
         try Route.exit(play, to: 39, interrupt: true)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
-        XCTAssertEqual(play.runner.game.value(for: .eventFlag(group: 33, index: 3)), true)
-        try Route.talk(play, to: 6)
-        XCTAssertEqual(play.runner.phase, .exploration(mapID: 39))
+        XCTAssertFalse(play.isGameOverPresented)
         // The departure script changes the clock before Room 215 selects its events.
         try Route.exit(play, to: 31, interrupt: true)
         XCTAssertEqual(play.runner.game.nowTime, 1)

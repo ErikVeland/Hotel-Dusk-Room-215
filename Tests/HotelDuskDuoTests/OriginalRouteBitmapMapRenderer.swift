@@ -42,6 +42,81 @@ final class OriginalRouteBitmapToiletTankRenderer: OriginalToiletTankRendering {
 }
 
 @MainActor
+final class OriginalRouteBitmapHangerRenderer: OriginalHangerRendering {
+    private let image: CGImage
+
+    init() throws {
+        guard let image = try OriginalBitmapLibrary.bundled()
+            .loadMap(path: "map/fmapscr/R205.bin").makeCGImage() else {
+            throw OriginalDataError.invalid("Route hanger image")
+        }
+        self.image = image
+    }
+
+    func render(_ puzzle: OriginalHangerProcess) throws -> CGImage { image }
+}
+
+@MainActor
+final class OriginalRouteBitmapThinWireRenderer: OriginalThinWireRendering {
+    private let image: CGImage
+
+    init() throws {
+        guard let image = try OriginalBitmapLibrary.bundled()
+            .loadMap(path: "map/fmapscr/R205.bin").makeCGImage() else {
+            throw OriginalDataError.invalid("Route wire image")
+        }
+        self.image = image
+    }
+
+    func render(_ puzzle: OriginalThinWireProcess) throws -> CGImage { image }
+}
+
+@MainActor
+final class OriginalRouteBitmapMemoPullRenderer: OriginalMemoPullRendering {
+    private let image: CGImage
+
+    init() throws {
+        guard let image = try OriginalBitmapLibrary.bundled()
+            .loadMap(path: "map/fmapscr/R205.bin").makeCGImage() else {
+            throw OriginalDataError.invalid("Route memo-pull image")
+        }
+        self.image = image
+    }
+
+    func render(_ puzzle: OriginalMemoPullProcess) throws -> CGImage { image }
+}
+
+@MainActor
+final class OriginalRouteBitmapCrowbarRenderer: OriginalCrowbarRendering {
+    private let image: CGImage
+
+    init() throws {
+        guard let image = try OriginalBitmapLibrary.bundled()
+            .loadMap(path: "map/fmapscr/R205.bin").makeCGImage() else {
+            throw OriginalDataError.invalid("Route crowbar image")
+        }
+        self.image = image
+    }
+
+    func render(_ puzzle: OriginalCrowbarProcess) throws -> CGImage { image }
+}
+
+@MainActor
+final class OriginalRouteBitmapCabinetDialRenderer: OriginalCabinetDialRendering {
+    private let image: CGImage
+
+    init() throws {
+        guard let image = try OriginalBitmapLibrary.bundled()
+            .loadMap(path: "map/fmapscr/R205.bin").makeCGImage() else {
+            throw OriginalDataError.invalid("Route cabinet-dial image")
+        }
+        self.image = image
+    }
+
+    func render(_ puzzle: OriginalCabinetDialProcess) throws -> CGImage { image }
+}
+
+@MainActor
 final class OriginalRouteBitmapSuitcaseContentsRenderer: OriginalSuitcaseContentsRendering {
     let initialContents: OriginalSuitcaseContents
     private let image: CGImage

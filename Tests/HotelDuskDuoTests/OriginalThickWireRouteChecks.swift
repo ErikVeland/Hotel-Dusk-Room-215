@@ -11,27 +11,19 @@ enum OriginalThickWireRouteChecks {
                     compare: (OriginalGameState, String) throws -> Void = { _, _ in },
                     captureImage: (CGImage?, String) throws -> Void = { _, _ in }) throws {
         play.leaveLobbyCounter()
-        play.holdLobbyTouch(x: 170, y: 128)
-        for _ in 0..<98 { play.advanceFrame() }
-        play.holdLobbyTouch(x: 96, y: 210)
-        for _ in 0..<54 { play.advanceFrame() }
-        play.releaseLobbyTouch()
+        try OriginalChapterThreeRouteChecks.approachSearchArea(play, 3)
         guard play.lobby?.nearbySearchArea == 3 else {
             return XCTFail("Expected suitcase search at \(String(describing: play.lobby?.position)), facing \(String(describing: play.lobby?.facing))")
         }
         play.inspectLobbyCounter()
         XCTAssertEqual(play.lobby?.searchAreaID, 3)
         try compare(play.runner.game, "chapter-two-thick-wire-approach/inspect")
-        play.useItemInSearchView(16)
-        play.selectLobbyObject(x: 130, y: 155)
-        play.confirmLobbyObject()
-        for _ in 0..<100 {
-            switch play.runner.phase {
-            case .dialogue, .itemNotice: play.advanceDialogue()
-            case .waiting: play.advanceFrame()
-            default: break
-            }
-        }
+        let counter = try XCTUnwrap(play.lobby)
+        let visible = counter.objectVisibility.visibleNodes(in: counter.counter, map: counter.mapID,
+            area: counter.searchAreaID, game: play.runner.game)
+        let suitcase = try XCTUnwrap(try counter.pickedCounterNode(page: SIMD2<Float>(130, 155), visibleNodes: visible),
+            "No suitcase object at the original wire-use target")
+        try OriginalChapterThreeRouteChecks.useItem(play, 16, on: suitcase)
         XCTAssertEqual(play.runner.phase, .process(id: 33))
         XCTAssertEqual(play.thinWire?.variant, .thick)
         for _ in 0..<65 { play.advanceFrame() }

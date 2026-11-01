@@ -39,15 +39,8 @@ enum OriginalHangerRouteChecks {
             XCTAssertNil(play.hanger, name)
             XCTAssertFalse(try play.runner.game.inventory.items.contains(16), name)
             try compare(play.runner.game, "chapter-two-hanger-\(name)/returned")
-            play.selectLobbyObject(x: 80, y: 105)
-            play.confirmLobbyObject()
-            for _ in 0..<100 {
-                switch play.runner.phase {
-                case .dialogue: play.advanceDialogue()
-                case .waiting: play.advanceFrame()
-                default: break
-                }
-            }
+            try OriginalChapterThreeRouteChecks.approachSearchArea(play, 4)
+            try OriginalChapterThreeRouteChecks.search(play, node: "obj02")
             XCTAssertEqual(play.closeup?.view.id, 258, name)
         }
     }
@@ -103,16 +96,16 @@ enum OriginalHangerRouteChecks {
     static func inspect(_ play: OriginalPlaySession,
                         compare: (OriginalGameState, String) throws -> Void = { _, _ in },
                         captureImage: (CGImage?, String) throws -> Void = { _, _ in }) throws {
-        play.holdLobbyTouch(x: 96, y: 210)
-        for _ in 0..<6 { play.advanceFrame() }
-        play.holdLobbyTouch(x: 170, y: 128)
-        for _ in 0..<20 { play.advanceFrame() }
-        play.releaseLobbyTouch()
-        XCTAssertEqual(play.lobby?.nearbySearchArea, 4)
+        try OriginalChapterThreeRouteChecks.approachSearchArea(play, 4)
         play.inspectLobbyCounter()
         XCTAssertEqual(play.lobby?.searchAreaID, 4)
         try captureImage(play.lobbyImage, "hanger_search")
-        play.selectLobbyObject(x: 80, y: 105)
+        let counter = try XCTUnwrap(play.lobby)
+        let visible = counter.objectVisibility.visibleNodes(in: counter.counter, map: counter.mapID,
+            area: counter.searchAreaID, game: play.runner.game)
+        let points = stride(from: 8, to: 248, by: 4).flatMap { y in stride(from: 8, to: 184, by: 4).map { SIMD2<Float>(Float($0), Float(y)) } }
+        let hanger = try XCTUnwrap(try points.first { try counter.pickedCounterNode(page: $0, visibleNodes: visible) == "obj02" })
+        play.selectLobbyObject(x: hanger.x, y: hanger.y)
         XCTAssertEqual(play.lobby?.selectedNode, "obj02")
         play.confirmLobbyObject()
         for _ in 0..<100 {

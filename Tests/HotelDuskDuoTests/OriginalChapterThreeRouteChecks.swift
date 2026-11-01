@@ -253,6 +253,39 @@ enum OriginalChapterThreeRouteChecks {
         return SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
     }
 
+    /**
+     * Walks to a room's search marker and faces it through ordinary movement input.
+     */
+    static func approachSearchArea(_ play: OriginalPlaySession, _ area: UInt16) throws {
+        let markerName = String(format: "s%02d", area)
+        let lobby = try XCTUnwrap(play.lobby)
+        let marker = try XCTUnwrap(lobby.room.nodes.first { $0.name == markerName }, "No marker \(markerName)")
+        let target = SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
+        let name = String(format: "search%02d", area)
+        let y = lobby.position.y
+        let candidates = stride(from: -24_576, through: 24_576, by: 512).flatMap { dz in
+            stride(from: -24_576, through: 24_576, by: 512).compactMap { dx -> SIMD2<Float>? in
+                let point = target + SIMD2(Float(dx), Float(dz))
+                let world = SIMD3(point.x, y, point.y)
+                guard lobby.collision.firstRegion(containing: world, prefix: "search") == name,
+                      simd_distance(lobby.collision.resolve(world), world) < 1,
+                      [SIMD2<Float>(512, 0), .init(-512, 0), .init(0, 512), .init(0, -512)]
+                        .allSatisfy({ offset in
+                            let neighbour = world + SIMD3(offset.x, 0, offset.y)
+                            return lobby.collision.firstRegion(containing: neighbour, prefix: "search") == name &&
+                                simd_distance(lobby.collision.resolve(neighbour), neighbour) < 1
+                        }) else { return nil }
+                return point
+            }
+        }.sorted { simd_distance($0, SIMD2(lobby.position.x, lobby.position.z)) <
+            simd_distance($1, SIMD2(lobby.position.x, lobby.position.z)) }
+        guard let stand = candidates.first else { throw OriginalDataError.invalid("No walkable position in \(name)") }
+        try navigate(play, to: stand)
+        face(play, x: target.x, z: target.y)
+        XCTAssertEqual(try XCTUnwrap(play.lobby?.nearbySearchArea,
+            "Could not face \(markerName) from \(stand), at \(String(describing: play.lobby?.position))"), area)
+    }
+
     /// Navigates to the door marker for a destination, faces it and goes through.
     /// `expectArrival: false` allows a departure script that keeps Kyle in the room.
     static func exit(_ play: OriginalPlaySession, to destination: Int16, interrupt: Bool = false,
@@ -349,7 +382,9 @@ enum OriginalChapterThreeRouteChecks {
         XCTAssertEqual(play.runner.game.mapID, destination,
             "Door from map \(play.runner.game.previousMapID) did not reach \(destination); " +
             "phase=\(play.runner.phase), nearbyDoor=\(String(describing: play.nearbyDoor)), " +
-            "door=\(String(describing: play.door?.doorID)), selection=\(play.runner.session.selection)")
+                "door=\(String(describing: play.door?.doorID)), selection=\(play.runner.session.selection), " +
+                "requests=\(play.runner.processRequests.suffix(6).map { "\($0.kind):\($0.value)" }), " +
+                "events=\(play.runner.eventTrail.suffix(12))")
     }
 
     /// With `itemsFirst`, items are presented before topics, and topics are asked again after each item.

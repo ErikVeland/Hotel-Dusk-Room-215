@@ -231,14 +231,16 @@ enum OriginalOfficeRouteChecks {
         try compare(play.runner.game, "chapter-two-cabinet-combination-entry/ready")
         for _ in 0..<65 { play.advanceFrame() }
         try captureImage(play.cabinetDialImage, "office_cabinet_dials")
-        let idleDial = play.cabinetDial
+        let idleDial = try XCTUnwrap(play.cabinetDial,
+            "Cabinet dial is absent in \(play.runner.phase) with selection \(play.runner.session.selection)")
         play.pause()
         play.holdCabinetDialTouch(x: 30, y: 130)
         play.quitCabinetDial()
         play.advanceFrame()
         XCTAssertEqual(play.cabinetDial, idleDial)
         play.resume()
-        let target = try XCTUnwrap(play.cabinetDial?.target)
+        let target = try XCTUnwrap(play.cabinetDial?.target,
+            "Cabinet dial ended while resuming in \(play.runner.phase)")
         for wheel in 0..<3 {
             let x = Float([30, 94, 156][wheel])
             for _ in 0..<10 {
