@@ -8,6 +8,7 @@ This beta focuses on touch controls, save and resume, audio, and the folding dis
 
 The adaptation is incomplete. Some story branches, visual details, audio cues, and puzzle behaviour still need verification.
 Progress through automated checkpoints does not prove that every chapter works in one uninterrupted session.
+Automated checks currently report unresolved failures in several puzzles and story routes, including the Chapter 2 hanger and suitcase sequence.
 
 ## What to test
 
