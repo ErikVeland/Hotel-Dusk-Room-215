@@ -22,10 +22,8 @@ struct OriginalInventoryView: View {
             if let item = inspectedItem, items.contains(item) {
                 Button("‹  All items") { inspectedItem = nil }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                ScrollView {
-                    OriginalInventoryInspection(item: item)
-                        .padding(.vertical, 12)
-                }
+                OriginalInventoryInspection(item: item)
+                    .padding(.vertical, 12)
                 if let onSelect {
                     Button(actionTitle) {
                         play.endInventoryBrowsing()
@@ -92,12 +90,19 @@ struct OriginalInventoryInspection: View {
             Text(OriginalInventoryArtwork.shared.name(for: item))
                 .font(NovelStyle.title).multilineTextAlignment(.center)
             GeometryReader { proxy in
-                ScrollView([.horizontal, .vertical]) {
-                    let side = enlarged ? 512.0 : min(256, max(0, proxy.size.width - 16))
+                let side = enlarged ? 512.0 : min(256, max(0, proxy.size.width - 16))
+                if let image = try? OriginalInventoryArtwork.shared.image(for: item) {
+                    OriginalZoomableCanvas(contentSize: CGSize(width: side, height: side)) {
+                        Image(decorative: image, scale: 1)
+                            .resizable().interpolation(.high).scaledToFit()
+                            .frame(width: side, height: side)
+                            .accessibilityLabel(OriginalInventoryArtwork.shared.name(for: item))
+                    }
+                    .id(enlarged)
+                    .padding(8)
+                } else {
                     OriginalInventoryItemImage(item: item)
-                        .frame(width: side, height: side)
-                        .padding(8)
-                        .frame(minWidth: proxy.size.width, minHeight: proxy.size.height)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .frame(height: enlarged ? 360 : 280)

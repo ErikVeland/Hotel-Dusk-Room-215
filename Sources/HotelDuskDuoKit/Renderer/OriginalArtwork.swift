@@ -265,10 +265,6 @@ public final class OriginalArtwork: @unchecked Sendable {
             crop: .zero,
             quad: [CGPoint(x: 5, y: 75), CGPoint(x: 188, y: 75),
                    CGPoint(x: 190, y: 228), CGPoint(x: 3, y: 228)]),
-        "map/R125/R125/poster05_l.dtx": InspectionTextureReplacement(
-            source: "OriginalBitmaps/map/sdata/SearchUp/125paintingbase.bin#opaque",
-            crop: CGRect(x: 11, y: 61, width: 169, height: 164), paintingIndex: 0,
-            revealedSource: "OriginalBitmaps/map/sdata/SearchUp/125paingup.bin#opaque"),
         "map/R205/R205/photo.dtx": InspectionTextureReplacement(
             source: "OriginalBitmaps/map/sdata/SearchUp/205paintingbase.bin#opaque",
             crop: CGRect(x: 7, y: 32, width: 144, height: 162), paintingIndex: 4,
@@ -311,7 +307,6 @@ public final class OriginalArtwork: @unchecked Sendable {
     static func paintingStateBit(forMapName mapName: String) -> UInt16? {
         let index: Int
         switch mapName {
-        case "R125": index = 0
         case "R117": index = 2
         case "R205": index = 4
         case "R207": index = 3

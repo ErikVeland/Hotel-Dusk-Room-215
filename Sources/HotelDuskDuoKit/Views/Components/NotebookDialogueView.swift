@@ -390,7 +390,6 @@ struct OriginalInspectionArtwork: View {
                 }
             }
             .padding(20)
-            .allowsHitTesting(false)
         }
         .clipped()
     }
