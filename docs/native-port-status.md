@@ -89,11 +89,11 @@ The supplied ROM and source artifacts are retained locally. Unverified data stay
 
 ## Paperclip straightening
 
-Process 28 now has checked native joint mechanics, drag projection, spring-back, success and quit outcomes. Its System story returns match complete original game state. The inventory table, native renderer, touch input and System return are connected. The normal route now quits, reopens and completes the puzzle to receive the thin wire. DS rasterisation, visual fades, rumble and physical-device behaviour remain unverified. See [Paperclip straightening](paperclip-straightening.md).
+Process 28 now has checked native joint mechanics, drag projection, spring-back, success and quit outcomes. Its System story returns match complete original game state. The inventory table, native renderer, touch input and System return are connected. The normal route now quits, reopens and completes the puzzle to receive the thin wire. The spring-back maps to Core Haptics on supported iOS devices. DS rasterisation, visual fades, and physical haptic behaviour remain unverified. See [Paperclip straightening](paperclip-straightening.md).
 
 ## Thin-wire lock attempt
 
-Process 29 now runs from suitcase item use through insertion, all three pins and the original failure dialogue. Both quit branches match complete original state. The normal route also checks quit, re-entry and pause. Shared mode-16 System selection now restores the room runner. Original models and lock bitmaps are connected. Captions, rumble, visual fades, DS pixel matching and physical-device checks remain open. The delivery trigger requires completed Dunning questions 0–2, which the extended route below now covers. See [Thin-wire lock attempt](thin-wire-lock.md).
+Process 29 now runs from suitcase item use through insertion, all three pins and the original failure dialogue. Both quit branches match complete original state. The normal route also checks quit, re-entry and pause. Shared mode-16 System selection now restores the room runner. Original models and lock bitmaps are connected. The rumble cue maps to Core Haptics on supported iOS devices. Captions, visual fades, DS pixel matching and physical haptic checks remain open. The delivery trigger requires completed Dunning questions 0–2, which the extended route below now covers. See [Thin-wire lock attempt](thin-wire-lock.md).
 
 ## Dunning questions and delivery knock
 

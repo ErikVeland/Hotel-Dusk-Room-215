@@ -16,6 +16,7 @@ enum OriginalProgressInput: Codable, Equatable, Sendable {
     case openNotebook
     case closeNotebook
     case turnNotebookPage(forward: Bool)
+    case addNotebookPage
     case clearNotebookPage
     case setNativeNotebookInk(page: Int, drawing: Data, packed: Data)
     case undoNotebookEdit
@@ -202,8 +203,11 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
             throw OriginalDataError.unsupported("Interaction presentation version")
         }
         guard inputs.count <= 1_000_000, base.count < 16_000_000,
-              (nativeNotebookPages?.count ?? 0) <= 3,
-              nativeNotebookPages?.allSatisfy({ ["0", "1", "2"].contains($0.key) && $0.value.count <= 8_000_000 }) ?? true else {
+              (nativeNotebookPages?.count ?? 0) <= 312,
+              nativeNotebookPages?.allSatisfy({
+                  Int($0.key).map { (0..<312).contains($0) } == true && $0.value.count <= 8_000_000
+              }) ?? true,
+              (nativeNotebookPages?.values.reduce(0) { $0 + $1.count } ?? 0) <= 64_000_000 else {
             throw OriginalDataError.invalid("Interaction progress size")
         }
         var frames = 0
@@ -261,6 +265,7 @@ extension OriginalPlaySession {
         case .openNotebook: openNotebook()
         case .closeNotebook: closeNotebook()
         case let .turnNotebookPage(forward): turnNotebookPage(forward: forward)
+        case .addNotebookPage: addNotebookPage()
         case .clearNotebookPage: clearNotebookPage()
         case let .setNativeNotebookInk(page, drawing, packed): setNativeNotebookInk(page: page, drawing: drawing, packed: packed)
         case .undoNotebookEdit: undoNotebookEdit()

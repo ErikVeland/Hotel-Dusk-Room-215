@@ -31,7 +31,10 @@ struct OriginalMapView: View {
                         ZStack {
                             Color.black
                             if screen == 0, lobby.mode == .walking, let map = play.lobbyMap {
-                                OriginalFloorPlanView(image: map, exploration: lobby)
+                                OriginalFloorPlanView(image: map, exploration: lobby,
+                                    people: lobby.people(in: play.runner.game)
+                                        .filter { $0.id != 0 }
+                                        .map { lobby.mapPoint(for: $0.position) })
                             } else if let image = play.lobbyImage {
                                 Image(decorative: image, scale: 1).resizable()
                                     .interpolation(hdGraphicsEnabled ? .high : .none)

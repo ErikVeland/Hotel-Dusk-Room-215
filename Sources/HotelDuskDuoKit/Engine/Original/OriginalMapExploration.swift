@@ -53,6 +53,13 @@ public struct OriginalMapExploration {
         return SIMD2<Float>(128, 128) + point + mapBitmapOffset
     }
 
+    /// Converts a character's world position to the visible floor-plan pixels.
+    public func mapPoint(for worldPosition: SIMD3<Float>) -> SIMD2<Float> {
+        let point = SIMD2(worldPosition.x, worldPosition.z) / 4096 * mapScale
+        let player = SIMD2(position.x, position.z) / 4096 * mapScale
+        return mapPlayerPoint + point - player
+    }
+
     public static let walkingHorizontalFieldOfView: Float = 50 * .pi / 180
 
     public private(set) var mode: Mode = .walking

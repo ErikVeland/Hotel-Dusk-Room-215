@@ -11,17 +11,22 @@ public struct OriginalNotebook: Sendable {
     }
 
     public static let packedSize = 0x1800
+    public static let maximumAddedPages = 256
     public private(set) var page = 0
     public private(set) var pages: [[UInt8]]
     public private(set) var pixels: [UInt8]
     private var inkLayers: [[InkLayer]]
+    private var editablePages: [Bool]
+    private var addedPageStart = 0
     public private(set) var erasing = false
     private let locked: [Bool]
     private var undoPixels: [UInt8]
     private var previousTouch: SIMD2<Int>?
 
-    public var canEdit: Bool { page < 3 && !locked[page] }
+    public var canEdit: Bool { editablePages[page] }
+    public var canAddPage: Bool { pages.count - addedPageStart < Self.maximumAddedPages }
     public var pageCount: Int { pages.count }
+    public var addedPages: [[UInt8]] { Array(pages.dropFirst(addedPageStart)) }
     var currentInkLayers: [InkLayer] { inkLayers[page] }
 
     /// The first available memo that has not been read. The notebook opens at its page.
@@ -31,15 +36,22 @@ public struct OriginalNotebook: Sendable {
     private static let applePageSlots = [(x: 16, y: 14), (x: 4, y: 18), (x: 14, y: 24),
                                          (x: 8, y: 5), (x: 1, y: 2)]
 
-    public init(game: OriginalGameState, load: (String) throws -> Data) throws {
+    public init(game: OriginalGameState, addedPages: [Data] = [],
+                load: (String) throws -> Data) throws {
+        guard addedPages.count <= Self.maximumAddedPages,
+              addedPages.allSatisfy({ $0.count == Self.packedSize }) else {
+            throw OriginalDataError.invalid("Additional notebook pages")
+        }
         pages = (0..<3).map { Array(game.bytes[(0x3558 + $0 * Self.packedSize)..<(0x3558 + ($0 + 1) * Self.packedSize)]) }
         inkLayers = Array(repeating: [], count: 3)
         locked = (0..<3).map { game.bytes[0x13C8 + $0] != 0 }
+        editablePages = locked.map { !$0 }
         for index in 0..<16 where game.bytes[0x87B + index / 8] & (1 << (index % 8)) != 0 {
             let data = try load(String(format: "system/note/memo/memo%02d_M.bin", index + 1))
             guard data.count == Self.packedSize else { throw OriginalDataError.invalid("Notebook drawing length") }
             pages.append(Array(data))
             inkLayers.append([])
+            editablePages.append(false)
         }
         /**
          * 0x020797CC packs available Mila memos top-down onto shared pages. A page breaks
@@ -94,6 +106,7 @@ public struct OriginalNotebook: Sendable {
             }
             pages.append(overview)
             inkLayers.append([])
+            editablePages.append(false)
 
             for index in 1..<Self.applePageSlots.count where game.appleNotebookPageMask & (1 << index) != 0 {
                 let path = String(format: "system/note/memo/apppic%d_M.bin", index + 1)
@@ -101,7 +114,14 @@ public struct OriginalNotebook: Sendable {
                 guard data.count == Self.packedSize else { throw OriginalDataError.invalid("Apple notebook drawing length") }
                 pages.append(Array(data))
                 inkLayers.append([])
+                editablePages.append(false)
             }
+        }
+        addedPageStart = pages.count
+        for data in addedPages {
+            pages.append(Array(data))
+            inkLayers.append([])
+            editablePages.append(true)
         }
         unreadMemo = unread
         page = startPage
@@ -138,6 +158,19 @@ public struct OriginalNotebook: Sendable {
         page = (page + (forward ? 1 : pageCount - 1)) % pageCount
         if page >= 3 || !locked[page] { pixels = Self.unpack(pages[page]) }
         undoPixels = pixels
+    }
+
+    public mutating func addPage() {
+        guard canAddPage else { return }
+        release()
+        storePage()
+        pages.append(Array(repeating: 0, count: Self.packedSize))
+        inkLayers.append([])
+        editablePages.append(true)
+        page = pages.count - 1
+        pixels = Self.unpack(pages[page])
+        undoPixels = pixels
+        erasing = false
     }
 
     public mutating func toggleEraser() { release(); erasing.toggle() }

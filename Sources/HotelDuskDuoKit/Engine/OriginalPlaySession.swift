@@ -34,6 +34,7 @@ public final class OriginalPlaySession: ObservableObject {
     @Published public private(set) var notebook: OriginalNotebook?
     @Published public private(set) var notebookImage: CGImage?
     @Published public private(set) var nativeNotebookPages: [String: Data] = [:]
+    private var addedNotebookPages: [Data] = []
     @Published private(set) var encounterPortraits: [OriginalEncounterAnimations.Portrait] = []
     private var encounterAnimations: OriginalEncounterAnimations?
     private var notebookTouch: SIMD2<Int>?
@@ -282,6 +283,7 @@ public final class OriginalPlaySession: ObservableObject {
     private var signProcess: OriginalSignProcess?
     private var heldTouch: OriginalEntranceProcess.Touch?
     private let audio: AudioController
+    private let rumbleFeedback: any RumbleFeedback
     private let originalEffectPlayer: ((Int, Int) -> Void)?
     private let catalog: OriginalScriptCatalog
     private var pendingDoorOpen: Int16?
@@ -362,6 +364,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public init(runner: OriginalEventRunner, audio: AudioController, catalog: OriginalScriptCatalog, fixture: String? = nil,
+                rumbleFeedback: (any RumbleFeedback)? = nil,
                 jigsawSeed: @escaping () -> UInt32 = { UInt32.random(in: .min ... .max) },
                 puzzleSeed: @escaping () -> UInt32 = { UInt32.random(in: .min ... .max) },
                 saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
@@ -386,6 +389,7 @@ public final class OriginalPlaySession: ObservableObject {
                 bookmarkBoxRender: (@MainActor (OriginalBookmarkBoxProcess) throws -> CGImage)? = nil) {
         self.runner = runner
         self.audio = audio
+        self.rumbleFeedback = rumbleFeedback ?? NoRumbleFeedback()
         usesLegacyInteractionPacing = audio.restoresLegacyInteractions
         self.originalEffectPlayer = originalEffectPlayer
         self.catalog = catalog
@@ -432,6 +436,7 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public static func chapterOne(audio: AudioController, timestamp: Int64? = nil, saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
+                                  rumbleFeedback: (any RumbleFeedback)? = nil,
                                   mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
                                   suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
                                   hangerRendererFactory: @escaping OriginalHangerRendererFactory = { try OriginalHangerRenderer() },
@@ -457,7 +462,8 @@ public final class OriginalPlaySession: ObservableObject {
             fixture = nil
         }
         #endif
-        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, fixture: fixture, saveStore: saveStore,
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog, fixture: fixture,
+                                   rumbleFeedback: rumbleFeedback, saveStore: saveStore,
                                    mapRendererFactory: mapRendererFactory, suitcaseRendererFactory: suitcaseRendererFactory,
                                    hangerRendererFactory: hangerRendererFactory,
                                    thinWireRendererFactory: thinWireRendererFactory,
@@ -630,7 +636,8 @@ public final class OriginalPlaySession: ObservableObject {
         }
         do {
             let library = try OriginalBitmapLibrary.bundled()
-            notebook = try OriginalNotebook(game: runner.game, load: library.loadNotebookData)
+            notebook = try OriginalNotebook(game: runner.game, addedPages: addedNotebookPages,
+                                            load: library.loadNotebookData)
             runner.openNotebook()
             lobbyTouch = nil
             firstPersonMovement = nil
@@ -645,7 +652,10 @@ public final class OriginalPlaySession: ObservableObject {
         guard !isPaused, notebook != nil else { return }
         releaseNotebook()
         notebook?.storePage()
-        if let notebook { runner.storeNotebook(notebook) }
+        if let notebook {
+            runner.storeNotebook(notebook)
+            addedNotebookPages = notebook.addedPages.map { Data($0) }
+        }
         let memo = notebook?.unreadMemo
         notebook = nil
         notebookImage = nil
@@ -667,7 +677,21 @@ public final class OriginalPlaySession: ObservableObject {
         guard !isPaused, notebook != nil else { return }
         releaseNotebook()
         notebook?.turnPage(forward: forward)
-        if let notebook { runner.storeNotebook(notebook) }
+        if let notebook {
+            runner.storeNotebook(notebook)
+            addedNotebookPages = notebook.addedPages.map { Data($0) }
+        }
+        refreshNotebookImage()
+    }
+
+    public func addNotebookPage() {
+        let recordsProgress = beginProgressInput(.addNotebookPage)
+        defer { endProgressInput(recordsProgress) }
+        guard !isPaused, var current = notebook, current.canAddPage else { return }
+        current.addPage()
+        notebook = current
+        runner.storeNotebook(current)
+        addedNotebookPages = current.addedPages.map { Data($0) }
         refreshNotebookImage()
     }
 
@@ -724,7 +748,11 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func refreshNotebookImage() {
-        notebookImage = notebook.flatMap(OriginalNotebookImage.render)
+        guard var current = notebook else { notebookImage = nil; return }
+        current.storePage()
+        notebook = current
+        addedNotebookPages = current.addedPages.map { Data($0) }
+        notebookImage = OriginalNotebookImage.render(current)
     }
 
     /// A new press on the touch page, in rotated page pixels (192 × 256).
@@ -1837,6 +1865,7 @@ public final class OriginalPlaySession: ObservableObject {
         switchboardTouch = nil
         fountainPenTouch = nil
         puzzleMicrophone.stop()
+        rumbleFeedback.stopRumble()
         memoPullTouch = nil
         hangerTouch = nil
         memoDrawingTouch = nil
@@ -1858,6 +1887,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     public func stop() {
         isPaused = true
+        rumbleFeedback.stopRumble()
         shownItemParent = nil
         onWalkingCheckpoint = nil
         onProgressCheckpoint = nil
@@ -3072,6 +3102,7 @@ public final class OriginalPlaySession: ObservableObject {
             switch effect {
             case .fade(let fade): fadeRemaining[fade.screen] = Int(fade.duration)
             case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
+            case .optionalRumble: rumbleFeedback.playRumble(durationFrames: nil)
             case .processReturn(let value): processReturn = value
             default: break
             }
@@ -3400,7 +3431,7 @@ public final class OriginalPlaySession: ObservableObject {
                 case .fadeOut(let updates):
                     try cabinetDialScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
                 case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
-                case .rumble: runner.recordUnrenderedRumble(processID: UInt16(puzzle.variant.rawValue))
+                case .rumble: rumbleFeedback.playRumble(durationFrames: nil)
                 case .completed(let result):
                     cabinetDial = nil
                     cabinetDialImage = nil
@@ -3448,8 +3479,8 @@ public final class OriginalPlaySession: ObservableObject {
                     _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 1, entryID: 30, fadeFrames: 1))
                 case .soundVolume(let volume):
                     _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 8, entryID: -1, target: volume, frames: 1))
-                case .rumble: runner.recordUnrenderedRumble(processID: 30)
-                case .stopRumble: break
+                case .rumble(let frames): rumbleFeedback.playRumble(durationFrames: frames)
+                case .stopRumble: rumbleFeedback.stopRumble()
                 case .completed(let result):
                     crowbar = nil
                     crowbarImage = nil
@@ -3578,7 +3609,7 @@ public final class OriginalPlaySession: ObservableObject {
             case .fadeIn(let updates), .fadeOut(let updates), .completionFade(let updates):
                 fadeRemaining[0] = updates
             case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
-            case .springBack: runner.recordUnrenderedRumble(processID: 28)
+            case .springBack: rumbleFeedback.playRumble(durationFrames: nil)
             case .completed(let result):
                 paperclip = nil
                 paperclipImage = nil
@@ -4286,7 +4317,7 @@ public final class OriginalPlaySession: ObservableObject {
             case .pinLatched: try? audio.playOriginalEffect(archiveID: 1, entryID: 33)
             case .markCompleted: runner.markThickWireCompleted()
             case .caption(let caption): runner.recordUnrenderedProcessCaption(processID: puzzle.processID, caption: caption)
-            case .rumble: runner.recordUnrenderedRumble(processID: puzzle.processID)
+            case .rumble: rumbleFeedback.playRumble(durationFrames: nil)
             case .completed(let result):
                 thinWire = nil
                 thinWireImage = nil
@@ -5005,6 +5036,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     public static func restoring(_ checkpoint: OriginalResumeSave, audio: AudioController,
                                  saveStore: any OriginalChapterSaveStore,
+                                 rumbleFeedback: (any RumbleFeedback)? = nil,
                                  mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
                                  suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
                                  hangerRendererFactory: @escaping OriginalHangerRendererFactory = { try OriginalHangerRenderer() },
@@ -5041,6 +5073,7 @@ public final class OriginalPlaySession: ObservableObject {
             switch journal.origin {
             case .arrival:
                 play = try chapterOne(audio: audio, timestamp: journal.timestamp, saveStore: saveStore,
+                rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory,
                 suitcaseRendererFactory: suitcaseRendererFactory,
                 hangerRendererFactory: hangerRendererFactory,
@@ -5054,6 +5087,7 @@ public final class OriginalPlaySession: ObservableObject {
             case .walking:
                 let base = try JSONDecoder().decode(OriginalResumeSave.self, from: journal.base)
                 play = try restoring(base, audio: audio, saveStore: saveStore,
+                rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory,
                 suitcaseRendererFactory: suitcaseRendererFactory,
                 hangerRendererFactory: hangerRendererFactory,
@@ -5071,6 +5105,7 @@ public final class OriginalPlaySession: ObservableObject {
             case .chapter:
                 let base = try JSONDecoder().decode(OriginalChapterSave.self, from: journal.base)
                 play = try restoring(base, audio: audio, saveStore: saveStore,
+                rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory,
                 suitcaseRendererFactory: suitcaseRendererFactory,
                 hangerRendererFactory: hangerRendererFactory,
@@ -5136,6 +5171,7 @@ public final class OriginalPlaySession: ObservableObject {
         let renderer = try mapRendererFactory(map, nil)
         let runner = try OriginalEventRunner(program: program, game: game, keywords: keywords, deferArrival: true)
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+                                       rumbleFeedback: rumbleFeedback,
                                        saveStore: saveStore, restoredExploration: exploration,
                                        mapRendererFactory: mapRendererFactory,
                                        suitcaseRendererFactory: suitcaseRendererFactory,
@@ -5165,6 +5201,7 @@ public final class OriginalPlaySession: ObservableObject {
      */
     public static func restoring(_ checkpoint: OriginalChapterSave, audio: AudioController,
                                  saveStore: any OriginalChapterSaveStore,
+                                 rumbleFeedback: (any RumbleFeedback)? = nil,
                                  puzzleSeed: @escaping () -> UInt32 = { UInt32.random(in: .min ... .max) },
                                  mapRendererFactory: @escaping OriginalMapRendererFactory = { try OriginalMapRenderer(mapName: $0, searchArea: $1) },
                                  suitcaseRendererFactory: @escaping OriginalSuitcaseRendererFactory = { try OriginalSuitcaseRenderer() },
@@ -5190,7 +5227,8 @@ public final class OriginalPlaySession: ObservableObject {
         var transition = OriginalChapterTransition()
         transition.stage = .title
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
-                                   puzzleSeed: puzzleSeed, saveStore: saveStore, chapterTransition: transition,
+                                   rumbleFeedback: rumbleFeedback, puzzleSeed: puzzleSeed, saveStore: saveStore,
+                                   chapterTransition: transition,
                                    mapRendererFactory: mapRendererFactory,
                                    suitcaseRendererFactory: suitcaseRendererFactory,
                                    hangerRendererFactory: hangerRendererFactory,
@@ -5346,6 +5384,7 @@ extension OriginalPlaySession {
         progressJournal = journal
         usesLegacyInteractionPacing = journal.qualityOfLifeVersion == nil
         nativeNotebookPages = journal.nativeNotebookPages ?? [:]
+        addedNotebookPages = []
         usesInstantSaves = journal.usesInstantSaves
         dialogueNotebook.onSaveProgress = { [weak self] _ in self?.notifyProgress() }
     }

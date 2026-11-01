@@ -434,20 +434,79 @@ struct OriginalPlayStatusView: View {
 }
 
 /**
- * Ordinary choices and chapter review answers retain their original order.
- * The original menu graphics are not drawn yet.
+ * Ordinary choices and chapter review answers retain their original order and use the original choice icons.
  */
 struct OriginalChoiceView: View {
     @ObservedObject var play: OriginalPlaySession
     let choices: [OriginalEventRunner.Choice]
+    @State private var selectedChoice: UInt16?
 
     var body: some View {
+        let selectedChoiceID = choices.first(where: { $0.id == selectedChoice })?.id ?? choices.first?.id
         VStack(spacing: 12) {
             ForEach(choices, id: \.id) { choice in
-                Button(choice.label) { play.choose(choice.id) }
-                    .buttonStyle(BookTextButtonStyle())
+                OriginalDialogueMenuButton(
+                    title: choice.label,
+                    icon: selectedChoiceID == choice.id
+                        ? "gimon_obj06.bin" : "gimon_obj04.bin"
+                ) {
+                    selectedChoice = choice.id
+                    play.choose(choice.id)
+                }
             }
         }
+    }
+}
+
+/**
+ * Loads the question, choice, and action icons from the original game assets.
+ */
+@MainActor
+private enum OriginalDialogueMenuArtwork {
+    private static var images: [String: CGImage] = [:]
+
+    static func image(_ name: String) -> CGImage? {
+        if let cached = images[name] { return cached }
+        guard let bitmap = try? OriginalBitmapLibrary.bundled()
+            .load(path: "local/us/SystemIcon/\(name)"),
+              let image = bitmap.makeCGImage(transparentPaletteZero: true) else { return nil }
+        images[name] = image
+        return image
+    }
+}
+
+/**
+ * Shows a dialogue menu row with the original icon and dark selection strip.
+ */
+@MainActor
+private struct OriginalDialogueMenuButton: View {
+    let title: String
+    let icon: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                if let image = OriginalDialogueMenuArtwork.image(icon) {
+                    Image(decorative: image, scale: 1)
+                        .resizable()
+                        .interpolation(.none)
+                        .frame(width: 24, height: 24)
+                        .accessibilityHidden(true)
+                }
+                Text(title)
+                    .font(NovelStyle.label)
+                    .foregroundStyle(Color.white)
+                    .multilineTextAlignment(.leading)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 8)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .background(Color.black.opacity(0.82))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
     }
 }
 
@@ -515,13 +574,14 @@ struct OriginalSignPageView: View {
     }
 }
 
-/// The question menu of event modes 7 and 8: the partner's open keywords
-/// from the chapter `.ttk`, and leaving the conversation. The original menu
-/// graphics are not drawn.
+/**
+ * Shows the partner's open chapter keywords and the original conversation actions.
+ */
 struct OriginalQuestionMenuView: View {
     @ObservedObject var play: OriginalPlaySession
     let topics: [OriginalEventRunner.Topic]
     @State private var showsInventory = false
+    @State private var selectedTopic: Int16?
 
     var body: some View {
         // Items chosen from the notebook page open the same picker here.
@@ -531,20 +591,24 @@ struct OriginalQuestionMenuView: View {
                 play.showItemInConversation(item)
             }, onClose: { showsInventory = false })
         } else {
+            let selectedTopicID = topics.first(where: { $0.keyword == selectedTopic })?.keyword ?? topics.first?.keyword
             ScrollView {
                 VStack(spacing: 10) {
                     Text(topics.isEmpty ? "No questions" : "Ask about").font(NovelStyle.caption).foregroundStyle(NovelStyle.fadedInk)
                     ForEach(topics, id: \.keyword) { topic in
-                        Button(topic.label) { play.ask(topic.keyword) }
-                            .buttonStyle(BookTextButtonStyle())
+                        OriginalDialogueMenuButton(
+                            title: topic.label,
+                            icon: selectedTopicID == topic.keyword
+                                ? "gimon_obj06.bin" : "gimon_obj02.bin"
+                        ) {
+                            selectedTopic = topic.keyword
+                            play.ask(topic.keyword)
+                        }
                     }
                     InkRule().padding(.vertical, 6)
-                    Button("Notebook") { play.openNotebook() }
-                        .buttonStyle(BookTextButtonStyle())
-                    Button("Items") { showsInventory = true }
-                        .buttonStyle(BookTextButtonStyle())
-                    Button("Leave") { play.leaveConversation() }
-                        .buttonStyle(BookTextButtonStyle())
+                    OriginalDialogueMenuButton(title: "Notebook", icon: "pocketbook.bin") { play.openNotebook() }
+                    OriginalDialogueMenuButton(title: "Items", icon: "bag.bin") { showsInventory = true }
+                    OriginalDialogueMenuButton(title: "Leave", icon: "yameru.bin") { play.leaveConversation() }
                 }
             }
         }

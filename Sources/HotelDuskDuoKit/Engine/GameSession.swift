@@ -36,6 +36,7 @@ public final class GameSession: ObservableObject {
     public let hingeManager: DuoHingeManager
     public let audioController: AudioController
     public let jigsawPuzzleManager: JigsawPuzzleManager
+    private let rumbleFeedback: any RumbleFeedback
     public let memoDraft = MemoDraft()
     public let scriptCatalog: OriginalScriptCatalog?
     public var isBookClosed: Bool { hingeManager.foldState == .closed }
@@ -55,6 +56,7 @@ public final class GameSession: ObservableObject {
 
     public init(hingeManager: DuoHingeManager? = nil,
                 audioController: AudioController = AudioController(),
+                rumbleFeedback: (any RumbleFeedback)? = nil,
                 jigsawPuzzleManager: JigsawPuzzleManager? = nil,
                 saveStore: any OriginalChapterSaveStore = OriginalChapterFileStore.application,
                 resumeStore: any OriginalResumeSaveStore = OriginalResumeFileStore.application,
@@ -66,6 +68,7 @@ public final class GameSession: ObservableObject {
         self.mapRendererFactory = mapRendererFactory
         self.hingeManager = hingeManager ?? DuoHingeManager()
         self.audioController = audioController
+        self.rumbleFeedback = rumbleFeedback ?? NoRumbleFeedback()
         self.jigsawPuzzleManager = jigsawPuzzleManager ?? JigsawPuzzleManager()
         do { scriptCatalog = try OriginalScriptCatalog.bundled() }
         catch {
@@ -116,6 +119,7 @@ public final class GameSession: ObservableObject {
         play?.stop()
         do {
             let next = try OriginalPlaySession.chapterOne(audio: audioController, saveStore: saveStore,
+                rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory)
             attachPlay(next)
         } catch {
@@ -151,6 +155,7 @@ public final class GameSession: ObservableObject {
         do {
             guard let checkpoint = try saveStore.load(slot: slot) else { return }
             let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore,
+                rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory)
             play?.stop()
             saveError = nil
@@ -191,7 +196,8 @@ public final class GameSession: ObservableObject {
         }
         do {
             let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController,
-                saveStore: saveStore, mapRendererFactory: mapRendererFactory)
+                saveStore: saveStore, rumbleFeedback: rumbleFeedback,
+                mapRendererFactory: mapRendererFactory)
             if case .halted(let restoreHalt) = next.runner.phase {
                 throw OriginalDataError.invalid("Safe-place restore stopped at \(restoreHalt.program)")
             }
@@ -215,7 +221,8 @@ public final class GameSession: ObservableObject {
         guard isPauseMenuOpen, let checkpoint = safePlaceSave else { return }
         do {
             let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController,
-                saveStore: saveStore, mapRendererFactory: mapRendererFactory)
+                saveStore: saveStore, rumbleFeedback: rumbleFeedback,
+                mapRendererFactory: mapRendererFactory)
             if case .halted(let halt) = next.runner.phase {
                 throw OriginalDataError.invalid("Safe-place restore stopped at \(halt.program)")
             }
@@ -262,6 +269,7 @@ public final class GameSession: ObservableObject {
         do {
             guard let checkpoint = try resumeStore.load() else { return }
             let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore,
+                rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory)
             play?.stop()
             if let sequence = checkpoint.musicSequenceID { try? audioController.playOriginalSequence(id: sequence) }

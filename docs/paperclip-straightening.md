@@ -72,7 +72,7 @@ Remaining work:
 
 - Draw the visual fades. Their timers already control the process return.
 - Compare DS brightness, lighting, marker blending and rasterisation. Native rendering currently looks brighter than the reference capture.
-- Implement the original spring-back rumble. The host records this missing effect in its presentation trace.
+- Check the mapped spring-back haptic on an iPhone Duo. The current Core Haptics pulse still needs device timing and intensity checks.
 - Draw the original item notice image and check sound timing. The System text and inventory replacement already run.
 - Compare continuous touch positions, animation timing and rendered pixels. Checkpoint tolerances do not prove complete per-frame equivalence.
 - Continue thin-wire lock picking and the delivery route.

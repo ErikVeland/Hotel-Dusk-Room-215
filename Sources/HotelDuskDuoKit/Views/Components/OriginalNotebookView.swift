@@ -69,6 +69,8 @@ struct OriginalNotebookView: View {
                     Button("Previous") { play.turnNotebookPage(forward: false) }
                     Text("\(notebook.page + 1)/\(notebook.pageCount)").font(NovelStyle.caption)
                     Button("Next") { play.turnNotebookPage(forward: true) }
+                    Button("Add page") { play.addNotebookPage() }
+                        .disabled(!notebook.canAddPage)
                     Button("Back") { play.closeNotebook() }
                 }.buttonStyle(BookTextButtonStyle())
             }

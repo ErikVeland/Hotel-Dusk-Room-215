@@ -3,6 +3,7 @@ import SwiftUI
 struct OriginalFloorPlanView: View {
     let image: CGImage
     let exploration: OriginalMapExploration
+    var people: [SIMD2<Float>] = []
     @AppStorage("hdGraphicsEnabled") private var hdGraphicsEnabled = true
 
     var body: some View {
@@ -13,6 +14,14 @@ struct OriginalFloorPlanView: View {
                 .frame(width: CGFloat(image.artworkWidth), height: CGFloat(image.artworkHeight))
                 .frame(width: 192, height: 256, alignment: .topLeading)
                 .offset(x: CGFloat(exploration.mapBitmapOffset.x), y: CGFloat(exploration.mapBitmapOffset.y))
+            ForEach(people.indices, id: \.self) { index in
+                if (0..<192).contains(people[index].x), (0..<256).contains(people[index].y) {
+                    OriginalMapCharacterIndicator()
+                        .position(x: CGFloat(people[index].x), y: CGFloat(people[index].y))
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                }
+            }
             OriginalMapPlayerIndicator(facing: exploration.facing)
                 .position(x: CGFloat(exploration.mapPlayerPoint.x), y: CGFloat(exploration.mapPlayerPoint.y))
                 .allowsHitTesting(false)
@@ -20,6 +29,16 @@ struct OriginalFloorPlanView: View {
         }
         .frame(width: 192, height: 256)
         .clipped()
+    }
+}
+
+private struct OriginalMapCharacterIndicator: View {
+    var body: some View {
+        Circle()
+            .fill(Color(red: 0.16, green: 0.43, blue: 0.88))
+            .overlay { Circle().stroke(.white, lineWidth: 1.25) }
+            .frame(width: 8, height: 8)
+            .shadow(color: .black.opacity(0.5), radius: 0.8, y: 0.5)
     }
 }
 

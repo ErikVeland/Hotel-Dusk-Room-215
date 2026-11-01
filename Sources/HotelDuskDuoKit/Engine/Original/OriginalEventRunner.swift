@@ -709,10 +709,6 @@ public struct OriginalEventRunner: Sendable {
         unrenderedPresentation.append("process\(processID):caption\(caption)")
     }
 
-    public mutating func recordUnrenderedRumble(processID: UInt16) {
-        unrenderedPresentation.append("process\(processID):rumble")
-    }
-
     /**
      * The jigsaw destructor saves its loose-piece mask before the process returns.
      */
