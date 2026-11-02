@@ -25,7 +25,11 @@ The detailed walkthrough identifies this route as `CHP201`. The original `EP2_R2
 | Bracelet answer | Option 7, response 16 |
 | Departure | Event 22, shared event key 21 |
 
-The more aggressive answer remains a separate branch. This route check does not establish its game-over behaviour.
+## Alternate answer: tell Rosa about Louie
+
+The `Rat out Louie.` answer opens the Jenny and Dunning question topics. Ask both topics. Advance through Rosa’s final “My Pager.” page. The game returns to corridor exploration. The original ROM and native runner match the same 32,088-byte game state. This route does not enter game over.
+
+`OriginalNileRouteTests.testTellingRosaTheTruthReturnsToTheCorridor` covers this answer. Its reference input is `tools/reference/chapter-two-rosa-tell-truth.txt`. The trace starts at the captured Rosa choice and uses normal touch and button input. The `truth-departure` capture is before the closing page. `truth-departure-complete` is the completed endpoint.
 
 ## Recovered checkpoint heading
 

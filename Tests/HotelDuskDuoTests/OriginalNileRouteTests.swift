@@ -66,4 +66,23 @@ final class OriginalNileRouteTests: XCTestCase {
             XCTAssertEqual(differences, [], "\(path): \(detail)")
         }, compareLouieRoomDoorSnapshots: false)
     }
+
+    func testTellingRosaTheTruthReturnsToTheCorridor() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        let runner = try OriginalEventRunner(program: catalog.loadProgram("EP2_R103"),
+            game: state("chapter-two-office-exit-approach/page9"),
+            keywords: OriginalKeywordTable(decoded: catalog.decodedFile("EP2_.ttk")))
+        let audio = originalRouteTestAudio()
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
+        defer { play.stop() }
+        try OriginalNileRouteChecks.run(play, compare: { actual, path in
+            let expected = try self.state(path).bytes
+            let differences = actual.bytes.indices.filter { actual.bytes[$0] != expected[$0] }
+            let detail = differences.prefix(80).map {
+                String(format: "%04X: %02X != %02X", $0, actual.bytes[$0], expected[$0])
+            }
+            XCTAssertEqual(differences, [], "\(path): \(detail)")
+        }, compareLouieRoomDoorSnapshots: false, rosaPastChoice: .tellTruth)
+    }
 }

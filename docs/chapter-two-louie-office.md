@@ -2,7 +2,7 @@
 
 The native route leaves Dunning's office after taking the red box, approaches Louie and follows the detailed guide's `CHP217` and `CHP218` choices. It then asks Rosa about Jenny and December 5. The existing event runner handles these conversations; this work adds route comparisons and corrects diagonal walking.
 
-The spoiler-free guide offers a different answer to Rosa's question about knowing Louie. This checked route uses the detailed guide's “Yeah, I know him.” branch. Other choices and missed interrupts remain unchecked here.
+The spoiler-free guide gives a different answer to Rosa's question about Louie. The keep-secret route below uses the detailed guide's “Yeah, I know him.” branch. The alternate “Rat out Louie.” route also passes its check. It covers both question topics, the final pager page and the return to corridor exploration. Its game state matches the original. Missed interrupts remain unchecked here.
 
 ## Original checkpoints
 
@@ -17,6 +17,7 @@ All scripts below are under `tools/reference`. They use ordinary touch and butto
 | `chapter-two-louie-sense-interrupt`, `chapter-two-louie-sense-answer` | Second interrupt and Rosa's arrival. |
 | `chapter-two-rosa-office-talk`, `chapter-two-rosa-office-interrupt`, `chapter-two-rosa-whats-wrong` | Rosa's first interrupt and question about Louie. |
 | `chapter-two-rosa-know-louie`, `chapter-two-rosa-past-choice`, `chapter-two-rosa-keep-secret` | Honest answer and choice to keep Louie's past secret. |
+| `chapter-two-rosa-tell-truth` | “Rat out Louie.” answer, both question topics, closing pager page and corridor return. |
 | `chapter-two-rosa-shifty-talk`, `chapter-two-rosa-shifty-interrupt`, `chapter-two-rosa-pizza-story`, `chapter-two-rosa-pizza-return` | Shifty interrupt, pizza-boy story and question menu. |
 | `chapter-two-rosa-jenny`, `chapter-two-rosa-december`, `chapter-two-rosa-pager` | Optional questions and departure. |
 
@@ -32,7 +33,7 @@ The original approach records 45 emulator frames at page point `(60,70)`, follow
 
 ## Native checks
 
-`OriginalNileRouteChecks` extends the ordinary office route. It selects the guide's choices by their original labels, uses the interruption control and asks keywords 11 and 12. Pause prevents choice selection and dialogue advancement. The checkpoint route compares all 32,088 original game-state bytes, including the retry checkpoint.
+`OriginalNileRouteChecks` extends the ordinary office route. It selects the guide's choices by their original labels, uses the interruption control and asks keywords 11 and 12. A second check selects “Rat out Louie.”, asks both question topics and advances through the pager page. Both branches compare all 32,088 original game-state bytes. Pause prevents choice selection and dialogue advancement. The checkpoint route also compares the full saved state, including the retry checkpoint.
 
 The continuous Chapter 2 route checks the Louie door destination, `EP2_R114` arrival and conversation directly. It skips two standalone door RAM comparisons because those captures retain different event flags; the standalone route keeps its byte comparisons.
 
@@ -45,6 +46,8 @@ On 18 October 2026, 27 targeted checks passed with no failures or skips. They co
 On 1 November 2026, `OriginalChapterTwoRouteTests.testChapterTwoRosaLinensAndHelenGuideRoute` passed in 109 seconds. One native session continued from the final Chapter 1 review through the Chapter 2 puzzles and conversations to the Chapter 3 entry checkpoint. The test uses bitmap renderers for host-independent puzzle input; it does not verify Metal rendering or physical-device input.
 
 On 1 November 2026, `LayoutSnapshotTests.testRenderRequiredDunningQuestionsAndDeliveryKnock` passed in 174.6 seconds. It starts from a fresh game and checks the Chapter 1 and Chapter 2 interactions. The R102 return check waits for the 20-frame room-entry heading blend before it checks the destination heading.
+
+On 2 November 2026, all three `OriginalNileRouteTests` passed. The truthful-answer route asks both topics and advances through the closing pager page. It matches all 32,088 bytes of the original corridor-return state. The original input trace and test do not use memory writes.
 
 There is no package script for these Swift targets. Run the focused checks through SwiftPM:
 

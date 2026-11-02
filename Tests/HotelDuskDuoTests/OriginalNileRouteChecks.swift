@@ -6,9 +6,15 @@ import XCTest
  */
 @MainActor
 enum OriginalNileRouteChecks {
+    enum RosaPastChoice: Equatable {
+        case keepSecret
+        case tellTruth
+    }
+
     static func run(_ play: OriginalPlaySession,
                     compare: (OriginalGameState, String) throws -> Void = { _, _ in },
-                    compareLouieRoomDoorSnapshots: Bool = true) throws {
+                    compareLouieRoomDoorSnapshots: Bool = true,
+                    rosaPastChoice: RosaPastChoice = .keepSecret) throws {
         play.holdLobbyTouch(x: 60, y: 70)
         for _ in 0..<43 { play.advanceFrame() }
         play.holdLobbyTouch(x: 20, y: 128)
@@ -46,6 +52,26 @@ enum OriginalNileRouteChecks {
         try compare(play.runner.game, "chapter-two-rosa-whats-wrong/page13")
         try choose("Yeah, I know him.", in: play)
         try compare(play.runner.game, "chapter-two-rosa-past-choice/page5")
+        if rosaPastChoice == .tellTruth {
+            try choose("Rat out Louie.", in: play)
+            guard case .questions(let topics) = play.runner.phase else {
+                return XCTFail("Expected Rosa's questions after the truthful answer: \(play.runner.phase)")
+            }
+            XCTAssertEqual(topics.map(\.keyword), [11, 12])
+            try compare(play.runner.game, "chapter-two-rosa-tell-truth/truth-question-menu")
+            play.ask(11)
+            drain(play)
+            guard case .questions = play.runner.phase else {
+                return XCTFail("Expected Rosa's questions after the Jenny answer: \(play.runner.phase)")
+            }
+            try compare(play.runner.game, "chapter-two-rosa-tell-truth/truth-jenny-return")
+            play.ask(12)
+            drain(play)
+            XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
+            XCTAssertFalse(play.isGameOverPresented)
+            try compare(play.runner.game, "chapter-two-rosa-tell-truth-final/truth-departure-complete")
+            return
+        }
         try choose("Don't tell her anything.", in: play)
         try compare(play.runner.game, "chapter-two-rosa-shifty-interrupt/page3")
         try choose("You think he's shifty?", in: play)
