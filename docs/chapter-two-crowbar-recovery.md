@@ -1,6 +1,6 @@
 # Chapter 2 crowbar recovery
 
-Process 30 now runs through ordinary inventory use on cabinet close-up 124. Native placement, lifting, paper retrieval and story return are connected. The route opens the joined memo and continues to the cabinet combination.
+Process 30 runs through ordinary inventory use on cabinet close-up 124. Native placement, lifting, paper retrieval and story return are connected. The route opens the joined memo and continues to the cabinet combination. The intact-memo route now reopens close-up 119 after the memo-pull process, uses the crowbar on the drawer, and reaches the same cabinet challenge. Its process-ready and memo-recovery states match the original captures.
 
 The supplied walkthroughs describe cabinet lifting in `CHP216` and the spoiler-free Chapter 2 route. The source also permits retrieving the whole memo before tearing it. This document records the implementation and original evidence.
 
@@ -27,6 +27,8 @@ Scripts are under `tools/reference`. Captures remain local under `extracted/refe
 These scripts use touch and button input. They do not change original memory.
 
 For the torn-paper route, the native route selects page point `(85,222)`, opens close-up 124 and uses item 10 at `(70,145)`. The resulting complete game state matches `chapter-two-crowbar-entry/ready`.
+
+For the intact-memo route, the native route quits the memo-pull process, selects `obj02` again at `(95,220)`, opens close-up 119 and uses item 10 at `(70,145)`. It matches `chapter-two-crowbar-whole-memo/ready` and continues through the whole-memo recovery and cabinet combination.
 
 ## Controller source
 
@@ -77,6 +79,8 @@ Capture frame counts can differ from controller update counts. Tests align the o
 
 The milestone passed 10 tests with no failures or skips: eight crowbar checks and both story routes. A subsequent crowbar run passed all eight checks after adding marker fields, audio timers and result-1 story comparison. `git diff --check` passed.
 
+On 2 November 2026, the updated Chapter 2 normal-input route passed in 112.878 seconds with no failures. The intact-memo branch reselects the drawer after leaving the memo-pull process, reaches the crowbar challenge, and continues through the cabinet combination and Chapter 3 handoff.
+
 ```sh
 SNAPSHOT_DIR=/tmp/hotel-crowbar-final \
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
@@ -90,7 +94,6 @@ The renderer loads original model and texture payloads. Native entry, placement 
 - Recover the shared animated touch marker and caption presentation.
 - Check sound output against the original envelopes and mixing. The native host sends the recovered sound and volume commands.
 - Compare the game-over presentation with the original, including menu artwork and timing. The process result, returned story state, warning-to-game-over request, Retry and Back to Title state changes have checks.
-- Check the alternative whole-memo route through the native session. Original captures and memo-image checks cover its assets.
 - Continue the office and Chapter 2 route. Process 31 and red-box acquisition are now connected. See [Combination recovery](chapter-two-cabinet-combination.md).
 
 Decompiler carry flags are not reliable high-level comparisons. Assembly and captured controller fields support the implemented branches.

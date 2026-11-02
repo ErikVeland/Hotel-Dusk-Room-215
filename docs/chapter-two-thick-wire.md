@@ -57,7 +57,7 @@ Process 35 uses overlay 24, selected by factory overlay index 23. Its object pos
 
 The Chapter 2 route and five focused controller checks passed without failures or skips. A subsequent 11-check run passed the new-game route, thin-wire regressions and shared Metal rendering. The final 13-check run passed both wire controllers, wire visibility and hanger rendering, including the exact sampled wall colours. `git diff --check` passed.
 
-The opening and insertion images were visually inspected. The earlier route checks stopped at process 35. The current contents route removes that stop and covers cash collection and client-list storage. Original presentation and device-input comparisons remain open; this route does not establish full-game completion.
+The opening and insertion images were visually inspected. The native route continues from process 35 through cash collection and client-list storage, then reaches the Dunning conversation and Chapter 3 entry. Original presentation and device-input comparisons remain open; this route does not establish full-game completion.
 
 ```sh
 SNAPSHOT_DIR=/tmp/hotel-thick-wire-final DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test --filter 'OriginalThinWireProcessTests|OriginalThickWireProcessTests|OriginalModelMetalTests|LayoutSnapshotTests.testRenderRequiredDunningQuestionsAndDeliveryKnock'

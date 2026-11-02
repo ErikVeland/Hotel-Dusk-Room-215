@@ -49,14 +49,12 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
 swift test --filter 'OriginalUpViewTests|LayoutSnapshotTests.testRenderRequiredDunningQuestionsAndDeliveryKnock'
 ```
 
-The original reference also enters R115 through `chapter-two-office-enter.txt`. Its completed entry capture is `extracted/reference/chapter-two-office-enter-ready/room`. This establishes the next source checkpoint, not native office support.
+The original reference also enters R115 through `chapter-two-office-enter.txt`. Its completed entry capture is `extracted/reference/chapter-two-office-enter-ready/room`. Native office search and cabinet routes continue from this entry; the complete game and original presentation remain unfinished.
 
 ## Remaining work
 
-- Continue R115 search through the trapped memo and cabinet puzzles.
-- Follow `CHP215` through the remaining cabinet memo and keys.
-- Recover the crowbar and memo interactions from original execution.
 - Check alternate payment answers and failure paths.
-- Complete original character presentation, movement transitions and sound comparisons.
+- Compare original character presentation, movement transitions and sound.
+- Extend saved-game route checks beyond the Chapter 3 entry and test recovery after interruption.
 
-The full game remains incomplete. Script completion alone does not establish presentation fidelity.
+The native route now reaches the Chapter 3 entry. A single uninterrupted device playthrough and original presentation fidelity remain unverified.

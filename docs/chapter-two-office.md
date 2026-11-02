@@ -74,14 +74,14 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
 swift test --filter 'OriginalOfficeTests|LayoutSnapshotTests.testRenderRequiredDunningQuestionsAndDeliveryKnock|OriginalSearchCloseupTests'
 ```
 
-The route now continues from `chapter-two-office-cabinet-approach/search` through native memo pulling and torn-paper acquisition. See [Trapped memo](chapter-two-memo-pull.md) for the later checks and presentation limits.
+The route now continues from `chapter-two-office-cabinet-approach/search` through memo pulling and crowbar recovery. Both the torn-paper path and the intact-memo path reach process 30 through native input. See [Trapped memo](chapter-two-memo-pull.md) and [Crowbar recovery](chapter-two-crowbar-recovery.md) for the route checks and presentation limits.
 
 ## Next work
 
 - Complete the memo process captions and tear-message presentation.
-- Complete the crowbar game-over presentation and alternative whole-memo route. Placement, lifting and joined-paper retrieval are connected. See [Crowbar recovery](chapter-two-crowbar-recovery.md).
-- Continue from the acquired red box to the office exit. Combination entry now uses the saved memo code.
-- Check the wall keys and the office-exit conditions for Louie's conversation.
-- Continue the remaining Chapter 2 conversations and review.
+- Compare the crowbar game-over presentation, including menu artwork and timing. Both memo routes now reach the cabinet challenge through native input. See [Crowbar recovery](chapter-two-crowbar-recovery.md).
+- Compare the memo captions and crowbar failure presentation against the original.
+- Check alternate dialogue answers and failure branches that are not part of the verified Chapter 2 route.
+- Continue full-route and saved-game checks through the later chapters.
 
-The complete game and original presentation remain unfinished.
+The Chapter 2 route checks reach the cabinet challenge and continue into Chapter 3. A single uninterrupted device playthrough and original presentation fidelity remain unverified.

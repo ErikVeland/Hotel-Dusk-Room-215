@@ -32,7 +32,7 @@ Reference inputs are in `tools/reference/chapter-two-linens-exit.txt`, `chapter-
 
 Original portraits, character animation, cinematic camera movement and audio timing remain incomplete. Alternate answers, physical Duo input and a complete unmodified original playthrough remain unverified.
 
-The next route is `CHP212`: use the pliers on the hanger, obtain the thick wire and open the suitcase. Hanger inspection and the recovered cutting controller now have original comparisons. Rendering and session integration remain unfinished. See [Hanger recovery](chapter-two-hanger.md). The successful thick-wire variant remains unfinished. Chapter 1's thin-wire failure does not implement this success path.
+The native route uses the pliers on the hanger, obtains the thick wire and completes process 33 through normal touch input. It opens process 35, takes the cash, stores the client list and continues to Dunning's office. The Chapter 2 route test compares the process-ready and story-return states with the original captures. See [Hanger recovery](chapter-two-hanger.md), [Thick-wire suitcase lock](chapter-two-thick-wire.md) and [Suitcase contents](chapter-two-suitcase-contents.md). Physical-device input and presentation fidelity remain open.
 
 ```sh
 SNAPSHOT_DIR=/tmp/hotel-chapter-two-helen-final DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test --filter 'OriginalChapterTwoRouteTests|OriginalLobbyExplorationTests|OriginalDoorTests|LayoutSnapshotTests.testRenderRequiredDunningQuestionsAndDeliveryKnock'

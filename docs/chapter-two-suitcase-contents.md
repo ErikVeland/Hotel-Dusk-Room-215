@@ -79,6 +79,6 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer \
 
 1. Complete cursor, selection feedback and original control presentation.
 2. Compare additional object descriptions, later item branches and re-entry paths.
-3. Continue from the now-connected [payment route](chapter-two-payment.md) into Dunning's office.
+3. Check later item branches, original presentation and device input.
 
 The complete port, later item branches, device input and presentation fidelity remain unverified.
