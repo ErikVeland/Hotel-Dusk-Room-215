@@ -23,11 +23,6 @@ final class OriginalCassetteDeckProcessTests: XCTestCase {
         XCTAssertEqual(process.returnedProcessValue, 0)
     }
 
-    func testFactoryVariantsSelectTheirSourceMusicSequence() {
-        XCTAssertEqual(OriginalCassetteDeckProcess().sourceMusicSequenceID, 0x34)
-        XCTAssertEqual(OriginalCassetteDeckProcess(variant: .sideB).sourceMusicSequenceID, 0x59)
-    }
-
     func testCassetteDeckDoesNotStartWithoutAProjectedSceneHit() {
         var process = OriginalCassetteDeckProcess()
         _ = process.update(touch: SIMD2(76, 156), pressedTouch: SIMD2(76, 156), sceneHit: false)
@@ -56,6 +51,30 @@ final class OriginalCassetteDeckProcessTests: XCTestCase {
         XCTAssertEqual(process.update(touch: nil, pressedTouch: SIMD2(47, 143), sceneHit: false),
                        [.sound(archiveID: 48, entryID: 3)])
         XCTAssertEqual(process.activateSelectedControl(), [.sound(archiveID: 48, entryID: 4)])
+    }
+
+    func testPlaybackStopsAndEmitsTheTapeCueAfterTwoSourceUpdates() {
+        var process = makeReadyProcess(selectedControl: SIMD2(47, 143))
+        XCTAssertEqual(process.activateSelectedControl(), [.sound(archiveID: 48, entryID: 4)])
+
+        XCTAssertEqual(process.update(touch: nil, pressedTouch: nil, sceneHit: false), [])
+        XCTAssertEqual(process.update(touch: nil, pressedTouch: nil, sceneHit: false), [
+            .stopSound(archiveID: 48, entryID: 4, fadeFrames: 3),
+            .sound(archiveID: 48, entryID: 5)
+        ])
+        XCTAssertEqual(process.update(touch: nil, pressedTouch: nil, sceneHit: false), [])
+        XCTAssertEqual(process.phase, .playing)
+    }
+
+    func testEarlyExitStopsPlaybackWithoutEmittingTheTapeCue() {
+        var process = makeReadyProcess(selectedControl: SIMD2(47, 143))
+        _ = process.activateSelectedControl()
+        _ = process.update(touch: nil, pressedTouch: nil, sceneHit: false)
+
+        XCTAssertEqual(process.requestExit(), [
+            .stopSound(archiveID: 48, entryID: 4, fadeFrames: 3)
+        ])
+        XCTAssertEqual(process.phase, .exiting)
     }
 
     private func makeReadyProcess(selectedControl: SIMD2<Int>) -> OriginalCassetteDeckProcess {

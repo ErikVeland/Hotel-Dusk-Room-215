@@ -197,7 +197,6 @@ final class OriginalFactoryOverlaySessionTests: XCTestCase {
         defer { play.stop() }
 
         XCTAssertEqual(play.cassetteDeck?.variant, .sideB)
-        XCTAssertEqual(play.cassetteDeck?.sourceMusicSequenceID, 0x59)
         XCTAssertEqual(play.runner.phase, .process(id: 89))
         if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
     }

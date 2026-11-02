@@ -14,6 +14,9 @@ public final class GameSession: ObservableObject {
     private let mapRendererFactory: OriginalMapRendererFactory
     @Published public private(set) var resumeSave: OriginalResumeSave?
     private var safePlaceSave: OriginalResumeSave?
+    private var resumeSaveReadFailed = false
+    private var safePlaceSaveReadFailed = false
+    private var chapterSaveReadFailed = false
     private var restoringAfterStop = false
     @Published public private(set) var isPauseMenuOpen = false
     @Published public private(set) var isReviewingConversations = false
@@ -42,6 +45,14 @@ public final class GameSession: ObservableObject {
     public var isBookClosed: Bool { hingeManager.foldState == .closed }
     public var canStartOriginalGame: Bool { scriptCatalog != nil }
     public var canReturnToSafePlace: Bool { play != nil && safePlaceSave != nil }
+    public var canRecoverSavedProgress: Bool { resumeSave == nil && safePlaceSave != nil }
+    public var hasSavedProgress: Bool {
+        resumeSave != nil || safePlaceSave != nil || chapterSaves.contains { $0 != nil }
+            || resumeSaveReadFailed || safePlaceSaveReadFailed || chapterSaveReadFailed
+    }
+    public var canContinueLegacySave: Bool {
+        resumeSave == nil && safePlaceSave == nil && chapterSaves.contains { $0 != nil }
+    }
     private var cancellables = Set<AnyCancellable>()
     private var playCancellable: AnyCancellable?
     private var animationDecoder: OriginalAnimationDecoder?
@@ -76,10 +87,19 @@ public final class GameSession: ObservableObject {
             sourceError = String(describing: error)
         }
         refreshChapterSaves()
-        do { resumeSave = try resumeStore.load() }
-        catch { saveError = "The resume checkpoint could not be read: \(error)" }
+        do {
+            let checkpoint = try resumeStore.load()
+            if let checkpoint { _ = try checkpoint.gameState() }
+            resumeSave = checkpoint
+        } catch {
+            resumeSaveReadFailed = true
+            saveError = "The resume checkpoint could not be read: \(error)"
+        }
         do { safePlaceSave = try safePlaceStore.load() }
-        catch { saveError = "The safe-place checkpoint could not be read: \(error)" }
+        catch {
+            safePlaceSaveReadFailed = true
+            saveError = "The safe-place checkpoint could not be read: \(error)"
+        }
         observeFoldEvents()
     }
 
@@ -173,10 +193,12 @@ public final class GameSession: ObservableObject {
     }
 
     private func refreshChapterSaves() {
+        chapterSaveReadFailed = false
         for slot in 0..<3 {
             do { chapterSaves[slot] = try saveStore.load(slot: slot) }
             catch {
                 chapterSaves[slot] = nil
+                chapterSaveReadFailed = true
                 saveError = "Save slot \(slot + 1) could not be read: \(error)"
             }
         }
@@ -215,6 +237,7 @@ public final class GameSession: ObservableObject {
 
     private func storeSafePlace(_ checkpoint: OriginalResumeSave) {
         safePlaceSave = checkpoint
+        safePlaceSaveReadFailed = false
         do { try safePlaceStore.save(checkpoint) }
         catch { saveError = "The safe-place checkpoint could not be saved: \(error)" }
     }
@@ -279,6 +302,7 @@ public final class GameSession: ObservableObject {
         do {
             try resumeStore.save(checkpoint)
             resumeSave = checkpoint
+            resumeSaveReadFailed = false
             saveError = nil
         } catch { saveError = "Progress could not be saved: \(error)" }
     }
@@ -301,7 +325,11 @@ public final class GameSession: ObservableObject {
 
     public func continueSavedGame() {
         do {
-            guard let checkpoint = try resumeStore.load() else { return }
+            guard let checkpoint = try resumeStore.load() else {
+                guard resumeSave != nil || safePlaceSave != nil else { return }
+                recoverFromResumeFailure(OriginalDataError.missing("Resume checkpoint"))
+                return
+            }
             let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore,
                 rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory)
@@ -311,7 +339,40 @@ public final class GameSession: ObservableObject {
             attachPlay(next)
             if let sequence = checkpoint.musicSequenceID { try? audioController.playOriginalSequence(id: sequence) }
             updatePlayActivity()
-        } catch { saveError = "The resume checkpoint could not be loaded: \(error)" }
+        } catch { recoverFromResumeFailure(error) }
+    }
+
+    private func recoverFromResumeFailure(_ error: Error) {
+        if let safePlaceSave {
+            do {
+                try continueFromSafePlace(safePlaceSave,
+                    notice: "The latest progress could not be loaded. Play returned to the last safe place.")
+                return
+            } catch {
+                saveError = "The resume checkpoint and last safe place could not be restored: \(error)"
+            }
+        } else {
+            saveError = "The resume checkpoint could not be loaded: \(error)"
+        }
+
+        resumeSave = nil
+        recoveryNotice = "The saved progress could not be loaded. Play started from Chapter 1."
+        startOriginalGame()
+    }
+
+    private func continueFromSafePlace(_ checkpoint: OriginalResumeSave, notice: String) throws {
+        let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController, saveStore: saveStore,
+            rumbleFeedback: rumbleFeedback, mapRendererFactory: mapRendererFactory)
+        if case .halted(let halt) = next.runner.phase {
+            next.stop()
+            throw OriginalDataError.invalid("Safe-place restore stopped at \(halt.program)")
+        }
+        play?.stop()
+        resumeSave = nil
+        saveError = nil
+        recoveryNotice = notice
+        attachPlay(next)
+        updatePlayActivity()
     }
 
     public func reviewConversations() {

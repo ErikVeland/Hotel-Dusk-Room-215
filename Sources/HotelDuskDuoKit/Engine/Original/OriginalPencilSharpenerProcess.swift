@@ -95,6 +95,10 @@ public struct OriginalPencilSharpenerProcess: Equatable, Sendable {
 
     public var returnedProcessValue: Int16? { processReturnValue }
 
+    public var powderProgressFraction: Double {
+        min(1, powderProgress / Self.powderProgressRequired)
+    }
+
     /**
      * Tests the diagonal pencil mask measured from the source hit region.
      */

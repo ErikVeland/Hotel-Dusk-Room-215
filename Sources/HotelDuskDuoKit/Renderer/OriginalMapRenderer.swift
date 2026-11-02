@@ -20,7 +20,7 @@ public typealias OriginalMapRendererFactory = @MainActor (String, UInt16?) throw
  */
 public final class OriginalMapRenderer: OriginalMapRendering, @unchecked Sendable {
     public let map: CGImage
-    private let device: MTLDevice
+    nonisolated(unsafe) private let device: MTLDevice
     private let models: OriginalModelLibrary
     private let textures: OriginalTextureLibrary
     nonisolated(unsafe) private var roomVariants: [UInt16: OriginalModelMetalPreview]

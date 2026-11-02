@@ -49,8 +49,12 @@ final class OriginalResumeSaveTests: XCTestCase {
     private final class Store: OriginalResumeSaveStore {
         var checkpoint: OriginalResumeSave?
         var fails = false
+        var failsToRead = false
         var writes = 0
-        func load() throws -> OriginalResumeSave? { checkpoint }
+        func load() throws -> OriginalResumeSave? {
+            if failsToRead { throw OriginalDataError.invalid("Read unavailable") }
+            return checkpoint
+        }
         func save(_ checkpoint: OriginalResumeSave) throws {
             if fails { throw OriginalDataError.invalid("Disk unavailable") }
             self.checkpoint = checkpoint
@@ -60,8 +64,12 @@ final class OriginalResumeSaveTests: XCTestCase {
 
     private final class ChapterStore: OriginalChapterSaveStore {
         var slots: [Int: OriginalChapterSave] = [:]
+        var failsToRead = false
         var writes = 0
-        func load(slot: Int) throws -> OriginalChapterSave? { slots[slot] }
+        func load(slot: Int) throws -> OriginalChapterSave? {
+            if failsToRead { throw OriginalDataError.invalid("Read unavailable") }
+            return slots[slot]
+        }
         func save(_ checkpoint: OriginalChapterSave, slot: Int) throws {
             slots[slot] = checkpoint
             writes += 1
@@ -84,6 +92,10 @@ final class OriginalResumeSaveTests: XCTestCase {
         session.startOriginalGame()
         let play = try XCTUnwrap(session.play)
         for _ in 0..<1200 {
+            if play.chapterTransition?.stage == .title {
+                play.continueChapterTitle()
+                continue
+            }
             switch play.runner.phase {
             case .dialogue: play.advanceDialogue()
             case .process(56):
@@ -98,6 +110,56 @@ final class OriginalResumeSaveTests: XCTestCase {
         }
         XCTFail("Opening did not finish")
         return play
+    }
+
+    private func corruptResumeChecksum(_ checkpoint: OriginalResumeSave) throws -> OriginalResumeSave {
+        var record = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(checkpoint)) as? [String: Any])
+        record["stateSHA256"] = String(repeating: "0", count: 64)
+        return try JSONDecoder().decode(OriginalResumeSave.self,
+            from: JSONSerialization.data(withJSONObject: record))
+    }
+
+    func testChapterOneTitleAppearsAfterEntranceAndContinuesToLobby() throws {
+        let game = session()
+        defer { game.endOriginalGame() }
+        game.startOriginalGame()
+        let play = try XCTUnwrap(game.play)
+        for _ in 0..<20 {
+            guard case .dialogue = play.runner.phase else { break }
+            play.advanceDialogue()
+        }
+        XCTAssertEqual(play.runner.phase, .process(id: 56))
+
+        for _ in 0..<900 where play.chapterTransition == nil {
+            if play.entrance?.awaitingHandle == true { play.touchEntrance(pageX: 92, pageY: 175) }
+            play.advanceFrame()
+        }
+
+        XCTAssertEqual(play.chapterTransition?.stage, .title)
+        XCTAssertNotNil(play.chapterTitleImages)
+        try assertRestores(game)
+        let store = Store()
+        store.checkpoint = try XCTUnwrap(game.resumeSave)
+        let resumed = session(store)
+        defer { resumed.endOriginalGame() }
+        resumed.continueSavedGame()
+        let resumedPlay = try XCTUnwrap(resumed.play, resumed.saveError ?? "No restored play")
+        XCTAssertEqual(resumedPlay.chapterTransition?.stage, .title)
+        resumedPlay.continueChapterTitle()
+        XCTAssertNil(resumedPlay.chapterTransition)
+
+        for _ in 0..<1200 {
+            switch resumedPlay.runner.phase {
+            case .dialogue, .itemNotice: resumedPlay.advanceDialogue()
+            case .waiting: resumedPlay.advanceFrame()
+            case .exploration(let mapID):
+                XCTAssertEqual(mapID, 2)
+                XCTAssertNotNil(resumedPlay.lobby)
+                return
+            default: XCTFail("Chapter title continuation stopped at \(resumedPlay.runner.phase)"); return
+            }
+        }
+        XCTFail("Chapter title did not continue to the lobby")
     }
 
     func testLegacyDialogueCheckpointRestoresBeforeItsOriginalContinue() throws {
@@ -258,6 +320,10 @@ final class OriginalResumeSaveTests: XCTestCase {
         var sawAutomaticRecovery = false
         for _ in 0..<2400 {
             guard let play = game.play else { return XCTFail("Recovery removed the active game") }
+            if play.chapterTransition?.stage == .title {
+                play.continueChapterTitle()
+                continue
+            }
             switch play.runner.phase {
             case .dialogue:
                 play.advanceDialogue()
@@ -348,6 +414,116 @@ final class OriginalResumeSaveTests: XCTestCase {
         if case .halted = play.runner.phase { XCTFail("Chapter 1 fallback must not remain halted") }
         XCTAssertEqual(play.runner.game.chapter, 0)
         XCTAssertTrue(game.recoveryNotice?.contains("beginning") == true)
+    }
+
+    func testCorruptResumeCheckpointContinuesFromLastSafePlace() throws {
+        let resumeStore = Store(), safePlaceStore = Store()
+        let previous = session(resumeStore, safePlaceStore: safePlaceStore)
+        defer { previous.endOriginalGame() }
+        let previousPlay = try enterLobby(previous)
+        let safePosition = previousPlay.lobby?.position
+        previous.endOriginalGame()
+        resumeStore.checkpoint = try corruptResumeChecksum(XCTUnwrap(resumeStore.checkpoint))
+
+        let resumed = session(resumeStore, safePlaceStore: safePlaceStore)
+        defer { resumed.endOriginalGame() }
+        XCTAssertNil(resumed.resumeSave)
+        XCTAssertTrue(resumed.canRecoverSavedProgress)
+        resumed.continueSavedGame()
+
+        let restored = try XCTUnwrap(resumed.play)
+        XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
+        XCTAssertEqual(restored.lobby?.position, safePosition)
+        XCTAssertTrue(resumed.recoveryNotice?.contains("last safe place") == true)
+        let repairedCheckpoint = try XCTUnwrap(resumeStore.checkpoint)
+        XCTAssertNoThrow(try repairedCheckpoint.gameState())
+    }
+
+    func testCorruptResumeWithoutSafePlaceStartsChapterOne() throws {
+        let resumeStore = Store()
+        let previous = session(resumeStore)
+        defer { previous.endOriginalGame() }
+        previous.startOriginalGame()
+        previous.endOriginalGame()
+        resumeStore.checkpoint = try corruptResumeChecksum(XCTUnwrap(resumeStore.checkpoint))
+
+        let resumed = session(resumeStore)
+        defer { resumed.endOriginalGame() }
+        XCTAssertNil(resumed.resumeSave)
+        XCTAssertTrue(resumed.hasSavedProgress)
+        resumed.continueSavedGame()
+
+        let restarted = try XCTUnwrap(resumed.play)
+        XCTAssertEqual(restarted.runner.game.chapter, 0)
+        if case .halted = restarted.runner.phase {
+            XCTFail("Chapter 1 fallback must not remain halted")
+        }
+        XCTAssertTrue(resumed.recoveryNotice?.contains("Chapter 1") == true)
+    }
+
+    func testUnreadableResumeStillRequiresNewGameConfirmation() throws {
+        let resumeStore = Store()
+        resumeStore.failsToRead = true
+        let game = session(resumeStore)
+        defer { game.endOriginalGame() }
+
+        XCTAssertNil(game.resumeSave)
+        XCTAssertTrue(game.hasSavedProgress)
+        XCTAssertFalse(game.canRecoverSavedProgress)
+    }
+
+    func testUnreadableSafePlaceStillRequiresNewGameConfirmation() throws {
+        let safePlaceStore = Store()
+        safePlaceStore.failsToRead = true
+        let game = session(safePlaceStore: safePlaceStore)
+        defer { game.endOriginalGame() }
+
+        XCTAssertTrue(game.hasSavedProgress)
+        XCTAssertFalse(game.canRecoverSavedProgress)
+    }
+
+    func testUnreadableLegacyChapterSaveStillRequiresNewGameConfirmation() throws {
+        let chapterStore = ChapterStore()
+        chapterStore.failsToRead = true
+        let game = session(chapterStore: chapterStore)
+        defer { game.endOriginalGame() }
+
+        XCTAssertTrue(game.hasSavedProgress)
+        XCTAssertFalse(game.canContinueLegacySave)
+    }
+
+    func testLegacyChapterSaveRemainsAvailableAndRequiresNewGameConfirmation() throws {
+        let chapterStore = ChapterStore()
+        let defaults = try OriginalStateDefaults.bundled()
+        var state = try OriginalGameState.newGame(defaults: defaults, timestamp: nil)
+        state.setMap(31, previous: 31)
+        try state.beginChapter(1)
+        let checkpoint = try OriginalChapterSave(game: state, savedAt: Date(timeIntervalSince1970: 100))
+        chapterStore.slots[1] = checkpoint
+
+        let game = session(chapterStore: chapterStore)
+        defer { game.endOriginalGame() }
+
+        XCTAssertTrue(game.hasSavedProgress)
+        XCTAssertTrue(game.canContinueLegacySave)
+        XCTAssertEqual(game.chapterSaves[1], checkpoint)
+    }
+
+    func testMissingResumeCheckpointRestartsWhenNoSafePlaceExists() throws {
+        let resumeStore = Store(), safePlaceStore = Store()
+        let game = session(resumeStore, safePlaceStore: safePlaceStore)
+        defer { game.endOriginalGame() }
+        game.startOriginalGame()
+        let original = try XCTUnwrap(game.play)
+        XCTAssertNotNil(resumeStore.checkpoint)
+        resumeStore.checkpoint = nil
+
+        game.continueSavedGame()
+
+        let restarted = try XCTUnwrap(game.play)
+        XCTAssertFalse(restarted === original)
+        XCTAssertEqual(restarted.runner.game.chapter, 0)
+        XCTAssertTrue(game.recoveryNotice?.contains("Chapter 1") == true)
     }
 
     func testInspectionCannotReplaceLastWalkingCheckpoint() throws {
@@ -536,6 +712,10 @@ final class OriginalResumeSaveTests: XCTestCase {
         for _ in 0..<400 { play.advanceFrame() }
         var signed = false
         for _ in 0..<600 {
+            if play.chapterTransition?.stage == .title {
+                play.continueChapterTitle()
+                continue
+            }
             switch play.runner.phase {
             case .dialogue, .itemNotice:
                 play.advanceDialogue()

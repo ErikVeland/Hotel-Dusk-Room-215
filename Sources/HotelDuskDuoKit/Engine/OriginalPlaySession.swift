@@ -27,6 +27,7 @@ public final class OriginalPlaySession: ObservableObject {
 
     @Published public private(set) var chapterTransition: OriginalChapterTransition?
     public private(set) var chapterTitleImages: OriginalChapterTitleImages?
+    private var isOpeningChapterTitle = false
     private let saveStore: any OriginalChapterSaveStore
     private let saveDate: () -> Date
     @Published private(set) var isBrowsingInventory = false
@@ -1153,18 +1154,14 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, cassetteDeck != nil else { return }
         guard let effects = cassetteDeck?.activateSelectedControl() else { return }
-        for effect in effects {
-            if case .sound(let archive, let entry) = effect {
-                _ = try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
-            }
-        }
+        applyCassetteDeckEffects(effects)
     }
 
     public func exitCassetteDeck() {
         let recordsProgress = beginProgressInput(.exitCassetteDeck)
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, cassetteDeck != nil else { return }
-        cassetteDeck?.requestExit()
+        if let effects = cassetteDeck?.requestExit() { applyCassetteDeckEffects(effects) }
     }
 
     /**
@@ -3134,12 +3131,19 @@ public final class OriginalPlaySession: ObservableObject {
         entrance?.awaitingHandle = current.movementAwaitingTouch
         process = current
         if step.status == 3 {
+            let showsOpeningChapterTitle = runner.phase == .process(id: 56)
+                && runner.game.chapter == 0 && runner.program.name == "EP1_R102"
             process = nil
             entrance = nil
             fadeRemaining = [:]
             processScreenEffects = OriginalScreenEffects()
             stopTimer()
             runner.finishProcess(returnValue: processReturn)
+            if showsOpeningChapterTitle {
+                chapterTransition = OriginalChapterTransition()
+                isOpeningChapterTitle = true
+                showChapterTitle()
+            }
             settle()
         }
     }
@@ -3343,11 +3347,7 @@ public final class OriginalPlaySession: ObservableObject {
             catch { runner.halt("The cassette deck could not be hit-tested: \(error)"); stopTimer(); return }
         }
         let effects = process.update(touch: cassetteTouch, pressedTouch: press, sceneHit: sceneHit)
-        for effect in effects {
-            if case .sound(let archive, let entry) = effect {
-                _ = try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
-            }
-        }
+        applyCassetteDeckEffects(effects)
         cassettePress = nil
         cassetteOpacity = process.opacity
         if oldCamera != process.camera || oldState != process.sceneState {
@@ -3364,6 +3364,18 @@ public final class OriginalPlaySession: ObservableObject {
         cassetteOpacity = 1
         runner.finishProcess(returnValue: process.returnedProcessValue ?? 2)
         settle()
+    }
+
+    private func applyCassetteDeckEffects(_ effects: [OriginalCassetteDeckProcess.Effect]) {
+        for effect in effects {
+            switch effect {
+            case .sound(let archive, let entry):
+                _ = try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
+            case .stopSound(let archive, let entry, let fadeFrames):
+                _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: archive, entryID: entry,
+                                                                 fadeFrames: fadeFrames))
+            }
+        }
     }
 
     private func updateCassetteRewind() {
@@ -5429,6 +5441,13 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.continueChapterTitle)
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition?.stage == .title else { return }
+        if isOpeningChapterTitle {
+            isOpeningChapterTitle = false
+            runner.saveRetryCheckpoint()
+            chapterTransition = nil
+            settle()
+            return
+        }
         do {
             guard OriginalMapExploration.supportedMaps[runner.game.mapID] != nil else {
                 throw OriginalDataError.unsupported("Chapter map")

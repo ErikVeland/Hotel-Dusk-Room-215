@@ -32,7 +32,9 @@ The former gallery matchbook, boiler's 215 PSI clue, and wine-rack crowbar advic
 
 ## Remaining work
 
-The complete Chapter 1 and Chapter 3 event scripts, inventory prerequisites, and surrounding Melissa/Kevin conversations are not fully reconstructed by a standalone jigsaw. Other original interactions—lock picking, the office cabinet, bookmark box, electrical switches, cassette, matchsticks, coins, and later folding events—require their own verified mechanics, original graphics, and story conditions. Their source assets alone do not mean these puzzles are playable or faithful. Keep unfinished interactions unavailable instead of filling gaps with invented puzzles or solution hints.
+The jigsaw is one part of the story route. Native input now covers many later puzzles and their story conditions, including the office cabinet, bookmark box, electrical panel, cassette rewind and deck, matchsticks, coin puzzles, tree search, painting search, typewriter and brick wall. The [walkthrough route plan](walkthrough-route-plan.md) records route coverage. The [route tracing workbench](route-tracing-workbench.md) records open puzzle and source-comparison gaps.
+
+The checkpointed normal-input route reaches the Chapter 10 ending. It does not prove one uninterrupted fresh-game session or every alternate branch. The cassette route continues without its Side A/B recording audio. Several gesture thresholds, hit maps, scene renders, sound cues and puzzle outcomes still lack matched original-run or physical Duo checks. Do not treat handler presence or a successful checkpoint replay as full source fidelity.
 
 ## Validation on 16 October 2026
 

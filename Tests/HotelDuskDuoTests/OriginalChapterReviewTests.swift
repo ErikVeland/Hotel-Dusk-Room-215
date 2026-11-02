@@ -1062,8 +1062,17 @@ final class OriginalChapterReviewTests: XCTestCase {
         defer { restored.stop() }
         XCTAssertEqual(restored.brickWall, process,
             "Restoring the normal route must rebuild the same Process 75 board")
+        try restored.enableRouteTracing(to: traceURL, runID: "r304-hammer-wall-start-resume",
+            checkpointName: "chapter10-r304-brick-wall-start")
+        restored.enableInstantSaves()
+        restored.resume()
+        play.stop()
+        var activePlay = restored
+        var midPuzzleResume: OriginalPlaySession?
+        defer { midPuzzleResume?.stop() }
+        var didRestoreMidPuzzle = false
         for index in OriginalBrickWallLayout.doorwayIndices.reversed() {
-            guard case .process(75) = play.runner.phase, let current = play.brickWall,
+            guard case .process(75) = activePlay.runner.phase, let current = activePlay.brickWall,
                   current.objects[index].position.y >= -1 else { continue }
             var touches: [SIMD2<Float>] = []
             for y in stride(from: 0, to: 256, by: 4) {
@@ -1091,28 +1100,50 @@ final class OriginalChapterReviewTests: XCTestCase {
                 XCTFail("Doorway brick \(index) has no sampled clear drag at seed \(wallCheckpoint.progress?.puzzleSeeds.first ?? 0)")
                 break
             }
-            play.holdBrickWallTouch(x: move.touch.x, y: move.touch.y)
-            play.holdBrickWallTouch(x: move.destination.x, y: move.destination.y)
-            play.releaseBrickWallTouch()
+            activePlay.holdBrickWallTouch(x: move.touch.x, y: move.touch.y)
+            activePlay.holdBrickWallTouch(x: move.destination.x, y: move.destination.y)
+            activePlay.releaseBrickWallTouch()
+            if !didRestoreMidPuzzle {
+                let midPuzzleCheckpoint = try activePlay.progressCheckpoint()
+                let midPuzzleStore = OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                    .appendingPathComponent("chapter10-r304-brick-wall-mid"))
+                try midPuzzleStore.save(midPuzzleCheckpoint)
+                let savedProgress = try XCTUnwrap(midPuzzleStore.load())
+                let resumed = try OriginalPlaySession.restoring(savedProgress, audio: originalRouteTestAudio(),
+                    saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                        .appendingPathComponent(UUID().uuidString)),
+                    mapRendererFactory: { name, _ in try OriginalRouteBitmapMapRenderer(mapName: name) })
+                try resumed.enableRouteTracing(to: traceURL, runID: "r304-hammer-wall-mid-resume",
+                    checkpointName: "chapter10-r304-brick-wall-mid")
+                XCTAssertEqual(resumed.brickWall, activePlay.brickWall,
+                    "Restoring mid-puzzle must preserve moved bricks and the remaining doorway")
+                resumed.enableInstantSaves()
+                activePlay.stop()
+                midPuzzleResume = resumed
+                activePlay = resumed
+                activePlay.resume()
+                didRestoreMidPuzzle = true
+            }
         }
-        XCTAssertNil(play.brickWall, "Clearing the doorway must complete Process 75")
-        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
-        XCTAssertEqual(play.runner.session.selection.eventID, 25)
-        XCTAssertEqual(play.runner.game.value(for: .gameFlag(index: 32)), true)
+        XCTAssertTrue(didRestoreMidPuzzle, "The route must save and restore an active wall puzzle")
+        XCTAssertNil(activePlay.brickWall, "Clearing the doorway must complete Process 75")
+        OriginalChapterThreeRouteChecks.drain(activePlay, interrupt: true)
+        XCTAssertEqual(activePlay.runner.session.selection.eventID, 25)
+        XCTAssertEqual(activePlay.runner.game.value(for: .gameFlag(index: 32)), true)
         try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-            .appendingPathComponent("chapter10-r304-brick-wall-open")).save(try play.progressCheckpoint())
-        try OriginalChapterThreeRouteChecks.exit(play, to: 41, interrupt: true, expectArrival: false)
-        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
-        XCTAssertEqual(play.nearbyDoor, 41)
+            .appendingPathComponent("chapter10-r304-brick-wall-open")).save(try activePlay.progressCheckpoint())
+        try OriginalChapterThreeRouteChecks.exit(activePlay, to: 41, interrupt: true, expectArrival: false)
+        OriginalChapterThreeRouteChecks.drain(activePlay, interrupt: true)
+        XCTAssertEqual(activePlay.nearbyDoor, 41)
         let handle = try XCTUnwrap(stride(from: 8, to: 248, by: 2).flatMap { y in
             stride(from: 8, to: 184, by: 2).map { ($0, y) }
-        }.first { play.doorImage?.hit(pageX: $0.0, pageY: $0.1) == 2 }, "R302 door must expose a tappable handle")
-        play.selectDoorComponent(x: handle.0, y: handle.1, confirmImmediately: true)
-        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
-        XCTAssertEqual(play.runner.game.mapID, 41)
-        XCTAssertEqual(play.lobby?.mapName, "R302")
+        }.first { activePlay.doorImage?.hit(pageX: $0.0, pageY: $0.1) == 2 }, "R302 door must expose a tappable handle")
+        activePlay.selectDoorComponent(x: handle.0, y: handle.1, confirmImmediately: true)
+        OriginalChapterThreeRouteChecks.drain(activePlay, interrupt: true)
+        XCTAssertEqual(activePlay.runner.game.mapID, 41)
+        XCTAssertEqual(activePlay.lobby?.mapName, "R302")
         try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-            .appendingPathComponent("chapter10-r302-entry")).save(try play.progressCheckpoint())
+            .appendingPathComponent("chapter10-r302-entry")).save(try activePlay.progressCheckpoint())
     }
 
     @MainActor func testChapterTenR302PaletteKnifePeelsPaintingFromNormalInput() throws {

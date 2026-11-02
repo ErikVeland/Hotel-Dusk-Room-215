@@ -45,15 +45,37 @@ generation are recorded without claiming test-case coverage.
 Use `--checkpoint-dir PATH` to supply checkpoints produced through the native
 route; this sets `HOTEL_DUSK_ROUTE_CHECKPOINTS`. It does not generate missing
 captures or treat component fixtures as complete-route evidence. Read skipped
-case names in the report and their reasons in `swift.log`. Preserve those gaps
-when reporting results. Static handler presence alone does not establish route
+case names in the report and their reasons in the pass logs listed in
+`report.json`. Preserve those gaps when reporting results. Static handler
+presence alone does not establish route
 completion, input fidelity or matching presentation.
 
 Reference and all profiles use a new, empty route-checkpoint directory by
 default when `--checkpoint-dir` is not set. Use `--fresh-checkpoints` to make
 that choice explicit. The directory is retained with that run's report so
-generated handoffs can be reviewed. Fresh mode cannot be combined with
+generated handoffs can be reviewed. Interactive probes that require a manually
+supplied starting save are excluded from release profiles. Fresh mode cannot be combined with
 `--checkpoint-dir`. In strict mode, any route that still needs a missing
 checkpoint fails instead of reusing a save from an earlier run. Set
 `--checkpoint-dir PATH` only when you intend to reuse previously generated
-route checkpoints.
+route checkpoints. The reference runner repeats only tests that skipped because
+a route checkpoint or earlier route step was not available. It stops when those
+tests pass or the checkpoint files stop changing. It caps retries at 20 passes.
+The report records the stop reason, unresolved route cases and latest status for
+each test. Strict mode fails if a checkpoint-dependent test still skips.
+
+## Puzzle solvability gate
+
+Call a required puzzle route playable only when a clean Chapter 1 route reaches
+the ending without injected puzzle results, debug selections or manually seeded
+story state. Each required puzzle must complete through normal session input and
+take the recovered story transition. Save and restore active puzzle state where
+Continue supports it.
+
+For screen-based and drag puzzles, route tests must use the same 192×256 touch
+coordinates as the displayed puzzle. Check that those coordinates select visible
+objects and can complete the puzzle. A CPU-projected route proves the process
+logic; it does not prove that a player can hit the displayed object. Check touch
+mapping on a supported Duo before release when source hit maps or rendered
+geometry remain unresolved. Keep those results separate from the clean-route
+test report.

@@ -43,10 +43,12 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
 
     public enum Effect: Equatable, Sendable {
         case sound(archiveID: Int, entryID: Int)
+        case stopSound(archiveID: Int, entryID: Int, fadeFrames: Int)
     }
 
     public static let controlsTransitionUpdates = 180
     public static let exitFadeUpdates = 60
+    public static let playbackCueUpdates = 2
     public static let soundArchiveID = 48
 
     public let variant: Variant
@@ -57,13 +59,13 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
     private var lastPoint: SIMD2<Int>?
     private var upwardDrag = 0
     private var transitionUpdates = 0
+    private var playbackUpdates = 0
+    private var playbackCueActive = false
     private var exitUpdates = 0
 
     public init(variant: Variant = .sideA) {
         self.variant = variant
     }
-
-    public var sourceMusicSequenceID: Int16 { variant == .sideA ? 0x34 : 0x59 }
 
     public var camera: OriginalCassetteDeckCamera {
         switch phase {
@@ -135,9 +137,17 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
             selectedSelector = selector
             effects.append(.sound(archiveID: Self.soundArchiveID, entryID: 3))
         case .playing:
-            guard let pressedTouch, Self.isBackTap(pressedTouch) else { return effects }
-            phase = .exiting
-            exitUpdates = 0
+            if playbackCueActive {
+                playbackUpdates += 1
+                if playbackUpdates >= Self.playbackCueUpdates {
+                    effects.append(.stopSound(archiveID: Self.soundArchiveID, entryID: 4, fadeFrames: 3))
+                    effects.append(.sound(archiveID: Self.soundArchiveID, entryID: 5))
+                    playbackCueActive = false
+                }
+            }
+            if let pressedTouch, Self.isBackTap(pressedTouch) {
+                effects.append(contentsOf: beginExit())
+            }
         case .exiting:
             exitUpdates += 1
             if exitUpdates >= Self.exitFadeUpdates {
@@ -153,13 +163,25 @@ public struct OriginalCassetteDeckProcess: Equatable, Sendable {
     public mutating func activateSelectedControl() -> [Effect] {
         guard phase == .controlsReady, selectedSelector != nil else { return [] }
         phase = .playing
+        playbackUpdates = 0
+        playbackCueActive = true
         return [.sound(archiveID: Self.soundArchiveID, entryID: 4)]
     }
 
-    public mutating func requestExit() {
-        guard phase == .playing else { return }
+    public mutating func requestExit() -> [Effect] {
+        guard phase == .playing else { return [] }
+        return beginExit()
+    }
+
+    private mutating func beginExit() -> [Effect] {
+        var effects: [Effect] = []
+        if playbackCueActive {
+            effects.append(.stopSound(archiveID: Self.soundArchiveID, entryID: 4, fadeFrames: 3))
+            playbackCueActive = false
+        }
         phase = .exiting
         exitUpdates = 0
+        return effects
     }
 
     private static func selector(at rawTouch: SIMD2<Int>) -> Int? {

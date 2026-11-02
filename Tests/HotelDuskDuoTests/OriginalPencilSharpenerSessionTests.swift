@@ -19,11 +19,14 @@ final class OriginalPencilSharpenerSessionTests: XCTestCase {
             process.releaseTouch()
         }
         XCTAssertNil(process.returnedProcessValue)
+        XCTAssertGreaterThan(process.powderProgressFraction, 0)
+        XCTAssertLessThan(process.powderProgressFraction, 1)
 
         process.holdTouch(pageX: 91, pageY: 100)
         process.holdTouch(pageX: 121, pageY: 70)
         process.holdTouch(pageX: 91, pageY: 100)
         XCTAssertEqual(process.returnedProcessValue, 0)
+        XCTAssertEqual(process.powderProgressFraction, 1)
     }
 
     func testChapterTenProcess59StartsTheFactoryMappedPencilSharpener() throws {

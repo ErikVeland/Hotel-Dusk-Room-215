@@ -10,6 +10,7 @@ Examples:
 """
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -21,8 +22,15 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE = re.compile(r"Test Case '-\[(\S+) (\S+)\]' (passed|failed|skipped)(?: \([^)]*\))?\.")
+ROUTE_DEPENDENCY_SKIP = re.compile(
+    r"-\[[^\]\s]*\.(\w+) (\w+)\]\s*:\s*Test skipped - [^\n]*(?:checkpoint|route first|native route)",
+    re.IGNORECASE,
+)
 PY_TOTAL = re.compile(r"Ran (\d+) tests? in")
 PY_RESULT = re.compile(r"^(OK|FAILED)(?: \((.*)\))?$")
+MAX_ROUTE_CHECKPOINT_PASSES = 20
+# This interactive probe needs a developer-supplied starting save.
+DIAGNOSTIC_TESTS = {"OriginalChapterFourProbe"}
 
 
 def parse_tests(output):
@@ -54,6 +62,9 @@ def classify_tests():
         classes = re.findall(r"(?:final\s+)?class\s+(\w+)\s*:\s*XCTestCase", text)
         if not classes:
             continue
+        classes = [name for name in classes if name not in DIAGNOSTIC_TESTS]
+        if not classes:
+            continue
         if re.search(r"extracted/reference|HOTEL_DUSK_ROUTE_CHECKPOINTS", text):
             group = "reference"
         elif re.search(r"OriginalAudioTests|RecordedMusicTests|OriginalMapAudioTests|AudioProfilingTests", text):
@@ -77,6 +88,78 @@ def group_status(exit_code, counts, strict=False):
 def test_filter(classes):
     # Swift test names use Module.Class/method. Match the class, not its module.
     return r"\.(?:" + "|".join(re.escape(name) for name in classes) + r")/"
+
+
+def test_filter_cases(cases):
+    """Match only the test cases that need another route-checkpoint pass."""
+    by_suite = {}
+    for suite, name in cases:
+        suite = suite.rsplit(".", 1)[-1]
+        by_suite.setdefault(suite, []).append(name)
+    suites = []
+    for suite, names in sorted(by_suite.items()):
+        method_pattern = "|".join(re.escape(name) for name in sorted(set(names)))
+        suites.append(re.escape(suite) + r"/(?:" + method_pattern + r")")
+    return r"\.(?:" + "|".join(suites) + r")"
+
+
+def route_dependency_cases(output):
+    """Return skipped test IDs that could run after an earlier route pass."""
+    return set(ROUTE_DEPENDENCY_SKIP.findall(output))
+
+
+def route_checkpoint_state(directory):
+    """Fingerprint saved route files to detect progress between test passes."""
+    if directory is None or not directory.exists():
+        return ()
+    files = sorted(path for path in directory.rglob("resume.*") if path.is_file())
+    return tuple((path.relative_to(directory).as_posix(), hashlib.sha256(path.read_bytes()).hexdigest())
+                 for path in files)
+
+
+def merge_test_results(name, results, strict=False):
+    """Keep each test's latest status across dependency-driven reruns."""
+    cases = {}
+    for result in results:
+        cases.update(result["cases"])
+    counts = {"passed": sum(status == "passed" for status in cases.values()),
+              "failed": sum(status == "failed" for status in cases.values()),
+              "skipped": sum(status == "skipped" for status in cases.values()),
+              "cases": cases}
+    failed_run = any(result["status"] == "failed" or result["exitCode"] != 0 for result in results)
+    exit_code = 1 if failed_run else 0
+    return {"name": name, "command": [result["command"] for result in results],
+            "status": group_status(exit_code, counts, strict), "exitCode": exit_code,
+            "seconds": round(sum(result["seconds"] for result in results), 2),
+            "logs": [result["log"] for result in results], "attempts": len(results), **counts}
+
+
+def run_reference_group(classes, directory, env, strict, checkpoint_directory, command_prefix):
+    """Repeat skipped route tests until earlier test passes create their saves."""
+    results = []
+    pending_cases = None
+    stop_reason = "passLimitReached"
+    for attempt in range(1, MAX_ROUTE_CHECKPOINT_PASSES + 1):
+        name = f"swift-reference-pass-{attempt:02d}"
+        command = [*command_prefix, "--filter",
+                   test_filter(classes) if pending_cases is None else test_filter_cases(pending_cases)]
+        before = route_checkpoint_state(checkpoint_directory)
+        result = run_group(name, command, directory, env, strict=False)
+        results.append(result)
+        output = (directory / f"{name}.log").read_text(errors="replace")
+        pending_cases = route_dependency_cases(output)
+        if not pending_cases:
+            stop_reason = "noDeferredCases"
+            break
+        if route_checkpoint_state(checkpoint_directory) == before:
+            stop_reason = "noCheckpointProgress"
+            break
+    merged = merge_test_results("swift-reference", results, strict)
+    merged["routeCheckpointStopReason"] = stop_reason
+    merged["pendingRouteDependencyCases"] = sorted(
+        f"{suite}/{name}" for suite, name in (pending_cases or set())
+    )
+    return merged
 
 
 def xctest_flags(help_output):
@@ -171,13 +254,22 @@ def main():
     results = []
     if args.profile in ("fast", "all"):
         results.append(run_group("verification-tool", [sys.executable, "-m", "unittest", "discover", "-s", "tools/tests", "-p", "test_verification.py"], directory, env, args.strict))
-    selected = sum(groups.values(), []) if args.profile == "all" else groups[args.profile]
-    if selected:
-        command = ["swift", "test", *supported_xctest_flags(), "--disable-sandbox"]
-        if args.scratch_path:
-            command += ["--scratch-path", str(args.scratch_path.resolve())]
-        command += ["--filter", test_filter(selected)]
-        results.append(run_group("swift", command, directory, env, args.strict))
+    command_prefix = ["swift", "test", *supported_xctest_flags(), "--disable-sandbox"]
+    if args.scratch_path:
+        command_prefix += ["--scratch-path", str(args.scratch_path.resolve())]
+    if args.profile == "reference":
+        results.append(run_reference_group(groups["reference"], directory, env, args.strict,
+                                           checkpoint_dir, command_prefix))
+    elif args.profile == "all":
+        non_reference = groups["fast"] + groups["audio"] + groups["native"]
+        if non_reference:
+            results.append(run_group("swift-non-reference",
+                [*command_prefix, "--filter", test_filter(non_reference)], directory, env, args.strict))
+        results.append(run_reference_group(groups["reference"], directory, env, args.strict,
+                                           checkpoint_dir, command_prefix))
+    elif groups[args.profile]:
+        results.append(run_group("swift", [*command_prefix, "--filter", test_filter(groups[args.profile])],
+                                 directory, env, args.strict))
     else:
         results.append({"name": "swift", "status": "failed", "exitCode": 1, "passed": 0, "failed": 0, "skipped": 0,
                         "seconds": 0, "log": "", "cases": {}, "reason": "No test classes matched the selected profile"})

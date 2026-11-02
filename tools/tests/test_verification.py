@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 import unittest
 import re
 import sys
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parents[1]))
 import audit_story_coverage
@@ -14,6 +15,11 @@ spec.loader.exec_module(verify)
 
 
 class VerificationTests(unittest.TestCase):
+    def test_temporary_route_probe_is_excluded_from_release_profiles(self):
+        groups = verify.classify_tests()
+        self.assertNotIn('OriginalChapterFourProbe', sum(groups.values(), []))
+        self.assertIn('OriginalChapterFourProbe', verify.DIAGNOSTIC_TESTS)
+
     def test_shared_system_processes_are_included_in_story_coverage(self):
         report = audit_story_coverage.audit()
         shared = report["sharedSystemProcesses"]
@@ -30,6 +36,96 @@ class VerificationTests(unittest.TestCase):
         self.assertIsNotNone(re.search(pattern, 'HotelDuskDuoTests.AudioControllerTests/testMute'))
         self.assertIsNone(re.search(pattern, 'HotelDuskDuoTests.OriginalStoryContinuationTests/testRoute'))
         self.assertIsNone(re.search(pattern, 'HotelDuskDuoTests.AudioControllerTestsExtra/testMute'))
+
+    def test_case_filter_matches_only_checkpoint_dependent_tests(self):
+        pattern = verify.test_filter_cases({
+            ('HotelDuskDuoTests.OriginalStoryContinuationTests', 'testChapterSix01ReachesBarFromChapterFiveSave')
+        })
+        self.assertIsNotNone(re.search(pattern,
+            'HotelDuskDuoTests.OriginalStoryContinuationTests/testChapterSix01ReachesBarFromChapterFiveSave'))
+        self.assertIsNone(re.search(pattern,
+            'HotelDuskDuoTests.OriginalStoryContinuationTests/testChapterSevenLeavesRoom215ForSecondFloorHallway'))
+        self.assertIsNone(re.search(pattern,
+            'HotelDuskDuoTests.OriginalPantryTraceTests/testCardsReadCheckpointPantryActionCompletesQuizAndEntersChapterTen'))
+
+    def test_route_dependency_skips_are_selected_for_another_pass(self):
+        output = """/repo/Tests/OriginalCellarTraceTests.swift:101: -[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfCloseupLayersFromNormalRoute] : Test skipped - The normal Chapter 10 cellar entry checkpoint is not available
+Test Case '-[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfCloseupLayersFromNormalRoute]' skipped (0.001 seconds).
+"""
+        self.assertEqual(verify.route_dependency_cases(output), {
+            ('OriginalCellarTraceTests', 'testCellarBackShelfCloseupLayersFromNormalRoute')
+        })
+        prereq = "-[HotelDuskDuoTests.OriginalStoryContinuationTests testChapterSix01ReachesBarFromChapterFiveSave] : Test skipped - Generate the Chapter 6 bar checkpoint through the Chapter 5 route first"
+        self.assertEqual(verify.route_dependency_cases(prereq), {
+            ('OriginalStoryContinuationTests', 'testChapterSix01ReachesBarFromChapterFiveSave')
+        })
+        final_route = "-[HotelDuskDuoTests.OriginalChapterReviewTests testChapterTenR302RevealedPaintingCompletesNormalEnding] : Test skipped - Complete the R302 painting route first"
+        self.assertEqual(verify.route_dependency_cases(final_route), {
+            ('OriginalChapterReviewTests', 'testChapterTenR302RevealedPaintingCompletesNormalEnding')
+        })
+
+    def test_checkpoint_fingerprint_changes_when_a_save_changes(self):
+        with TemporaryDirectory() as temporary_directory:
+            checkpoint_directory = Path(temporary_directory)
+            save = checkpoint_directory / 'chapter' / 'resume.json'
+            save.parent.mkdir()
+            save.write_text('{"step":1}')
+            first = verify.route_checkpoint_state(checkpoint_directory)
+            save.write_text('{"step":2}')
+            second = verify.route_checkpoint_state(checkpoint_directory)
+        self.assertNotEqual(first, second)
+
+    def test_reference_result_keeps_failures_from_earlier_passes(self):
+        case = 'OriginalStoryContinuationTests/testChapterNineRoute'
+        results = [
+            {"command": [], "status": "failed", "exitCode": 0, "seconds": 1,
+             "log": "first.log", "cases": {case: "failed"}},
+            {"command": [], "status": "passed", "exitCode": 0, "seconds": 1,
+             "log": "second.log", "cases": {case: "passed"}},
+        ]
+        merged = verify.merge_test_results('swift-reference', results)
+        self.assertEqual(merged['status'], 'failed')
+
+    def test_reference_runner_retries_missing_checkpoint_cases(self):
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            output_directory = root / 'output'
+            output_directory.mkdir()
+            checkpoint_directory = root / 'checkpoints'
+            checkpoint_directory.mkdir()
+            case = ('OriginalCellarTraceTests', 'testCellarBackShelfCloseupLayersFromNormalRoute')
+            calls = []
+
+            def fake_run(name, command, directory, env, strict):
+                calls.append(command)
+                log_path = directory / f'{name}.log'
+                if len(calls) == 1:
+                    saved = checkpoint_directory / 'chapter10-entry'
+                    saved.mkdir()
+                    (saved / 'resume.json').write_text('{}')
+                    log_path.write_text("""/repo/OriginalCellarTraceTests.swift:1: -[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfCloseupLayersFromNormalRoute] : Test skipped - The cellar entry checkpoint is not available
+Test Case '-[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfCloseupLayersFromNormalRoute]' skipped (0.001 seconds).
+""")
+                    cases = {f'{case[0]}/{case[1]}': 'skipped'}
+                else:
+                    log_path.write_text(
+                        "Test Case '-[HotelDuskDuoTests.OriginalCellarTraceTests "
+                        "testCellarBackShelfCloseupLayersFromNormalRoute]' passed (0.1 seconds).\n")
+                    cases = {f'{case[0]}/{case[1]}': 'passed'}
+                return {"name": name, "command": command, "status": "passed", "exitCode": 0,
+                        "seconds": 0.1, "log": str(log_path), "passed": int(len(calls) > 1),
+                        "failed": 0, "skipped": int(len(calls) == 1), "cases": cases}
+
+            with patch.object(verify, 'run_group', side_effect=fake_run):
+                result = verify.run_reference_group(['OriginalCellarTraceTests'], output_directory, {}, True,
+                    checkpoint_directory, ['swift', 'test'])
+
+        self.assertEqual(result['attempts'], 2)
+        self.assertEqual(result['status'], 'passed')
+        self.assertEqual(result['routeCheckpointStopReason'], 'noDeferredCases')
+        self.assertEqual(result['pendingRouteDependencyCases'], [])
+        self.assertEqual(result['cases'][f'{case[0]}/{case[1]}'], 'passed')
+        self.assertIn(verify.test_filter_cases({case}), calls[1])
 
     def test_xctest_discovery_is_enabled_when_swiftpm_supports_it(self):
         help_output = "--enable-xctest/--disable-xctest --enable-swift-testing/--disable-swift-testing"

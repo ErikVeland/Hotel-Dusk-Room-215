@@ -22,14 +22,18 @@ struct OriginalTitleMenuView: View {
                          ? "Saved walking checkpoint. New progress will also retain conversations and interactions in progress."
                          : "Your place is saved, including conversations and interactions in progress.")
                         .font(NovelStyle.caption)
+                } else if session.canRecoverSavedProgress {
+                    Button("Recover saved progress") { session.continueSavedGame() }
+                    Text("The latest checkpoint could not be read. Continue will retry it, then use your last safe place.")
+                        .font(NovelStyle.caption)
                 }
                 if session.canStartOriginalGame {
                     Button("Begin Chapter 1") {
-                        if session.resumeSave != nil { confirmsNewGame = true }
+                        if session.hasSavedProgress { confirmsNewGame = true }
                         else { session.startOriginalGame() }
                     }
                 }
-                if session.resumeSave == nil,
+                if session.canContinueLegacySave,
                    let legacy = session.chapterSaves.enumerated().compactMap({ slot, save in
                        save.map { (slot: slot, date: $0.savedAt) }
                    }).max(by: { $0.date < $1.date }) {

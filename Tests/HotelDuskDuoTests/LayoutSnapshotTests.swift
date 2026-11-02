@@ -275,6 +275,7 @@ final class LayoutSnapshotTests: XCTestCase {
             if play.entrance?.awaitingHandle == true { play.touchEntrance(pageX: 92, pageY: 175) }
             play.advanceFrame()
         }
+        if play.chapterTransition?.stage == .title { play.continueChapterTitle() }
         for _ in 0..<10 {
             guard case .dialogue = play.runner.phase else { break }
             play.advanceDialogue()
@@ -347,6 +348,7 @@ final class LayoutSnapshotTests: XCTestCase {
             if play.entrance?.awaitingHandle == true { play.touchEntrance(pageX: 92, pageY: 175) }
             play.advanceFrame()
         }
+        if play.chapterTransition?.stage == .title { play.continueChapterTitle() }
         for _ in 0..<10 {
             guard case .dialogue = play.runner.phase else { break }
             play.advanceDialogue()

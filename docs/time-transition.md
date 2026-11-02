@@ -1,6 +1,6 @@
 # Time-change command and clock process
 
-Opcode 16 now decodes its request and label, queues the request, clears the previous map, and enters clock process 126. The ordinary clock process now runs its hand updates and label animation, then returns to Room 215. The special `08:00AM` transition remains unsupported.
+Opcode 16 decodes its request and label, queues the request, clears the previous map, and enters clock process 126. The Chapter 10 route reaches Room 215 at `08:00AM` and time slot 3. The clock model loads the `0800am` bitmap and runs the shared process. An original frame trace for that morning label is still missing, so its exact timing and presentation are not verified.
 
 ## Recovered sequence
 
@@ -37,7 +37,7 @@ The original clock uses these existing bundled resources:
 - `OriginalBitmaps/trick/clock/{clock,hour,min,sec}.bin`
 - `OriginalBitmaps/talktest/TalkTime/0510pm.bin` and the AM/PM transition layers.
 
-Relevant original functions are `0x0205E6D4` for loading and initial clock state, `0x0205E57C` for queued image completion, `0x0205ECE0` for clock-image setup, `0x0205EE60` for timer and hand updates, and `0x0205E1A8` for label animation. `08:00AM` has a separate branch and must not inherit the ordinary transition's timing.
+Relevant original functions are `0x0205E6D4` for loading and initial clock state, `0x0205E57C` for queued image completion, `0x0205ECE0` for clock-image setup, `0x0205EE60` for timer and hand updates, and `0x0205E1A8` for label animation. The `08:00AM` story event has its own time request; compare its clock frames with an original run before claiming timing parity.
 
 `OriginalClockProcessTests` compares all counters, hand times, alpha and label stages across 245 consecutive original frames. The test supplies the captured second counter as the clock input. It also checks minute rollover, completion and unsupported labels. The model keeps clock updates separate from the alternating display frames.
 
@@ -47,7 +47,7 @@ Relevant original functions are `0x0205E6D4` for loading and initial clock state
 
 The final logic run passed 18 tests with no failures or skips. Both native routes passed, including clock pause/resume and return to Room 215. The extended route then passed through Door, handle selection and event 31 to Louie's event 32. One attempt crashed in a CoreAudio render callback. The unchanged retry passed. The corrected standalone clock image was inspected. `git diff --check` passed.
 
-Remaining fidelity work includes original resource-upload latency, the phase of the hardware second counter, surrounding fades, exact rasterisation, audio comparison and the `08:00AM` branch. A complete unmodified original route from the required Dunning questions through delivery is still being recorded. The native route now completes Louie's first conversation. The wrong parcel and notebook remain next. See [Louie's delivery](louie-delivery.md).
+Remaining fidelity work includes original resource-upload latency, the phase of the hardware second counter, surrounding fades, exact rasterisation, audio comparison and a frame-by-frame comparison of the `08:00AM` clock. A complete unmodified original route from the required Dunning questions through delivery is still being recorded. The native route now completes Louie's first conversation. The wrong parcel and notebook remain next. See [Louie's delivery](louie-delivery.md).
 
 ## Door handoff
 

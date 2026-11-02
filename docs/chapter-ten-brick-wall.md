@@ -203,9 +203,10 @@ none of them. The source ray now uses the recovered axis conversion. Against
 all 90 positions and scales read from Process 75 memory, its four-triangle mask
 made 677 hit predictions and matched 506 of 684 positive samples against the
 one-frame scan. Because that scan may contain stale selections, this score is
-not valid calibration. The native process now uses the mask, but that wiring
-does not establish source parity. Keep the route marked incomplete until
-per-point selection and drag checks match the source.
+not valid calibration. The native process uses the mask, but that wiring does
+not establish source parity. Keep the source-fidelity status open until
+per-point selection and drag checks match the source. The normal native route
+continues through the puzzle and reaches Chapter 10's ending.
 
 A new isolated scan reset touch before each tap. It sampled 3,072 raw touch
 points at 4-pixel intervals. Each sample released touch, waited three frames,
@@ -237,8 +238,9 @@ hit with the greatest world-X coordinate. The triangle routine uses Q12
 fixed-point arithmetic. A native trial with greatest-X ordering matched 2,862
 of 2,885 sweep selections, below the nearest-hit approximation's 2,880 with a
 `0.004` edge tolerance. The native ray and hit coordinates therefore still
-differ from the source path. Keep the gameplay halt until the fixed-point ray
-and intersection path matches captured taps.
+differ from the source path. Keep source-fidelity status open until the
+fixed-point ray and intersection path matches captured taps. The native
+approximation remains available so the puzzle route does not halt.
 
 A fresh reference-runner capture of the sweep's `ready.mln` checkpoint confirms
 that the reconstructed seed produces the same object X positions as the live
@@ -281,6 +283,18 @@ clear, and returns 2 when the player leaves. A normal-input Chapter 10 route
 test reaches R302 after solving it. This is checkpointed native-route evidence;
 the current environment cannot run that XCTest again because its active
 Command Line Tools do not include XCTest.
+
+The route test now also saves the puzzle after one doorway brick moves, reloads
+that checkpoint from disk, and continues to R302. The changed test parses, but
+it has not run: Command Line Tools cannot import XCTest, and Xcode 27.2 stops at
+its unaccepted licence. Do not treat mid-puzzle save recovery as verified until
+this focused test passes.
+
+A standalone process smoke check on 2 November 2026 cleared all 44 movable
+doorway bricks through hit selection, drag and release. Four fixed layout
+bricks were already below the completion gate. The check used a four-pixel
+touch scan and the production process model. It did not render the puzzle,
+restore a save, or enter the Chapter 10 story route.
 
 The process is not source-exact. Remaining work is to:
 
