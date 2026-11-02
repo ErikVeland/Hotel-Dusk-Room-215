@@ -8,6 +8,7 @@ import CoreGraphics
 @MainActor
 enum OriginalPaymentRouteChecks {
     static func run(_ play: OriginalPlaySession,
+                    memoRoute: OriginalOfficeRouteChecks.MemoRoute = .torn,
                     compare: (OriginalGameState, String) throws -> Void = { _, _ in },
                     captureImage: (CGImage?, String) throws -> Void = { _, _ in }) throws {
         play.leaveSearchCloseup()
@@ -46,7 +47,8 @@ enum OriginalPaymentRouteChecks {
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
         XCTAssertEqual(play.lobby?.mapID, 15)
         try compare(play.runner.game, "chapter-two-office-arrival/room")
-        try OriginalOfficeRouteChecks.run(play, compare: compare, captureImage: captureImage)
+        try OriginalOfficeRouteChecks.run(play, memoRoute: memoRoute,
+            compare: compare, captureImage: captureImage)
     }
 
     private static func drain(_ play: OriginalPlaySession) {

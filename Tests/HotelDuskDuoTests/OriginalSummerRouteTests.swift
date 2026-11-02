@@ -83,9 +83,8 @@ final class OriginalSummerRouteTests: XCTestCase {
         let runner = try OriginalEventRunner(program: catalog.loadProgram("EP1_R205"),
             game: state("iris-return-room215/room"),
             keywords: OriginalKeywordTable(decoded: catalog.decodedFile("EP1_.ttk")))
-        let audio = AudioController()
-        audio.isMuted = true
-        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
+        let play = OriginalPlaySession(runner: runner, audio: originalRouteTestAudio(), catalog: catalog,
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
         defer { play.stop() }
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 31))
         play.holdLobbyTouch(x: 20, y: 128)

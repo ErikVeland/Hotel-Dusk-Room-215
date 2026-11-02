@@ -69,7 +69,7 @@ final class OriginalMapIndicatorTests: XCTestCase {
         let pixels = try XCTUnwrap(context.data).assumingMemoryBound(to: UInt8.self)
         let centre = (384 * 576 + 288) * 4
         XCTAssertGreaterThan(Int(pixels[centre]), Int(pixels[centre + 1]) + 80)
-        let arrow = (342 * 576 + 288) * 4
+        let arrow = (423 * 576 + 288) * 4
         XCTAssertGreaterThan(Int(pixels[arrow]), Int(pixels[arrow + 1]) + 80)
         if let folder = ProcessInfo.processInfo.environment["SNAPSHOT_DIR"] {
             let url = URL(fileURLWithPath: folder).appendingPathComponent("floor-plan-navigation.png")

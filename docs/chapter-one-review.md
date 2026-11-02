@@ -64,4 +64,4 @@ Reference scripts continue the modified delivery fixture and add no memory write
 
 ## Next work
 
-Continue the Chapter 2 route after Rosa’s corridor conversation. See [Rosa in Chapter 2](chapter-two-rosa.md). General midgame saves, physical Duo checks, alternate branches and presentation fidelity remain open. The full game remains unfinished.
+Continue the Chapter 2 route after Rosa’s corridor conversation. See [Rosa in Chapter 2](chapter-two-rosa.md). Native resume saves now cover tested midgame states. Physical Duo checks, DS save compatibility, alternate branches and presentation fidelity remain open. The full game remains unfinished.

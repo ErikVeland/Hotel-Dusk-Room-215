@@ -1,6 +1,7 @@
 import simd
 import XCTest
 import CoreGraphics
+import Metal
 @testable import HotelDuskDuoKit
 
 final class OriginalStoryContinuationTests: XCTestCase {
@@ -1895,6 +1896,7 @@ final class OriginalStoryContinuationTests: XCTestCase {
     }
 
     @MainActor func testChapterSevenStorageSearchAreaFromCheckpoint() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter7-storage")).load() else {
@@ -1905,7 +1907,7 @@ final class OriginalStoryContinuationTests: XCTestCase {
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)),
             mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) },
-            bagSearchRendererFactory: { try OriginalRouteBitmapBagSearchRenderer() })
+            bagSearchRendererFactory: { try OriginalBagSearchRenderer() })
         defer { play.stop() }
 
         try OriginalChapterThreeRouteChecks.navigate(play, to: SIMD2(13598, -1065), interrupt: true)

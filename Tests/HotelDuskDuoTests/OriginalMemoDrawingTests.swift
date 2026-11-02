@@ -54,6 +54,16 @@ final class OriginalMemoDrawingTests: XCTestCase {
     }
 
     private func compareImage(paper: OriginalMemoDrawing.Paper, capture name: String) throws {
+        let defaults = UserDefaults.standard
+        let previousHDSetting = defaults.object(forKey: "hdGraphicsEnabled")
+        defaults.set(false, forKey: "hdGraphicsEnabled")
+        defer {
+            if let previousHDSetting {
+                defaults.set(previousHDSetting, forKey: "hdGraphicsEnabled")
+            } else {
+                defaults.removeObject(forKey: "hdGraphicsEnabled")
+            }
+        }
         let renderer = try OriginalMemoDrawingImage(paper: paper, library: .bundled())
         let randomInfo = try capture(name).u16(0x11018C + 0x13D4)
         let memo = try OriginalMemoDrawing(paper: paper, randomInfo: randomInfo, mask: renderer.mask)

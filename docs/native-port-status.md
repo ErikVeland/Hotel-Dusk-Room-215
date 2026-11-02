@@ -2,7 +2,9 @@
 
 The architecture is Swift and SwiftUI, with Metal for the Duo book material. The original ROM is the comparison reference. No emulator integration is planned or included.
 
-The native game remains incomplete. A fresh-game native-input test chain reaches the Chapter 10 ending through instant-save checkpoints. The Chapter 7 checkpoint route completes processes 55 and 43 through the normal session input APIs with CPU-projected touch points. It does not verify the visible target mapping or rendering against the original device. Focused tests restore checkpoints between route sections. Original-device checks remain open for selected route triggers, puzzle gestures, bowling scores and audio. The game-over trigger now offers native retry and title actions; original screen artwork and timing remain unverified. See the [route tracing workbench](route-tracing-workbench.md) and [walkthrough route plan](walkthrough-route-plan.md) for the current boundaries.
+The native route connects a fresh Chapter 1 start to the Chapter 10 ending through saved progress checkpoints. A clean replay seeded from a copied Chapter 8 checkpoint now passes through Chapter 9's five paintings, letter puzzle and quiz, then Chapter 10's cellar bottles, R301 pencil and typewriter puzzles, timed R304 event, brick wall, final painting and ending. Each route section uses normal game input and saves progress before the next section restores it. The connected route has no known gameplay stop. This does not prove one uninterrupted app session or exact original-game fidelity.
+
+The full test suite has not been verified as green in the current tree. The fast profile passed 305 tests with no failures and five artwork-candidate skips. The reference profile passed 307 tests with no failures and eight skips; its gameplay route tests include the connected Chapter 1–10 path through saved checkpoints. The audio profile passed 29 tests and four source-audio checks with no failures; nine playback checks skipped because Apple audio units are unavailable. Strict audio verification remains incomplete because it treats those skips as failures. Repeated map-audio updates no longer re-record the same muted ambience cue. The focused hanger source-pixel comparison now passes with HD enhancement disabled for an original-to-original comparison. Original-device checks remain open for touch targets, puzzle gestures, bowling, audio and haptics. The attempted generic iOS build reports that the iOS 26.5 platform is not installed; `xcodebuild -showsdks` listing that SDK does not make the platform available. CoreSimulatorService also failed during destination discovery. See the [route tracing workbench](route-tracing-workbench.md) and [walkthrough route plan](walkthrough-route-plan.md) for the current boundaries.
 
 ## Shared interaction gaps
 
@@ -77,13 +79,11 @@ Passing these checks proves the covered transformations agree with recovered sou
 
 ## Remaining native work
 
-1. Recover startup and initial game state, event selection and all condition side effects.
-2. Translate all dispatcher handlers, dialogue control codes and character scheduling.
-3. Recover original scene geometry, textures, collision, camera and touch behavior.
-4. Translate every original puzzle and its chapter prerequisites, including microphone and hinge interactions.
-5. Restore original audio event selection, effects, envelope/modulation behavior and measured timing.
-6. Recover notebook, DS save compatibility, original failure-screen artwork and animation, all endings and chapter transitions. The retry-state copy and kind-7 retry/title routing are now connected; device comparison remains open.
-7. Compare matching ROM/native input traces and screen/audio checkpoints throughout the complete game.
+1. Complete the optional interaction gaps listed above, then verify optional story branches and alternate endings.
+2. Capture the original-game caller for the Chapter 9 pantry quiz and compare remaining uncertain process results.
+3. Restore the opening cinematic and remaining original failure-screen artwork and timing.
+4. Build with the required iOS platform, then check touch targets, puzzle gestures, audio and haptics on a supported device.
+5. Compare native input traces and screen and audio checkpoints with the running original game.
 
 The supplied ROM and source artifacts are retained locally. Unverified data stays available for recovery; unverified gameplay stays unavailable in the app.
 

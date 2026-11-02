@@ -1,5 +1,6 @@
 import XCTest
 import ImageIO
+import Metal
 @testable import HotelDuskDuoKit
 
 final class OriginalCabinetDialTests: XCTestCase {
@@ -136,6 +137,7 @@ final class OriginalCabinetDialTests: XCTestCase {
     }
 
     @MainActor func testOriginalRenderer() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
         let renderer = try OriginalCabinetDialRenderer()
         var process = OriginalCabinetDialProcess(randomValue: 100, retainedValue: 0)
         update(&process, count: 2)

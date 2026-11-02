@@ -12,10 +12,17 @@ final class OriginalResumeSaveTests: XCTestCase {
         let map: CGImage
         private let renderFailure: RenderFailure?
 
+        init(map: CGImage, renderFailure: RenderFailure? = nil) {
+            self.renderFailure = renderFailure
+            self.map = map
+        }
+
         init(_ name: String, renderFailure: RenderFailure? = nil) throws {
             self.renderFailure = renderFailure
-            map = try XCTUnwrap(OriginalBitmapLibrary.bundled().loadMap(path: "map/fmapscr/\(name).bin").makeCGImage())
+            map = try XCTUnwrap(OriginalBitmapLibrary.bundled()
+                .loadMap(path: "map/fmapscr/\(name).bin").makeCGImage())
         }
+
         func render(_ state: OriginalMapExploration, game: OriginalGameState) throws -> CGImage {
             if renderFailure?.shouldFailNextRender == true {
                 renderFailure?.shouldFailNextRender = false
@@ -24,6 +31,21 @@ final class OriginalResumeSaveTests: XCTestCase {
             return map
         }
     }
+
+    private var mapImages = [String: CGImage]()
+
+    private func mapRenderer(_ name: String, renderFailure: RenderFailure?) throws -> MapRenderer {
+        let image: CGImage
+        if let cached = mapImages[name] {
+            image = cached
+        } else {
+            image = try XCTUnwrap(OriginalBitmapLibrary.bundled()
+                .loadMap(path: "map/fmapscr/\(name).bin").makeCGImage())
+            mapImages[name] = image
+        }
+        return MapRenderer(map: image, renderFailure: renderFailure)
+    }
+
     private final class Store: OriginalResumeSaveStore {
         var checkpoint: OriginalResumeSave?
         var fails = false
@@ -55,7 +77,7 @@ final class OriginalResumeSaveTests: XCTestCase {
         let audio = AudioController(musicOutputFactory: { _, _, _ in ProgressMusicOutput() })
         audio.isMuted = true
         return GameSession(audioController: audio, saveStore: chapterStore, resumeStore: store, safePlaceStore: safePlaceStore,
-            mapRendererFactory: { name, _ in try MapRenderer(name, renderFailure: renderFailure) })
+            mapRendererFactory: { [unowned self] name, _ in try self.mapRenderer(name, renderFailure: renderFailure) })
     }
 
     private func enterLobby(_ session: GameSession) throws -> OriginalPlaySession {

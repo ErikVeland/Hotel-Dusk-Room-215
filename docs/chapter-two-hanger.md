@@ -55,7 +55,7 @@ The separate native route now supplies ordinary session input for both cuts. It 
 
 The game conceals each cut with a small wall-textured quad at depth 1. `0x02203178` extends this quad 0.05 units across the wire and 0.025 units along it. Native vertices match captures for lower, upper-left and upper-right cuts. `0x02203700` derives the patch texture coordinates from the wire position.
 
-The wall and hook panels use polygon alpha 30 over an opaque black clear colour. Cut covers use alpha 31. The native panel shader preserves this blend and the original five-bit display capture. Five sampled wall pixels now match the original RGB values exactly. This does not establish complete image equivalence. `chapter-two-hanger-geometry` records the original polygon attributes, display registers and uploaded texture and palette bytes.
+The wall and hook panels use polygon alpha 30 over an opaque black clear colour. Cut covers use alpha 31. The native panel shader preserves this blend and the original five-bit display capture. The source-pixel comparison disables HD enhancement, then confirms five sampled wall pixels match the original RGB values exactly. The enhanced artwork is not expected to match source pixels. This does not establish complete image equivalence. `chapter-two-hanger-geometry` records the original polygon attributes, display registers and uploaded texture and palette bytes.
 
 The session uses `OriginalScreenEffects` for the entrance fade, white completion flash and exit fade. Sound entry 32 plays at the recovered cutting counter. Native image controls remain outside the original bitmap UI. Exact DS rasterisation, all lighting and edge pixels, caption presentation, left-handed play and wall-clock timing remain unverified.
 

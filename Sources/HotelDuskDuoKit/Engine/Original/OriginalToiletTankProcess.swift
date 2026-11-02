@@ -81,7 +81,7 @@ public struct OriginalToiletTankProcess: Equatable, Sendable {
                 effects.append(.completionFade(60))
             } else if stage == 3 {
                 stage = 4; timer = 0
-                effects.append(.sound(archive: 0, entry: 1))
+                effects.append(.sound(archive: 1, entry: 0))
             } else if stage == 4 {
                 timer += 1
                 if timer > 210 { stage = 5; effects.append(.fadeOut(60)) }
@@ -106,7 +106,7 @@ public struct OriginalToiletTankProcess: Equatable, Sendable {
                 timer -= 1
                 if timer == 0 {
                     flushAngle = -135; timer = 15; stage = 501
-                    return [.sound(archive: 0, entry: 45)]
+                    return [.sound(archive: 45, entry: 0)]
                 }
                 flushAngle -= 9
             case 501:

@@ -97,7 +97,7 @@ public struct OriginalSuitcaseContentsProcess: Equatable, Sendable {
                 if timer < 1 {
                     lidRotation = 0
                     stage = 1002
-                    return [.fadeOut(60), .sound(archive: 1, entry: 55)]
+                    return [.fadeOut(60), .sound(archive: 55, entry: 1)]
                 }
                 timer -= 1
                 lidRotation -= Float(bitPattern: 0x3BFB38AA)
@@ -127,7 +127,7 @@ public struct OriginalSuitcaseContentsProcess: Equatable, Sendable {
                 switch selection {
                 case .drag:
                     stage = 500
-                    return [.sound(archive: 1, entry: 8), .sound(archive: 0, entry: 38)]
+                    return [.sound(archive: 8, entry: 1), .sound(archive: 38, entry: 0)]
                 case .describe(let response):
                     responses = [response]
                     stage = 100
@@ -138,7 +138,7 @@ public struct OriginalSuitcaseContentsProcess: Equatable, Sendable {
                     stage = 2
                     itemStage = 0
                 }
-                return [.sound(archive: 1, entry: 8)]
+                return [.sound(archive: 8, entry: 1)]
             }
         case 2: return updateItem(textureReady: itemTextureReady)
         case 3:
@@ -208,7 +208,7 @@ public struct OriginalSuitcaseContentsProcess: Equatable, Sendable {
             if timer < 1 {
                 timer = 0
                 itemStage = 4
-                return [.sound(archive: 0, entry: 7)] + startResponse()
+                return [.sound(archive: 7, entry: 0)] + startResponse()
             }
         case 4:
             if !responses.isEmpty { return startResponse() }

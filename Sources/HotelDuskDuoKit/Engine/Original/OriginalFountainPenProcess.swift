@@ -108,7 +108,7 @@ public struct OriginalFountainPenProcess: Equatable, Sendable {
                 if pressed, let touch {
                     if Self.contains(touch, polygon: Self.grab) {
                         rubbing = true
-                        effects.append(.sound(archive: 0, entry: 50))
+                        effects.append(.sound(archive: 50, entry: 0))
                     }
                 } else if rubbing, let touch, Self.contains(touch, polygon: Self.rub) { erase(at: touch) }
                 else { rubbing = false }
@@ -127,8 +127,8 @@ public struct OriginalFountainPenProcess: Equatable, Sendable {
             case 2:
                 if pressed, let touch, Self.contains(touch, polygon: Self.inspect) {
                     clearDust()
-                    if dustComplete { returnValue = 0; stage = 3; return [.sound(archive: 0, entry: 38), .reveal(30)] }
-                    return [.sound(archive: 0, entry: 38)]
+                    if dustComplete { returnValue = 0; stage = 3; return [.sound(archive: 50, entry: 1), .reveal(30)] }
+                    return [.sound(archive: 50, entry: 1)]
                 } else if touch == nil, microphoneWarmup == 0, microphoneEnergy > 30000 {
                     clearDust(); stage = 10
                 }
@@ -147,7 +147,7 @@ public struct OriginalFountainPenProcess: Equatable, Sendable {
             case 10:
                 clearDust()
                 if dustComplete { returnValue = 1; stage = 5; timer = 120 }
-                return [.ensureSound(archive: 1, entry: 50)]
+                return [.ensureSound(archive: 50, entry: 1)]
             default: break
             }
         case 3:

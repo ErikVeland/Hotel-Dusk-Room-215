@@ -83,7 +83,7 @@ final class OriginalDifferencesTests: XCTestCase {
         let before = try renderer.render(puzzle)
         draw(circle(OriginalDifferencesProcess.targets[0]), on: &puzzle)
         let after = try renderer.render(puzzle)
-        XCTAssertEqual(after.width, 192); XCTAssertEqual(after.height, 256)
+        XCTAssertEqual(after.width, 768); XCTAssertEqual(after.height, 1024)
         XCTAssertNotEqual(before.dataProvider?.data as Data?, after.dataProvider?.data as Data?)
         let destination = try XCTUnwrap(CGImageDestinationCreateWithURL(URL(fileURLWithPath: "/tmp/hotel-pamphlet.png") as CFURL, "public.png" as CFString, 1, nil))
         CGImageDestinationAddImage(destination, after, nil)

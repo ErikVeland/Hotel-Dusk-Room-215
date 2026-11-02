@@ -153,7 +153,7 @@ public struct OriginalCrowbarProcess: Equatable, Sendable {
                 handle.z = -4096
                 holding = false
                 stage = 2
-                return [.sound(archive: 0, entry: 30)]
+                return [.sound(archive: 30, entry: 0)]
             }
         case 2:
             position.x = Self.approachZero(position.x)
@@ -195,7 +195,7 @@ public struct OriginalCrowbarProcess: Equatable, Sendable {
                     let volume = dropSeverity > 0 ? Int(Float(32) + Float(95) * dropSeverity) : 0
                     if volume > 0 {
                         effects.append(.soundVolume(volume))
-                        if soundTimer < 1 { effects.append(.sound(archive: 1, entry: 30)); soundTimer = 60 }
+                        if soundTimer < 1 { effects.append(.sound(archive: 30, entry: 1)); soundTimer = 60 }
                     }
                 } else { drop(); effects.append(.stopLiftSound) }
             } else { drop(); effects.append(.stopLiftSound) }
@@ -219,7 +219,7 @@ public struct OriginalCrowbarProcess: Equatable, Sendable {
                 stage = 8
                 timer = 0
                 cabinetAngle = 0
-                var effects: [Effect] = [.sound(archive: 2, entry: 30), .soundVolume(Int(Float(127) * dropSeverity))]
+                var effects: [Effect] = [.sound(archive: 30, entry: 2), .soundVolume(Int(Float(127) * dropSeverity))]
                 if dropSeverity > 0.8 { rumbleTimer = 20; effects.append(.rumble(20)) }
                 return effects
             }
@@ -227,7 +227,7 @@ public struct OriginalCrowbarProcess: Equatable, Sendable {
             timer = 0
             returnValue = 0
             stage = 7
-            return [.sound(archive: 0, entry: 6)]
+            return [.sound(archive: 1, entry: 0)]
         case 7:
             timer += 1
             if timer > 120 { timer = 0; phase = 2; stage = 0 }

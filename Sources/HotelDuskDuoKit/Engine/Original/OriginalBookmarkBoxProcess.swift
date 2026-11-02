@@ -97,7 +97,7 @@ public struct OriginalBookmarkBoxProcess: Equatable, Sendable {
             if pressed, let touch, arrow == nil, Self.contains(boxHitRect, touch) {
                 shake = min(2.5, shake + 0.3)
                 if canDislodgeBookmark { taps += 1 }
-                effects.append(.sound(archive: 4, entry: 16))
+                effects.append(.sound(archive: 39, entry: 0))
             } else { shake = max(0, shake - 0.5) }
             if let axis = rotationAxis {
                 angles[axis] += velocity
@@ -127,16 +127,16 @@ public struct OriginalBookmarkBoxProcess: Equatable, Sendable {
             case 1:
                 if pressed, let touch, Self.contains(.init(Int(bookmarkX), 124, Int(bookmarkX) + 82, 186), touch) { stage = 500 }
             case 500:
-                if touch == nil { stage = 1; effects.append(.stopSound(archive: 1, entry: 39, frames: 5)) }
+                if touch == nil { stage = 1; effects.append(.stopSound(archive: 39, entry: 1, frames: 5)) }
                 else {
                     bookmarkX += Float(pullDelta)
-                    if pullDelta != 0 { effects.append(.ensureSound(archive: 1, entry: 39)) }
+                    if pullDelta != 0 { effects.append(.ensureSound(archive: 39, entry: 1)) }
                     if bookmarkX - 27 >= 32 { stage = 2; timer = 30 }
                 }
             case 2:
                 if timer > 0 { timer -= 1; bookmarkX += 0.5 }
                 else { stage = 3; effects.append(.completionFade(60)) }
-            case 3: stage = 4; timer = 120; effects.append(.sound(archive: 0, entry: 1))
+            case 3: stage = 4; timer = 120; effects.append(.sound(archive: 1, entry: 0))
             case 4: if timer > 0 { timer -= 1 } else { stage = 5; timer = 0 }
             case 5:
                 timer += 1

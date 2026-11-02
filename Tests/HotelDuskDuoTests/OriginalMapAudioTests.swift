@@ -14,7 +14,7 @@ final class OriginalMapAudioTests: XCTestCase {
     }
 
     @MainActor func testWalkingHostStartsAlternatingStepsAndOwnsRoomAmbience() throws {
-        let audio = AudioController()
+        let audio = AudioController(musicOutputFactory: { _, _, _ in ProgressMusicOutput() })
         audio.isMuted = true
         defer { audio.stopAll() }
         let origin = SIMD3<Float>.zero
@@ -34,7 +34,8 @@ final class OriginalMapAudioTests: XCTestCase {
         audio.playWalkingMusic(mapID: 6, game: game)
         XCTAssertEqual(audio.soundEffectsHistory.count, count)
         let player = try archive.effect(archiveID: 12, entryID: 0).playerID
-        XCTAssertTrue(try audio.applyOriginalCommand(.waitForEffectPlayer(player)))
+        // Muted effects are recorded for diagnostics but do not create a player that can hold a wait.
+        XCTAssertFalse(try audio.applyOriginalCommand(.waitForEffectPlayer(player)))
         audio.stopWalkingAudio()
         for _ in 0..<5 { audio.advanceOriginalFrame() }
         XCTAssertFalse(try audio.applyOriginalCommand(.waitForEffectPlayer(player)))

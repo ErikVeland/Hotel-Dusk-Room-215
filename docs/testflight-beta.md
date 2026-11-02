@@ -2,7 +2,7 @@
 
 The beta uses bundle ID `com.veland.hoteldusk.duo`, version `0.1`, and signing team `54WU29TRTY`.
 The archive command sets the build number. Use a new number for each upload.
-The complete original game is not yet verified as playable. See [current game status](../README.md).
+The checkpointed native-input route reaches the Chapter 10 ending. One uninterrupted session, every branch, source fidelity and device behaviour are not yet verified. See [current game status](../README.md).
 
 ## Preparation result — 1 November 2026
 
@@ -41,6 +41,18 @@ Do not treat all failures as artwork-only issues.
 
 The detailed reports are in `.build/verification/testflight-merged-fast` and `.build/verification/testflight-native-corrected`.
 Resolve or explicitly scope these issues before inviting testers. The device checks below also remain open.
+
+## Readiness check — 2 November 2026
+
+Current checks used Xcode 26.6. The fast profile passed with 305 tests, no failures and five skips. The skipped tests need isolated artwork candidate files. See `.build/verification/goal-fast-ios-current/report.json`.
+
+The full reference profile passed with 307 tests, no failures and eight skips. The skips include seven Metal renderer checks and one Chapter 4 probe without its save. Checkpointed normal-input tests cover the required route through the Chapter 10 ending. They do not prove one uninterrupted session, every branch, source fidelity or device input. See `.build/verification/goal-reference-final-xcode/report.json`.
+
+The audio profile passed 29 tests and four source-audio checks, with no failures. Nine playback checks skipped because Apple sampler and audio-player units are unavailable in this environment. The source-backed checks cover both archive-entry cues and single-archive puzzle cues. They do not verify playback timbre, perceived level or physical haptic timing. See `.build/verification/goal-audio-after-legacy-cue-fix/report.json`.
+
+The native UI profile did not complete. `LayoutSnapshotTests.testRenderPaperMaterialAtRestAndWhileSettling` stalled after IOSurface errors and was stopped after three minutes. It is not a pass. See `.build/verification/goal-native-current/swift.log`.
+
+The iOS simulator build could not resolve packages because the restricted host could not write Xcode's user cache, and CoreSimulator was unavailable. An unsigned iOS device build with local package caches then found that the iOS 26.5 platform is not installed in Xcode 26.6. No iOS build or device validation is established. Xcode 27.1 or later is required for the current hinge API. Bowling score parity, puzzle input fidelity, audio output and physical haptics also need device checks.
 
 ## Create an archive
 

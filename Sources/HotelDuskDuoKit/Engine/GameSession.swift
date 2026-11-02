@@ -36,7 +36,7 @@ public final class GameSession: ObservableObject {
     public let hingeManager: DuoHingeManager
     public let audioController: AudioController
     public let jigsawPuzzleManager: JigsawPuzzleManager
-    private let rumbleFeedback: any RumbleFeedback
+    let rumbleFeedback: any RumbleFeedback
     public let memoDraft = MemoDraft()
     public let scriptCatalog: OriginalScriptCatalog?
     public var isBookClosed: Bool { hingeManager.foldState == .closed }
@@ -68,7 +68,7 @@ public final class GameSession: ObservableObject {
         self.mapRendererFactory = mapRendererFactory
         self.hingeManager = hingeManager ?? DuoHingeManager()
         self.audioController = audioController
-        self.rumbleFeedback = rumbleFeedback ?? NoRumbleFeedback()
+        self.rumbleFeedback = rumbleFeedback ?? SystemRumbleFeedback()
         self.jigsawPuzzleManager = jigsawPuzzleManager ?? JigsawPuzzleManager()
         do { scriptCatalog = try OriginalScriptCatalog.bundled() }
         catch {
@@ -194,7 +194,10 @@ public final class GameSession: ObservableObject {
         } catch { saveError = "The saved game could not be loaded: \(error)" }
     }
 
-    private func attachPlay(_ next: OriginalPlaySession) {
+    /**
+     * Installs a play session and connects its save, recovery and activity callbacks.
+     */
+    func attachPlay(_ next: OriginalPlaySession) {
         next.enableInstantSaves()
         isPauseMenuOpen = false
         isReviewingConversations = next.dialogueNotebook.isReviewing

@@ -27,7 +27,11 @@ final class HotelDuskDuoTests: XCTestCase {
     }
 
     func testNativeBuildDoesNotStartInventedGameplay() throws {
-        let session = GameSession()
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let session = GameSession(audioController: originalRouteTestAudio(),
+            saveStore: OriginalChapterFileStore(directory: directory),
+            resumeStore: OriginalResumeFileStore(directory: directory),
+            safePlaceStore: OriginalResumeFileStore(directory: directory))
         XCTAssertNil(session.play)
         XCTAssertNil(session.originalProgram)
         XCTAssertNil(session.sourceError)

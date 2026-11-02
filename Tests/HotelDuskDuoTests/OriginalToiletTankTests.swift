@@ -46,7 +46,7 @@ final class OriginalToiletTankTests: XCTestCase {
         }
         var effects: [OriginalToiletTankProcess.Effect] = []
         for _ in 0..<220 { effects += puzzle.update() }
-        XCTAssertTrue(effects.contains(.sound(archive: 0, entry: 45)))
+        XCTAssertTrue(effects.contains(.sound(archive: 45, entry: 0)))
         XCTAssertTrue(effects.contains(.hint(pairA: 25, pairB: 1)))
         XCTAssertTrue(puzzle.awaitingHint)
         XCTAssertNil(puzzle.result)
@@ -93,6 +93,7 @@ final class OriginalToiletTankTests: XCTestCase {
         XCTAssertNotEqual(play.runner.phase, .process(id: 48))
         XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 25)), true)
         XCTAssertEqual(play.runner.game.value(for: .trickFlag(index: 24)), false)
+        XCTAssertTrue(audio.soundEffectsHistory.contains("ME_NAZOTOKI_SEIKOU"))
     }
     @MainActor func testOriginalModelShowsMovingLid() throws {
         let renderer = try OriginalToiletTankRenderer()

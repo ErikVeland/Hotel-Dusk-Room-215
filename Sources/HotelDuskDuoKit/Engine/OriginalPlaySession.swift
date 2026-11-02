@@ -3119,7 +3119,7 @@ public final class OriginalPlaySession: ObservableObject {
                 beginProcessFade(screen: fade.screen, mask: fade.mask, mode: UInt8(clamping: fade.mode),
                                  from: Float(bitPattern: fade.targetBits), frames: Int(fade.duration))
             case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
-            case .optionalRumble: rumbleFeedback.playRumble(durationFrames: nil)
+            case .optionalRumble(let frames): rumbleFeedback.playRumble(durationFrames: frames)
             case .processReturn(let value): processReturn = value
             default: break
             }
@@ -3518,7 +3518,7 @@ public final class OriginalPlaySession: ObservableObject {
                     try crowbarScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
                 case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
                 case .stopLiftSound:
-                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 1, entryID: 30, fadeFrames: 1))
+                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 30, entryID: 1, fadeFrames: 1))
                 case .soundVolume(let volume):
                     _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 8, entryID: -1, target: volume, frames: 1))
                 case .rumble(let frames): rumbleFeedback.playRumble(durationFrames: frames)
@@ -3560,11 +3560,11 @@ public final class OriginalPlaySession: ObservableObject {
                     try memoDrawingScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 3, from: -16, frames: UInt16(updates))
                 case .fadeOut(let updates):
                     try memoDrawingScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
-                case .startSound: try? audio.playOriginalEffect(archiveID: 0, entryID: 34)
+                case .startSound: try? audio.playOriginalEffect(archiveID: 34, entryID: 0)
                 case .soundVolume(let volume):
-                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 0, entryID: 34, target: volume, frames: 10))
+                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 34, entryID: 0, target: volume, frames: 10))
                 case .stopSound:
-                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 34, fadeFrames: 5))
+                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 34, entryID: 0, fadeFrames: 5))
                 case .completed(let result):
                     memoDrawing = nil
                     memoDrawingImage = nil
@@ -3652,7 +3652,7 @@ public final class OriginalPlaySession: ObservableObject {
             case .fadeIn(let updates): beginProcessFade(.fadeIn, frames: updates)
             case .fadeOut(let updates): beginProcessFade(.fadeOut, frames: updates)
             case .completionFade(let updates): beginProcessFade(.completion, frames: updates)
-            case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
+            case .sound(let archiveID): try? audio.playOriginalEffect(archiveID: archiveID)
             case .springBack: rumbleFeedback.playRumble(durationFrames: nil)
             case .completed(let result):
                 paperclip = nil
@@ -3690,7 +3690,7 @@ public final class OriginalPlaySession: ObservableObject {
                     try hangerScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
                 case .completionFade(let updates):
                     try hangerScreenEffects.beginBrightness(screen: 0, mask: 0x21, mode: 3, from: 16, frames: UInt16(updates))
-                case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
+                case .sound(let archiveID): try? audio.playOriginalEffect(archiveID: archiveID)
                 case .markCompleted: runner.markHangerCutCompleted()
                 case .completed(let result):
                     hanger = nil
@@ -3731,9 +3731,9 @@ public final class OriginalPlaySession: ObservableObject {
                 case .sound(let archive, let entry):
                     try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
                 case .stopDragSound:
-                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 38, fadeFrames: 1))
+                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 38, entryID: 0, fadeFrames: 1))
                 case .dragVolume(let volume):
-                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 0, entryID: 38, target: volume, frames: 1))
+                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 38, entryID: 0, target: volume, frames: 1))
                 case .award(let item): try runner.takeSuitcaseItem(item)
                 case .response(let response):
                     let child = try runner.processHint(catalog: catalog, pairA: 12, pairB: response)
@@ -3821,10 +3821,10 @@ public final class OriginalPlaySession: ObservableObject {
                     try toiletTankScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
                 case .sound(let archive, let entry): try? audio.playOriginalEffect(archiveID: archive, entryID: entry)
                 case .slideSound(let moving):
-                    if moving { try? audio.ensureOriginalEffect(archiveID: 0, entryID: 46) }
-                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 0, entryID: 46, target: moving ? 127 : 0, frames: 5))
+                    if moving { try? audio.ensureOriginalEffect(archiveID: 46, entryID: 0) }
+                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 46, entryID: 0, target: moving ? 127 : 0, frames: 5))
                 case .stopSlideSound:
-                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 46, fadeFrames: 10))
+                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 46, entryID: 0, fadeFrames: 10))
                 case .hint(let pairA, let pairB):
                     let hint = try runner.processHint(catalog: catalog, pairA: pairA, pairB: pairB)
                     toiletTankParent = runner; runner = hint
@@ -3860,12 +3860,12 @@ public final class OriginalPlaySession: ObservableObject {
                     try differencesScreenEffects.beginBrightness(screen: 0, mask: 0x21, mode: 3, from: 16, frames: UInt16(updates))
                 case .fadeOut(let updates):
                     try differencesScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
-                case .startSound: try? audio.playOriginalEffect(archiveID: 0, entryID: 34)
+                case .startSound: try? audio.playOriginalEffect(archiveID: 34, entryID: 0)
                 case .soundVolume(let value):
-                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 0, entryID: 34, target: value, frames: 10))
+                    _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 34, entryID: 0, target: value, frames: 10))
                 case .stopSound:
-                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 34, fadeFrames: 5))
-                case .victory: try? audio.playOriginalEffect(archiveID: 0, entryID: 1)
+                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 34, entryID: 0, fadeFrames: 5))
+                case .victory: try? audio.playOriginalEffect(archiveID: 1, entryID: 0)
                 case .hint(let pairA, let pairB):
                     let hint = try runner.processHint(catalog: catalog, pairA: pairA, pairB: pairB)
                     differencesParent = runner; runner = hint
@@ -4160,9 +4160,9 @@ public final class OriginalPlaySession: ObservableObject {
                     try labelPeelScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 3, from: -16, frames: UInt16(updates))
                 case .fadeOut(let updates):
                     try labelPeelScreenEffects.beginBrightness(screen: 0, mask: 1, mode: 2, from: 0, frames: UInt16(updates))
-                case .dragging(true): try? audio.ensureOriginalEffect(archiveID: 0, entryID: 44)
+                case .dragging(true): try? audio.ensureOriginalEffect(archiveID: 44, entryID: 2)
                 case .dragging(false):
-                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: 44, fadeFrames: 5))
+                    _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 44, entryID: 2, fadeFrames: 5))
                 case .completed(let result):
                     labelPeelFollowupPending = result == 2
                     runner.storeWineLabelPeelState(UInt16(truncatingIfNeeded:
@@ -4356,12 +4356,12 @@ public final class OriginalPlaySession: ObservableObject {
             case .fadeIn(let updates): beginProcessFade(.fadeIn, frames: updates)
             case .fadeOut(let updates): beginProcessFade(.fadeOut, frames: updates)
             case .completionFade(let updates): beginProcessFade(.completion, frames: updates)
-            case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
-            case .stopSound(let entry):
-                _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: entry, fadeFrames: 1))
+            case .sound: try? audio.playOriginalEffect(archiveID: 33, entryID: 2)
+            case .stopSound:
+                _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 33, entryID: 2, fadeFrames: 1))
             case .scrapeVolume(let volume):
-                _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 0, entryID: 33, target: volume, frames: 1))
-            case .pinLatched: try? audio.playOriginalEffect(archiveID: 1, entryID: 33)
+                _ = try? audio.applyOriginalCommand(.effectVolume(archiveID: 33, entryID: 2, target: volume, frames: 1))
+            case .pinLatched: try? audio.playOriginalEffect(archiveID: 33, entryID: 0)
             case .markCompleted: runner.markThickWireCompleted()
             case .caption(let caption): runner.recordUnrenderedProcessCaption(processID: puzzle.processID, caption: caption)
             case .rumble: rumbleFeedback.playRumble(durationFrames: nil)
@@ -4398,9 +4398,9 @@ public final class OriginalPlaySession: ObservableObject {
             case .fadeIn(let updates): beginProcessFade(.fadeIn, frames: updates)
             case .fadeOut(let updates): beginProcessFade(.fadeOut, frames: updates)
             case .completionFade(let updates): beginProcessFade(.completion, frames: updates)
-            case .sound(let entry): try? audio.playOriginalEffect(archiveID: 0, entryID: entry)
+            case .sound(let archiveID): try? audio.playOriginalEffect(archiveID: archiveID)
             case .stopSound(let entry):
-                _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: 0, entryID: entry, fadeFrames: 1))
+                _ = try? audio.applyOriginalCommand(.stopEffect(archiveID: entry, entryID: 0, fadeFrames: 1))
             case .caption(let caption): runner.recordUnrenderedProcessCaption(processID: 37, caption: caption)
             case .completed(let result):
                 suitcaseKey = nil

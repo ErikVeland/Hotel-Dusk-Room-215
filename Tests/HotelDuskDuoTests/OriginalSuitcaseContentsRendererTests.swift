@@ -1,10 +1,12 @@
 import XCTest
 import ImageIO
+import Metal
 @testable import HotelDuskDuoKit
 
 @MainActor
 final class OriginalSuitcaseContentsRendererTests: XCTestCase {
     func testRenderOverviewAndCompartments() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal is unavailable on this host") }
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
         let file = root.appendingPathComponent("extracted/reference/chapter-two-suitcase-open/lower-ram.bin")
         guard FileManager.default.fileExists(atPath: file.path) else { throw XCTSkip("The original suitcase state is unavailable") }

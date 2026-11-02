@@ -87,6 +87,7 @@ enum OriginalSuitcaseContentsRouteChecks {
         XCTAssertFalse(try play.runner.game.inventory.items.contains(49))
         XCTAssertEqual(play.runner.game.value(for: .gameFlag(index: 51)), true)
         try compare(play.runner.game, "chapter-two-suitcase-store/page5")
-        try OriginalPaymentRouteChecks.run(play, compare: compare, captureImage: captureImage)
+        try OriginalPaymentRouteChecks.run(play, memoRoute: .whole,
+            compare: compare, captureImage: captureImage)
     }
 }

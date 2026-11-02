@@ -41,8 +41,8 @@ final class OriginalPencilSharpenerProcessTests: XCTestCase {
 
     func testRendererLoadsTheCapturedPortraitScene() throws {
         let renderer = try OriginalPencilSharpenerRenderer()
-        XCTAssertEqual(renderer.image.width, 192)
-        XCTAssertEqual(renderer.image.height, 256)
+        XCTAssertEqual(renderer.image.artworkWidth, 192)
+        XCTAssertEqual(renderer.image.artworkHeight, 256)
     }
 
 }

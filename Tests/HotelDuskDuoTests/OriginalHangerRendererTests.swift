@@ -1,5 +1,6 @@
 import XCTest
 import ImageIO
+import Metal
 @testable import HotelDuskDuoKit
 
 @MainActor
@@ -23,6 +24,7 @@ final class OriginalHangerRendererTests: XCTestCase {
     }
 
     func testRenderHangerAndCuttingStages() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
         let renderer = try OriginalHangerRenderer()
         var puzzle = OriginalHangerProcess()
         func capture(_ name: String) throws {
@@ -54,6 +56,18 @@ final class OriginalHangerRendererTests: XCTestCase {
     }
 
     func testInitialWallPixelsMatchOriginal() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
+        let defaults = UserDefaults.standard
+        let previousHDSetting = defaults.object(forKey: "hdGraphicsEnabled")
+        defaults.set(false, forKey: "hdGraphicsEnabled")
+        defer {
+            if let previousHDSetting {
+                defaults.set(previousHDSetting, forKey: "hdGraphicsEnabled")
+            } else {
+                defaults.removeObject(forKey: "hdGraphicsEnabled")
+            }
+        }
+
         let file = root.appendingPathComponent("extracted/reference/chapter-two-hanger-use/puzzle-bottom.ppm")
         guard FileManager.default.fileExists(atPath: file.path) else { throw XCTSkip("The original hanger image is unavailable") }
         let reference = try Data(contentsOf: file), header = Data("P6\n256 192\n255\n".utf8)
@@ -63,7 +77,7 @@ final class OriginalHangerRendererTests: XCTestCase {
         let rgba = try XCTUnwrap(image.dataProvider?.data) as Data
         for point in [SIMD2(10, 10), .init(70, 70), .init(140, 70), .init(50, 200), .init(170, 200)] {
             let original = (point.x * 256 + 255 - point.y) * 3
-            let native = (point.y * 192 + point.x) * 4
+            let native = (((point.y * 4 + 2) * image.width) + point.x * 4 + 2) * 4
             for channel in 0..<3 {
                 XCTAssertEqual(rgba[native + channel], pixels[original + channel],
                     "Page \(point), native \(Array(rgba[native..<native + 3])), original \(Array(pixels[original..<original + 3]))")

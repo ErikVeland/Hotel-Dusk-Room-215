@@ -90,6 +90,13 @@ The ROM reference runner records PCM during isolated process captures even when
 `activeBGM` is `-1`. Those files contain non-silent audio, but the current cue log
 does not identify sound-effect requests or attribute PCM to an effect. Do not use
 those captures as music playback evidence.
+
+Puzzle processes that emit one sound archive ID play its entry 0. The hanger,
+paperclip and suitcase-key handlers now preserve this archive/entry order. Their
+former mapping treated the archive ID as an entry in archive 0, which failed
+lookup and silently dropped the cue. The audio tests resolve the single-archive
+cues and the suitcase-key stop address against the bundled SDAT inventory.
+
 Walking footsteps now use the map-specific pair of original cues, the original
 6/8-tick cadence increments, and actual movement after collision handling. Idle
 frames reset the counter to 200 after walking has started; untouched initial idle
@@ -153,6 +160,20 @@ Audio ramps continue during dialogue, choices, inventory and chapter titles.
 The book's pause state suspends them. Ending a session also stops effect players,
 including looping cues. Playback and render errors appear beside mute and volume
 controls in the pause menu. Unknown cues stay silent and report an error.
+
+Puzzle processes use zero-based archive and sequence IDs. On 2 November 2026,
+the source inventory audit found invalid literal cue pairs in puzzle interactions.
+The fixes map memo, bookmark box, fountain pen, toilet lid, wine label, wire lock,
+dot drawing and other checked cues to named source sequences. A static check now
+finds a bundled sequence for each literal effect pair in the engine. Focused tests
+check the source names for corrected puzzle cues. These checks verify cue lookup,
+not playback quality or DS audio fidelity.
+
+The default game session now installs `SystemRumbleFeedback`, so recovered rumble
+cues reach Core Haptics on supported iOS devices. Other platforms remain silent.
+Frame counts map to continuous haptic duration with an 80 ms minimum; one-frame
+entrance feedback and the adapter selection have focused checks. Physical timing
+and strength still need review on a supported device.
 
 This adapter still needs comparison with DS recordings for envelopes, resampling,
 modulation, mixing and sequence-volume response. MIDI controller conversion and

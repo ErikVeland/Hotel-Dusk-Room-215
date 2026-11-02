@@ -21,7 +21,7 @@ Process 9 owns the chapter title. Initialisation at `0x02017278` records ` 05:30
 
 The native save format contains all 32,088 original game-state bytes, the separate condition byte, a format version, a state checksum and a native timestamp. It is not a DS cartridge save. Loading validates the version, checksum, state size and supported checkpoint. Save failures retain the slot screen and allow retry. Occupied slots require explicit replacement confirmation.
 
-Only the Chapter 2 starting checkpoint is currently supported. Loading replays the title and room arrival without repeating the chapter reset. General midgame saves, other chapter checkpoints and DS save import remain unfinished.
+Native chapter slots store supported title checkpoints. The separate resume journal stores supported walking, dialogue, choice, puzzle and notebook progress and can restore it in a new app session. Twenty-six resume-save tests cover the opening route, puzzle input replay, notebook ink, per-step disk reads, interrupted writes and failed-save recovery. This is not DS cartridge save import; that remains unfinished.
 
 ## Presentation limits
 

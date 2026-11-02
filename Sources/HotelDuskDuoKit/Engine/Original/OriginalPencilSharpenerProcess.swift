@@ -43,7 +43,6 @@ public struct OriginalPencilSharpenerProcess: Equatable, Sendable {
         releaseTouch()
         phase = .exitAnimation
         remainingExitFrames = Self.exitAnimationFrames
-        processReturnValue = 2
         return true
     }
 
@@ -88,7 +87,10 @@ public struct OriginalPencilSharpenerProcess: Equatable, Sendable {
     public mutating func updateOneFrame() {
         guard phase == .exitAnimation else { return }
         remainingExitFrames -= 1
-        if remainingExitFrames == 0 { phase = .complete }
+        if remainingExitFrames == 0 {
+            phase = .complete
+            processReturnValue = 2
+        }
     }
 
     public var returnedProcessValue: Int16? { processReturnValue }

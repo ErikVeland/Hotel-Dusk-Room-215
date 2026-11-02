@@ -46,8 +46,8 @@ final class OriginalPencilSharpenerSessionTests: XCTestCase {
         defer { play.stop() }
 
         XCTAssertNotNil(play.pencilSharpener)
-        XCTAssertEqual(play.pencilSharpenerImage?.width, 192)
-        XCTAssertEqual(play.pencilSharpenerImage?.height, 256)
+        XCTAssertEqual(play.pencilSharpenerImage?.artworkWidth, 192)
+        XCTAssertEqual(play.pencilSharpenerImage?.artworkHeight, 256)
         XCTAssertNil(play.appleWordEntry)
         if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
     }

@@ -7,9 +7,15 @@ import CoreGraphics
  */
 @MainActor
 enum OriginalOfficeRouteChecks {
+    enum MemoRoute: Equatable { case torn, whole }
+
     static func run(_ play: OriginalPlaySession,
+                    memoRoute: MemoRoute = .torn,
                     compare: (OriginalGameState, String) throws -> Void = { _, _ in },
                     captureImage: (CGImage?, String) throws -> Void = { _, _ in }) throws {
+        func compareTornRoute(_ name: String) throws {
+            if memoRoute == .torn { try compare(play.runner.game, name) }
+        }
         try captureImage(play.lobbyImage, "office_arrival")
         walk(play, x: 170, y: 128, frames: 26)
         walk(play, x: 96, y: 45, frames: 83)
@@ -103,79 +109,90 @@ enum OriginalOfficeRouteChecks {
         try compare(play.runner.game, "chapter-two-memo-pull-ready/page9")
         for _ in 0..<65 { play.advanceFrame() }
         try captureImage(play.memoPullImage, "office_memo_pull")
-        play.holdMemoPullTouch(x: 106, y: 162)
-        for _ in 0..<2 { play.advanceFrame() }
-        let held = play.memoPull
-        play.pause()
-        play.quitMemoPull()
-        play.advanceFrame()
-        XCTAssertEqual(play.memoPull, held)
-        play.resume()
-        play.holdMemoPullTouch(x: 106, y: 162)
-        for index in 0...12 {
-            play.holdMemoPullTouch(x: index % 2 == 0 ? 102 : 110, y: 162)
+        if memoRoute == .whole {
+            play.quitMemoPull()
+            for _ in 0..<300 where play.memoPull != nil { play.advanceFrame() }
+            XCTAssertNil(play.memoPull)
+            drain(play)
+            XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
+            XCTAssertFalse(try play.runner.game.inventory.items.contains(7))
+            play.leaveSearchCloseup()
+            play.panLobbyCounter(1)
+        } else {
+            play.holdMemoPullTouch(x: 106, y: 162)
+            for _ in 0..<2 { play.advanceFrame() }
+            let held = play.memoPull
+            play.pause()
+            play.quitMemoPull()
             play.advanceFrame()
+            XCTAssertEqual(play.memoPull, held)
+            play.resume()
+            play.holdMemoPullTouch(x: 106, y: 162)
+            for index in 0...12 {
+                play.holdMemoPullTouch(x: index % 2 == 0 ? 102 : 110, y: 162)
+                play.advanceFrame()
+            }
+            play.releaseMemoPullTouch()
+            XCTAssertEqual(play.memoPull?.returnValue, 0)
+            for _ in 0..<300 where play.memoPull != nil { play.advanceFrame() }
+            XCTAssertNil(play.memoPull)
+            try compare(play.runner.game, "chapter-two-memo-torn-return/returned")
+            play.advanceDialogue()
+            try compare(play.runner.game, "chapter-two-memo-torn-return/page0")
+            drain(play)
+            XCTAssertTrue(try play.runner.game.inventory.items.contains(7))
+            XCTAssertEqual(play.runner.phase, .process(id: 34))
+            for _ in 0..<65 { play.advanceFrame() }
+            XCTAssertNotNil(play.memoDrawing)
+            try captureImage(play.memoDrawingImage, "office_memo_drawing")
+            try compare(play.runner.game, "chapter-two-memo-torn-return/page15")
+            play.holdMemoDrawingTouch(x: 40, y: 105)
+            play.advanceFrame()
+            play.releaseMemoDrawingTouch()
+            XCTAssertTrue(play.memoDrawing?.drawing.pixels.contains(0xE0) == true)
+            play.pause()
+            let ink = play.memoDrawing?.drawing.pixels
+            play.clearMemoDrawing()
+            play.quitMemoDrawing()
+            play.advanceFrame()
+            XCTAssertEqual(play.memoDrawing?.drawing.pixels, ink)
+            play.resume()
+            play.clearMemoDrawing()
+            XCTAssertTrue(play.memoDrawing?.drawing.pixels.allSatisfy { $0 == 0 } == true)
+            play.quitMemoDrawing()
+            for _ in 0..<100 where play.memoDrawing != nil { play.advanceFrame() }
+            drain(play)
+            XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
+            XCTAssertNil(play.memoDrawing)
+            try compare(play.runner.game, "chapter-two-memo-drawing-quit/finished")
+            XCTAssertNil(play.closeup)
+            let savedState = play.runner.game.bytes
+            play.useItemInSearchView(7)
+            XCTAssertEqual(play.runner.phase, .process(id: 34))
+            for _ in 0..<65 { play.advanceFrame() }
+            XCTAssertTrue(play.memoDrawing?.drawing.pixels.allSatisfy { $0 == 0 } == true)
+            XCTAssertEqual(play.runner.game.bytes, savedState)
+            try compare(play.runner.game, "chapter-two-memo-drawing-reopen/reopened")
+            play.quitMemoDrawing()
+            for _ in 0..<100 where play.memoDrawing != nil { play.advanceFrame() }
+            drain(play)
+            XCTAssertNil(play.memoDrawing)
+            XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
+            XCTAssertNil(play.searchItem)
+            try compare(play.runner.game, "chapter-two-memo-drawing-reopen-return/finished")
         }
-        play.releaseMemoPullTouch()
-        XCTAssertEqual(play.memoPull?.returnValue, 0)
-        for _ in 0..<300 where play.memoPull != nil { play.advanceFrame() }
-        XCTAssertNil(play.memoPull)
-        try compare(play.runner.game, "chapter-two-memo-torn-return/returned")
-        play.advanceDialogue()
-        try compare(play.runner.game, "chapter-two-memo-torn-return/page0")
-        drain(play)
-        XCTAssertTrue(try play.runner.game.inventory.items.contains(7))
-        XCTAssertEqual(play.runner.phase, .process(id: 34))
-        for _ in 0..<65 { play.advanceFrame() }
-        XCTAssertNotNil(play.memoDrawing)
-        try captureImage(play.memoDrawingImage, "office_memo_drawing")
-        try compare(play.runner.game, "chapter-two-memo-torn-return/page15")
-        play.holdMemoDrawingTouch(x: 40, y: 105)
-        play.advanceFrame()
-        play.releaseMemoDrawingTouch()
-        XCTAssertTrue(play.memoDrawing?.drawing.pixels.contains(0xE0) == true)
-        play.pause()
-        let ink = play.memoDrawing?.drawing.pixels
-        play.clearMemoDrawing()
-        play.quitMemoDrawing()
-        play.advanceFrame()
-        XCTAssertEqual(play.memoDrawing?.drawing.pixels, ink)
-        play.resume()
-        play.clearMemoDrawing()
-        XCTAssertTrue(play.memoDrawing?.drawing.pixels.allSatisfy { $0 == 0 } == true)
-        play.quitMemoDrawing()
-        for _ in 0..<100 where play.memoDrawing != nil { play.advanceFrame() }
-        drain(play)
-        XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
-        XCTAssertNil(play.memoDrawing)
-        try compare(play.runner.game, "chapter-two-memo-drawing-quit/finished")
-        XCTAssertNil(play.closeup)
-        let savedState = play.runner.game.bytes
-        play.useItemInSearchView(7)
-        XCTAssertEqual(play.runner.phase, .process(id: 34))
-        for _ in 0..<65 { play.advanceFrame() }
-        XCTAssertTrue(play.memoDrawing?.drawing.pixels.allSatisfy { $0 == 0 } == true)
-        XCTAssertEqual(play.runner.game.bytes, savedState)
-        try compare(play.runner.game, "chapter-two-memo-drawing-reopen/reopened")
-        play.quitMemoDrawing()
-        for _ in 0..<100 where play.memoDrawing != nil { play.advanceFrame() }
-        drain(play)
-        XCTAssertNil(play.memoDrawing)
-        XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
-        XCTAssertNil(play.searchItem)
-        try compare(play.runner.game, "chapter-two-memo-drawing-reopen-return/finished")
         play.selectLobbyObject(x: 85, y: 222)
         XCTAssertEqual(play.lobby?.selectedNode, "obj07")
         play.confirmLobbyObject()
         drain(play)
         XCTAssertEqual(play.closeup?.view.id, 124)
-        try compare(play.runner.game, "chapter-two-crowbar-closeup/torn")
+        try compareTornRoute("chapter-two-crowbar-closeup/torn")
         play.useItemInCloseup(10)
         play.selectCloseupComponent(x: 70, y: 145)
         play.confirmCloseupComponent()
         drain(play)
         XCTAssertEqual(play.runner.phase, .process(id: 30))
-        try compare(play.runner.game, "chapter-two-crowbar-entry/ready")
+        try compareTornRoute("chapter-two-crowbar-entry/ready")
         for _ in 0..<65 { play.advanceFrame() }
         try captureImage(play.crowbarImage, "office_crowbar")
         let idle = play.crowbar
@@ -207,13 +224,20 @@ enum OriginalOfficeRouteChecks {
         XCTAssertEqual(play.crowbar?.returnValue, 0)
         for _ in 0..<600 where play.crowbar != nil { play.advanceFrame() }
         XCTAssertNil(play.crowbar)
-        try compare(play.runner.game, "chapter-two-crowbar-lift/returned")
+        try compareTornRoute("chapter-two-crowbar-lift/returned")
         drain(play)
-        XCTAssertTrue(try play.runner.game.inventory.items.contains(13))
+        let recoveredMemoID: UInt8 = memoRoute == .whole ? 63 : 13
+        XCTAssertTrue(try play.runner.game.inventory.items.contains(recoveredMemoID))
         XCTAssertEqual(play.runner.phase, .process(id: 34))
         for _ in 0..<180 { play.advanceFrame() }
-        try captureImage(play.memoDrawingImage, "office_joined_memo")
-        try compare(play.runner.game, "chapter-two-memo-joined-ready/finished")
+        XCTAssertEqual(play.memoDrawing?.drawing.paper, memoRoute == .whole ? .whole : .joined)
+        if memoRoute == .whole {
+            try captureImage(play.memoDrawingImage, "office_whole_memo")
+            try compare(play.runner.game, "chapter-two-crowbar-whole-memo/finished")
+        } else {
+            try captureImage(play.memoDrawingImage, "office_joined_memo")
+            try compare(play.runner.game, "chapter-two-memo-joined-ready/finished")
+        }
         play.quitMemoDrawing()
         for _ in 0..<100 where play.memoDrawing != nil { play.advanceFrame() }
         drain(play)
@@ -223,12 +247,12 @@ enum OriginalOfficeRouteChecks {
         play.confirmLobbyObject()
         drain(play)
         XCTAssertEqual(play.closeup?.view.id, 116)
-        try compare(play.runner.game, "chapter-two-cabinet-keypad/ready")
+        try compareTornRoute("chapter-two-cabinet-keypad/ready")
         play.selectCloseupComponent(x: 135, y: 40)
         play.confirmCloseupComponent()
         drain(play)
         XCTAssertEqual(play.runner.phase, .process(id: 31))
-        try compare(play.runner.game, "chapter-two-cabinet-combination-entry/ready")
+        try compareTornRoute("chapter-two-cabinet-combination-entry/ready")
         for _ in 0..<65 { play.advanceFrame() }
         try captureImage(play.cabinetDialImage, "office_cabinet_dials")
         let idleDial = try XCTUnwrap(play.cabinetDial,
@@ -259,35 +283,37 @@ enum OriginalOfficeRouteChecks {
         XCTAssertEqual(play.cabinetDial?.returnValue, 0)
         for _ in 0..<600 where play.cabinetDial != nil { play.advanceFrame() }
         XCTAssertNil(play.cabinetDial)
-        try compare(play.runner.game, "chapter-two-cabinet-unlock/returned")
+        try compareTornRoute("chapter-two-cabinet-unlock/returned")
         drain(play)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 15))
-        try compare(play.runner.game, "chapter-two-cabinet-unlock/page11")
+        try compareTornRoute("chapter-two-cabinet-unlock/page11")
         play.selectLobbyObject(x: 65, y: 85)
         XCTAssertEqual(play.lobby?.selectedNode, "obj08")
         play.confirmLobbyObject()
         drain(play)
         XCTAssertEqual(play.closeup?.view.id, 122)
-        try compare(play.runner.game, "chapter-two-red-box-closeup/ready")
+        try compareTornRoute("chapter-two-red-box-closeup/ready")
         play.selectCloseupComponent(x: 145, y: 95)
         play.confirmCloseupComponent()
         drain(play)
         XCTAssertTrue(try play.runner.game.inventory.items.contains(14))
         try captureImage(play.closeupImage?.image, "office_red_box_taken")
-        try compare(play.runner.game, "chapter-two-red-box-take/page13")
+        try compareTornRoute("chapter-two-red-box-take/page13")
         play.leaveSearchCloseup()
         play.leaveLobbyCounter()
         XCTAssertNil(play.closeup)
         XCTAssertEqual(play.lobby?.mode, .walking)
-        try compare(play.runner.game, "chapter-two-office-after-box/walking")
+        try compareTornRoute("chapter-two-office-after-box/walking")
         walk(play, x: 20, y: 128, frames: 100)
         XCTAssertNotNil(play.nearbyDoor)
         play.inspectNearbyDoor()
         drain(play)
         XCTAssertEqual(play.runner.phase, .exploration(mapID: 3))
-        try compare(play.runner.game, "chapter-two-office-exit-approach/page9")
+        try compareTornRoute("chapter-two-office-exit-approach/page9")
         // The continuous route retains prior event flags. These standalone door captures start from a different state.
-        try OriginalNileRouteChecks.run(play, compare: compare, compareLouieRoomDoorSnapshots: false)
+        try OriginalNileRouteChecks.run(play, compare: { game, name in
+            if memoRoute == .torn { try compare(game, name) }
+        }, compareLouieRoomDoorSnapshots: false)
     }
 
     private static func walk(_ play: OriginalPlaySession, x: Float, y: Float, frames: Int) {

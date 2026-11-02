@@ -18,7 +18,7 @@ Run the chain with `HOTEL_DUSK_ROUTE_CHECKPOINTS` set, in the order above, after
 
 - Opcode 34 (`0x0203C51C`) pushes a request with the record's kind and value. It then commits scene 1, mode 29 and block 0, with the value in session `+0x3A` (`0x02028240`, `0x020282EC`). Mode-29 events select on this value. Dunning's Room 217 scene and the R117 search use it.
 - A departure script's clock request (kind 3) now changes the time before the destination map selects its arrival events. Before this change, the request was lost when the runner moved to the new map.
-- Text control `%r` with four digits is decoded and the native runner now lets the original warning text continue. The original text handler skips this marker. The retry-state byte restore matches the source copy and preserved event-flag range. Request kind 7 now opens native Retry and Back to Title choices; Retry restores that buffer, and Back to Title leaves the resume save intact.
+- Text control `%r` with four digits is decoded and the native runner now lets the original warning text continue. The original text handler skips this marker. The retry-state byte restore matches the source copy and preserved event-flag range. Request kind 7 now opens native Retry and Back to Title choices; Retry restores that buffer, and Back to Title leaves the resume save intact. The dropped-crowbar retry test now checks the full restored game state and condition byte, not only the map position and facing.
 
 ## Route helpers
 

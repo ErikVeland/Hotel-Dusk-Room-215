@@ -40,11 +40,23 @@ final class OriginalChapterTenSearchShedSessionTests: XCTestCase {
 
         XCTAssertEqual(play.runner.phase, .process(id: 79))
         XCTAssertEqual(play.searchShed?.objects.count, 90)
-        XCTAssertEqual(play.searchShedImage?.width, 192)
-        XCTAssertEqual(play.searchShedImage?.height, 256)
+        XCTAssertEqual(play.searchShedImage?.width, 768)
+        XCTAssertEqual(play.searchShedImage?.height, 1024)
+
+        play.advanceFrame()
+        let process = try XCTUnwrap(play.searchShed)
+        let model = try OriginalModelLibrary.bundled().load(path: "trick/searchshed/soko.mdf")
+        let touch = try XCTUnwrap((0..<256).flatMap { y in
+            (0..<192).map { SIMD2<Float>(Float($0), Float(y)) }
+        }.first { point in
+            guard let object = OriginalSearchShedRenderer.object(at: point, process: process, model: model) else {
+                return false
+            }
+            return OriginalSearchShedProcess.isAcceptedIndex(object)
+        }, "The board must expose at least one valid search target")
 
         for _ in 0..<5 {
-            play.holdSearchShedTouch(x: 96, y: 128)
+            play.holdSearchShedTouch(x: touch.x, y: touch.y)
             play.releaseSearchShedTouch()
         }
         XCTAssertEqual(play.searchShed?.hitCount, 5)

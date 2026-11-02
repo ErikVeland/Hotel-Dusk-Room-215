@@ -254,6 +254,13 @@ public final class AudioController: ObservableObject {
     }
 
     /**
+     * Plays the first entry in a source sound archive.
+     */
+    func playOriginalEffect(archiveID: Int) throws {
+        try playOriginalEffect(archiveID: archiveID, entryID: 0)
+    }
+
+    /**
      * Fades all active effect players, as used by the original bowling result callback.
      */
     func stopOriginalEffects(fadeFrames: Int) {
@@ -435,8 +442,13 @@ public final class AudioController: ObservableObject {
                 _ = try applyOriginalCommand(command)
             }
             if let cue = try table.walkingAmbience(mapID: mapID, game: game) {
-                try ensureOriginalEffect(archiveID: cue.archiveID, entryID: cue.entryID)
-                walkingAmbient = cue
+                if walkingAmbient != cue {
+                    try ensureOriginalEffect(archiveID: cue.archiveID, entryID: cue.entryID)
+                    walkingAmbient = cue
+                } else if !isMuted {
+                    // Recheck the player when audible; muted playback has no player to match.
+                    try ensureOriginalEffect(archiveID: cue.archiveID, entryID: cue.entryID)
+                }
             }
         } catch { lastError = error.localizedDescription }
     }

@@ -55,12 +55,12 @@ public struct OriginalSwitchboardProcess: Equatable, Sendable {
             let delta = (previousTouch?.y ?? 0) - (touch?.y ?? 0)
             if Self.left(previousTouch), Self.left(touch), abs(delta) > 2 {
                 let on = delta > 0
-                if leftOn != on { effects.append(.sound(archive: on ? 2 : 3, entry: 40)) }
+                if leftOn != on { effects.append(.sound(archive: 40, entry: on ? 2 : 3)) }
                 leftOn = on
             }
             if Self.right(previousTouch), Self.right(touch), abs(delta) > 2 {
                 let on = delta > 0
-                if rightOn != on { effects.append(.sound(archive: on ? 2 : 3, entry: 40)) }
+                if rightOn != on { effects.append(.sound(archive: 40, entry: on ? 2 : 3)) }
                 rightOn = on
             }
             if (Self.left(previousTouch) || Self.right(previousTouch)), Self.bar(touch) {
@@ -72,7 +72,7 @@ public struct OriginalSwitchboardProcess: Equatable, Sendable {
             else {
                 for on in [leftOn, rightOn] where on {
                     failures += 1
-                    effects.append(.sound(archive: 3, entry: 40))
+                    effects.append(.sound(archive: 40, entry: 3))
                 }
                 let failed = leftOn || rightOn
                 leftOn = false; rightOn = false
@@ -90,9 +90,9 @@ public struct OriginalSwitchboardProcess: Equatable, Sendable {
                     phase = 1; previousTouch = nil
                 } else { phase = 2 }
             } else if let touch, let previousTouch, previousTouch.y - touch.y > 2 {
-                var effects: [Effect] = [.sound(archive: 0, entry: 40)]
-                if !leftOn { effects.append(.sound(archive: 2, entry: 40)) }
-                if !rightOn { effects.append(.sound(archive: 2, entry: 40)) }
+                var effects: [Effect] = [.sound(archive: 40, entry: 0)]
+                if !leftOn { effects.append(.sound(archive: 40, entry: 2)) }
+                if !rightOn { effects.append(.sound(archive: 40, entry: 2)) }
                 leftOn = true; rightOn = true; lightOn = true
                 phase = 5
                 return effects
@@ -104,7 +104,7 @@ public struct OriginalSwitchboardProcess: Equatable, Sendable {
                 if fadeComplete { stage = 1; timer = 0; return [.completionFade(60)] }
             case 1:
                 timer += 1; stage = 2
-                return [.sound(archive: 0, entry: 1)]
+                return [.sound(archive: 1, entry: 0)]
             case 2:
                 timer += 1
                 if timer > 120 { stage = 3; timer = 0 }

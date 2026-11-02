@@ -27,7 +27,7 @@ Each page has 6,144 packed bytes and 49,152 expanded pixels. Writable pages star
 
 Overlay 38's constructor reads the 16-bit apple mask from the game substructure at `0x13D8`; its completion path merges the found letter and its destructor writes the mask back to the same offset. The notebook renderer reads that mask to reveal the apple overview regions and detail pages. The five notebook pages and apple-painting progress therefore share one source field. The generic Mila memo flags at `0x13D0` are separate.
 
-The session samples held ink at its existing original update rate. Pause releases the touch. Opening the notebook clears held walking input. Closing restores the retained parent phase. Writable ink survives notebook close and reopen within the running session.
+The session samples held ink at its existing original update rate. Pause releases the touch. Opening the notebook clears held walking input. Closing restores the retained parent phase. Writable ink survives notebook close and reopen within the running session. The instant-save journal also preserves supported notebook ink across an app restart; `OriginalResumeSaveTests.testNativeNotebookInkSurvivesInstantSaveAndReopen` checks the saved page pixels and drawing data.
 
 ## Original comparisons
 
@@ -61,7 +61,7 @@ The native drawing snapshot was inspected. It shows the original drawing upright
 - Recover original menu graphics, paper layers, cursor, page-turn animation and sound cues.
 - Compare locked writable pages and additional stroke edge cases with original execution.
 - Connect notebook viewing requests from later dialogue and puzzles, including mode-25 conversation responses.
-- Add original persistent save and restore. The current checks cover the running session only.
+- Compare notebook restore on a supported iOS device. Native resume saves preserve the tested ink state; DS cartridge save compatibility remains unsupported.
 - Verify physical Duo touch, hinge and lifecycle behaviour.
 
 The native controls expose notebook editing directly. The original notebook’s wider menu, character records, plot summary, map, settings and save interface remain unfinished.

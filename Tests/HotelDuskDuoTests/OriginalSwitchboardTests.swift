@@ -52,6 +52,13 @@ final class OriginalSwitchboardTests: XCTestCase {
         XCTAssertEqual(released.result, 1)
     }
 
+    func testSwitchSoundRequestsMatchTheSourceArchiveEntries() {
+        var puzzle = ready()
+        _ = puzzle.update(pageTouch: .init(48, 170))
+        XCTAssertEqual(puzzle.update(pageTouch: .init(48, 160)), [.sound(archive: 40, entry: 2)])
+        XCTAssertEqual(puzzle.update(pageTouch: .init(48, 170)), [.sound(archive: 40, entry: 3)])
+    }
+
     @MainActor func testOriginalScriptStartsPanelAndTouchCompletionReturnsToStory() throws {
         let catalog = try OriginalScriptCatalog.bundled()
         var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
@@ -76,6 +83,9 @@ final class OriginalSwitchboardTests: XCTestCase {
         XCTAssertNil(play.switchboard)
         XCTAssertNotEqual(play.runner.phase, .process(id: 41))
         if case .halted(let halt) = play.runner.phase { XCTFail(halt.reason) }
+        XCTAssertTrue(audio.soundEffectsHistory.contains("SE_NAZOTOKI_HAIDENBAN_MASTER_ON"))
+        XCTAssertTrue(audio.soundEffectsHistory.contains("SE_NAZOTOKI_HAIDENBAN_KEITOU_ON"))
+        XCTAssertTrue(audio.soundEffectsHistory.contains("ME_NAZOTOKI_SEIKOU"))
     }
 
     @MainActor func testSourcePanelArtRendersBothStates() throws {

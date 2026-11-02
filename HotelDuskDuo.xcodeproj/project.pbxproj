@@ -374,6 +374,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		99E6802D5D467857B5D71480 /* HotelDuskDuoKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 338848465B3C6B203281355E /* XCLocalSwiftPackageReference "." */;
 			productName = HotelDuskDuoKit;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -1,5 +1,6 @@
 import XCTest
 import ImageIO
+import Metal
 @testable import HotelDuskDuoKit
 
 final class OriginalCrowbarTests: XCTestCase {
@@ -41,32 +42,39 @@ final class OriginalCrowbarTests: XCTestCase {
 
     }
 
-    private func update(_ process: inout OriginalCrowbarProcess, page: SIMD2<Float>?, count: Int) {
+    @discardableResult
+    private func update(_ process: inout OriginalCrowbarProcess, page: SIMD2<Float>?, count: Int) -> [OriginalCrowbarProcess.Effect] {
+        var effects: [OriginalCrowbarProcess.Effect] = []
         for _ in 0..<count {
             let touch = page.flatMap { OriginalCrowbarProjection.touch(page: $0, process: process) }
-            process.update(touch: touch)
+            effects += process.update(touch: touch)
         }
+        return effects
     }
 
     func testPlacementMatchesOriginal() throws {
         _ = try placedProcess()
     }
 
-    private func placedProcess() throws -> OriginalCrowbarProcess {
+    private func placedProcess(captureEffects: (([OriginalCrowbarProcess.Effect]) -> Void)? = nil) throws -> OriginalCrowbarProcess {
         var process = OriginalCrowbarProcess()
-        update(&process, page: nil, count: 2)
+        func advance(_ page: SIMD2<Float>?, count: Int) {
+            let effects = update(&process, page: page, count: count)
+            captureEffects?(effects)
+        }
+        advance(nil, count: 2)
         try compare(process, "chapter-two-crowbar-entry/ready")
-        update(&process, page: SIMD2(115, 93), count: 2)
+        advance(SIMD2(115, 93), count: 2)
         try compare(process, "chapter-two-crowbar-place/held")
         var previous = SIMD2<Float>(115, 93)
         for (i, point) in [SIMD2<Float>(112,105), .init(108,125), .init(103,145), .init(98,165),
                            .init(93,185), .init(88,205), .init(83,225)].enumerated() {
-            update(&process, page: previous, count: 1)
-            update(&process, page: point, count: 19)
+            advance(previous, count: 1)
+            advance(point, count: 19)
             previous = point
             try compare(process, "chapter-two-crowbar-place/drag\(i)")
         }
-        update(&process, page: nil, count: 120)
+        advance(nil, count: 120)
         try compare(process, "chapter-two-crowbar-place/placed")
         return process
     }
@@ -122,6 +130,18 @@ final class OriginalCrowbarTests: XCTestCase {
         XCTAssertEqual(process.update(fadeComplete: true), [.completed(0)])
     }
 
+    func testCabinetAudioRequestsUseTheSourceArchiveEntries() throws {
+        var effects: [OriginalCrowbarProcess.Effect] = []
+        _ = try placedProcess { effects += $0 }
+        XCTAssertTrue(effects.contains(.sound(archive: 30, entry: 0)))
+        XCTAssertEqual(try OriginalSoundArchive.load().effect(archiveID: 30, entryID: 0).symbol,
+                       "SE_NAZOTOKI_CABINET_AGE_BAR_IRERU")
+        XCTAssertEqual(try OriginalSoundArchive.load().effect(archiveID: 30, entryID: 1).symbol,
+                       "SE_NAZOTOKI_CABINET_AGE_MOCHIAGE")
+        XCTAssertEqual(try OriginalSoundArchive.load().effect(archiveID: 30, entryID: 2).symbol,
+                       "SE_NAZOTOKI_CABINET_AGE_KAGU_CHAKUCHI")
+    }
+
     func testQuitPreservesOriginalResultUntilRegrab() throws {
         for regrab in [false, true] {
             var process = OriginalCrowbarProcess()
@@ -164,16 +184,32 @@ final class OriginalCrowbarTests: XCTestCase {
             runner.finishCrowbar(returnValue: result)
             let expected = try state(path).bytes
             XCTAssertEqual(runner.game.bytes.indices.filter { runner.game.bytes[$0] != expected[$0] }, [], path)
+            if result == 3 {
+                var reachedGameOver = false
+                for _ in 0..<200 {
+                    if runner.processRequests.contains(where: { $0.kind == 7 }) {
+                        reachedGameOver = true
+                        break
+                    }
+                    switch runner.phase {
+                    case .dialogue, .itemNotice: runner.acknowledgeDialogue()
+                    case .waiting: runner.advanceWait()
+                    default: break
+                    }
+                }
+                XCTAssertTrue(reachedGameOver, "A dropped crowbar must finish its warning dialogue and request the source game-over menu")
+            }
         }
     }
 
     @MainActor func testRendererUsesOriginalAssets() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { throw XCTSkip("Metal unavailable on this host") }
         let renderer = try OriginalCrowbarRenderer(tornPaper: true)
         let states = [("entry", OriginalCrowbarProcess()), ("placed", try placedProcess()), ("lifted", try liftedProcess(through: 6))]
         for (name, state) in states {
             let image = try renderer.render(state)
-            XCTAssertEqual(image.width, 192)
-            XCTAssertEqual(image.height, 256)
+            XCTAssertEqual(image.width, 768)
+            XCTAssertEqual(image.height, 1024)
             if let folder = ProcessInfo.processInfo.environment["SNAPSHOT_DIR"] {
                 try FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: true)
                 let path = URL(fileURLWithPath: folder).appendingPathComponent("crowbar-\(name).png")

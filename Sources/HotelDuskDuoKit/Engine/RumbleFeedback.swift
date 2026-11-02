@@ -3,6 +3,16 @@ import Foundation
 import CoreHaptics
 #endif
 
+enum RumbleTiming {
+    static let minimumDuration = 0.08
+    static let maximumDuration = 30.0
+
+    static func durationSeconds(frameCount: Int?, updatesPerSecond: Double) -> Double {
+        let frames = max(0, frameCount ?? 8)
+        return min(max(Double(frames) / updatesPerSecond, minimumDuration), maximumDuration)
+    }
+}
+
 /**
  * Plays recovered rumble effects through the current device.
  */
@@ -31,15 +41,22 @@ public final class SystemRumbleFeedback: RumbleFeedback {
     public init() {
         #if os(iOS)
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        engine = try? CHHapticEngine()
+        let hapticEngine = try? CHHapticEngine()
+        hapticEngine?.resetHandler = { [weak self] in
+            Task { @MainActor [weak self] in self?.player = nil }
+        }
+        hapticEngine?.stoppedHandler = { [weak self] _ in
+            Task { @MainActor [weak self] in self?.player = nil }
+        }
+        engine = hapticEngine
         #endif
     }
 
     public func playRumble(durationFrames: Int?) {
         #if os(iOS)
         guard let engine else { return }
-        let frameDuration = 1 / OriginalPlaySession.updatesPerSecond
-        let duration = min(max(Double(durationFrames ?? 8) * frameDuration, 0.08), 30)
+        let duration = RumbleTiming.durationSeconds(frameCount: durationFrames,
+                                                    updatesPerSecond: OriginalPlaySession.updatesPerSecond)
         let parameters = [
             CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.72),
             CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.24)

@@ -16,6 +16,63 @@ final class OriginalAudioTests: XCTestCase {
         XCTAssertNil(audio.lastError)
     }
 
+    func testPuzzleAudioMappingsResolveToTheirNamedSourceCues() throws {
+        let audio = AudioController()
+        audio.isMuted = true
+        let cues: [(Int, Int, String)] = [
+            (40, 0, "SE_NAZOTOKI_HAIDENBAN_MASTER_ON"),
+            (40, 2, "SE_NAZOTOKI_HAIDENBAN_KEITOU_ON"),
+            (40, 3, "SE_NAZOTOKI_HAIDENBAN_KEITOU_OFF"),
+            (45, 0, "SE_NAZOTOKI_218_TOILET_1_LEVER"),
+            (55, 1, "SE_NAZOTOKI_SUIT_CASE_CLOSE"),
+            (38, 0, "SE_EVENT_SCENE_IN_HYDE_s_SUIT_CASE_ASARU"),
+            (7, 0, "ME_ITEM_NYUUSHU"),
+            (8, 1, "SE_SYSTEM_SELECT"),
+            (30, 0, "SE_NAZOTOKI_CABINET_AGE_BAR_IRERU"),
+            (30, 1, "SE_NAZOTOKI_CABINET_AGE_MOCHIAGE"),
+            (30, 2, "SE_NAZOTOKI_CABINET_AGE_KAGU_CHAKUCHI"),
+            (29, 0, "SE_NAZOTOKI_MEMO_HIPPARI_YABURE"),
+            (29, 1, "SE_NAZOTOKI_MEMO_HIPPARI_YABURE_END"),
+            (29, 2, "SE_NAZOTOKI_MEMO_HIPPARI_UGOKASU"),
+            (39, 1, "SE_EVENT_SCENE_DAN_BOUL_NAKA_SHIORI"),
+            (39, 0, "SE_EVENT_SCENE_DAN_BOUL_NAKA_OPEN"),
+            (46, 0, "SE_NAZOTOKI_218_TOILET_2_FUTA_SLIDE"),
+            (44, 2, "SE_NAZOTOKI_LABEL_HAGASHI_HAGASU"),
+            (33, 0, "SE_NAZOTOKI_KABANAKE_KACHA"),
+            (33, 2, "SE_NAZOTOKI_KABANAKE_KAGI_OSU"),
+            (34, 0, "SE_NAZOTOKI_TEN_TSUNAGU"),
+            (50, 0, "SE_NAZOTOKI_KAZARIMOJI_KEZURU"),
+            (50, 1, "SE_NAZOTOKI_KAZARIMOJI_KONA_FUKIKAKERU"),
+            (6, 0, "ME_NAZOTOKI_SHIPPAI"),
+            (1, 0, "ME_NAZOTOKI_SEIKOU")
+        ]
+
+        for (archiveID, entryID, symbol) in cues {
+            try audio.playOriginalEffect(archiveID: archiveID, entryID: entryID)
+            XCTAssertEqual(audio.soundEffectsHistory.last, symbol)
+            XCTAssertNil(audio.lastError)
+        }
+    }
+
+    func testSingleArchivePuzzleCuesResolveToTheirFirstSourceEntry() throws {
+        let audio = AudioController()
+        audio.isMuted = true
+        let cues: [(Int, String)] = [
+            (6, "ME_NAZOTOKI_SHIPPAI"),
+            (28, "SE_NAZOTOKI_CLIP_NOBASHI"),
+            (31, "SE_NAZOTOKI_CABINET_KAGI_AKE_DIAL"),
+            (32, "SE_NAZOTOKI_HARIGANEDUKURI"),
+            (33, "SE_NAZOTOKI_KABANAKE_KACHA"),
+            (55, "SE_NAZOTOKI_SUIT_CASE_OPEN")
+        ]
+        for (archiveID, symbol) in cues {
+            try audio.playOriginalEffect(archiveID: archiveID)
+            XCTAssertEqual(audio.soundEffectsHistory.last, symbol)
+            XCTAssertNil(audio.lastError)
+        }
+        XCTAssertNoThrow(try audio.applyOriginalCommand(.stopEffect(archiveID: 33, entryID: 0, fadeFrames: 1)))
+    }
+
     func testDialogueAudioUsesOriginalLookupOrderAndStopSemantics() throws {
         let table = try OriginalDialogueAudio.load()
         XCTAssertEqual(try table.command(for: .music(mode: 0, name: "BGM_36")), .startMusic(sequenceID: 35))

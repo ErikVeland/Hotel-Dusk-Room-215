@@ -34,9 +34,9 @@ final class OriginalRosaRouteTests: XCTestCase {
             keywords: OriginalKeywordTable(decoded: catalog.decodedFile("EP1_.ttk")))
         runner.talkToPerson(5)
         XCTAssertEqual(runner.eventIndex, 67)
-        let audio = AudioController()
-        audio.isMuted = true
-        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
+        let audio = originalRouteTestAudio()
+        let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog,
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
         defer { play.stop() }
         advance(play)
         XCTAssertEqual(play.runner.phase, .picture(id: 24))

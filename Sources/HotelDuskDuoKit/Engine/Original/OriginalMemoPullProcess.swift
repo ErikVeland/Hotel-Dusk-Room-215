@@ -81,7 +81,7 @@ public struct OriginalMemoPullProcess: Equatable, Sendable {
                 tearSpeed = 0.06
                 soundStage = 3
                 stage = 1
-                return [.sound(archive: 2, entry: 29)]
+                return [.sound(archive: 29, entry: 2)]
             case 1:
                 /**
                  * 0x021FDA1C compares the incremented animation counter with zero.
@@ -90,7 +90,7 @@ public struct OriginalMemoPullProcess: Equatable, Sendable {
                 tearSpeed -= 0.005
                 position.x += Int32((tearSpeed * 4096).rounded(.toNearestOrAwayFromZero))
                 stage = 2
-                return [.torn, .sound(archive: 0, entry: 6)]
+                return [.torn, .sound(archive: 6, entry: 0)]
             case 2:
                 timer += 1
                 if timer > 120 { timer = 0; phase = 3; stage = 0 }
@@ -126,14 +126,14 @@ public struct OriginalMemoPullProcess: Equatable, Sendable {
         if pull > 0.35 {
             phase = 2
             stage = 0
-            effects += [.hideCaption, .completionFade(60), .sound(archive: 1, entry: 29)]
+            effects += [.hideCaption, .completionFade(60), .sound(archive: 29, entry: 1)]
         } else if pull <= 0.34, pull > 0.30 {
-            if soundStage == 1 { effects.append(.sound(archive: 0, entry: 29)) }
+            if soundStage == 1 { effects.append(.sound(archive: 29, entry: 0)) }
             soundStage = 2
         }
         if soundStage == 0 {
             soundStage = 1
-            effects.append(.sound(archive: 0, entry: 29))
+            effects.append(.sound(archive: 29, entry: 2))
         }
         return effects
     }

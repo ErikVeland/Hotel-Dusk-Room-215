@@ -28,10 +28,10 @@ final class OriginalLabelPeelSessionTests: XCTestCase {
         defer { play.stop() }
 
         for _ in 0..<65 { play.advanceFrame() }
-        for y in stride(from: 52, through: 204, by: 8) {
+        for y in stride(from: 52, through: 204, by: 10) {
             play.holdLabelPeelTouch(x: 36, y: Float(y))
             play.advanceFrame()
-            for x in stride(from: 38, through: 156, by: 2) {
+            for x in stride(from: 46, through: 156, by: 10) {
                 play.holdLabelPeelTouch(x: Float(x), y: Float(y))
                 play.advanceFrame()
             }
@@ -54,11 +54,12 @@ final class OriginalLabelPeelSessionTests: XCTestCase {
         XCTAssertEqual(play.labelPeel?.stage, .peel)
 
         for _ in 0..<65 { play.advanceFrame() }
-        for _ in 0..<5 {
-            play.holdLabelPeelTouch(x: 150, y: 70)
+        for expectedPosition in [793, 111] {
+            play.holdLabelPeelTouch(x: 150, y: 72)
             play.advanceFrame()
-            play.holdLabelPeelTouch(x: 132, y: 88)
+            play.holdLabelPeelTouch(x: 132, y: 90)
             play.advanceFrame()
+            XCTAssertEqual(play.labelPeel?.sourcePosition, expectedPosition)
             play.releaseLabelPeelTouch()
             play.advanceFrame()
         }

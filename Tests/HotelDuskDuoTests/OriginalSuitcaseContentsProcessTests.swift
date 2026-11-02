@@ -85,7 +85,7 @@ final class OriginalSuitcaseContentsProcessTests: XCTestCase {
         try process.update(game: game)
         try process.update(game: game)
         for _ in 0..<60 { try process.update(game: game) }
-        XCTAssertEqual(try process.update(game: game), [.fadeOut(60), .sound(archive: 1, entry: 55)])
+        XCTAssertEqual(try process.update(game: game), [.fadeOut(60), .sound(archive: 55, entry: 1)])
         for _ in 0..<60 { try process.update(game: game, fadeComplete: false) }
         XCTAssertNil(process.result)
         XCTAssertEqual(try process.update(game: game), [.completed(0)])

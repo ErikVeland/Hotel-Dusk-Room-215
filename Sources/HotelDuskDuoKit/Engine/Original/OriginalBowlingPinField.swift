@@ -343,11 +343,22 @@ public struct OriginalBowlingPinField: Equatable, Sendable {
     }
 
     private static func advanceAngularMotion(_ pin: inout Pin) {
+        if pin.angularVelocity == 0,
+           pin.rotation == positiveRotationLimit || pin.rotation == negativeRotationLimit {
+            return
+        }
+
         let twoPi = 2 * Float.pi
         var rotation = (pin.rotation + pin.angularVelocity).truncatingRemainder(dividingBy: twoPi)
         if rotation < 0 { rotation += twoPi }
 
-        if pin.angularVelocity > 0, rotation > positiveRotationLimit {
+        if pin.angularVelocity > 0, pin.rotation >= positiveRotationLimit {
+            pin.rotation = positiveRotationLimit
+            pin.angularVelocity = 0
+        } else if pin.angularVelocity < 0, pin.rotation >= negativeRotationLimit {
+            pin.rotation = negativeRotationLimit
+            pin.angularVelocity = 0
+        } else if pin.angularVelocity > 0, rotation > positiveRotationLimit {
             pin.rotation = positiveRotationLimit
             pin.angularVelocity = 0
         } else if pin.angularVelocity < 0, rotation < negativeRotationLimit {

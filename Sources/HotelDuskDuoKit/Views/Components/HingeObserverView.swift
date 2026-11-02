@@ -11,6 +11,7 @@ struct HingeObserverView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         view.isUserInteractionEnabled = false
+        #if compiler(>=6.4)
         if #available(iOS 27.1, *) {
             let interaction = UIHingeInteraction { [weak manager] _, update in
                 guard let manager, let hinge = update.hinge else { return }
@@ -30,6 +31,7 @@ struct HingeObserverView: UIViewRepresentable {
             }
             view.addInteraction(interaction)
         }
+        #endif
         return view
     }
 
@@ -37,6 +39,7 @@ struct HingeObserverView: UIViewRepresentable {
 
     /// `status` is the reliable signal; the angle's precision is system policy.
     /// Pin the end states so posture changes do not depend on angle accuracy.
+    #if compiler(>=6.4)
     @available(iOS 27.1, *)
     static func degrees(for hinge: UIHinge) -> Double {
         switch hinge.status {
@@ -48,5 +51,6 @@ struct HingeObserverView: UIViewRepresentable {
             return Double(hinge.angle) * 180 / .pi
         }
     }
+    #endif
 }
 #endif

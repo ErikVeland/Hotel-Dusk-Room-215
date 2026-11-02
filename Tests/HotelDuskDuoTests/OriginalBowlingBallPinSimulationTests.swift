@@ -166,6 +166,7 @@ final class OriginalBowlingBallPinSimulationTests: XCTestCase {
             XCTAssertEqual(nativePin.needsUpdate, sourcePin.needsUpdate,
                            "pin \(index) update flag")
         }
+
     }
 
     private func vector(_ values: [Int32]) throws -> SIMD3<Int32> {

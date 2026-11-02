@@ -195,6 +195,21 @@ final class OriginalBowlingPinFieldTests: XCTestCase {
         XCTAssertEqual(pins.pins[1].angularVelocity, 0)
     }
 
+    func testAngularMotionAtTheSourceLimitStaysStopped() {
+        var pins = OriginalBowlingPinField()
+        _ = pins.setPin(.init(positionFixed20_12: .zero, rotation: .pi / 2,
+                              angularVelocity: 0, needsUpdate: true), at: 0)
+        _ = pins.setPin(.init(positionFixed20_12: .zero, rotation: 3 * .pi / 2,
+                              angularVelocity: 0, needsUpdate: true), at: 1)
+
+        pins.advanceMotion()
+
+        XCTAssertEqual(pins.pins[0].rotation, .pi / 2, accuracy: 0.000001)
+        XCTAssertEqual(pins.pins[0].angularVelocity, 0)
+        XCTAssertEqual(pins.pins[1].rotation, 3 * .pi / 2, accuracy: 0.000001)
+        XCTAssertEqual(pins.pins[1].angularVelocity, 0)
+    }
+
     func testLinearMotionStopsDampedComponentsBelowSourceThreshold() {
         var pins = OriginalBowlingPinField()
         let movingPin = OriginalBowlingPinField.Pin(

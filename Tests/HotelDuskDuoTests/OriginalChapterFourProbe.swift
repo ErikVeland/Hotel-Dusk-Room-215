@@ -25,7 +25,9 @@ final class OriginalChapterFourProbe: XCTestCase {
                 saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)))
         } else {
             let chapterDirectory = URL(fileURLWithPath: directory).appendingPathComponent(ProcessInfo.processInfo.environment["PROBE_CHAPTER"] ?? "chapter6")
-            let save = try XCTUnwrap(try OriginalChapterFileStore(directory: chapterDirectory).load(slot: 0))
+            guard let save = try OriginalChapterFileStore(directory: chapterDirectory).load(slot: 0) else {
+                throw XCTSkip("The probe chapter save is unavailable")
+            }
             play = try OriginalPlaySession.restoring(save, audio: audio,
                 saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)))
             play.continueChapterTitle()

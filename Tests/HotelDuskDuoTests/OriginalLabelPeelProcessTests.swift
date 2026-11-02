@@ -127,6 +127,20 @@ final class OriginalLabelPeelProcessTests: XCTestCase {
         XCTAssertEqual(process.result, 0)
     }
 
+    func testSavedPeelPositionAcceptsAValidProjectedDrag() {
+        let mask = [UInt8](repeating: 1, count: OriginalLabelPeelProcess.width * OriginalLabelPeelProcess.height)
+        var process = OriginalLabelPeelProcess(mask: mask, stage: .peel,
+                                               sourceStateWord: UInt16(OriginalLabelPeelProcess.peelPositionBias + 793))
+        _ = process.update()
+
+        _ = process.update(pageTouch: SIMD2(150, 72))
+        _ = process.update(pageTouch: SIMD2(132, 90))
+
+        XCTAssertEqual(process.sourcePosition, 111)
+        XCTAssertTrue(process.isPeelComplete)
+        XCTAssertTrue(process.update().contains(.fadeOut(60)))
+    }
+
     func testSourceBrushUsesTenPixelRadiusAfterTheFirstTouchFrame() {
         let mask = [UInt8](repeating: 1, count: OriginalLabelPeelProcess.width * OriginalLabelPeelProcess.height)
         var process = OriginalLabelPeelProcess(mask: mask)

@@ -1198,9 +1198,11 @@ final class OriginalChapterReviewTests: XCTestCase {
     }
 
     @MainActor func testChapterTenR302RevealedPaintingCompletesNormalEnding() throws {
-        let directory = try XCTUnwrap(ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"])
-        let checkpoint = try XCTUnwrap(OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-            .appendingPathComponent("chapter10-r302-painting-revealed")).load())
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter10-r302-painting-revealed")).load() else {
+            throw XCTSkip("Complete the R302 painting route first")
+        }
         let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)),
