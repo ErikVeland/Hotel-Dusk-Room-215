@@ -1,4 +1,8 @@
 import importlib.util
+import base64
+import hashlib
+import json
+import struct
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -15,6 +19,25 @@ spec.loader.exec_module(verify)
 
 
 class VerificationTests(unittest.TestCase):
+    @staticmethod
+    def route_state(chapter, map_id):
+        state = bytearray(0x7D58)
+        struct.pack_into("<H", state, 0, chapter)
+        struct.pack_into("<h", state, 4, map_id)
+        return bytes(state)
+
+    @classmethod
+    def route_save(cls, chapter, map_id, version=1):
+        state = cls.route_state(chapter, map_id)
+        record = {"version": version, "state": base64.b64encode(state).decode(),
+                  "stateSHA256": hashlib.sha256(state).hexdigest()}
+        if version == 2:
+            record["progress"] = {"version": 1, "note": "ending"}
+            progress = json.dumps(record["progress"], sort_keys=True, separators=(",", ":"),
+                                  ensure_ascii=False, allow_nan=False).encode("utf-8")
+            record["progressSHA256"] = hashlib.sha256(progress).hexdigest()
+        return record
+
     def test_temporary_route_probe_is_excluded_from_release_profiles(self):
         groups = verify.classify_tests()
         self.assertNotIn('OriginalChapterFourProbe', sum(groups.values(), []))
@@ -75,6 +98,116 @@ Test Case '-[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfClose
             second = verify.route_checkpoint_state(checkpoint_directory)
         self.assertNotEqual(first, second)
 
+    def test_fresh_route_gate_checks_chapter_three_and_ending_saves(self):
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            records = {
+                "chapter3-entry": self.route_save(2, 31),
+                "chapter10-ending": self.route_save(9, 31, version=2),
+            }
+            for name, record in records.items():
+                directory = root / name
+                directory.mkdir()
+                (directory / "resume.json").write_text(json.dumps(record))
+
+            result = verify.fresh_route_checkpoint_result(root)
+
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["passed"], 2)
+        self.assertEqual(result["failed"], 0)
+        self.assertEqual(result["cases"], {
+            "fresh-route-checkpoints/chapter3-entry": "passed",
+            "fresh-route-checkpoints/chapter10-ending": "passed",
+        })
+        self.assertEqual(result["reasons"], {})
+
+    def test_fresh_route_gate_fails_for_missing_handoffs(self):
+        with TemporaryDirectory() as temporary_directory:
+            result = verify.fresh_route_checkpoint_result(Path(temporary_directory))
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["passed"], 0)
+        self.assertEqual(result["failed"], 2)
+        self.assertTrue(all("missing" in reason for reason in result["reasons"].values()))
+
+    def test_fresh_route_gate_fails_for_damaged_handoff(self):
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            entry = root / "chapter3-entry"
+            entry.mkdir()
+            (entry / "resume.json").write_text(json.dumps(self.route_save(2, 31)))
+            ending = root / "chapter10-ending"
+            ending.mkdir()
+            damaged = self.route_save(9, 31, version=2)
+            damaged["stateSHA256"] = "damaged"
+            (ending / "resume.json").write_text(json.dumps(damaged))
+
+            result = verify.fresh_route_checkpoint_result(root)
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["passed"], 1)
+        self.assertEqual(result["failed"], 1)
+        self.assertEqual(result["cases"]["fresh-route-checkpoints/chapter10-ending"], "failed")
+        self.assertIn("checksum", result["reasons"]["fresh-route-checkpoints/chapter10-ending"])
+
+    def test_fresh_route_gate_fails_for_a_valid_save_at_the_wrong_location(self):
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            entry = root / "chapter3-entry"
+            entry.mkdir()
+            (entry / "resume.json").write_text(json.dumps(self.route_save(2, 14)))
+            ending = root / "chapter10-ending"
+            ending.mkdir()
+            (ending / "resume.json").write_text(json.dumps(self.route_save(9, 31, version=2)))
+
+            result = verify.fresh_route_checkpoint_result(root)
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["passed"], 1)
+        self.assertEqual(result["failed"], 1)
+        self.assertIn("Chapter 3, map 31",
+                      result["reasons"]["fresh-route-checkpoints/chapter3-entry"])
+
+    def test_fresh_route_gate_rejects_version_two_save_without_progress_checksum(self):
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            entry = root / "chapter3-entry"
+            entry.mkdir()
+            (entry / "resume.json").write_text(json.dumps(self.route_save(2, 31)))
+            ending = root / "chapter10-ending"
+            ending.mkdir()
+            record = self.route_save(9, 31, version=2)
+            record.pop("progressSHA256")
+            (ending / "resume.json").write_text(json.dumps(record))
+
+            result = verify.fresh_route_checkpoint_result(root)
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["passed"], 1)
+        self.assertEqual(result["failed"], 1)
+        self.assertIn("invalid checksum",
+                      result["reasons"]["fresh-route-checkpoints/chapter10-ending"])
+
+    def test_fresh_route_gate_rejects_damaged_version_two_progress(self):
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            entry = root / "chapter3-entry"
+            entry.mkdir()
+            (entry / "resume.json").write_text(json.dumps(self.route_save(2, 31)))
+            ending = root / "chapter10-ending"
+            ending.mkdir()
+            record = self.route_save(9, 31, version=2)
+            record["progressSHA256"] = "0" * 64
+            (ending / "resume.json").write_text(json.dumps(record))
+
+            result = verify.fresh_route_checkpoint_result(root)
+
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["passed"], 1)
+        self.assertEqual(result["failed"], 1)
+        self.assertIn("invalid checksum",
+                      result["reasons"]["fresh-route-checkpoints/chapter10-ending"])
+
     def test_reference_result_keeps_failures_from_earlier_passes(self):
         case = 'OriginalStoryContinuationTests/testChapterNineRoute'
         results = [
@@ -134,6 +267,21 @@ Test Case '-[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfClose
 
     def test_xctest_discovery_flags_are_omitted_for_older_swiftpm(self):
         self.assertEqual(verify.xctest_flags("Usage: swift test [options]"), [])
+
+    def test_xctest_preflight_reports_missing_test_framework(self):
+        self.assertEqual(
+            verify.xctest_preflight_failure(1, "error: no such module 'XCTest'"),
+            "The selected Swift toolchain does not provide XCTest.",
+        )
+
+    def test_xctest_preflight_reports_compiler_sdk_mismatch(self):
+        self.assertEqual(
+            verify.xctest_preflight_failure(1, "error: SDK is not supported by the compiler"),
+            "The selected Swift compiler and SDK versions do not match.",
+        )
+
+    def test_xctest_preflight_accepts_a_successful_import(self):
+        self.assertIsNone(verify.xctest_preflight_failure(0, ""))
 
     def test_fresh_route_checkpoints_use_a_new_retained_directory(self):
         with TemporaryDirectory() as temporary_directory:

@@ -58,4 +58,4 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift test --filter 'Or
 
 ## Remaining work
 
-The connected Chapter 1–2 route now reaches the Chapter 3 entry. The broader normal-input checkpoint chain continues from there through the Chapter 10 ending, as recorded in [Chapter 3 progress](chapter-three-progress.md). That chain restores checkpoints between sections, so it does not prove one uninterrupted app session. Alternate branches, exhaustive movement boundary checks, original character composition, cinematic presentation, audio fidelity and physical Duo checks remain open.
+The connected Chapter 1–2 route now reaches the Chapter 3 entry. Earlier normal-input checkpoint tests continued from there through the Chapter 10 ending, as recorded in [Chapter 3 progress](chapter-three-progress.md). They predate the current source tree and do not establish current full-route solvability. Alternate branches, exhaustive movement boundary checks, original character composition, cinematic presentation, audio fidelity and physical Duo checks remain open.

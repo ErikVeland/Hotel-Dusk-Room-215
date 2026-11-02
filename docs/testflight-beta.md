@@ -2,7 +2,7 @@
 
 The beta uses bundle ID `com.veland.hoteldusk.duo`, version `0.1`, and signing team `54WU29TRTY`.
 The archive command sets the build number. Use a new number for each upload.
-The checkpointed native-input route reaches the Chapter 10 ending. One uninterrupted session, every branch, source fidelity and device behaviour are not yet verified. See [current game status](../README.md).
+Earlier checkpointed native-input tests reached the Chapter 10 ending. They predate the current source tree. Full-route solvability on this checkout, every branch, source fidelity and device behaviour are not verified. See [current game status](../README.md).
 
 ## Preparation result — 1 November 2026
 
@@ -46,7 +46,7 @@ Resolve or explicitly scope these issues before inviting testers. The device che
 
 The recorded checks used Xcode 26.6. The fast profile passed with 305 tests, no failures and five skips. The skipped tests need isolated artwork candidate files. These are historical results, not current-tree verification. Xcode 27.2 is now installed, but its licence is not accepted, so current XCTest and iOS build checks cannot run. See `.build/verification/goal-fast-ios-current/report.json`.
 
-The full reference profile passed with 307 tests, no failures and eight skips. The skips include seven Metal renderer checks and one Chapter 4 probe without its save. Checkpointed normal-input tests cover the required route through the Chapter 10 ending. They do not prove one uninterrupted session, every branch, source fidelity or device input. See `.build/verification/goal-reference-final-xcode/report.json`.
+The earlier reference profile passed with 307 tests, no failures and eight skips. The skips include seven Metal renderer checks and one Chapter 4 probe without its save. Those checkpointed normal-input tests reached the Chapter 10 ending before the current source tree. They do not prove current full-route solvability, one uninterrupted session, every branch, source fidelity or device input. See `.build/verification/goal-reference-final-xcode/report.json`.
 
 The audio profile passed 29 tests and four source-audio checks, with no failures. Nine playback checks skipped because Apple sampler and audio-player units are unavailable in this environment. The source-backed checks cover both archive-entry cues and single-archive puzzle cues. They do not verify playback timbre, perceived level or physical haptic timing. See `.build/verification/goal-audio-after-legacy-cue-fix/report.json`.
 

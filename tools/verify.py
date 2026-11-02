@@ -9,12 +9,14 @@ Examples:
   python3 tools/verify.py --profile all --ios --strict
 """
 import argparse
+import base64
 from datetime import datetime, timezone
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
+import struct
 import subprocess
 import sys
 import time
@@ -117,6 +119,48 @@ def route_checkpoint_state(directory):
                  for path in files)
 
 
+def fresh_route_checkpoint_result(directory):
+    """Require intact saves at the expected fresh-route handoffs."""
+    expected = {"chapter3-entry": (2, 31), "chapter10-ending": (9, 31)}
+    cases = {}
+    reasons = {}
+    for name, (chapter, map_id) in expected.items():
+        path = directory / name / "resume.json"
+        try:
+            record = json.loads(path.read_text())
+            state = base64.b64decode(record["state"], validate=True)
+            valid = record.get("version") in (1, 2) and hashlib.sha256(state).hexdigest() == record.get("stateSHA256")
+            if valid and (len(state) != 0x7D58 or struct.unpack_from("<H", state)[0] != chapter or
+                          struct.unpack_from("<h", state, 4)[0] != map_id):
+                valid = False
+                detail = f"save is not at Chapter {chapter + 1}, map {map_id}"
+            elif valid and record["version"] == 2:
+                progress = record.get("progress")
+                progress_bytes = json.dumps(progress, sort_keys=True, separators=(",", ":"),
+                                            ensure_ascii=False, allow_nan=False).encode("utf-8")
+                progress_digest = hashlib.sha256(progress_bytes).hexdigest()
+                if not isinstance(progress, dict) or progress_digest != record.get("progressSHA256"):
+                    valid = False
+                    detail = "version 2 interaction progress is missing or has an invalid checksum"
+                else:
+                    detail = "passed"
+            elif valid:
+                detail = "passed"
+            else:
+                detail = "state checksum or version is invalid"
+        except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as error:
+            valid = False
+            detail = f"save is missing or invalid: {error}"
+        cases[f"fresh-route-checkpoints/{name}"] = "passed" if valid else "failed"
+        if not valid:
+            reasons[f"fresh-route-checkpoints/{name}"] = detail
+    failed = sum(status == "failed" for status in cases.values())
+    return {"name": "fresh-route-checkpoints", "command": ["verify", "fresh-route-checkpoints"],
+            "status": "failed" if failed else "passed", "exitCode": int(bool(failed)), "seconds": 0,
+            "log": "", "passed": len(expected) - failed, "failed": failed, "skipped": 0,
+            "cases": cases, "reasons": reasons}
+
+
 def merge_test_results(name, results, strict=False):
     """Keep each test's latest status across dependency-driven reruns."""
     cases = {}
@@ -170,6 +214,37 @@ def xctest_flags(help_output):
     if "--disable-swift-testing" in help_output:
         flags.append("--disable-swift-testing")
     return flags
+
+
+def xctest_preflight_failure(return_code, output):
+    """Describe why the selected compiler cannot build an XCTest import."""
+    if return_code == 0:
+        return None
+    if "no such module 'XCTest'" in output or 'no such module "XCTest"' in output:
+        return "The selected Swift toolchain does not provide XCTest."
+    if "SDK is not supported by the compiler" in output:
+        return "The selected Swift compiler and SDK versions do not match."
+    diagnostic = next((line.strip() for line in reversed(output.splitlines())
+                       if "error:" in line), "Swift could not import XCTest.")
+    return f"The XCTest preflight failed: {diagnostic}"
+
+
+def xctest_preflight(env):
+    """Check XCTest availability before SwiftPM compiles the full test target."""
+    result = subprocess.run(["swiftc", "-typecheck", "-"], input="import XCTest\n",
+                            capture_output=True, text=True, check=False, env=env)
+    output = result.stdout + result.stderr
+    return xctest_preflight_failure(result.returncode, output), output
+
+
+def unavailable_swift_group(name, directory, reason, output):
+    """Record a failed test group when its required XCTest module is absent."""
+    log = directory / "xctest-preflight.log"
+    log.write_text(output or reason + "\n")
+    print(f"{name}: failed; {reason}", flush=True)
+    return {"name": name, "command": ["swiftc", "-typecheck", "-"], "status": "failed",
+            "exitCode": 1, "seconds": 0, "log": str(log), "passed": 0, "failed": 0,
+            "skipped": 0, "cases": {}, "reason": reason}
 
 
 def supported_xctest_flags():
@@ -257,7 +332,25 @@ def main():
     command_prefix = ["swift", "test", *supported_xctest_flags(), "--disable-sandbox"]
     if args.scratch_path:
         command_prefix += ["--scratch-path", str(args.scratch_path.resolve())]
-    if args.profile == "reference":
+    swift_groups = ("reference",) if args.profile == "reference" else (
+        ("fast", "audio", "native", "reference") if args.profile == "all" else (args.profile,)
+    )
+    has_swift_tests = any(groups.get(name) for name in swift_groups)
+    preflight_reason, preflight_output = xctest_preflight(env) if has_swift_tests else (None, "")
+    if preflight_reason:
+        if args.profile == "reference":
+            results.append(unavailable_swift_group("swift-reference", directory,
+                                                   preflight_reason, preflight_output))
+        elif args.profile == "all":
+            if any(groups[name] for name in ("fast", "audio", "native")):
+                results.append(unavailable_swift_group("swift-non-reference", directory,
+                                                       preflight_reason, preflight_output))
+            results.append(unavailable_swift_group("swift-reference", directory,
+                                                   preflight_reason, preflight_output))
+        elif groups.get(args.profile):
+            results.append(unavailable_swift_group("swift", directory,
+                                                   preflight_reason, preflight_output))
+    elif args.profile == "reference":
         results.append(run_reference_group(groups["reference"], directory, env, args.strict,
                                            checkpoint_dir, command_prefix))
     elif args.profile == "all":
@@ -273,6 +366,13 @@ def main():
     else:
         results.append({"name": "swift", "status": "failed", "exitCode": 1, "passed": 0, "failed": 0, "skipped": 0,
                         "seconds": 0, "log": "", "cases": {}, "reason": "No test classes matched the selected profile"})
+    if args.profile == "all" and fresh_checkpoints and checkpoint_dir is not None:
+        route_result = fresh_route_checkpoint_result(checkpoint_dir)
+        results.append(route_result)
+        print(f"fresh-route-checkpoints: {route_result['status']}; "
+              f"{route_result['passed']} passed, {route_result['failed']} failed", flush=True)
+        for checkpoint, reason in route_result["reasons"].items():
+            print(f"{checkpoint}: {reason}", flush=True)
     if args.profile in ("audio", "all"):
         if (ROOT / "extracted/audio/inventory.json").exists():
             results.append(run_group("source-audio", [sys.executable, "tools/test_original_audio.py"], directory, env, args.strict))
@@ -299,6 +399,10 @@ def main():
     skipped = [name for result in results for name, status in result["cases"].items() if status == "skipped"]
     if skipped:
         lines += ["", "## Skipped coverage", ""] + [f"- `{name}`" for name in skipped]
+    failed_route_checks = [(name, reason) for result in results for name, reason in result.get("reasons", {}).items()]
+    if failed_route_checks:
+        lines += ["", "## Fresh route checkpoint failures", ""]
+        lines += [f"- `{name}`: {reason}" for name, reason in failed_route_checks]
     lines += ["", "Logs and individual test outcomes are in report.json. A passing check does not establish complete route or presentation fidelity.", ""]
     (directory / "report.md").write_text("\n".join(lines))
     print(f"Report: {directory / 'report.md'}", flush=True)

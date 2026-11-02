@@ -1,6 +1,6 @@
 # Chapter 3 progress
 
-The fresh-game normal-input test chain starts at Chapter 1 arrival, reaches the Chapter 3 checkpoints, and continues through the Chapter 10 ending. Focused route tests restore instant-save checkpoints between sections, so this confirms the connected route rather than one uninterrupted app session.
+An earlier fresh-game normal-input test chain started at Chapter 1 arrival, reached the Chapter 3 checkpoints, and continued through the Chapter 10 ending. It predates the current source tree and restored instant-save checkpoints between route sections. Full-route solvability on the current tree remains unverified.
 
 ## Checked story path
 
@@ -8,7 +8,7 @@ The fresh-game normal-input test chain starts at Chapter 1 arrival, reaches the 
 
 `OriginalChapterThreeRouteChecks` continues through Kevin in the Central Hallway, Louie in the restaurant reception and Iris's conversation. It enters the dining room, collects Melissa's rag doll, completes dinner and asks Summer and Rosa the required questions. Talking to Louie afterwards completes the 6:20 PM clock transition and returns to walking in the restaurant reception. Route helpers use ordinary movement, collision, dialogue, question and interaction methods. They do not grant items or set story flags.
 
-The optional `HOTEL_DUSK_ROUTE_CHECKPOINTS` test directory stores checkpoints reached by the full route. Focused continuation tests restore those files through the same native save APIs as the app. They explicitly skip when the checkpoints are absent. These files are test outputs, not bundled chapter shortcuts.
+The optional `HOTEL_DUSK_ROUTE_CHECKPOINTS` test directory stores route checkpoints. Focused continuation tests restore those files through the same native save APIs as the app. They explicitly skip when the checkpoints are absent. These files are test outputs, not bundled chapter shortcuts. The current strict fresh-route check could not run because this Command Line Tools installation has no XCTest module.
 
 ## Shared runtime changes
 
@@ -25,7 +25,7 @@ The catalog enables 37 rooms with original collision data and floor plans. Every
 
 ## Remaining work
 
-Native handlers cover the full, reverse and restored jigsaws (39, 40, 84), electrical panel (41), fountain pen (42), bookmark box (47) and four-pin door lock (77). Input and source-event tests cover these additions. The fresh-game checkpoint chain now reaches the Chapter 10 ending. Alternate branches, failure paths, game-over retries, original character presentation, original-device fidelity and physical Duo testing remain incomplete. See the [route tracing workbench](route-tracing-workbench.md) for remaining fidelity checks.
+Native handlers cover the full, reverse and restored jigsaws (39, 40, 84), electrical panel (41), fountain pen (42), bookmark box (47) and four-pin door lock (77). Input and source-event tests cover these additions. The earlier fresh-game checkpoint chain reached the Chapter 10 ending, but does not verify the current source tree. Alternate branches, failure paths, game-over retries, original character presentation, original-device fidelity and physical Duo testing remain incomplete. See the [route tracing workbench](route-tracing-workbench.md) for current route evidence and remaining checks.
 
 The author walkthrough identifies the route and dependencies: [neeker's walkthrough](https://gamefaqs.gamespot.com/ds/933043-hotel-dusk-room-215/faqs/46777). Recovered game scripts and native source determine state changes. New continuation checks establish native playability, not a complete byte-for-byte comparison with a matching original run.
 

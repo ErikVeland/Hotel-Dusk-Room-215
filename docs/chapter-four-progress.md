@@ -1,6 +1,6 @@
 # Chapter 4 progress
 
-The fresh-game normal-input checkpoint chain reaches Chapter 4 from the Chapter 3 finale, completes the Chapter 4 review, and continues through the Chapter 10 ending. Focused tests restore instant-save checkpoints between route sections. Selected original-device fidelity checks remain open.
+An earlier fresh-game normal-input checkpoint chain reached Chapter 4 from the Chapter 3 finale, completed the Chapter 4 review, and continued through the Chapter 10 ending. It predates the current source tree and restored instant-save checkpoints between route sections. Full-route solvability on the current tree remains unverified. Selected original-device fidelity checks remain open.
 
 ## Checked story path
 

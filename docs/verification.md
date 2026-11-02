@@ -20,7 +20,22 @@ the profile with the required host or fixture dependency.
 
 The project tests use XCTest. The verifier enables XCTest discovery when the
 installed SwiftPM supports it. Older SwiftPM versions use their default test
-runner.
+runner. Before SwiftPM compiles the test target, the verifier checks that the
+selected Swift compiler can import XCTest. If the import fails, it records a
+failed Swift group with the compiler reason and continues independent checks.
+This preflight does not count as a test run or route evidence.
+
+Use the `all` profile for the clean Chapter 1-to-ending route gate. It runs the
+native group first. The fresh Chapter 1 route creates `chapter3-entry` before
+the reference group starts. The reference group then continues through the
+later chapter handoffs. The `reference` profile alone can use a captured Chapter
+1 review state, so it does not prove a fresh route from a new game.
+
+The all profile also checks the `chapter3-entry` and `chapter10-ending` saves in
+its fresh checkpoint directory. It checks each saved state checksum, state
+size, chapter and map. It also checks the checksum for interaction progress in
+version 2 saves. A missing, damaged or misplaced save fails the route gate even
+if a test runner reports success.
 
 Audio and native checks require access to macOS Core Audio and Metal. A restricted
 shell can fail those checks even when compilation succeeds. `--ios` also builds
