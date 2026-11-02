@@ -269,24 +269,34 @@ test checks the source transition table and dialogue records.
 Do not confuse an update callback's `0` with the process result. The session
 marks a puzzle complete when the final process result is `0`. Overlay 40's
 final callback returns `1`, and its intermediate wait path returns `2`. A
-native port must recover the overlay-manager transition around these callbacks
-before it maps them to `EP10_R304` events 25–27.
+native normal-input route currently maps its modeled process result to the
+recovered `EP10_R304` transition table. The original overlay manager's mapping
+from those callbacks to the script result remains unverified.
 
-## Remaining recovery work
+## Remaining fidelity work
 
-- Bind the decoded brick background and face textures to the native scene.
-- Reconstruct the procedural brick geometry and its original transforms.
-- Match the remaining source ray selection results and drag collision results.
-- Supply the normal mode-0 random seed and fixed-cell mask.
-- Port the no-tool response, hammer-enabled brick removal, collision,
-  validation, reset and exit state changes.
-- Capture a normal overlay-40 mode-0 run to verify the interaction and all
-  three `EP10_R304` transitions. No Chapter 10 reference checkpoint is
-  currently available.
+The native process has a playable route: it requires Hammer item 71, supports
+brick dragging and collision checks, completes when all 48 doorway bricks are
+clear, and returns 2 when the player leaves. A normal-input Chapter 10 route
+test reaches R302 after solving it. This is checkpointed native-route evidence;
+the current environment cannot run that XCTest again because its active
+Command Line Tools do not include XCTest.
 
-Until those steps are complete, the explicit process halt is safer than
-returning a fabricated result. See [the route plan](walkthrough-route-plan.md)
-for the chapter-level boundary.
+The process is not source-exact. Remaining work is to:
+
+- Bind the decoded brick background and face textures to the native scene and
+  match the original procedural geometry.
+- Match source touch selection and drag collision results. ROM scans still
+  disagree with the native hit mask, especially at shared edges.
+- Recover the normal mode-0 global random seed and fixed-cell mask.
+- Capture the no-tool response and source return-1 trigger.
+- Verify how the original overlay manager maps callback returns to all three
+  `EP10_R304` outcomes during normal play.
+- Compare the complete puzzle on original hardware.
+
+Keep those behaviours marked unresolved until captures support them. They are
+fidelity gaps; they do not block the verified native route through Chapter 10.
+See [the route plan](walkthrough-route-plan.md) for the chapter-level boundary.
 
 ## Source hit-test details
 

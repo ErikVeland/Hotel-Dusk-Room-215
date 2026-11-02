@@ -119,7 +119,7 @@ final class OriginalPantryTraceTests: XCTestCase {
     }
 
     @MainActor
-    func testCardsReadCheckpointHiddenPantryDoorStartsQuizByRoomHit() throws {
+    func testCardsReadCheckpointPantryActionCompletesQuizAndEntersChapterTen() throws {
         guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
               let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
                 .appendingPathComponent("chapter9-dunning-items-and-cards")).load() else {
@@ -138,33 +138,15 @@ final class OriginalPantryTraceTests: XCTestCase {
         OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
         try OriginalChapterThreeRouteChecks.exit(play, to: 12, interrupt: true)
 
-        var hit: (String, SIMD2<Float>)?
-        for markerName in ["s01", "s03"] where hit == nil {
-            let room = try XCTUnwrap(play.lobby)
-            let marker = try XCTUnwrap(room.room.nodes.first { $0.name == markerName })
-            let target = SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
-            try OriginalChapterThreeRouteChecks.navigate(play, to: target, interrupt: true)
-            OriginalChapterThreeRouteChecks.face(play, x: target.x, z: target.y)
-            guard let facingRoom = play.lobby else { continue }
-            let visible = facingRoom.objectVisibility.visibleNodes(in: facingRoom.room, map: facingRoom.mapID,
-                area: nil, game: play.runner.game)
-            let points = stride(from: 0, to: 256, by: 4).flatMap { y in
-                stride(from: 0, to: 192, by: 4).map { SIMD2<Float>(Float($0), Float(y)) }
-            }
-            for point in points {
-                guard let node = try facingRoom.pickedRoomObject(page: point, visibleNodes: visible),
-                      node == "obj9999" else { continue }
-                hit = (node, point)
-                break
-            }
-        }
-        let target = try XCTUnwrap(hit, "The pantry top-wall helper masks should be selectable")
-        play.selectLobbyRoomObject(x: target.1.x, y: target.1.y)
+        let room = try XCTUnwrap(play.lobby)
+        let marker = try XCTUnwrap(room.room.nodes.first { $0.name == "s01" })
+        let target = SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
+        try OriginalChapterThreeRouteChecks.navigate(play, to: target, interrupt: true)
+        OriginalChapterThreeRouteChecks.face(play, x: target.x, z: target.y)
+        XCTAssertTrue(play.canInspectPantryDoor, "The clue should enable the visible pantry action")
+        play.inspectPantryDoor()
 
-        XCTAssertEqual(target.0, "obj9999")
-        XCTAssertEqual(target.1, SIMD2<Float>(164, 0))
         XCTAssertEqual(play.runner.program.name, "EP9_R107")
-        XCTAssertEqual(play.runner.session.selection.mapID, 7)
         OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
         guard case .choice(let choices) = play.runner.phase else {
             return XCTFail("The pantry door should start Quiz 9, got \(play.runner.phase)")
@@ -264,6 +246,92 @@ final class OriginalPantryTraceTests: XCTestCase {
         }
         let trace = try String(contentsOf: traceURL, encoding: .utf8)
         XCTAssertTrue(trace.contains("\"trigger\":\"chapter9-pantry-quiz\""))
-        XCTAssertTrue(trace.contains("\"pickedNode\":\"\(target.0)\""))
+        XCTAssertTrue(trace.contains("\"pickedNode\":\"contextual-action\""))
+    }
+
+    @MainActor
+    func testCardsReadCheckpointHiddenPantryHitStillStartsQuiz() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter9-dunning-items-and-cards")).load() else {
+            throw XCTSkip("The Chapter 9 cards-read checkpoint is not available")
+        }
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { name, _ in try OriginalRouteBitmapMapRenderer(mapName: name) })
+        defer { play.stop() }
+        play.resume()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 12, interrupt: true)
+
+        var point: SIMD2<Float>?
+        for markerName in ["s01", "s03"] where point == nil {
+            let room = try XCTUnwrap(play.lobby)
+            let marker = try XCTUnwrap(room.room.nodes.first { $0.name == markerName })
+            let target = SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
+            try OriginalChapterThreeRouteChecks.navigate(play, to: target, interrupt: true)
+            OriginalChapterThreeRouteChecks.face(play, x: target.x, z: target.y)
+            let facingRoom = try XCTUnwrap(play.lobby)
+            let visible = facingRoom.objectVisibility.visibleNodes(in: facingRoom.room, map: facingRoom.mapID,
+                area: nil, game: play.runner.game)
+            point = try stride(from: 0, to: 256, by: 4).lazy.flatMap { y in
+                stride(from: 0, to: 192, by: 4).map { SIMD2(Float($0), Float(y)) }
+            }.first { sample in
+                try facingRoom.pickedRoomObject(page: sample, visibleNodes: visible) == "obj9999"
+            }
+        }
+        let hiddenHit = try XCTUnwrap(point, "The hidden helper hit mask should remain mapped")
+        XCTAssertEqual(hiddenHit, SIMD2<Float>(164, 0))
+
+        play.selectLobbyRoomObject(x: hiddenHit.x, y: hiddenHit.y)
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.program.name, "EP9_R107")
+        guard case .choice(let choices) = play.runner.phase else {
+            return XCTFail("The hidden pantry hit should start Quiz 9, got \(play.runner.phase)")
+        }
+        XCTAssertTrue(choices.contains { $0.id == 5 })
+    }
+
+    @MainActor
+    func testCardsReadCheckpointOffersReachablePantryQuizAction() throws {
+        guard let directory = ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"],
+              let checkpoint = try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
+                .appendingPathComponent("chapter9-dunning-items-and-cards")).load() else {
+            throw XCTSkip("The Chapter 9 cards-read checkpoint is not available")
+        }
+        let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { name, _ in try OriginalRouteBitmapMapRenderer(mapName: name) })
+        defer { play.stop() }
+        play.resume()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        try OriginalChapterThreeRouteChecks.exit(play, to: 12, interrupt: true)
+
+        let room = try XCTUnwrap(play.lobby)
+        let marker = try XCTUnwrap(room.room.nodes.first { $0.name == "s01" })
+        let target = SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
+        try OriginalChapterThreeRouteChecks.navigate(play, to: target, interrupt: true)
+        OriginalChapterThreeRouteChecks.face(play, x: target.x, z: target.y)
+
+        XCTAssertTrue(play.canInspectPantryDoor)
+        play.inspectPantryDoor()
+        OriginalChapterThreeRouteChecks.drain(play, interrupt: true)
+        XCTAssertEqual(play.runner.program.name, "EP9_R107")
+        guard case .choice(let choices) = play.runner.phase else {
+            return XCTFail("The pantry action should start Quiz 9, got \(play.runner.phase)")
+        }
+        XCTAssertTrue(choices.contains { $0.id == 5 })
+
+        let quizCheckpoint = try play.progressCheckpoint()
+        let resumed = try OriginalPlaySession.restoring(quizCheckpoint, audio: originalRouteTestAudio(),
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { name, _ in try OriginalRouteBitmapMapRenderer(mapName: name) })
+        defer { resumed.stop() }
+        resumed.resume()
+        XCTAssertEqual(resumed.runner.program.name, "EP9_R107")
+        XCTAssertEqual(resumed.runner.phase, play.runner.phase)
     }
 }

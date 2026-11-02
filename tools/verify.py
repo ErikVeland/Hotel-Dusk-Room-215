@@ -5,6 +5,7 @@ Examples:
   python3 tools/verify.py --profile fast
   python3 tools/verify.py --profile audio --strict
   python3 tools/verify.py --profile reference --checkpoint-dir .build/route-checkpoints --strict
+  python3 tools/verify.py --profile reference --strict --fresh-checkpoints
   python3 tools/verify.py --profile all --ios --strict
 """
 import argparse
@@ -16,6 +17,7 @@ import re
 import subprocess
 import sys
 import time
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 CASE = re.compile(r"Test Case '-\[(\S+) (\S+)\]' (passed|failed|skipped)(?: \([^)]*\))?\.")
@@ -77,6 +79,38 @@ def test_filter(classes):
     return r"\.(?:" + "|".join(re.escape(name) for name in classes) + r")/"
 
 
+def xctest_flags(help_output):
+    """Enable XCTest discovery when the installed SwiftPM supports the flags."""
+    if "--enable-xctest" not in help_output:
+        return []
+    flags = ["--enable-xctest"]
+    if "--disable-swift-testing" in help_output:
+        flags.append("--disable-swift-testing")
+    return flags
+
+
+def supported_xctest_flags():
+    result = subprocess.run(["swift", "test", "--help"], capture_output=True,
+                            text=True, check=False)
+    return xctest_flags(result.stdout + result.stderr)
+
+
+def route_checkpoint_directory(checkpoint_dir, fresh, output_directory):
+    """Choose explicit or isolated route checkpoints without reusing old saves."""
+    if checkpoint_dir is not None and fresh:
+        raise ValueError("--checkpoint-dir and --fresh-checkpoints cannot be used together")
+    if checkpoint_dir is not None:
+        return checkpoint_dir.resolve()
+    if fresh:
+        return output_directory / f"route-checkpoints-{uuid.uuid4().hex}"
+    return None
+
+
+def should_use_fresh_route_checkpoints(profile, checkpoint_dir, requested):
+    """Avoid stale route saves by default for profiles that execute route tests."""
+    return requested or (profile in ("reference", "all") and checkpoint_dir is None)
+
+
 def run_group(name, command, directory, env, strict, tests=True):
     print(f"Running {name}…", flush=True)
     started = time.monotonic()
@@ -105,11 +139,15 @@ def main():
     parser.add_argument("--profile", choices=["fast", "audio", "native", "reference", "all"], default="fast")
     parser.add_argument("--strict", action="store_true", help="Fail if any selected test is skipped")
     parser.add_argument("--checkpoint-dir", type=Path, help="Checkpoints generated through the full native route")
+    parser.add_argument("--fresh-checkpoints", action="store_true",
+                        help="Use a new, retained checkpoint directory (default for reference and all)")
     parser.add_argument("--ios", action="store_true", help="Also build the iOS simulator app")
     parser.add_argument("--output", type=Path, default=ROOT / ".build/verification/latest")
     parser.add_argument("--scratch-path", type=Path, help="Separate Swift build directory for concurrent development checks")
     parser.add_argument("--list", action="store_true", help="Print profile membership without running tests")
     args = parser.parse_args()
+    if args.fresh_checkpoints and args.profile not in ("reference", "all"):
+        parser.error("--fresh-checkpoints requires --profile reference or --profile all")
     groups = classify_tests()
     if args.list:
         print(json.dumps(groups, indent=2))
@@ -120,14 +158,22 @@ def main():
     env["CLANG_MODULE_CACHE_PATH"] = str(ROOT / ".build/clang-cache")
     env["SWIFTPM_MODULECACHE_OVERRIDE"] = str(ROOT / ".build/module-cache")
     env["HOTEL_DUSK_AUDIO_PROFILE"] = str(directory / "audio-profile.json")
-    if args.checkpoint_dir:
-        env["HOTEL_DUSK_ROUTE_CHECKPOINTS"] = str(args.checkpoint_dir.resolve())
+    try:
+        fresh_checkpoints = should_use_fresh_route_checkpoints(
+            args.profile, args.checkpoint_dir, args.fresh_checkpoints
+        )
+        checkpoint_dir = route_checkpoint_directory(args.checkpoint_dir, fresh_checkpoints, directory)
+    except ValueError as error:
+        parser.error(str(error))
+    if checkpoint_dir is not None:
+        checkpoint_dir.mkdir(parents=True, exist_ok=not args.fresh_checkpoints)
+        env["HOTEL_DUSK_ROUTE_CHECKPOINTS"] = str(checkpoint_dir)
     results = []
     if args.profile in ("fast", "all"):
         results.append(run_group("verification-tool", [sys.executable, "-m", "unittest", "discover", "-s", "tools/tests", "-p", "test_verification.py"], directory, env, args.strict))
     selected = sum(groups.values(), []) if args.profile == "all" else groups[args.profile]
     if selected:
-        command = ["swift", "test", "--disable-sandbox"]
+        command = ["swift", "test", *supported_xctest_flags(), "--disable-sandbox"]
         if args.scratch_path:
             command += ["--scratch-path", str(args.scratch_path.resolve())]
         command += ["--filter", test_filter(selected)]

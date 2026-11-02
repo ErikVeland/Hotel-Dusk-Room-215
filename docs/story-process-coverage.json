@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "romSHA256": "134236d0793bad5d563de119068774a3e1c43a9b1614b1fe1c1fbf923eab676b",
-  "scope": "Static story process coverage checks handler IDs only. It does not establish factory-resource matching, route completion, presentation fidelity, input fidelity, or optional inventory processes.",
+  "scope": "Static process coverage checks handler IDs for chapter scripts and shared System events. It does not establish factory-resource matching, route completion, presentation fidelity, input fidelity, or optional inventory processes.",
   "nativeHostProcessIDs": [
     24,
     25,
@@ -43,6 +43,10 @@
     63,
     64,
     67,
+    68,
+    69,
+    70,
+    71,
     73,
     74,
     75,
@@ -688,6 +692,218 @@
       ]
     }
   ],
+  "sharedSystemProcesses": [
+    {
+      "processID": 29,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 986,
+          "sourceOffset": 20360
+        }
+      ]
+    },
+    {
+      "processID": 32,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 996,
+          "sourceOffset": 20560
+        }
+      ]
+    },
+    {
+      "processID": 33,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 990,
+          "sourceOffset": 20440
+        }
+      ]
+    },
+    {
+      "processID": 35,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 956,
+          "sourceOffset": 19760
+        }
+      ]
+    },
+    {
+      "processID": 50,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 238,
+          "sourceOffset": 5400
+        }
+      ]
+    },
+    {
+      "processID": 53,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 348,
+          "sourceOffset": 7600
+        }
+      ]
+    },
+    {
+      "processID": 54,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 351,
+          "sourceOffset": 7660
+        }
+      ]
+    },
+    {
+      "processID": 57,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 256,
+          "sourceOffset": 5760
+        }
+      ]
+    },
+    {
+      "processID": 58,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 328,
+          "sourceOffset": 7200
+        }
+      ]
+    },
+    {
+      "processID": 68,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 354,
+          "sourceOffset": 7720
+        }
+      ]
+    },
+    {
+      "processID": 69,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 357,
+          "sourceOffset": 7780
+        }
+      ]
+    },
+    {
+      "processID": 70,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 360,
+          "sourceOffset": 7840
+        }
+      ]
+    },
+    {
+      "processID": 71,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 363,
+          "sourceOffset": 7900
+        }
+      ]
+    },
+    {
+      "processID": 87,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 229,
+          "sourceOffset": 5220
+        },
+        {
+          "program": "System",
+          "event": 270,
+          "sourceOffset": 6040
+        },
+        {
+          "program": "System",
+          "event": 301,
+          "sourceOffset": 6660
+        },
+        {
+          "program": "System",
+          "event": 320,
+          "sourceOffset": 7040
+        },
+        {
+          "program": "System",
+          "event": 332,
+          "sourceOffset": 7280
+        },
+        {
+          "program": "System",
+          "event": 766,
+          "sourceOffset": 15960
+        },
+        {
+          "program": "System",
+          "event": 1183,
+          "sourceOffset": 24300
+        }
+      ]
+    },
+    {
+      "processID": 89,
+      "hasNativeHandler": true,
+      "explicitlyUnsupported": false,
+      "references": [
+        {
+          "program": "System",
+          "event": 656,
+          "sourceOffset": 13760
+        }
+      ]
+    }
+  ],
   "chapters": [
     {
       "chapter": 1,
@@ -808,26 +1024,32 @@
     }
   ],
   "eventModeCounts": {
-    "0": 167,
+    "0": 177,
     "1": 233,
-    "3": 896,
+    "3": 932,
     "4": 73,
     "5": 330,
     "6": 94,
     "7": 73,
     "8": 73,
-    "10": 193,
-    "11": 73,
-    "12": 4,
-    "13": 19,
-    "14": 79,
-    "15": 59,
-    "16": 126,
+    "10": 889,
+    "11": 177,
+    "12": 12,
+    "13": 20,
+    "14": 229,
+    "15": 80,
+    "16": 314,
     "17": 135,
+    "18": 40,
+    "19": 154,
+    "20": 87,
     "24": 45,
-    "25": 120,
-    "27": 70,
-    "29": 49,
+    "25": 138,
+    "26": 1,
+    "27": 77,
+    "29": 51,
+    "30": 6,
+    "31": 7,
     "32": 1
   }
 }

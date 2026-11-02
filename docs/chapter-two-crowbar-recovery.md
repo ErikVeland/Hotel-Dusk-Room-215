@@ -53,7 +53,7 @@ The controller starts in phase 1, substage 10. Camera eye is `(-42,7332,-2608)` 
 
 Placement moves to substage 2, then 5, then 3. The placed handle rotates around the cabinet base. The initial angle is approximately `0.157079637`. Successful lifting clamps it to `0.785398185`. Original captures retain intermediate angles and touch-held flags.
 
-The lift capture reaches substage 6, then receives the remaining memo and opens the joined-paper drawing process. The drop capture releases from an intermediate lift checkpoint and enters the original failure dialogue. Runner and session tests advance that warning to the source game-over request, then check Retry restores the retry location and Back to Title preserves the resume save. The Chapter 2 normal-input route passes through the successful lift and continues beyond the office. The failure integration starts from the captured close-up and supplies the captured drop result; it does not repeat the physical drag input. Original menu artwork and timing remain unverified.
+The lift capture reaches substage 6, then receives the remaining memo and opens the joined-paper drawing process. The drop capture releases from an intermediate lift checkpoint and enters the original failure dialogue. Runner and session tests advance that warning to the source game-over request, then check Retry restores the retry location and Back to Title preserves the resume save. The Chapter 2 normal-input route passes through the successful lift and continues beyond the office. The failure integration starts from the captured close-up and supplies the captured drop result; it does not repeat the physical drag input. The game-over screen now uses the captured final background and menu composition. Its selected state and reveal timing remain unverified.
 
 The original default return value is 2. The first grab leaves it unchanged. Releasing and grabbing again during placement changes it to 1. Success changes it to 0. A loud cabinet drop uses result 3. A low release returns to the lifting stage.
 
@@ -93,7 +93,7 @@ The renderer loads original model and texture payloads. Native entry, placement 
 
 - Recover the shared animated touch marker and caption presentation.
 - Check sound output against the original envelopes and mixing. The native host sends the recovered sound and volume commands.
-- Compare the game-over presentation with the original, including menu artwork and timing. The process result, returned story state, warning-to-game-over request, Retry and Back to Title state changes have checks.
+- Compare game-over reveal timing with the original. The process result, returned story state, final menu composition, selected rows and confirmed Retry/Back to Title outcomes have checks.
 - Continue the office and Chapter 2 route. Process 31 and red-box acquisition are now connected. See [Combination recovery](chapter-two-cabinet-combination.md).
 
 Decompiler carry flags are not reliable high-level comparisons. Assembly and captured controller fields support the implemented branches.

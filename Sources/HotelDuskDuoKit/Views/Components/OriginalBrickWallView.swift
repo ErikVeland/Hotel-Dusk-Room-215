@@ -7,7 +7,10 @@ struct OriginalBrickWallView: View {
     @ObservedObject var play: OriginalPlaySession
 
     var body: some View {
-        VStack {
+        VStack(spacing: 8) {
+            Text("Drag bricks away to uncover the doorway.")
+                .font(NovelStyle.caption)
+                .multilineTextAlignment(.center)
             GeometryReader { proxy in
                 let scale = max(0, min((proxy.size.width - 16) / 192, (proxy.size.height - 36) / 256))
                 ZStack {

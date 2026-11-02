@@ -1369,10 +1369,10 @@ public final class OriginalPlaySession: ObservableObject {
             switch effect {
             case .play(let sequence):
                 runner.setJukeboxSequence(Int16(sequence))
-                try? audio.applyOriginalCommand(.startMusic(sequenceID: sequence))
+                _ = try? audio.applyOriginalCommand(.startMusic(sequenceID: sequence))
             case .stop:
                 runner.setJukeboxSequence(-1)
-                try? audio.applyOriginalCommand(.stopMusic(fadeFrames: 0))
+                _ = try? audio.applyOriginalCommand(.stopMusic(fadeFrames: 0))
             case .completed: break
             }
         }
@@ -4757,6 +4757,20 @@ public final class OriginalPlaySession: ObservableObject {
         }
     }
 
+    public var canInspectPantryDoor: Bool {
+        guard !isPaused, chapterTransition == nil, case .exploration = runner.phase,
+              closeup == nil, let lobby, lobby.mode == .walking, lobby.mapID == 12,
+              lobby.nearbySearchArea != nil else { return false }
+        return runner.game.value(for: .eventFlag(group: 23, index: 4)) == true
+    }
+
+    public func inspectPantryDoor() {
+        let recordsProgress = beginProgressInput(.inspectPantryDoor)
+        defer { endProgressInput(recordsProgress) }
+        guard canInspectPantryDoor else { return }
+        dispatchChapterNinePantryQuiz()
+    }
+
     /**
      * Starts the search response for a room object selected with its visible hit mesh.
      */
@@ -4775,11 +4789,7 @@ public final class OriginalPlaySession: ObservableObject {
             ]))
             if lobby.mapID == 12, node == "obj9999",
                runner.game.value(for: .eventFlag(group: 23, index: 4)) == true {
-                routeTrace?.write(kind: "storyDispatch", fields: routeTraceFields(extra: [
-                    "trigger": "chapter9-pantry-quiz", "pickedNode": node
-                ]))
-                try startChapterNinePantryQuiz()
-                settle()
+                dispatchChapterNinePantryQuiz(pickedNode: node)
                 return
             }
             let table = try OriginalSearchTable.bundled(map: lobby.mapName)
@@ -4802,6 +4812,19 @@ public final class OriginalPlaySession: ObservableObject {
             game: runner.game, selection: context)
         review.attachRouteTrace(routeTrace)
         runner = review
+    }
+
+    private func dispatchChapterNinePantryQuiz(pickedNode: String? = nil) {
+        routeTrace?.write(kind: "storyDispatch", fields: routeTraceFields(extra: [
+            "trigger": "chapter9-pantry-quiz", "pickedNode": pickedNode ?? "contextual-action"
+        ]))
+        do {
+            try startChapterNinePantryQuiz()
+            settle()
+        } catch {
+            runner.halt("The pantry quiz could not start: \(error)")
+            settle()
+        }
     }
 
     public func useItemInSearchView(_ item: UInt8?) {

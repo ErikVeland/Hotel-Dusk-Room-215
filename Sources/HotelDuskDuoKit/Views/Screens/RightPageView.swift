@@ -67,21 +67,87 @@ public struct RightPageView: View {
 
 private struct OriginalGameOverView: View {
     @ObservedObject var session: GameSession
+    @State private var selectedChoice: Choice?
+
+    private enum Choice: Equatable {
+        case retry
+        case title
+    }
 
     var body: some View {
-        VStack(spacing: 18) {
-            Spacer()
-            Text("GAME OVER")
-                .font(NovelStyle.title)
-                .foregroundStyle(NovelStyle.redInk)
-            Text("Choose how to continue.")
-                .font(NovelStyle.body)
-            Button("Retry") { session.retryOriginalGameOver() }
-                .buttonStyle(BookTextButtonStyle())
-            Button("Back to Title") { session.returnToTitleAfterGameOver() }
-                .buttonStyle(BookTextButtonStyle())
-            Spacer()
+        GeometryReader { proxy in
+            let scale = min(proxy.size.width / 192, proxy.size.height / 256)
+            ZStack {
+                Color.black
+                if let images = OriginalGameOverImages.bundled() {
+                    ZStack {
+                        Image(decorative: selectedLowerImage(images), scale: 1)
+                            .resizable()
+                            .interpolation(.none)
+                            .frame(width: 192 * scale, height: 256 * scale)
+                            .accessibilityHidden(true)
+                        Button { activate(.retry) } label: {
+                            Color.clear.contentShape(Rectangle())
+                        }
+                        .frame(width: 100 * scale, height: 34 * scale)
+                        .position(x: 142 * scale, y: 192 * scale)
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Retry")
+                        .accessibilityValue(selectedChoice == .retry ? "Selected" : "Not selected")
+                        .accessibilityHint(selectedChoice == .retry
+                            ? "Activate again to confirm."
+                            : "Select Retry, then activate again to confirm.")
+                        Button { activate(.title) } label: {
+                            Color.clear.contentShape(Rectangle())
+                        }
+                        .frame(width: 112 * scale, height: 34 * scale)
+                        .position(x: 136 * scale, y: 231 * scale)
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Back to Title")
+                        .accessibilityValue(selectedChoice == .title ? "Selected" : "Not selected")
+                        .accessibilityHint(selectedChoice == .title
+                            ? "Activate again to confirm."
+                            : "Select Back to Title, then activate again to confirm.")
+                    }
+                    .frame(width: 192 * scale, height: 256 * scale)
+                } else {
+                    VStack(spacing: 18) {
+                        Text("GAME OVER")
+                            .font(NovelStyle.title)
+                            .foregroundStyle(NovelStyle.redInk)
+                        Text("Choose how to continue.")
+                            .font(NovelStyle.body)
+                        Button(selectedChoice == .retry ? "Retry ✓" : "Retry") { activate(.retry) }
+                            .buttonStyle(BookTextButtonStyle())
+                        Button(selectedChoice == .title ? "Back to Title ✓" : "Back to Title") {
+                            activate(.title)
+                        }
+                            .buttonStyle(BookTextButtonStyle())
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func activate(_ choice: Choice) {
+        guard selectedChoice == choice else {
+            selectedChoice = choice
+            return
+        }
+        switch choice {
+        case .retry:
+            session.retryOriginalGameOver()
+        case .title:
+            session.returnToTitleAfterGameOver()
+        }
+    }
+
+    private func selectedLowerImage(_ images: OriginalGameOverImages) -> CGImage {
+        switch selectedChoice {
+        case .retry: images.retrySelectedLower
+        case .title: images.titleSelectedLower
+        case nil: images.lower
+        }
     }
 }

@@ -24,15 +24,20 @@ def audit():
     settle = host.split('private func settle()', 1)[1].split('private func applyAudioControls', 1)[0]
     handlers = {int(value) for match in re.findall(r'\.process\((\d+)\)|id == (\d+)', settle)
                 for value in match if value}
+    # Process 68–71 share one guarded handler instead of four literal switch cases.
+    if re.search(r'\(68\.\.\.71\)\.contains\(id\)', settle):
+        handlers.update(range(68, 72))
     unsupported = {int(process) for process in re.findall(
         r'case \.process\((\d+)\):\s*runner\.halt\(', settle)}
     references = defaultdict(list)
+    system_references = defaultdict(list)
     modes = defaultdict(int)
     chapters = defaultdict(set)
     for file in manifest['files']:
         name = file['name']
         match = re.fullmatch(r'EP(\d+)_.*\.blk', name)
-        if not match:
+        is_system = name == 'System.blk'
+        if not match and not is_system:
             continue
         raw = (scripts / name).read_bytes()
         if hashlib.sha256(raw).hexdigest() != file['sha256']:
@@ -41,7 +46,7 @@ def audit():
         if file.get('decodedSHA256') and hashlib.sha256(decoded).hexdigest() != file['decodedSHA256']:
             raise ValueError(f'Decoded checksum mismatch: {name}')
         graph = parse_blocks(decoded)
-        chapter = int(match[1])
+        chapter = int(match[1]) if match else None
         for event in graph['tables'][2]['records']:
             data = bytes.fromhex(event['hex'])
             mode = struct.unpack_from('<H', data)[0]
@@ -49,15 +54,23 @@ def audit():
             if mode != 15:
                 continue
             process = data[16] + 23
+            if is_system:
+                system_references[process].append({'program': name[:-4], 'event': event['index'],
+                                                   'sourceOffset': event['byteOffset']})
+                continue
             chapters[chapter].add(process)
             references[process].append({'program': name[:-4], 'event': event['index'],
                                        'sourceOffset': event['byteOffset']})
     processes = [{'processID': process, 'hasNativeHandler': process in handlers,
                   'explicitlyUnsupported': process in unsupported,
                   'references': events} for process, events in sorted(references.items())]
-    return {'schemaVersion': 1, 'romSHA256': manifest['romSHA256'],
-            'scope': 'Static story process coverage checks handler IDs only. It does not establish factory-resource matching, route completion, presentation fidelity, input fidelity, or optional inventory processes.',
+    shared_processes = [{'processID': process, 'hasNativeHandler': process in handlers,
+                        'explicitlyUnsupported': process in unsupported,
+                        'references': events} for process, events in sorted(system_references.items())]
+    return {'schemaVersion': 2, 'romSHA256': manifest['romSHA256'],
+            'scope': 'Static process coverage checks handler IDs for chapter scripts and shared System events. It does not establish factory-resource matching, route completion, presentation fidelity, input fidelity, or optional inventory processes.',
             'nativeHostProcessIDs': sorted(handlers), 'processes': processes,
+            'sharedSystemProcesses': shared_processes,
             'chapters': [{'chapter': chapter, 'requiredProcesses': sorted(ids),
                           'missingProcesses': sorted(ids - handlers),
                           'unsupportedProcesses': sorted(ids & unsupported)}
@@ -68,6 +81,8 @@ def audit():
 def markdown(report):
     required = report['processes']
     missing = [p for p in required if not p['hasNativeHandler']]
+    shared = report['sharedSystemProcesses']
+    missing_shared = [p for p in shared if not p['hasNativeHandler']]
     lines = ['# Story process coverage', '', report['scope'], '',
              f"The original chapter scripts reference {len(required)} distinct embedded processes. "
              f"{len(missing)} still have no native host handler.", '',
@@ -77,11 +92,19 @@ def markdown(report):
         ids = lambda values: ', '.join(map(str, values)) or 'None'
         lines.append(f"| {chapter['chapter']} | {ids(chapter['requiredProcesses'])} | "
                      f"{ids(chapter['missingProcesses'])} | {ids(chapter['unsupportedProcesses'])} |")
+    lines += ['', '## Shared System processes', '',
+              f"`System.blk` references {len(shared)} distinct embedded processes. "
+              f"{len(missing_shared)} still have no native host handler.", '',
+              '| Process | Original references | Handler |', '| --- | --- | --- |']
+    for process in shared:
+        refs = ', '.join(f"{r['program']} event {r['event']}" for r in process['references'])
+        status = 'unsupported' if process['explicitlyUnsupported'] else ('yes' if process['hasNativeHandler'] else 'missing')
+        lines.append(f"| {process['processID']} | {refs} | {status} |")
     lines += ['', '## Missing handlers', '', '| Process | Original references |', '| --- | --- |']
     for process in missing:
         refs = ', '.join(f"{r['program']} event {r['event']}" for r in process['references'])
         lines.append(f"| {process['processID']} | {refs} |")
-    unsupported = [p for p in required if p['explicitlyUnsupported']]
+    unsupported = [p for p in required + shared if p['explicitlyUnsupported']]
     lines += ['', '## Explicitly unsupported processes', '', '| Process | Original references |', '| --- | --- |']
     for process in unsupported:
         refs = ', '.join(f"{r['program']} event {r['event']}" for r in process['references'])
@@ -99,7 +122,8 @@ def main():
     result = audit()
     args.output.write_text(json.dumps(result, indent=2) + '\n')
     args.markdown.write_text(markdown(result))
-    print(f"Audited {len(result['processes'])} story processes across {len(result['chapters'])} chapters.")
+    print(f"Audited {len(result['processes'])} chapter processes across {len(result['chapters'])} chapters and "
+          f"{len(result['sharedSystemProcesses'])} shared System processes.")
 
 
 if __name__ == '__main__':

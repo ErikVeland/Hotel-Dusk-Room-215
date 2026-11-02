@@ -129,8 +129,7 @@ final class LayoutSnapshotTests: XCTestCase {
             try game.apply(.addInventory(id: item))
         }
         let runner = try OriginalEventRunner(program: catalog.loadProgram("EP1_R102"), game: game, deferArrival: true)
-        let audio = AudioController()
-        audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = OriginalPlaySession(runner: runner, audio: audio, catalog: catalog)
         defer { play.stop() }
         let bytes = play.runner.game.bytes
@@ -151,8 +150,7 @@ final class LayoutSnapshotTests: XCTestCase {
     }
 
     func testRenderConversationParticipantInk() throws {
-        let audio = AudioController()
-        audio.isMuted = true
+        let audio = originalRouteTestAudio()
         let play = try OriginalPlaySession.chapterOne(audio: audio)
         defer { play.stop() }
         let program = try OriginalScriptCatalog.bundled().loadProgram("EP1_R102")
@@ -180,7 +178,8 @@ final class LayoutSnapshotTests: XCTestCase {
     func testRenderWrittenDialoguePages() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
-        let session = GameSession(saveStore: OriginalChapterFileStore(directory: root),
+        let session = GameSession(audioController: originalRouteTestAudio(),
+                                  saveStore: OriginalChapterFileStore(directory: root),
                                   resumeStore: OriginalResumeFileStore(directory: root))
         session.startOriginalGame()
         defer { session.endOriginalGame() }
@@ -261,7 +260,8 @@ final class LayoutSnapshotTests: XCTestCase {
     func testRenderNoirNotebookExploration() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
-        let session = GameSession(saveStore: OriginalChapterFileStore(directory: root),
+        let session = GameSession(audioController: originalRouteTestAudio(),
+                                  saveStore: OriginalChapterFileStore(directory: root),
                                   resumeStore: OriginalResumeFileStore(directory: root))
         session.startOriginalGame()
         defer { session.endOriginalGame() }

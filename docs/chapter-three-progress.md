@@ -36,7 +36,7 @@ The Duo simulator Debug build and the generic iOS Release build both succeeded. 
 
 The room, script, save and texture regression group passed its executable checks. Ten original-reference comparisons skipped because the required local captures were absent. The new Chapter 3 continuation does not replace those original comparisons.
 
-The final uninterrupted route replay passed on 22 October 2026 in 417 seconds, including restoration of walking checkpoints without replaying arrival events. Across this replay and the targeted regression group, 34 tests passed and 10 capture-dependent comparisons skipped. The earlier route-only failure was corrected by facing Louie before selecting Talk.
+The connected checkpoint route replay passed on 22 October 2026 in 417 seconds. It restored walking checkpoints between route sections without replaying arrival events. Across this replay and the targeted regression group, 34 tests passed and 10 capture-dependent comparisons skipped. The earlier route-only failure was corrected by facing Louie before selecting Talk.
 
 ```sh
 HOTEL_DUSK_ROUTE_CHECKPOINTS="$PWD/.build/story-checkpoints" \

@@ -44,7 +44,7 @@ Resolve or explicitly scope these issues before inviting testers. The device che
 
 ## Readiness check — 2 November 2026
 
-Current checks used Xcode 26.6. The fast profile passed with 305 tests, no failures and five skips. The skipped tests need isolated artwork candidate files. See `.build/verification/goal-fast-ios-current/report.json`.
+The recorded checks used Xcode 26.6. The fast profile passed with 305 tests, no failures and five skips. The skipped tests need isolated artwork candidate files. These are historical results, not current-tree verification. Xcode 27.2 is now installed, but its licence is not accepted, so current XCTest and iOS build checks cannot run. See `.build/verification/goal-fast-ios-current/report.json`.
 
 The full reference profile passed with 307 tests, no failures and eight skips. The skips include seven Metal renderer checks and one Chapter 4 probe without its save. Checkpointed normal-input tests cover the required route through the Chapter 10 ending. They do not prove one uninterrupted session, every branch, source fidelity or device input. See `.build/verification/goal-reference-final-xcode/report.json`.
 

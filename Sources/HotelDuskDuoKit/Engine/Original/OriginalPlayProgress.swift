@@ -153,6 +153,7 @@ enum OriginalProgressInput: Codable, Equatable, Sendable {
     case selectLobbyObject(x: Float, y: Float, confirmImmediately: Bool)
     case inspectLobbyBell
     case selectLobbyRoomObject(x: Float, y: Float)
+    case inspectPantryDoor
     case useItemInSearchView(item: UInt8?)
     case confirmLobbyObject
     case selectCloseupComponent(x: Int, y: Int, confirmImmediately: Bool)
@@ -404,6 +405,7 @@ extension OriginalPlaySession {
         case let .selectLobbyObject(x, y, confirmImmediately): selectLobbyObject(x: x, y: y, confirmImmediately: confirmImmediately)
         case .inspectLobbyBell: inspectLobbyBell()
         case let .selectLobbyRoomObject(x, y): selectLobbyRoomObject(x: x, y: y)
+        case .inspectPantryDoor: inspectPantryDoor()
         case let .useItemInSearchView(item): useItemInSearchView(item)
         case .confirmLobbyObject: confirmLobbyObject()
         case let .selectCloseupComponent(x, y, confirmImmediately): selectCloseupComponent(x: x, y: y, confirmImmediately: confirmImmediately)

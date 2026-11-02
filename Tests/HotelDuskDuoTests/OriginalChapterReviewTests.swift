@@ -499,7 +499,7 @@ final class OriginalChapterReviewTests: XCTestCase {
         let directory = try XCTUnwrap(ProcessInfo.processInfo.environment["HOTEL_DUSK_ROUTE_CHECKPOINTS"])
         let checkpoint = try XCTUnwrap(OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
             .appendingPathComponent("chapter10-r301-entry")).load())
-        let play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
+        var play = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
             saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
                 .appendingPathComponent(UUID().uuidString)),
             mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
@@ -551,8 +551,19 @@ final class OriginalChapterReviewTests: XCTestCase {
         XCTAssertEqual(play.runner.phase, .process(id: 59))
         XCTAssertNotNil(play.pencilSharpener)
         XCTAssertNotNil(instantCheckpoint?.progress)
+        let processCheckpoint = try play.progressCheckpoint()
         try OriginalResumeFileStore(directory: URL(fileURLWithPath: directory)
-            .appendingPathComponent("chapter10-r301-pencil-process")).save(try play.progressCheckpoint())
+            .appendingPathComponent("chapter10-r301-pencil-process")).save(processCheckpoint)
+        let encodedCheckpoint = try JSONEncoder().encode(processCheckpoint)
+        let decodedCheckpoint = try JSONDecoder().decode(OriginalResumeSave.self, from: encodedCheckpoint)
+        play.stop()
+        play = try OriginalPlaySession.restoring(decodedCheckpoint, audio: originalRouteTestAudio(),
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)),
+            mapRendererFactory: { mapName, _ in try OriginalRouteBitmapMapRenderer(mapName: mapName) })
+        play.resume()
+        XCTAssertEqual(play.runner.phase, .process(id: 59))
+        XCTAssertNotNil(play.pencilSharpener)
 
         for _ in 0..<6 {
             play.holdPencilSharpenerTouch(pageX: 91, pageY: 100)

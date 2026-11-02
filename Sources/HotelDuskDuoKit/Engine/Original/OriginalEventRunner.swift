@@ -1204,7 +1204,7 @@ public struct OriginalEventRunner: Sendable {
                 interrupt.shared = 0
             }
         case 33:
-            if let id = try? OriginalBytes(next.raw).u16(2) { try? game.apply(.flag12FE(index: id)) }
+            if let id = try? OriginalBytes(next.raw).u16(2) { _ = try? game.apply(.flag12FE(index: id)) }
         case 38:
             interrupt.window = true
             interrupt.shared = 0

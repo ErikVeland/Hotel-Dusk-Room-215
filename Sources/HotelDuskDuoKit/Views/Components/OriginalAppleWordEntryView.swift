@@ -22,7 +22,7 @@ struct OriginalAppleWordEntryView: View {
                         VStack(spacing: 4) {
                             Text(String(letters[index]))
                                 .font(.title2.bold())
-                            Text("\(index + 1) apple\(index == 0 ? "" : "s")")
+                            Text(verbatim: appleCountLabel(at: index))
                                 .font(.caption2)
                         }
                         .frame(maxWidth: .infinity, minHeight: 56)
@@ -31,7 +31,7 @@ struct OriginalAppleWordEntryView: View {
                         .contentShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("\(letters[index]), \(index + 1) apple\(index == 0 ? "" : "s")")
+                    .accessibilityLabel(Text(verbatim: "\(letters[index]), \(appleCountLabel(at: index))"))
                 }
             }
 
@@ -43,5 +43,10 @@ struct OriginalAppleWordEntryView: View {
         .padding(16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .accessibilityElement(children: .contain)
+    }
+
+    private func appleCountLabel(at index: Int) -> String {
+        let count = index + 1
+        return count == 1 ? "1 apple" : "\(count) apples"
     }
 }

@@ -188,12 +188,18 @@ struct OriginalMapView: View {
     }
 
     private var interactionButtons: some View {
-        HStack {
-            Button(play.nearbyDoor.map { OriginalMapExploration.displayName(for: $0) } ?? "Door") { play.inspectNearbyDoor() }.disabled(play.nearbyDoor == nil)
-            Button("Inspect") { play.inspectLobbyCounter() }
-                .disabled(play.lobby?.canInspectCounter(in: play.runner.game) != true)
-            Button("Talk") { play.talkToNearbyPerson() }
-                .disabled(play.lobby?.nearbyPerson(in: play.runner.game) == nil)
+        VStack(spacing: 4) {
+            HStack {
+                Button(play.nearbyDoor.map { OriginalMapExploration.displayName(for: $0) } ?? "Door") { play.inspectNearbyDoor() }.disabled(play.nearbyDoor == nil)
+                Button("Inspect") { play.inspectLobbyCounter() }
+                    .disabled(play.lobby?.canInspectCounter(in: play.runner.game) != true)
+                Button("Talk") { play.talkToNearbyPerson() }
+                    .disabled(play.lobby?.nearbyPerson(in: play.runner.game) == nil)
+            }
+            if play.canInspectPantryDoor {
+                Button("Search pantry wall") { play.inspectPantryDoor() }
+                    .buttonStyle(BookTextButtonStyle())
+            }
         }
         .buttonStyle(BookTextButtonStyle())
     }

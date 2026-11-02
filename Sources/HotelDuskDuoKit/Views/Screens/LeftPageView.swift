@@ -7,8 +7,16 @@ public struct LeftPageView: View {
     public var body: some View {
         Group {
             if let play = session.play {
-                OriginalPlayPage(play: play, hingeManager: session.hingeManager, screen: 1)
-                    .padding(24)
+                if play.isGameOverPresented, let images = OriginalGameOverImages.bundled() {
+                    Image(decorative: images.upper, scale: 1)
+                        .resizable()
+                        .interpolation(.none)
+                        .aspectRatio(contentMode: .fit)
+                        .padding(24)
+                } else {
+                    OriginalPlayPage(play: play, hingeManager: session.hingeManager, screen: 1)
+                        .padding(24)
+                }
             } else if let frame = session.animationPreview {
                 OriginalAnimationFrameView(frame: frame)
             } else {

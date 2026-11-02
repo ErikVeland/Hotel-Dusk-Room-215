@@ -6,8 +6,8 @@ Run from the project root:
 python3 tools/verify.py --profile fast --strict
 python3 tools/verify.py --profile audio --strict
 python3 tools/verify.py --profile native --strict
-python3 tools/verify.py --profile reference --strict
-python3 tools/verify.py --profile all --ios --strict
+python3 tools/verify.py --profile reference --strict --fresh-checkpoints
+python3 tools/verify.py --profile all --ios --strict --fresh-checkpoints
 ```
 
 `--list` prints the current profile membership. The fast profile runs logic and
@@ -17,6 +17,10 @@ Native covers app/session and renderer checks. Reference covers tests that depen
 on recovered ROM captures or full-route checkpoints. All includes every profile.
 Some test classes contain more than one kind of check; the whole class runs in
 the profile with the required host or fixture dependency.
+
+The project tests use XCTest. The verifier enables XCTest discovery when the
+installed SwiftPM supports it. Older SwiftPM versions use their default test
+runner.
 
 Audio and native checks require access to macOS Core Audio and Metal. A restricted
 shell can fail those checks even when compilation succeeds. `--ios` also builds
@@ -44,3 +48,12 @@ captures or treat component fixtures as complete-route evidence. Read skipped
 case names in the report and their reasons in `swift.log`. Preserve those gaps
 when reporting results. Static handler presence alone does not establish route
 completion, input fidelity or matching presentation.
+
+Reference and all profiles use a new, empty route-checkpoint directory by
+default when `--checkpoint-dir` is not set. Use `--fresh-checkpoints` to make
+that choice explicit. The directory is retained with that run's report so
+generated handoffs can be reviewed. Fresh mode cannot be combined with
+`--checkpoint-dir`. In strict mode, any route that still needs a missing
+checkpoint fails instead of reusing a save from an earlier run. Set
+`--checkpoint-dir PATH` only when you intend to reuse previously generated
+route checkpoints.
