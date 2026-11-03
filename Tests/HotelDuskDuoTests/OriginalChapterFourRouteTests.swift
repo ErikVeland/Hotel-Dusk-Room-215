@@ -207,7 +207,10 @@ final class OriginalChapterFourRouteTests: XCTestCase {
         try Route.navigate(play, to: .init(8000, 12000), interrupt: true)
         Route.face(play, x: 18672, z: 29104)
         XCTAssertEqual(play.lobby?.nearbySearchArea, 3)
-        for item: UInt8 in [28, 13, 14, 45] { try Route.useItem(play, item, on: "obj04", interrupt: true) }
+        for item: UInt8 in [28, 13, 63, 14, 45] where try play.runner.game.inventory.items.contains(item) {
+            try Route.useItem(play, item, on: "obj04", interrupt: true)
+            XCTAssertFalse(try play.runner.game.inventory.items.contains(item), "Item \(item) must be stored")
+        }
         try Route.exit(play, to: 39, interrupt: true)
         try Route.exit(play, to: 37, interrupt: true)
         try Route.navigate(play, to: .init(9000, -22000), interrupt: true)

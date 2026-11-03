@@ -249,7 +249,8 @@ enum OriginalChapterThreeRouteChecks {
     /// World position of the in_ marker for a destination.
     static func doorMarker(_ play: OriginalPlaySession, _ destination: Int16) throws -> SIMD2<Float> {
         let name = "in_" + OriginalMapExploration.mapNames[Int(destination)].lowercased()
-        let marker = try XCTUnwrap(play.lobby?.room.nodes.first { $0.name == name }, "No marker \(name)")
+        let marker = try XCTUnwrap(play.lobby?.room.nodes.first { $0.name == name },
+            "No marker \(name) in map \(play.runner.game.mapID), phase \(play.runner.phase)")
         return SIMD2(Float(marker.worldFixed[12]), Float(marker.worldFixed[14]))
     }
 
@@ -539,6 +540,9 @@ enum OriginalChapterThreeRouteChecks {
 
     /// Uses an inventory item on a model node in the facing search area.
     static func useItem(_ play: OriginalPlaySession, _ item: UInt8, on node: String, interrupt: Bool = false) throws {
+        guard try play.runner.game.inventory.items.contains(item) else {
+            throw OriginalDataError.invalid("Cannot use absent inventory item \(item) on \(node)")
+        }
         if play.lobby?.mode != .counter { play.inspectLobbyCounter() }
         let counter = try XCTUnwrap(play.lobby)
         let visible = counter.objectVisibility.visibleNodes(in: counter.counter, map: counter.mapID,

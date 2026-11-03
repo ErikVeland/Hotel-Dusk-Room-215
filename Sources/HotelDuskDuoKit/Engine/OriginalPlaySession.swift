@@ -1984,6 +1984,7 @@ public final class OriginalPlaySession: ObservableObject {
                 return settle()
             }
         case .picture(let id):
+            acquiredItemImage = nil
             if touchPicture == nil {
                 do {
                     guard let record = try OriginalTouchPictureTable.bundled().records.first(where: { $0.id == id }) else {

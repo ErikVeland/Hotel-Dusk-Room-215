@@ -1,5 +1,28 @@
 # Reproducible verification
 
+Run the ordered Chapter 1-to-ending route with a new output directory:
+
+```sh
+python3 tools/verify_full_route.py --output .build/verification/full-route-001
+```
+
+This runner builds the XCTest target and runs the 80 sections listed in
+`tools/full-route-tests.json` in checkpoint dependency order. It starts with an
+empty checkpoint directory and stops on a failure, skip or missing test. Each
+section must report exactly the requested test as passed. The final gate checks
+the Chapter 3 and Chapter 10 ending saves. Logs and individual results are in
+`route-report.json` beside the checkpoints. This verifies a normal-input route
+with save restores between sections. Device rendering, alternate branches and
+the broader test suite require separate checks.
+
+For development, resume a stopped run with the same output directory and
+`--resume`. The report records that it was resumed. After a route fix, use a new
+directory for final verification from Chapter 1.
+
+On 3 November 2026, the ordered fresh route passed all 80 sections with no
+failures or skips. Both required handoff saves passed validation. The Chapter 4
+stash step accepts the whole or torn memo, according to the carried inventory.
+
 Run from the project root:
 
 ```sh
