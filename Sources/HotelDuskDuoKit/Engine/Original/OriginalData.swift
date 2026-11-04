@@ -21,12 +21,12 @@ struct OriginalBytes {
         return bytes[offset..<offset + length]
     }
     func u16(_ offset: Int) throws -> UInt16 {
-        let b = Array(try range(offset, 2))
-        return UInt16(b[0]) | UInt16(b[1]) << 8
+        let b = try range(offset, 2)
+        return UInt16(b[offset]) | UInt16(b[offset + 1]) << 8
     }
     func u32(_ offset: Int) throws -> UInt32 {
-        let b = Array(try range(offset, 4))
-        return UInt32(b[0]) | UInt32(b[1]) << 8 | UInt32(b[2]) << 16 | UInt32(b[3]) << 24
+        let b = try range(offset, 4)
+        return UInt32(b[offset]) | UInt32(b[offset + 1]) << 8 | UInt32(b[offset + 2]) << 16 | UInt32(b[offset + 3]) << 24
     }
     func zeroTerminated(_ offset: Int, limit: Int) throws -> [UInt8] {
         let bytes = try range(offset, limit)

@@ -173,15 +173,19 @@ public struct OriginalTexture: Sendable {
 public struct OriginalTextureLibrary: Sendable {
     public let manifest: OriginalTextureManifest
     private let resourceRoot: URL
+    private let records: [String: OriginalTextureManifest.Record]
+    private let caseInsensitiveRecords: [String: [OriginalTextureManifest.Record]]
 
     public init(resourceRoot: URL) throws {
         self.resourceRoot = resourceRoot
         let data = try Data(contentsOf: resourceRoot.appendingPathComponent("OriginalTextureManifest.json"))
         manifest = try JSONDecoder().decode(OriginalTextureManifest.self, from: data)
         guard manifest.formatVersion == 1 else { throw OriginalDataError.unsupported("Texture manifest version") }
+        records = Dictionary(manifest.textures.map { ($0.source, $0) }, uniquingKeysWith: { first, _ in first })
+        caseInsensitiveRecords = Dictionary(grouping: manifest.textures) { $0.source.lowercased() }
     }
 
-    public static func bundled() throws -> OriginalTextureLibrary {
+    private static let bundledLibrary: Result<Self, Error> = Result {
         guard let root = Bundle.module.resourceURL?.appendingPathComponent("OriginalTextures"),
               FileManager.default.fileExists(atPath: root.path) else {
             throw OriginalDataError.missing("OriginalTextures")
@@ -189,13 +193,14 @@ public struct OriginalTextureLibrary: Sendable {
         return try .init(resourceRoot: root)
     }
 
+    public static func bundled() throws -> OriginalTextureLibrary { try bundledLibrary.get() }
+
     /// Room search models share named textures with other members of the same map archive.
     /// Accept a shared name only when every candidate has the same decoded image.
     func mapTexturePath(modelPath: String, textureName: String) throws -> String {
         let directory = (modelPath as NSString).deletingLastPathComponent
         let requested = directory + "/" + textureName + ".dtx"
-        let exact = manifest.textures.filter { $0.source.lowercased() == requested.lowercased() }
-        if exact.count == 1 { return exact[0].source }
+        if let exact = caseInsensitiveRecords[requested.lowercased()], exact.count == 1 { return exact[0].source }
         let components = modelPath.split(separator: "/")
         guard components.count >= 3, components[0] == "map" else { throw OriginalDataError.missing(requested) }
         let archive = "map/" + components[1] + "/"
@@ -208,6 +213,13 @@ public struct OriginalTextureLibrary: Sendable {
             throw OriginalDataError.missing(requested)
         }
         return first.source
+    }
+
+    func texturePath(matching requested: String) throws -> String {
+        guard let matches = caseInsensitiveRecords[requested.lowercased()], matches.count == 1 else {
+            throw OriginalDataError.missing(requested)
+        }
+        return matches[0].source
     }
 
     /// These names have no FILE entry in their original scene .def. The original
@@ -223,7 +235,7 @@ public struct OriginalTextureLibrary: Sendable {
     }
 
     public func load(path: String) throws -> OriginalTexture {
-        guard let record = manifest.textures.first(where: { $0.source == path }) else { throw OriginalDataError.missing(path) }
+        guard let record = records[path] else { throw OriginalDataError.missing(path) }
         guard record.status == "decoded" else { throw OriginalDataError.unsupported(record.error ?? path) }
         let url = resourceRoot.appendingPathComponent(path).standardizedFileURL
         guard url.path.hasPrefix(resourceRoot.standardizedFileURL.path + "/") else {

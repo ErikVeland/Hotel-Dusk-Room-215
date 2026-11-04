@@ -266,22 +266,26 @@ public struct OriginalModelMetalGeometry {
 public struct OriginalModelLibrary: Sendable {
     public let manifest: OriginalModelManifest
     private let resourceRoot: URL
+    private let records: [String: OriginalModelManifest.Record]
 
     public init(resourceRoot: URL) throws {
         self.resourceRoot = resourceRoot
         manifest = try JSONDecoder().decode(OriginalModelManifest.self,
             from: Data(contentsOf: resourceRoot.appendingPathComponent("OriginalModelManifest.json")))
         guard manifest.formatVersion == 1 else { throw OriginalDataError.unsupported("Model manifest version") }
+        records = Dictionary(manifest.models.map { ($0.source, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
-    public static func bundled() throws -> OriginalModelLibrary {
+    private static let bundledLibrary: Result<Self, Error> = Result {
         guard let root = Bundle.module.resourceURL?.appendingPathComponent("OriginalModels"),
               FileManager.default.fileExists(atPath: root.path) else { throw OriginalDataError.missing("OriginalModels") }
         return try .init(resourceRoot: root)
     }
 
+    public static func bundled() throws -> OriginalModelLibrary { try bundledLibrary.get() }
+
     public func load(path: String) throws -> OriginalModel {
-        guard let record = manifest.models.first(where: { $0.source == path }) else { throw OriginalDataError.missing(path) }
+        guard let record = records[path] else { throw OriginalDataError.missing(path) }
         guard record.status == "decoded" else { throw OriginalDataError.unsupported(record.error ?? path) }
         let url = resourceRoot.appendingPathComponent(path).standardizedFileURL
         guard url.path.hasPrefix(resourceRoot.standardizedFileURL.path + "/") else {

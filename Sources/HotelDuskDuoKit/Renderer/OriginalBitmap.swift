@@ -82,19 +82,26 @@ public struct OriginalBitmapLibrary: Sendable {
     }
     public let manifest: Manifest
     private let root: URL
+    private let imageRecords: [String: Manifest.Record]
+    private let dataFileRecords: [String: Manifest.DataFile]
     var resourceRoot: URL { root }
     public init(resourceRoot: URL) throws {
         root = resourceRoot.standardizedFileURL
         manifest = try JSONDecoder().decode(Manifest.self, from: Data(contentsOf:
             root.appendingPathComponent("OriginalBitmapManifest.json")))
         guard manifest.formatVersion == 1 else { throw OriginalDataError.unsupported("Bitmap manifest version") }
+        imageRecords = Dictionary(manifest.images.map { ($0.source, $0) }, uniquingKeysWith: { first, _ in first })
+        dataFileRecords = Dictionary((manifest.dataFiles ?? []).map { ($0.source, $0) }, uniquingKeysWith: { first, _ in first })
     }
-    public static func bundled() throws -> Self {
+    private static let bundledLibrary: Result<Self, Error> = Result {
         guard let root = Bundle.module.resourceURL else { throw OriginalDataError.missing("OriginalBitmaps") }
         return try .init(resourceRoot: root.appendingPathComponent("OriginalBitmaps"))
     }
+
+    public static func bundled() throws -> Self { try bundledLibrary.get() }
+
     public func load(path: String) throws -> OriginalBitmap {
-        guard let record = manifest.images.first(where: { $0.source == path }) else { throw OriginalDataError.missing(path) }
+        guard let record = imageRecords[path] else { throw OriginalDataError.missing(path) }
         guard record.status == "decoded" else { throw OriginalDataError.unsupported(record.error ?? path) }
         let url = root.appendingPathComponent(path).standardizedFileURL
         guard url.path.hasPrefix(root.path + "/") else { throw OriginalDataError.invalid("Bitmap path leaves source directory") }
@@ -208,8 +215,8 @@ extension OriginalBitmapLibrary {
     }
 
     func checkedPayload(path: String, includeDataFiles: Bool = false) throws -> Data {
-        let imageRecord = manifest.images.first { $0.source == path }
-        let dataFileRecord = includeDataFiles ? manifest.dataFiles?.first { $0.source == path } : nil
+        let imageRecord = imageRecords[path]
+        let dataFileRecord = includeDataFiles ? dataFileRecords[path] : nil
         guard let expectedHash = imageRecord?.payloadSHA256 ?? dataFileRecord?.payloadSHA256 else {
             throw OriginalDataError.missing(path)
         }

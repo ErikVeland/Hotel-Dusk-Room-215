@@ -3,15 +3,19 @@ import Foundation
 public struct OriginalAnimationLibrary: Sendable {
     public let manifest: OriginalAnimationManifest
     private let resourceRoot: URL
+    private let animationRecords: [String: OriginalAnimationManifest.AnimationRecord]
+    private let colourRecords: [String: OriginalAnimationManifest.ColourRecord]
 
     public init(resourceRoot: URL) throws {
         self.resourceRoot = resourceRoot
         let data = try Data(contentsOf: resourceRoot.appendingPathComponent("OriginalAnimationManifest.json"))
         manifest = try JSONDecoder().decode(OriginalAnimationManifest.self, from: data)
         guard manifest.formatVersion == 1 else { throw OriginalAnimationError.invalid("unsupported manifest version") }
+        animationRecords = Dictionary(manifest.animations.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        colourRecords = Dictionary(manifest.colourOverlays.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
-    public static func bundled() throws -> OriginalAnimationLibrary {
+    private static let bundledLibrary: Result<Self, Error> = Result {
         guard let root = Bundle.module.resourceURL?.appendingPathComponent("OriginalAnimations"),
               FileManager.default.fileExists(atPath: root.path) else {
             throw OriginalAnimationError.missing("OriginalAnimations")
@@ -19,8 +23,10 @@ public struct OriginalAnimationLibrary: Sendable {
         return try .init(resourceRoot: root)
     }
 
+    public static func bundled() throws -> OriginalAnimationLibrary { try bundledLibrary.get() }
+
     public func load(id: String) throws -> OriginalAnimationClip {
-        guard let record = manifest.animations.first(where: { $0.id == id }) else {
+        guard let record = animationRecords[id] else {
             throw OriginalAnimationError.missing(id)
         }
         guard record.status == "decoded" else {
@@ -33,7 +39,7 @@ public struct OriginalAnimationLibrary: Sendable {
     }
 
     public func loadColourGrid(id: String) throws -> OriginalAnimationColourGrid {
-        guard let record = manifest.colourOverlays.first(where: { $0.id == id }) else {
+        guard let record = colourRecords[id] else {
             throw OriginalAnimationError.missing(id)
         }
         return try .init(data: verifiedPayload(path: record.source, sha256: record.payloadSHA256))

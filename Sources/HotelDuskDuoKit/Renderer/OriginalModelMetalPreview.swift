@@ -17,6 +17,7 @@ public final class OriginalModelMetalPreview {
 
     private struct Draw {
         let node: Int
+        let world: simd_float4x4
         let buffers: OriginalModelMetalGeometry
         let texture: MTLTexture?
         let dimensions: SIMD4<UInt32>
@@ -71,8 +72,17 @@ public final class OriginalModelMetalPreview {
         var resolvedPaths = [Int: String]()
         var prepared = [Draw]()
         let directory = (modelPath as NSString).deletingLastPathComponent
+        let gameplayRenderNodes = gameplayOnly ? model.gameplayRenderNodes : []
+        let worldTransforms = model.nodes.map { node in
+            let values = node.worldFixed.map { Float($0) / 4096 }
+            return simd_float4x4(columns: (
+                SIMD4(values[0], values[1], values[2], values[3]),
+                SIMD4(values[4], values[5], values[6], values[7]),
+                SIMD4(values[8], values[9], values[10], values[11]),
+                SIMD4(values[12], values[13], values[14], values[15])))
+        }
         for group in model.groups {
-            if gameplayOnly && !model.gameplayRenderNodes.contains(group.node) { continue }
+            if gameplayOnly && !gameplayRenderNodes.contains(group.node) { continue }
             guard let geometry = group.render else { continue }
             let material = model.materials[group.material]
             var dimensions = SIMD4<UInt32>(repeating: 0)
@@ -89,9 +99,7 @@ public final class OriginalModelMetalPreview {
                         if gameplayOnly && modelPath.hasPrefix("map/") {
                             path = try textures.mapTexturePath(modelPath: modelPath, textureName: material.texture)
                         } else {
-                            let matches = textures.manifest.textures.filter { $0.source.lowercased() == requested.lowercased() }
-                            guard matches.count == 1, let record = matches.first else { throw OriginalDataError.missing(requested) }
-                            path = record.source
+                            path = try textures.texturePath(matching: requested)
                         }
                         if isWalkingRoomModel { artworkSourcePath = path }
                         texture = try textures.load(path: path)
@@ -113,7 +121,7 @@ public final class OriginalModelMetalPreview {
                 sampling = SIMD4(UInt32(uploaded.width / texture.storedWidth), repeatMask,
                                  flipValue <= 3 ? flipValue : 0, smoothTextures ? 1 : 0)
             }
-            prepared.append(try Draw(node: group.node, buffers: geometry.makeMetalBuffers(device: device),
+            prepared.append(try Draw(node: group.node, world: worldTransforms[group.node], buffers: geometry.makeMetalBuffers(device: device),
                                      texture: gpuTexture, dimensions: dimensions, sampling: sampling))
         }
         draws = prepared
@@ -130,15 +138,9 @@ public final class OriginalModelMetalPreview {
         encoder.setCullMode(.none)
         for draw in draws where visibleNodes.contains(draw.node) {
             encoder.setRenderPipelineState(draw.texture == nil ? untexturedPipeline : pipeline)
-            let values = model.nodes[draw.node].worldFixed.map { Float($0) / 4096 }
-            let world = simd_float4x4(columns: (
-                SIMD4(values[0], values[1], values[2], values[3]),
-                SIMD4(values[4], values[5], values[6], values[7]),
-                SIMD4(values[8], values[9], values[10], values[11]),
-                SIMD4(values[12], values[13], values[14], values[15])))
             let instances = nodeInstances[draw.node] ?? [nodeTransforms[draw.node] ?? matrix_identity_float4x4]
             for instance in instances {
-                var uniforms = Uniforms(viewProjection: viewProjection, world: modelTransform * instance * world,
+                var uniforms = Uniforms(viewProjection: viewProjection, world: modelTransform * instance * draw.world,
                                         dimensions: draw.dimensions, sampling: draw.sampling)
                 encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
                 encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)

@@ -20,7 +20,7 @@ public typealias OriginalMapRendererFactory = @MainActor (String, UInt16?) throw
  */
 public final class OriginalMapRenderer: OriginalMapRendering, @unchecked Sendable {
     public let map: CGImage
-    nonisolated(unsafe) private let device: MTLDevice
+    private let device: MTLDevice
     private let models: OriginalModelLibrary
     private let textures: OriginalTextureLibrary
     nonisolated(unsafe) private var roomVariants: [UInt16: OriginalModelMetalPreview]
@@ -89,7 +89,6 @@ public final class OriginalMapRenderer: OriginalMapRendering, @unchecked Sendabl
         }
         let visible = state.objectVisibility.visibleNodes(in: scene.model, map: state.mapID,
             area: state.mode == .walking ? nil : state.searchAreaID, game: game)
-            .intersection(scene.model.gameplayRenderNodes)
         return try scene.render(width: 192 * renderScale, height: 256 * renderScale, viewProjection: state.viewProjection,
             visibleNodes: visible)
     }

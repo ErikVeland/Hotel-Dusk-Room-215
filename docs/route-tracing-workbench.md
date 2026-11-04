@@ -85,15 +85,6 @@ The walkthrough also says the final Chapter 10 conversation ends the game after 
 
 The Chapter 9 apple route is already covered in normal-input notes. The player finds J under the one-apple painting, orders all five letters by apple count to spell JENNY, then closes and reopens the DS for the CPR action. Do not spend the next trace cycle on these steps unless a regression appears. [Walkthrough CHP913–CHP914](https://gamefaqs.gamespot.com/ds/933043-hotel-dusk-room-215/faqs/46777)
 
-## Parallel analysis roles
-
-Use agents for separate evidence tasks. Each agent should return source paths, offsets, observed state, confidence and the next unresolved question. Keep code edits with one integrator to avoid conflicting changes.
-
-1. **Script graph analyst:** build candidate event and transition links from BLK and CHK data. Mark unknown conditions and command effects.
-2. **Runtime trace analyst:** capture normal inputs and state changes from checkpoints. Find the first mismatch between the expected and actual selector result.
-3. **ARM handler analyst:** resolve one unknown command, condition or process return from the recovered code. Return the handler address and a minimal source-backed rule.
-4. **Route integrator:** join the evidence, update the route graph and select the next highest-value trace.
-
 The latest isolated process-59 trace confirms that the runner updates touch coordinates during a held stroke. A cross-pencil sweep from `(100, 110)` to `(140, 150)` and back creates shaving particles and raises source progress at `+0x1a94` to 376. Repeating that path, with or without a fresh touch anchor, does not pass 376 or leave interaction state `(1,1,0)`. This is a useful input path, but not a successful process return. The next trace must vary the stroke range or action to advance beyond the 375-count source milestone.
 
 On 2 November 2026, a modified-checkpoint emulator run repeated 60 perpendicular sweeps. Source progress reached `0x0178` (376) by sweep 30 and stayed there through sweep 60. The runner logged `ARM9: data abort (01FFC404)` after sweep 10. The run does not prove normal Chapter 10 behaviour or a successful original sharpening route. Keep this source-input comparison open.

@@ -31,7 +31,6 @@ public final class OriginalArtwork: @unchecked Sendable {
     private let root: URL?
     private let records: [String: Manifest.Record]
     private let sourceRecords: [String: Manifest.Record]
-    private let animationFrameRecords: [String: Manifest.Record]
     private let defaultScale: Int
     private let cache = NSCache<NSString, CGImage>()
     private final class Size: NSObject {
@@ -52,14 +51,10 @@ public final class OriginalArtwork: @unchecked Sendable {
             sourceRecords = Dictionary(manifest.images.flatMap { record in
                 record.sources.map { ($0, record) }
             }, uniquingKeysWith: { first, _ in first })
-            animationFrameRecords = Dictionary(manifest.images.flatMap { record in
-                record.sources.filter { $0.hasPrefix("OriginalAnimations/") }.map { ($0, record) }
-            }, uniquingKeysWith: { first, _ in first })
         } else {
             defaultScale = 1
             records = [:]
             sourceRecords = [:]
-            animationFrameRecords = [:]
         }
         cache.totalCostLimit = 128 * 1024 * 1024
     }
@@ -74,7 +69,7 @@ public final class OriginalArtwork: @unchecked Sendable {
 
     /// The enhanced first-pass image of an animation frame named `<anm>#<frame>`.
     func animationFrameImage(source: String, width: Int, height: Int) -> CGImage? {
-        guard Self.isHDGraphicsEnabled, let record = animationFrameRecords[source],
+        guard Self.isHDGraphicsEnabled, source.hasPrefix("OriginalAnimations/"), let record = sourceRecords[source],
               record.width == width, record.height == height else { return nil }
         return load(record)
     }
@@ -317,17 +312,20 @@ public final class OriginalArtwork: @unchecked Sendable {
     }
 
     private func load(_ record: Manifest.Record) -> CGImage? {
-        if let image = cache.object(forKey: record.key as NSString) { return image }
         let scale = record.scale ?? defaultScale
-        guard (1...8).contains(scale) else { return nil }
-        guard (record.file == record.key + ".png" || record.file == record.key + ".webp"), let root,
+        let cacheKey = "\(record.width)x\(record.height):\(record.file):\(record.pngSHA256):\(scale)" as NSString
+        if let image = cache.object(forKey: cacheKey) { return image }
+        guard (1...8).contains(scale),
+              record.file.range(of: "\\A\(record.width)x\(record.height)-[0-9a-f]{64}\\.(png|webp)\\z",
+                                options: .regularExpression) != nil else { return nil }
+        guard let root,
               let data = try? Data(contentsOf: root.appendingPathComponent(record.file)),
               OriginalAnimationClip.digest(data) == record.pngSHA256,
               let source = CGImageSourceCreateWithData(data as CFData, nil),
               let image = CGImageSourceCreateImageAtIndex(source, 0, [kCGImageSourceShouldCacheImmediately: true] as CFDictionary),
               image.width == record.width * scale, image.height == record.height * scale else { return nil }
         remember(image, size: CGSize(width: record.width, height: record.height))
-        cache.setObject(image, forKey: record.key as NSString, cost: image.bytesPerRow * image.height)
+        cache.setObject(image, forKey: cacheKey, cost: image.bytesPerRow * image.height)
         return image
     }
 

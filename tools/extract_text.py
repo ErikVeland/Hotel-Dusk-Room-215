@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import os
+import re
 import struct
 import sys
 
@@ -24,43 +25,21 @@ def parse_map_strings(path):
     return strings
 
 def parse_txt_file(path):
-    lines = []
     with open(path, "r", encoding="latin-1", errors="replace") as f:
-        for line in f:
-            lines.append(line.rstrip("\r\n"))
-    return lines
+        return [line.rstrip("\r\n") for line in f]
 
 def parse_dat_strings(path):
-    # Extracts printable null-terminated strings from binary dat files
     with open(path, "rb") as f:
         data = f.read()
     strings = []
-    cur = bytearray()
-    for b in data:
-        if b == 0:
-            if len(cur) >= 2:
-                try:
-                    s = cur.decode("latin-1")
-                    if any(c.isalnum() for c in s):
-                        strings.append(s)
-                except Exception:
-                    pass
-            cur = bytearray()
-        elif 32 <= b <= 126 or b in (10, 13, 9):
-            cur.append(b)
-        else:
-            if len(cur) >= 2:
-                try:
-                    s = cur.decode("latin-1")
-                    if any(c.isalnum() for c in s):
-                        strings.append(s)
-                except Exception:
-                    pass
-            cur = bytearray()
+    for match in re.finditer(rb"[\x20-\x7e\t\r\n]{2,}", data):
+        text = match[0].decode("ascii")
+        if any(character.isalnum() for character in text):
+            strings.append(text)
     return strings
 
 def export_all_text(data_dir, output_json):
-    os.makedirs(os.path.dirname(output_json), exist_ok=True)
+    os.makedirs(os.path.dirname(output_json) or ".", exist_ok=True)
     catalog = {
         "system_text": {},
         "dialogues": {},
@@ -94,5 +73,5 @@ def export_all_text(data_dir, output_json):
 
 if __name__ == "__main__":
     ddir = sys.argv[1] if len(sys.argv) > 1 else "extracted/root/data"
-    out = sys.argv[2] if len(sys.argv) > 2 else "HotelDuskDuo/Resources/GameText.json"
+    out = sys.argv[2] if len(sys.argv) > 2 else "Sources/HotelDuskDuoKit/Resources/GameText.json"
     export_all_text(ddir, out)

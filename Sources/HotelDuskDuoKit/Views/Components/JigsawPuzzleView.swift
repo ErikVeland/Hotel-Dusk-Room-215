@@ -132,16 +132,6 @@ public struct JigsawPuzzleView: View {
         .accessibilityLabel(clockwise ? "Turn piece right" : "Turn piece left")
     }
 
-    private func pageInsets(at index: Int) -> EdgeInsets {
-        // Equal outer clearances keep both original stages reflected about the
-        // hinge even if a camera cutout affects only one side of the display.
-        let outer = max(12, safeArea.leading, safeArea.trailing)
-        return EdgeInsets(top: max(12, safeArea.top),
-                          leading: index == 0 ? outer : 16,
-                          bottom: max(12, safeArea.bottom),
-                          trailing: index == 0 ? 16 : outer)
-    }
-
     private func stageImage(for role: DuoBookLayout.Page) -> String {
         let art = puzzleManager.manifest
         switch puzzleManager.phase {

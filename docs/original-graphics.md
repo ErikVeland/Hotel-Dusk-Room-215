@@ -22,7 +22,7 @@ with 289 colour-grid frames, 2,957 DTX textures, and 296 MDF model resources.
 | 61 MDF models | 60 `MDF_GL_100` test/effect resources and one older group-layout resource remain unsupported. |
 | 19 LRIM opening animations, 135 frames | All Nintendo LZ10 streams and original tile deltas decoded. Full frame hashes and checkpoint continuity are verified independently. |
 
-The reproducible report is [original-animation-report.json](original-animation-report.json).
+The reproducible report is [bundled manifest](../Sources/HotelDuskDuoKit/Resources/OriginalAnimations/OriginalAnimationManifest.json).
 It includes source and payload SHA-256 hashes, per-frame index/palette/RGBA
 hashes, original header values, and explicit unsupported records.
 
@@ -98,10 +98,10 @@ loop restart, checkpoint restoration, unsupported-data rejection and all MTC
 frame hashes. These checks establish decoding agreement; they do not validate
 the whole game's character timing or complete scene composition.
 
-The [Kyle contact sheet](previews/original-animations/KyleContactSheet.png) shows
+The generated Kyle contact sheet in `.cache/previews/original-animations` shows
 the 11 original `Hy_hanas_` frames in order. It uses a plain preview background
 to make alpha visible. The individual PNGs retain transparency. The warehouse
-sequence in `previews/original-animations/An_TanaMove_` also confirms palette
+sequence in `.cache/previews/original-animations/An_TanaMove_` also confirms palette
 colour and accumulated delta frames through the door reveal.
 
 ## Original textures
@@ -134,7 +134,7 @@ python3 tools/decode_dtx.py \
 `OriginalTextureLibrary.bundled().load(path:)` verifies the payload hash and
 returns source data, decoded RGBA, a Core Graphics image, or an exact texel
 upload through `makeMetalTexture(device:)`. The report is
-[original-texture-report.json](original-texture-report.json).
+[bundled manifest](../Sources/HotelDuskDuoKit/Resources/OriginalTextures/OriginalTextureManifest.json).
 
 ## Original models and native Metal preview
 
@@ -187,7 +187,7 @@ HOTEL_DUSK_MODEL_PREVIEW="$PWD/.cache/previews/original-models/R212-native-metal
 `OriginalModelTests` passed for all 235 supported models, comparing decoded
 bytes, vertex/index hashes and every local/world fixed-point matrix against
 the independent Python decoder. The report is
-[original-model-report.json](original-model-report.json). The unsupported
+[bundled manifest](../Sources/HotelDuskDuoKit/Resources/OriginalModels/OriginalModelManifest.json). The unsupported
 `map/R123/R123_s04/R123_s04.mdf` contains eight-byte group records, while the
 recovered game loader consumes sixteen-byte records. Its original bytes are
 retained; it is not silently interpreted as the later format.
@@ -218,7 +218,7 @@ Animation timing and repetition remain under script control.
 Checkpoints retain the exact 49,152 tiled pixel indices, current frame and
 source hash. Restoring a different clip's checkpoint fails. All 135 frames
 match independent decompressed-buffer, tile-buffer and RGBA hashes in
-[original-tile-animation-report.json](original-tile-animation-report.json).
+[bundled manifest](../Sources/HotelDuskDuoKit/Resources/OriginalBitmaps/OriginalTileAnimationManifest.json).
 
 ```sh
 python3 tools/decode_lrim.py
@@ -268,7 +268,7 @@ python3 tools/recover_opening_graphics.py
 swift test --filter OriginalOpeningGraphicsTests
 ```
 
-The report is [original-opening-graphics-report.json](original-opening-graphics-report.json).
+The report is [bundled manifest](../Sources/HotelDuskDuoKit/Resources/OriginalBitmaps/OriginalOpeningGraphicsManifest.json).
 Lossless previews for all three variants are in `previews/original-opening-cards`.
 
 ## Remaining work

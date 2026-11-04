@@ -23,7 +23,8 @@ On 3 November 2026, the ordered fresh route passed all 80 sections with no
 failures or skips. Both required handoff saves passed validation. The Chapter 4
 stash step accepts the whole or torn memo, according to the carried inventory.
 
-Run from the project root:
+Install `tools/requirements.txt` in a Python environment, then run from the project root.
+Use that environment’s Python executable for these commands:
 
 ```sh
 python3 tools/verify.py --profile fast --strict
@@ -44,8 +45,11 @@ the profile with the required host or fixture dependency.
 The project tests use XCTest. The verifier enables XCTest discovery when the
 installed SwiftPM supports it. Older SwiftPM versions use their default test
 runner. Before SwiftPM compiles the test target, the verifier checks that the
-selected Swift compiler can import XCTest. If the import fails, it records a
-failed Swift group with the compiler reason and continues independent checks.
+selected Swift compiler can import XCTest.
+
+On a missing XCTest import, it retries with the selected macOS platform's
+developer framework directory. If the import still fails, it records a failed
+Swift group with the compiler reason and continues independent checks.
 This preflight does not count as a test run or route evidence.
 
 Use the `all` profile for the clean Chapter 1-to-ending route gate. It runs the

@@ -3,6 +3,7 @@ import base64
 import hashlib
 import json
 import struct
+from subprocess import CompletedProcess
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -308,6 +309,73 @@ Test Case '-[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfClose
 
     def test_xctest_preflight_accepts_a_successful_import(self):
         self.assertIsNone(verify.xctest_preflight_failure(0, ""))
+
+    def test_xctest_preflight_uses_platform_frameworks_when_the_default_search_path_misses_xctest(self):
+        missing = "error: no such module 'XCTest'\n"
+        env = {"DEVELOPER_DIR": "/selected/Xcode.app/Contents/Developer"}
+        with TemporaryDirectory() as directory:
+            platform = Path(directory) / "MacOSX.platform"
+            frameworks = platform / "Developer/Library/Frameworks"
+            frameworks.mkdir(parents=True)
+            with patch.object(verify.subprocess, "run", side_effect=[
+                CompletedProcess([], 1, "", missing),
+                CompletedProcess([], 0, str(platform) + "\n", ""),
+                CompletedProcess([], 0, "", ""),
+            ]) as run:
+                reason, output = verify.xctest_preflight(env)
+            self.assertIsNone(reason)
+            self.assertIn(missing, output)
+            self.assertEqual(run.call_args_list[1].args[0],
+                             ["xcrun", "--sdk", "macosx", "--show-sdk-platform-path"])
+            retry = run.call_args_list[2]
+            self.assertEqual(retry.args[0], ["swiftc", "-typecheck", "-", "-F", str(frameworks)])
+            self.assertEqual(retry.kwargs["env"], env)
+            self.assertEqual(retry.kwargs["input"], "import XCTest\n")
+
+    def test_xctest_preflight_preserves_missing_module_diagnostics_without_xcrun(self):
+        missing = "error: no such module 'XCTest'\n"
+        with patch.object(verify.subprocess, "run", side_effect=[
+            CompletedProcess([], 1, "", missing), FileNotFoundError("xcrun"),
+        ]):
+            reason, output = verify.xctest_preflight({})
+        self.assertEqual(reason, "The selected Swift toolchain does not provide XCTest.")
+        self.assertEqual(output, missing)
+
+    def test_xctest_preflight_does_not_retry_without_platform_frameworks(self):
+        missing = "error: no such module 'XCTest'\n"
+        with TemporaryDirectory() as directory:
+            with patch.object(verify.subprocess, "run", side_effect=[
+                CompletedProcess([], 1, "", missing),
+                CompletedProcess([], 0, directory + "\n", ""),
+            ]) as run:
+                reason, output = verify.xctest_preflight({})
+        self.assertEqual(reason, "The selected Swift toolchain does not provide XCTest.")
+        self.assertEqual(output, missing)
+        self.assertEqual(run.call_count, 2)
+
+    def test_xctest_preflight_keeps_retry_failure_reason_and_both_compiler_diagnostics(self):
+        missing = "error: no such module 'XCTest'\n"
+        mismatch = "error: SDK is not supported by the compiler\n"
+        with TemporaryDirectory() as directory:
+            platform = Path(directory)
+            (platform / "Developer/Library/Frameworks").mkdir(parents=True)
+            with patch.object(verify.subprocess, "run", side_effect=[
+                CompletedProcess([], 1, "", missing),
+                CompletedProcess([], 0, directory + "\n", ""),
+                CompletedProcess([], 1, "", mismatch),
+            ]):
+                reason, output = verify.xctest_preflight({})
+        self.assertEqual(reason, "The selected Swift compiler and SDK versions do not match.")
+        self.assertEqual(output, missing + mismatch)
+
+    def test_xctest_preflight_does_not_discover_frameworks_after_success_or_an_sdk_mismatch(self):
+        for code, diagnostic in ((0, ""), (1, "error: SDK is not supported by the compiler\n")):
+            with self.subTest(code=code), patch.object(verify.subprocess, "run", return_value=
+                CompletedProcess([], code, "", diagnostic)) as run:
+                reason, output = verify.xctest_preflight({})
+                self.assertEqual(reason, verify.xctest_preflight_failure(code, diagnostic))
+                self.assertEqual(output, diagnostic)
+                self.assertEqual(run.call_count, 1)
 
     def test_fresh_route_checkpoints_use_a_new_retained_directory(self):
         with TemporaryDirectory() as temporary_directory:

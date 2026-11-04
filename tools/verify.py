@@ -30,6 +30,7 @@ ROUTE_DEPENDENCY_SKIP = re.compile(
 )
 PY_TOTAL = re.compile(r"Ran (\d+) tests? in")
 PY_RESULT = re.compile(r"^(OK|FAILED)(?: \((.*)\))?$")
+MISSING_XCTEST = re.compile(r"""no such module ['"]XCTest['"]""")
 MAX_ROUTE_CHECKPOINT_PASSES = 20
 # This interactive probe needs a developer-supplied starting save.
 DIAGNOSTIC_TESTS = {"OriginalChapterFourProbe"}
@@ -246,7 +247,7 @@ def xctest_preflight_failure(return_code, output):
     """Describe why the selected compiler cannot build an XCTest import."""
     if return_code == 0:
         return None
-    if "no such module 'XCTest'" in output or 'no such module "XCTest"' in output:
+    if MISSING_XCTEST.search(output):
         return "The selected Swift toolchain does not provide XCTest."
     if "SDK is not supported by the compiler" in output:
         return "The selected Swift compiler and SDK versions do not match."
@@ -260,6 +261,20 @@ def xctest_preflight(env):
     result = subprocess.run(["swiftc", "-typecheck", "-"], input="import XCTest\n",
                             capture_output=True, text=True, check=False, env=env)
     output = result.stdout + result.stderr
+    if result.returncode and MISSING_XCTEST.search(output):
+        try:
+            platform = subprocess.run(["xcrun", "--sdk", "macosx", "--show-sdk-platform-path"],
+                                      capture_output=True, text=True, check=False, env=env)
+        except OSError:
+            platform = None
+        if platform is not None and platform.returncode == 0 and platform.stdout.strip():
+            frameworks = Path(platform.stdout.strip()) / "Developer/Library/Frameworks"
+            if frameworks.is_dir():
+                retry = subprocess.run(["swiftc", "-typecheck", "-", "-F", str(frameworks)],
+                                       input="import XCTest\n", capture_output=True,
+                                       text=True, check=False, env=env)
+                retry_output = retry.stdout + retry.stderr
+                return xctest_preflight_failure(retry.returncode, retry_output), output + retry_output
     return xctest_preflight_failure(result.returncode, output), output
 
 

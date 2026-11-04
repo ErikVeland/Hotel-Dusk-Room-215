@@ -33,7 +33,7 @@ beta_pack="$PWD/.build/testflight/EnhancedArtwork"
 if [[ ! -x "$artwork_python" ]]; then
     echo "Create the artwork environment first:" >&2
     echo "python3 -m venv .build/testflight-tools" >&2
-    echo ".build/testflight-tools/bin/python -m pip install Pillow==12.0.0" >&2
+    echo ".build/testflight-tools/bin/python -m pip install -r tools/requirements.txt" >&2
     exit 1
 fi
 if [[ -f "$beta_pack/ArtworkManifest.json" ]]; then
@@ -43,14 +43,12 @@ from pathlib import Path
 source, beta = map(Path, sys.argv[1:])
 manifest = json.loads((beta / 'ArtworkManifest.json').read_text())
 expected = hashlib.sha256((source / 'ArtworkManifest.json').read_bytes()).hexdigest()
-exclusions = json.loads(Path('HotelDuskDuo/BetaArtworkExclusions.json').read_text())
 packaging = manifest.get('betaPackaging', {})
-if packaging.get('sourceManifestSHA256') != expected or packaging.get('originalArtworkFallbacks') != exclusions:
+if packaging.get('sourceManifestSHA256') != expected or packaging.get('originalArtworkFallbacks') != {}:
     sys.exit('The beta artwork is stale. Move .build/testflight/EnhancedArtwork, then run this command again.')
 PY
 else
-    "$artwork_python" tools/package_beta_artwork.py "$source_pack" "$beta_pack" \
-        --exclusions HotelDuskDuo/BetaArtworkExclusions.json
+    "$artwork_python" tools/package_beta_artwork.py "$source_pack" "$beta_pack"
 fi
 "$artwork_python" tools/verify_artwork_candidate.py "$beta_pack"
 {

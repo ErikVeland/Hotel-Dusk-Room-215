@@ -2,68 +2,18 @@
 
 The beta uses bundle ID `com.veland.hoteldusk.duo`, version `0.1`, and signing team `54WU29TRTY`.
 The archive command sets the build number. Use a new number for each upload.
-Earlier checkpointed native-input tests reached the Chapter 10 ending. They predate the current source tree. Full-route solvability on this checkout, every branch, source fidelity and device behaviour are not verified. See [current game status](../README.md).
-
-## Preparation result — 1 November 2026
-
-Version `0.1 (4)` has a signed device archive at `.build/testflight/HotelDusk-4.xcarchive`.
-It uses merged revision `3ea2c37c`, including the corrected room labels.
-Its archived app size is 2,844,819,695 bytes, down from 6,393,473,687 bytes.
-Local metadata, privacy-manifest, crash-symbol, size, and code-signature checks pass.
-All 7,564 images in the beta pack pass file-hash, dimension, and recorded-pixel-hash checks.
-All 10 focused artwork, notebook, and startup tests pass with the beta pack.
-
-App Store export succeeded. The signed IPA is `.build/testflight/export-4/Hotel Dusk.ipa` (2,795,488,371 bytes).
-Its profile has `beta-reports-active` enabled and `get-task-allow` disabled, with no registered-device restriction.
-The build has not been uploaded to App Store Connect or assigned to testers.
-The source revision, sizes, SHA-256, and verification summary are recorded in `.build/testflight/build-4.json`.
-
-The archive log, export log, and artwork test log are under `.build/testflight`.
-Run the focused runtime checks against the beta pack with:
-
-```sh
-HOTEL_DUSK_ARTWORK_CANDIDATE="$PWD/.build/testflight/EnhancedArtwork" \
-HOTEL_DUSK_NOTEBOOK_CANDIDATE="$PWD/.build/testflight/EnhancedArtwork" \
-HOTEL_DUSK_ARTWORK_ANIMATION_SCALE=4 \
-swift test --disable-sandbox \
-  --filter '\.(ChapterOneArtworkCandidateTests|NotebookArtworkCandidateTests|HotelDuskDuoTests)/'
-```
-
-The gameplay verification is **not green**. The refreshed fast run recorded 303 passed Swift tests and one missing-reference skip.
-Strict mode reports incomplete coverage because the PNG/WebP comparison reference is absent.
-The earlier corrected native run recorded 201 passed tests and 12 failed tests before it was stopped during a lengthy restore test.
-The remaining native tests did not complete. These results do not establish full-game beta readiness.
-
-The native failures include lobby camera expectations, the Chapter 2 hanger/suitcase route, bag rendering and transitions,
-Chapter 10 shed selection, pamphlet rendering, label peeling, map indicators, and pencil-sharpener behaviour and image dimensions.
-Some failures compare original pixel dimensions with enhanced artwork dimensions. Others need route and behaviour investigation.
-Do not treat all failures as artwork-only issues.
-
-The detailed reports are in `.build/verification/testflight-merged-fast` and `.build/verification/testflight-native-corrected`.
-Resolve or explicitly scope these issues before inviting testers. The device checks below also remain open.
-
-## Readiness check — 2 November 2026
-
-The recorded checks used Xcode 26.6. The fast profile passed with 305 tests, no failures and five skips. The skipped tests need isolated artwork candidate files. These are historical results, not current-tree verification. Xcode 27.2 is now installed, but its licence is not accepted, so current XCTest and iOS build checks cannot run. See `.build/verification/goal-fast-ios-current/report.json`.
-
-The earlier reference profile passed with 307 tests, no failures and eight skips. The skips include seven Metal renderer checks and one Chapter 4 probe without its save. Those checkpointed normal-input tests reached the Chapter 10 ending before the current source tree. They do not prove current full-route solvability, one uninterrupted session, every branch, source fidelity or device input. See `.build/verification/goal-reference-final-xcode/report.json`.
-
-The audio profile passed 29 tests and four source-audio checks, with no failures. Nine playback checks skipped because Apple sampler and audio-player units are unavailable in this environment. The source-backed checks cover both archive-entry cues and single-archive puzzle cues. They do not verify playback timbre, perceived level or physical haptic timing. See `.build/verification/goal-audio-after-legacy-cue-fix/report.json`.
-
-The native UI profile did not complete. `LayoutSnapshotTests.testRenderPaperMaterialAtRestAndWhileSettling` stalled after IOSurface errors and was stopped after three minutes. It is not a pass. See `.build/verification/goal-native-current/swift.log`.
-
-The iOS simulator build could not resolve packages because the restricted host could not write Xcode's user cache, and CoreSimulator was unavailable. An unsigned iOS device build with local package caches then found that the iOS 26.5 platform is not installed in Xcode 26.6. No iOS build or device validation is established. Xcode 27.1 or later is required for the current hinge API. Bowling score parity, puzzle input fidelity, audio output and physical haptics also need device checks.
+See [implementation status](native-port-status.md) and [verification](verification.md) for route coverage and remaining device checks.
 
 ## Create an archive
 
 Use Xcode 27.1 or later to compile the hinge APIs. Use a release of Xcode accepted by App Store Connect.
-The commands below select the installed stable Xcode without changing the system selection.
+Select the intended Xcode installation before archiving.
 
 1. Install the artwork tool in a local environment:
 
    ```sh
    python3 -m venv .build/testflight-tools
-   .build/testflight-tools/bin/python -m pip install Pillow==12.0.0
+   .build/testflight-tools/bin/python -m pip install -r tools/requirements.txt
    ```
 
 2. Regenerate the Xcode project after changing `project.yml`:
@@ -90,19 +40,18 @@ If signing fails, select the existing team in Xcode and refresh its signing asse
 
 ## Artwork packaging
 
-The source artwork occupies about 6.01 GB. The original app archive occupies about 6.39 GB.
+The source artwork occupies about 5.56 GB after duplicate images are shared.
 Apple limits iOS apps to [4 GB uncompressed](https://developer.apple.com/help/app-store-connect/reference/app-uploads/maximum-build-file-sizes/).
 
-The beta pack reduces 2,803 enhanced animation images from 8× to 4×.
+The beta pack reduces enhanced animation images from 8× to 4×. Shared source files are resized once and remain shared.
 Scene images retain their existing 4× resolution. All original game resources remain bundled.
 The tool preserves the source artwork and checks each resized image after lossless WebP encoding.
 It updates the image dimensions and checksums in the separate beta manifest.
 The archive command installs this pack, signs the app again with its original identity, and verifies the signature.
 Use the archive command for beta builds. Xcode's Archive action alone retains the oversized source artwork pack.
 
-Three enhanced notebook controls have file and pixel checksums that differ from the source manifest.
-`HotelDuskDuo/BetaArtworkExclusions.json` records these exceptions. The game continues to use their existing original-artwork fallback.
-Other checksum failures stop packaging. A successful package check does not establish visual quality on a device.
+Three invalid notebook overrides have been removed from the source pack. Their source exclusions remain in the artwork manifest, and the game uses original artwork.
+Checksum failures stop packaging. A successful package check does not establish visual quality on a device.
 
 ## Privacy and export metadata
 

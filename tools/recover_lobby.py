@@ -86,18 +86,16 @@ def main():
             "storedWidth": texture.width, "storedHeight": texture.height,
             "decodedSHA256": digest(texture.data), "paletteSHA256": digest(texture.palette),
             "pixelDataSHA256": digest(texture.pixel_data), "rgbaSHA256": digest(texture.rgba())}
-        for target in ["Sources/HotelDuskDuoKit/Resources/OriginalTextures/OriginalTextureManifest.json",
-                       "docs/original-texture-report.json"]:
-            path = ROOT / target
-            manifest = json.loads(path.read_text())
-            old = next(item for item in manifest["textures"] if item["source"] == source_path)
-            if old["status"] != "decoded":
-                manifest["coverage"]["decoded"] += 1
-                manifest["coverage"]["unsupported"] -= 1
-                manifest["coverage"]["mode7"] += 1
-            old.clear()
-            old.update(record)
-            path.write_text(json.dumps(manifest, indent=2) + "\n")
+        path = ROOT / "Sources/HotelDuskDuoKit/Resources/OriginalTextures/OriginalTextureManifest.json"
+        manifest = json.loads(path.read_text())
+        old = next(item for item in manifest["textures"] if item["source"] == source_path)
+        if old["status"] != "decoded":
+            manifest["coverage"]["decoded"] += 1
+            manifest["coverage"]["unsupported"] -= 1
+            manifest["coverage"]["mode7"] += 1
+        old.clear()
+        old.update(record)
+        path.write_text(json.dumps(manifest, indent=2) + "\n")
 
 
 

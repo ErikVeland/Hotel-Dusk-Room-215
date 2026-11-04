@@ -20,7 +20,6 @@ let package = Package(
     targets: [
         .target(
             name: "HotelDuskDuoKit",
-            exclude: ["Resources/Shaders"],
             resources: [
                 .process("Resources/Images"),
                 .process("Resources/GameText.json"),

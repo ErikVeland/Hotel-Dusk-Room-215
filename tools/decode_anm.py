@@ -156,7 +156,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=SOURCE)
     parser.add_argument("--bundle", type=Path, help="Copy original payloads and write runtime manifest")
-    parser.add_argument("--report", type=Path, default=ROOT / "docs/original-animation-report.json")
+    parser.add_argument("--report", type=Path, default=ROOT / ".build/recovery/original-animation-report.json")
     parser.add_argument("--preview", action="append", default=[], help="ANM basename to export as PNG frames")
     parser.add_argument("--preview-directory", type=Path, default=ROOT / ".cache/previews/original-animations")
     args = parser.parse_args()

@@ -100,7 +100,9 @@ def main():
                         "frameCount": len(frames), "frames": frames})
     report = {"formatVersion": 1, "coverage": {"animations": len(entries), "frames": total}, "animations": entries}
     text = json.dumps(report, indent=2) + "\n"
-    (ROOT / "docs/original-tile-animation-report.json").write_text(text)
+    report_path = ROOT / ".build/recovery/original-tile-animation-report.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(text)
     (ROOT / "Sources/HotelDuskDuoKit/Resources/OriginalBitmaps/OriginalTileAnimationManifest.json").write_text(text)
     print(report["coverage"])
 

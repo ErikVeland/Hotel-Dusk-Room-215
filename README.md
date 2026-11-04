@@ -1,51 +1,102 @@
-# Hotel Dusk: Room 215 — native Duo rewrite
+# Hotel Dusk: Room 215
 
-This is an unfinished Swift and SwiftUI rewrite of the supplied Nintendo DS game. The ROM is a reference for recovering and comparing behaviour. The app does not execute ARM code or embed a DS emulator. **On 3 November 2026, the ordered fresh-checkpoint XCTest route passed from Chapter 1 through the Chapter 10 ending: 80 sections passed, with no failures or skips. Both required handoff saves passed checksum, chapter and map validation. The tests restore saves between route sections. The broader strict `all` suite still has failures and missing-fixture skips. The ordered route does not establish device rendering fidelity or cover alternate branches. `HotelDuskDuoKit` and `HotelDuskDuoApp` build for macOS. The iOS target and device behaviour remain unverified.**
+An unfinished native Swift and SwiftUI port for a two-page Duo display. The app
+runs recovered game scripts and Swift implementations of the original processes.
+A separate ROM runner supports comparison with the Nintendo DS game.
 
-The former demonstration dialogue, arbitrary initial inventory, chapter shortcuts, suspicion meter, floor plan and procedural corridor have been removed from the app. Their source is retained outside the build in `archive/retired-prototype`. **Begin Chapter 1** now reaches the original lobby, counter and bell through normal play. The title menu requires confirmation before a new game replaces valid or unreadable saved progress. It keeps a valid legacy chapter save available when no current resume or safe-place save exists. Development previews remain available through **Book options** in debug builds.
+The bundled resources support ordinary play without the ROM. Source recovery and
+some tests need local files that are not included in Git.
 
-## Playing on Duo
+## Build and run
 
-The ordered native-input test chain now reaches the Chapter 10 ending from a fresh Chapter 1 game. It restores checkpoints created within that run between route sections. Chapter 7 process 55 uses overlay 30's 26 recovered cube transforms, `soko.mdf`, and the recovered object-9 blocker check. Checkpointed normal-input tests complete the tree search and decoration with CPU-projected touch points. They do not verify the visible touch mapping against the original game or Metal rendering on a device. Chapter 10 process 79 uses overlay 40's 90-slot board, accepts five valid middle-box hits, and presents a confirmation before returning success. It uses a fixed seed so saved input replays against the same layout; the original uses a time-based seed and varies box face details. The five-hit event route and CPU mesh-hit checks pass, but Metal rendering is unavailable on this host. If an interaction stops on an error, play restores the last safe walking place; the active puzzle may need to be repeated. Focused tests restore checkpoints between route sections. Start with **Begin Chapter 1**. **Continue** restores the saved step after quitting or restarting the app, including conversations, choices, registration, puzzle inputs and the notebook reading position. Every input, active simulation step and writing update saves immediately through a compact append log. Interrupted final writes retain the preceding complete step. Pausing, backgrounding and returning to the title flush the current progress. Walking boundaries compact the interaction record. Failed saves retain the previous file and keep the live game open for retry. The app skips the original manual save prompts. Older chapter saves remain readable.
+Use Xcode with the macOS SDK and Swift 5.9 or later. The package targets macOS 14
+and iOS 17. Newer device APIs can require a newer SDK.
 
-Dialogue turns one sheet across the spine. Swipe right or select **Previous pages** to reread written text. Swipe left or use the page control to return. **Book options → Previous conversations** opens the transcript outside dialogue and restores your place when you select **Return to game**. Active puzzles block this view. Selecting a dialogue choice shows its response without another Continue for a repeated answer. Folding the Duo retains the reading position and pauses unfinished writing, including through cover-display size changes.
+```sh
+swift build
+swift run HotelDuskDuoApp
+```
 
-Open **Book options → Pause game** for Resume, Recall saved place, Return to last safe place, sound controls and Return to title. Return to last safe place leaves the current interaction and restores the latest walking checkpoint; you may need to repeat the interaction. Backgrounding the app or closing the Duo also pauses play. Opening the Duo does not dismiss a menu pause. Doors now use the original shared responses when no room-specific event matches. If an interaction cannot continue, play returns to the last safe walking place. If Continue cannot restore its latest checkpoint, it uses the last safe place or starts Chapter 1. Save failures appear in the pause menu and retain the previous checkpoint.
+For iOS, open `HotelDuskDuo.xcodeproj`, select **HotelDuskDuoiOS**, choose your
+connected device and set your signing team. The project is generated from
+`project.yml`. After changing that file, regenerate it with XcodeGen:
 
-**Book options → Music source** switches between **Native music** and the supplied **Recorded soundtrack** during play. The pause menu has the same selector. A switch retains the current track and musical position, with a short crossfade during playback. The app remembers this choice across launches. Mute, volume and original sound effects work with either source. Recovered Rumble Pack cues use Core Haptics on supported iOS devices.
+```sh
+xcodegen generate
+```
 
-To install on the physical Duo, open `HotelDuskDuo.xcodeproj` in Xcode, select the **HotelDuskDuoiOS** scheme, and select your connected Duo. Select your signing team under **Signing & Capabilities**, then Run. A simulator build cannot be installed on the phone. Physical hinge behaviour still needs a check on the actual device.
+See [TestFlight preparation](docs/testflight-beta.md) for archives and distribution.
 
-The fresh ordered checkpoint chain verifies the checked Chapter 1-to-ending route. It does not establish full source fidelity or device-level playability. Chapter 7 process 55 uses recovered object data, model and blocker logic. Checkpointed normal-input tests complete processes 55 and 43 with CPU-projected touch points. Original touch mapping and Metal rendering still need device checks. Chapter 10 process 79 uses the recovered 90-slot layout and five-hit rule. It uses a deterministic seed and shared box-face rendering, while the original uses a time-based seed and per-face variation. Metal rendering and device-level Chapter 10 touch checks remain open. Original-device checks also remain open for selected masks, puzzle gestures, bowling scores, audio and haptics. Some character animation and alternate story branches remain incomplete. The game-over screen uses its captured final artwork, shows the selected menu row, and requires a second activation to confirm, matching the original touch-and-A sequence. ROM probes confirmed Retry and Back to Title outcomes; menu reveal timing and Duo hardware checks remain open. Runtime interaction errors restore the last safe walking place, so the player can repeat the unfinished interaction. See [the route tracing workbench](docs/route-tracing-workbench.md) and [the walkthrough route plan](docs/walkthrough-route-plan.md) for current evidence and boundaries. The development jigsaw preview is not a later playable chapter.
+## Play
 
-The automated native-input route completes Louie's Chapter 2 confrontation, its photo interaction and the chapter review. It then enters Chapter 3 through the native save/title flow and continues through Rachel, Kevin, Louie and Iris, collects the rag doll, and completes dinner with Summer and Rosa, and reaches the 6:20 PM checkpoint. See [Chapter 3 progress](docs/chapter-three-progress.md). It also restores walking checkpoints from at least ten locations without replaying arrival events. This verifies the checked route, not every branch. Some original-state comparisons require reference captures that are not present in this checkout.
+Select **Begin Chapter 1** to start in the lobby. **Continue** restores saved
+progress, including supported conversations, puzzle inputs and notebook state.
+Starting a new game requires confirmation when saved progress exists.
 
-Drag horizontally on the 3D view to look around. Hold its movement pad to walk forward, backward or sideways relative to the camera. Release the pad to stop. The floor plan remains available with its original movement controls. Door, Inspect and Talk are available below either view when you are close enough and facing the target. Both movement schemes use the same collision and story triggers.
+- Drag the room view to look around. Hold the movement pad to walk.
+- Use **Door**, **Inspect** or **Talk** when close enough and facing the target.
+- Open **Items** to inspect, use or show an owned item.
+- Swipe right or select **Previous pages** to reread dialogue.
+- Open **Book options** for pause, sound, music source and previous conversations.
+- Close the Duo to pause. Reopening retains the session and reading position.
 
-Open **Items** to browse the graphical inventory while walking, inspecting a scene, or talking. Tap an item to inspect its picture, then select **Enlarge image** for a closer look. **Use item** selects it for the current scene. **Show item** presents it to your conversation partner. Browsing does not use an item or advance the game. The inventory uses 81 original item pictures. The source archive has no Message Card picture, so that item has a labelled missing-picture marker.
+Progress saves after inputs and simulation updates. Failed saves retain the
+previous file and expose the error in the pause menu. If an interaction cannot
+continue, the app restores the last safe walking place. The interaction may need
+to be repeated. Keep the `book-art` directory with any resume-save backup.
 
-Tap an object once to interact, including doors, close-ups and item pictures. To use an inventory item, choose it first, then tap its target. At the front desk, face the counter and select **Inspect**. Use the slider to look across the counter, then tap the bell. Ring it three times to continue. See [Lobby to bell](docs/lobby-to-bell.md) for the checked route and remaining limits. The lower-level two-press input remains available to source-comparison tests; the player UI uses single-tap activation.
+Debug builds also expose development previews under **Book options**.
 
-After registration and the first question menu, play returns to the lobby. Face Dunning and select **Talk** to continue his saved conversation. His position at the desk disables counter inspection. You can continue through the Central Hallway, complete Melissa’s first jigsaw, collect the dropped piece and enter the upstairs corridor. Walking west starts Jeff’s conversation. Its three interrupts and both questions now have original state comparisons. A separate route resolves Dunning’s registration questions and reaches the later delivery knock. Its ordinary time transition now runs and returns to Room 215. Selecting **Door** then reaches Louie's arrival. The route now takes his parcel, identifies him and completes his first conversation. Bed inspection then opens the wrong parcel and awards its brown notebook. Leaving Room 215 now reaches Melissa near the stairs. Her conversation, notebook picture, puzzle-piece return and departure are connected. The notebook now displays her drawing and supports the three original writable pages, added blank pages, erasing and undo. See [Original notebook](docs/notebook.md). The checked route then returns to the lobby, meets Mila and Rosa, and reaches the 5:20 time change. See [Mila and Rosa](docs/mila-rosa.md). The route then returns upstairs, knocks on Room 213 and completes Jeff’s Mila questions. See [Jeff at Room 213](docs/jeff-room213.md). It then completes Iris’s introduction and Summer’s visit, returns the notebook and takes Kyle’s parcel. See [Iris and Summer](docs/iris-summer.md). Bed inspection then collects the client list and order sheet. See [Order documents](docs/order-documents.md). Rachel’s next call and all five Chapter 1 review answers now run through native input. Play now offers a save, shows the Chapter 2 title and returns to walking in Room 215. Native saves can resume this checkpoint after restarting the app. The checked route then leaves Room 215 and completes Rosa’s corridor conversation. See [Rosa in Chapter 2](docs/chapter-two-rosa.md). The route now reaches the Linens Closet, completes Louie’s conversation and collects the pliers, crowbar, screwdriver and magazine. See [Chapter 2 Linens Closet](docs/chapter-two-linens.md). The route also completes Helen’s introduction, her Room 212 questions and the return to Room 215. See [Helen in Chapter 2](docs/chapter-two-helen.md). Hanger inspection and cutting are connected. The native route uses the pliers, makes two cuts and receives the thick wire. It then inserts that wire, latches the pins and opens the suitcase. The route now opens the suitcase contents, moves the pencil, takes the cash and returns to room inspection. Client-list storage is connected through the existing item-use script. The route then returns downstairs, knocks on Dunning’s office door and completes payment. The apology choice and returned state have original comparisons. The route now enters the office and reads the guest ledger, birthday card, supervisory log and calendar. The route now pulls the trapped memo, tears it and receives the torn paper. Chapter 2 process 34 opens the point-tie drawing scene, which supports drawing, Clear, Back and inventory reopening. Chapter 9 normal-input checkpoint tests cover the five-letter painting route, JENNY entry, CPR action and story continuation through the pantry quiz. These tests use checkpoints and do not prove one uninterrupted app session. Crowbar placement and lifting are connected. The route now turns the cabinet number wheels, opens drawer 3, takes the red box and returns to the lobby. It then follows Louie’s Nile conversation and Rosa’s questions. See [Nile and Rosa](docs/chapter-two-louie-office.md). See [Cabinet combination](docs/chapter-two-cabinet-combination.md). See [Crowbar recovery](docs/chapter-two-crowbar-recovery.md). See [Memo drawing](docs/chapter-two-memo-drawing.md). See [Trapped memo](docs/chapter-two-memo-pull.md). See [Office search](docs/chapter-two-office.md). See [Chapter 2 payment](docs/chapter-two-payment.md). See [Thick-wire suitcase lock](docs/chapter-two-thick-wire.md). See [Hanger recovery](docs/chapter-two-hanger.md). See [Chapter 2 transition and saves](docs/chapter-two-transition.md). See [Chapter 1 review](docs/chapter-one-review.md). See [Melissa’s notebook and piece return](docs/melissa-notebook.md). See [Wrong parcel and notebook](docs/wrong-parcel.md). See [Louie's delivery](docs/louie-delivery.md). See [Dunning and delivery](docs/dunning-delivery-route.md). You can unlock Room 215 with its key, enter the room, walk to the dresser and answer Rachel’s telephone call. You can then inspect the suitcase, insert its key and break it through the original puzzle. Return to the dresser, inspect the brochure and collect its paperclip. Select **Items → Paper Clip** to straighten it, then receive the thin wire. Use it on the suitcase, insert it and press all three pins to reach the original failed-attempt dialogue. See [Thin-wire lock attempt](docs/thin-wire-lock.md). See [Paperclip straightening](docs/paperclip-straightening.md). See [Brochure and paperclip](docs/paperclip.md). See [Room 215](docs/room215.md) and [Suitcase key](docs/suitcase-key.md). See [Chapter 1 jigsaw](docs/chapter-one-jigsaw.md) for the comparisons and rendering limits.
+## Verification and limits
 
-## Recovered native components
+Install the Python verification dependency in a local environment:
 
-The suitcase-contents process now connects source graphics, object dragging, item acquisition, shared dialogue and back navigation. Original comparisons cover pencil positions, item animation and the complete returned cash state. See [Suitcase contents recovery](docs/chapter-two-suitcase-contents.md).
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r tools/requirements.txt
+.venv/bin/python tools/verify.py --profile fast --strict
+.venv/bin/python tools/verify_full_route.py --output .build/verification/full-route-001
+```
 
-| Component | Implemented and checked | Remaining limits |
-| --- | --- | --- |
-| Script data | Native Swift CiNG decompression; 610 byte-exact source members with compressed and decoded SHA-256 checks; 115 BLK programs and their text, choice, debug and condition records | Decoding records is not event execution. |
-| Original commands and processes | Native event handlers cover the commands used by checked routes. Tests compare selected dialogue, wait, state-change and event-completion behaviour. The process audit finds native host handlers for all 47 process IDs referenced by chapter scripts. | Some dispatcher side effects, condition paths, boot state and presentation output remain unverified. Unknown behaviour stays explicit and does not report puzzle success. |
-| Conditions | Original CHK spans and pure checks for event flags, game flags, inventory, doors and puzzle flags | Other condition kinds and selection-context side effects are not implemented. Unknown state is not treated as false. |
-| Lobby exploration | Original floor plan, geometry, collision, counter selection and bell; the map catalogue enables 37 rooms with collision and floor-plan data. Checkpointed routes cover room travel, object selection, conversations and later chapters. | Room and search coverage is not exhaustive. Original character presentation and selected door, search and touch behaviour remain incomplete. |
-| Animation | Original delta-frame and palette decoder; 346 animations, 3,021 frames checked against an independent Python decoder; original loop positions and restorable index buffers | One bracelet animation remains unsupported. Story timing and the original colour-mesh compositor need further recovery. All 347 ANM and 54 MTC source payloads are preserved. |
-| Audio | Original music and SSAR effect playback; recovered dialogue controls; map-specific walking footsteps; the source-conditioned map 6 ambience; mute and volume controls | Other environmental triggers, door-transition cues and exact dialogue cue timing still need recovery. Apple's sampler still needs acoustic comparison with DS envelopes and modulation. |
-| Jigsaw | Chapter 1 process with original randomisation, rotation, placement, hints, quit results and story return; separate full-puzzle folding preview | Chapter 1 projection and presentation retain approximations. The Chapter 3 preview is not connected to its original story. |
-| Book | Full-bleed paper on both pages; weathered source-cover treatment; real Metal paper, curvature light and spine passes | Book rendering is a port presentation layer, separate from original gameplay. |
+The ordered route checks Chapter 1 through the Chapter 10 ending. It restores
+checkpoints between sections and validates the required handoff saves. The
+recorded 3 November 2026 run passed all 80 sections without failures or skips.
+That result covers one tested route. Alternate branches, original-game fidelity
+and device behaviour need separate checks.
 
-The existing music exports were not assumed intact: source recovery found truncated PCM and invalid sample tails. Recovered ROM audio is used to repair the playback banks. Unimplemented sound effects remain silent; synthetic replacements have been removed.
+Metal, audio and layout tests require the corresponding macOS services. Reference
+tests also need recovered captures. Strict verification fails on missing-fixture
+skips. Read the [verification guide](docs/verification.md) for profiles,
+dependencies and result interpretation.
+
+Open work includes character presentation, selected touch mappings, puzzle
+gestures, audio parity, alternate branches and DS cartridge-save compatibility.
+Enhanced artwork is bundled and active, but still needs visual and device review.
+See [implementation status](docs/native-port-status.md) for specific limits.
+
+## Repository
+
+| Path | Contents |
+| --- | --- |
+| `Sources/HotelDuskDuoApp` | SwiftUI application entry point |
+| `Sources/HotelDuskDuoKit` | Engine, renderers, views and bundled resources |
+| `HotelDuskDuo` | iOS icon, privacy declaration and distribution settings |
+| `Tests` | Swift tests and checked reference fixtures |
+| `tools` | Recovery, artwork, verification and ROM comparison tools |
+| `docs` | Format findings, route evidence and maintenance guides |
+
+[Architecture](ARCHITECTURE.md) explains the runtime boundaries.
+The [documentation index](docs/README.md) groups the recovery records by topic.
 
 ## Source recovery
+
+Local recovery inputs live in ignored directories:
+
+- `Source/ROM/Hotel Dusk - Room 215.nds`: supplied ROM.
+- `extracted`: extracted bytes, recovered code and reference captures.
+- `.tools`: local Ghidra and melonDS installations.
+
+Typical recovery steps are:
 
 ```sh
 python3 tools/extract_nds.py
@@ -57,58 +108,7 @@ python3 tools/decode_anm.py
 python3 tools/recover_lobby.py
 ```
 
-See each tool's help and the recovery documents before regenerating optional outputs. The ROM remains at `Source/ROM/Hotel Dusk - Room 215.nds`; original extracted bytes remain under `extracted`.
-
-ARM9 is compressed in the ROM. The old assembly listing under `extracted/binaries` was made from compressed bytes and is not a valid complete disassembly. Recovery produces the 1,031,352-byte decompressed ARM9 image, original overlay load metadata and a verified 54-entry operation dispatch map under `extracted/recovered_logic`. An ELF wrapper or extracted asset is not decompiled game logic.
-
-- [Architecture and system boundaries](ARCHITECTURE.md)
-- [Original logic evidence and addresses](docs/original-logic.md)
-- [Puzzle fidelity and remaining mechanics](docs/puzzle-fidelity.md)
-- [Paperback artwork provenance](docs/paperback-art.md)
-- [Native implementation status](docs/native-port-status.md)
-
-## Book and hinge behavior
-
-The display is split at its physical centre before content safe-area margins are applied. Paper fills both screens. Handedness swaps page roles without moving the binding. Partial openings retain the two-page book layout.
-
-Dialogue pages reserve fixed portrait frames with a clear gap around the artwork. Larger portraits stay in the outer corners, with eye-lines across the spread. Text wraps above and beside them. Poses, speaker changes, inspection mode and transcript review keep the same text shape. New dialogue and menus follow the existing ink. Changes to page dimensions, margins or text size can repaginate the book.
-
-The book also keeps the player's journey. Each place visited has an arrival page. Later pages retain the walked route, a pencil view before an interaction, and departures. Return visits stay separate. Opening the earlier pages also records the current walk if it has progressed. The drawings come from the actual room view and recovered floor plan. An otherwise unused interaction page keeps the last place visible.
-
-Earlier leaves retain their own portraits, including empty corners. Selected answers remain in the narrative even when the script does not repeat them. Walking, interaction and native chapter saves retain the book. In-game retries and returns to a safe place keep the existing record and start a fresh visit. An explicit new game starts a new book. Loading an older save restores that save's book. Older saves remain readable, with new journey entries recorded from that point onward.
-
-Resume saves store each drawing once in `book-art` beside the save files. Incremental updates append new entries and route points. Checksums cover the image references, and loading verifies the drawing data. Keep the `book-art` directory with a resume-save backup.
-
-`Metal/BookPaper.metal` provides the paper stock, curvature lighting and binding. Fixed grain avoids a crawling texture. Each opening produces a small, independently seeded, damped settling response on each page. Lighting stops updating after 1.8 seconds, while hidden, when closed or when inactive. Reduce Motion disables settling. Text and touch targets stay fixed. The shaded spine widens and deepens as the hinge closes.
-
-The closed cover uses the weathered paperback treatment of `Source/Cover`, fills the entire display and adds no text. The app owns its session above the display windows. A cover-to-inner-screen transition preserves loaded data, original animation buffers, notebook drafts and jigsaw placements. The jigsaw responds to the first explicit open report; it does not require 180 degrees. These checks cover the running session. Native walking checkpoints now persist across process termination. Native interaction saves retain conversations and puzzle input progress. Original DS save-game compatibility remains unfinished.
-
-## Build and verification
-
-See [TestFlight beta preparation](docs/testflight-beta.md) for signed archives, artwork packaging, and beta test notes.
-
-```sh
-python3 tools/verify.py --profile fast
-swift run HotelDuskDuoApp
-```
-
-Use `python3 tools/verify.py --profile fast --strict` for logic checks, or
-`--profile all --ios --strict` for the full report and simulator build. The
-[verification guide](docs/verification.md) describes profile requirements and
-explicit skipped coverage. Independent Chapter 5 component evidence and the
-linen-wagon integration API are in [component recovery](docs/chapter-five-component-recovery.md).
-
-The GPU and audio tests need Metal, CoreAudio and window-server access. They are not substitutes for playing the ROM and native implementation through matching checkpoints. `SNAPSHOT_DIR` exports book, material and puzzle previews.
-
-```sh
-xcodegen generate
-xcodebuild -project HotelDuskDuo.xcodeproj -scheme HotelDuskDuoiOS \
-  -destination 'platform=iOS Simulator,name=iPhone Duo' \
-  -derivedDataPath .build/xcode build
-```
-
-The iOS build uses `UIHingeInteraction` when available. On macOS, debug book options simulate the same fold event path. Development animation previews advance manually: ANM metadata does not provide an FPS field, and the game animation clock must be recovered before assigning playback timing.
-
-## Completion criteria
-
-A faithful native release needs the original startup, all chapters and branches, dialogue controls, inventory acquisition, movement and collision, puzzle state machines, original render and sound cues, notebook behavior, saves, failure paths and endings. Each must be compared with the supplied ROM at matching states and input sequences, including closure and the first partial reopening. No generated dialogue, guessed event order, substitute graphics, invented puzzle or extra solution hint may fill an unrecovered system.
+Read the [logic recovery notes](docs/original-logic.md) before regenerating data.
+ARM9 is compressed in the ROM. The old assembly listing made from compressed
+bytes is not a valid disassembly. Recovery uses the decompressed ARM9 image and
+original overlay metadata.

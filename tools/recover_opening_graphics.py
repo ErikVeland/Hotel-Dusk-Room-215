@@ -50,7 +50,7 @@ def main():
     parser.add_argument('--arm9', type=Path, default=ROOT / 'extracted/recovered_logic/binaries/arm9.bin')
     parser.add_argument('--source', type=Path, default=ROOT / 'extracted/unpacked_wpf')
     parser.add_argument('--bundle', type=Path, default=ROOT / 'Sources/HotelDuskDuoKit/Resources/OriginalBitmaps')
-    parser.add_argument('--report', type=Path, default=ROOT / 'docs/original-opening-graphics-report.json')
+    parser.add_argument('--report', type=Path, default=ROOT / '.build/recovery/original-opening-graphics-report.json')
     parser.add_argument('--previews', type=Path, default=ROOT / '.cache/previews/original-opening-cards')
     args = parser.parse_args()
     arm9 = args.arm9.read_bytes()
@@ -98,6 +98,7 @@ def main():
                              'zFixed': 8602, 'alpha': 31, 'polygonID': 10, 'colour': 32767},
               'textures': entries, 'variants': variants}
     encoded = json.dumps(report, indent=2) + '\n'
+    args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(encoded)
     (args.bundle / 'OriginalOpeningGraphicsManifest.json').write_text(encoded)
     print(f'{len(entries)} original textures and {len(variants)} original card variants recovered')

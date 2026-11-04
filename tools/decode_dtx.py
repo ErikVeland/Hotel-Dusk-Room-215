@@ -102,7 +102,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=ROOT / "extracted/unpacked_wpf")
     parser.add_argument("--bundle", type=Path)
-    parser.add_argument("--report", type=Path, default=ROOT / "docs/original-texture-report.json")
+    parser.add_argument("--report", type=Path, default=ROOT / ".build/recovery/original-texture-report.json")
     parser.add_argument("--preview-prefix", action="append", default=[])
     parser.add_argument("--preview-directory", type=Path, default=ROOT / ".cache/previews/original-textures")
     args = parser.parse_args()

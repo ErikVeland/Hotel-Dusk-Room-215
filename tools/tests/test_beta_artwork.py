@@ -9,9 +9,52 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from package_beta_artwork import package
+from verify_artwork_candidate import verify
 
 
 class BetaArtworkTests(unittest.TestCase):
+    def test_shared_animation_files_are_resized_once_and_keep_both_records(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / 'source'
+            source.mkdir()
+            key = '2x1-' + 'a' * 64
+            path = source / (key + '.png')
+            Image.new('RGBA', (16, 8), (90, 40, 10, 255)).save(path)
+            record = dict(key=key, width=2, height=1, scale=8, file=path.name,
+                          sources=['OriginalAnimations/first.anm#0'],
+                          pngSHA256=hashlib.sha256(path.read_bytes()).hexdigest())
+            alias = dict(record, key='2x1-' + 'b' * 64,
+                         sources=['OriginalAnimations/second.anm#0'])
+            (source / 'ArtworkManifest.json').write_text(json.dumps(
+                dict(formatVersion=1, scale=4, complete=True, images=[record, alias])))
+            self.assertEqual(verify(source), [])
+            output = Path(directory) / 'output'
+            size = package(source, output)
+            packed = json.loads((output / 'ArtworkManifest.json').read_text())
+            files = {item['file'] for item in packed['images']}
+            self.assertEqual(files, {key + '.webp'})
+            self.assertEqual(size, (output / (key + '.webp')).stat().st_size)
+            self.assertEqual([item['key'] for item in packed['images']], [key, alias['key']])
+            self.assertEqual([item['sources'] for item in packed['images']],
+                             [record['sources'], alias['sources']])
+            self.assertEqual(verify(output), [])
+
+    def test_shared_files_with_conflicting_dimensions_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / 'source'
+            source.mkdir()
+            key = '2x1-' + 'a' * 64
+            path = source / (key + '.png')
+            Image.new('RGBA', (16, 8)).save(path)
+            record = dict(key=key, width=2, height=1, scale=8, file=path.name,
+                          sources=['OriginalAnimations/first.anm#0'],
+                          pngSHA256=hashlib.sha256(path.read_bytes()).hexdigest())
+            alias = dict(record, key='different', scale=4)
+            (source / 'ArtworkManifest.json').write_text(json.dumps(
+                dict(formatVersion=1, scale=4, complete=True, images=[record, alias])))
+            with self.assertRaisesRegex(ValueError, 'Conflicting'):
+                package(source, Path(directory) / 'output')
+
     def test_preserves_sources_and_scene_pixels_with_verified_animation_output(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory) / 'source'

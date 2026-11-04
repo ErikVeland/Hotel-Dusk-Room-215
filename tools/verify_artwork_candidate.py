@@ -7,6 +7,8 @@ from pathlib import Path
 
 from PIL import Image
 
+from artwork_manifest import valid_artwork_filename
+
 
 def verify(root: Path) -> list[str]:
     issues = []
@@ -14,13 +16,17 @@ def verify(root: Path) -> list[str]:
         manifest = json.loads((root / 'ArtworkManifest.json').read_text())
     except (OSError, ValueError) as error:
         return [f'manifest: {error}']
-    if manifest.get('formatVersion') != 1 or not isinstance(manifest.get('images'), list):
+    if not isinstance(manifest, dict) or manifest.get('formatVersion') != 1 or not isinstance(manifest.get('images'), list):
         return ['manifest: unsupported format']
     seen = set()
+    files = {}
     for record in manifest['images']:
+        if not isinstance(record, dict):
+            issues.append('manifest: invalid image record')
+            continue
         key = record.get('key')
         filename = record.get('file')
-        if not isinstance(key, str) or filename not in (key + '.png', key + '.webp') or Path(filename).name != filename:
+        if not valid_artwork_filename(record):
             issues.append(f'filename: {filename!r}')
             continue
         if key in seen:
@@ -29,20 +35,24 @@ def verify(root: Path) -> list[str]:
         seen.add(key)
         width, height = record.get('width'), record.get('height')
         scale = record.get('scale', manifest.get('scale'))
-        if not all(isinstance(value, int) and value > 0 for value in (width, height, scale)) or scale > 8:
+        if not all(type(value) is int and value > 0 for value in (width, height, scale)) or scale > 8:
             issues.append(f'dimensions: {filename}')
             continue
         path = root / filename
         try:
-            if hashlib.sha256(path.read_bytes()).hexdigest() != record.get('pngSHA256'):
+            if filename not in files:
+                file_hash = hashlib.sha256(path.read_bytes()).hexdigest()
+                with Image.open(path) as image:
+                    pixel_hash = hashlib.sha256(image.convert('RGBA').tobytes()).hexdigest()
+                    files[filename] = image.size, file_hash, pixel_hash
+            size, file_hash, pixel_hash = files[filename]
+            if file_hash != record.get('pngSHA256'):
                 issues.append(f'hash: {filename}')
-            with Image.open(path) as image:
-                if image.size != (width * scale, height * scale):
-                    issues.append(f'dimensions: {filename}')
-                pixels = image.convert('RGBA').tobytes()
-                expected_pixels = record.get('outputRGBA256')
-                if expected_pixels is not None and hashlib.sha256(pixels).hexdigest() != expected_pixels:
-                    issues.append(f'pixel hash: {filename}')
+            if size != (width * scale, height * scale):
+                issues.append(f'dimensions: {filename}')
+            expected_pixels = record.get('outputRGBA256')
+            if expected_pixels is not None and pixel_hash != expected_pixels:
+                issues.append(f'pixel hash: {filename}')
         except (OSError, ValueError) as error:
             issues.append(f'file: {filename}: {error}')
     return issues

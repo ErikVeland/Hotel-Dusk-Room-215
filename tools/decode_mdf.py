@@ -147,7 +147,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=ROOT / "extracted/unpacked_wpf")
     parser.add_argument("--bundle", type=Path)
-    parser.add_argument("--report", type=Path, default=ROOT / "docs/original-model-report.json")
+    parser.add_argument("--report", type=Path, default=ROOT / ".build/recovery/original-model-report.json")
     args = parser.parse_args()
     entries, stats = [], Counter()
     for path in sorted(args.source.rglob("*.mdf")):
@@ -178,9 +178,15 @@ def main():
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(raw)
     report = {"formatVersion": 1, "coverage": {"models": len(entries), **dict(stats)}, "models": entries}
+    args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
     if args.bundle:
-        (args.bundle / "OriginalModelManifest.json").write_text(json.dumps(report, separators=(",", ":")) + "\n")
+        runtime_keys = {"source", "payloadSHA256", "status", "error", "decodedSHA256", "geometrySHA256", "nodes"}
+        bundled = {**report, "models": [
+            {key: value for key, value in record.items() if key in runtime_keys}
+            for record in entries
+        ]}
+        (args.bundle / "OriginalModelManifest.json").write_text(json.dumps(bundled, separators=(",", ":")) + "\n")
     print(json.dumps(report["coverage"]))
     for record in entries:
         if record["status"] == "unsupported" and not record["source"].startswith("talktest/"):

@@ -13,6 +13,31 @@ from verify_artwork_candidate import verify
 
 
 class ArtworkCandidateIntegrityTests(unittest.TestCase):
+    def test_rejects_invalid_manifest_shapes_without_crashing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for manifest in ([], None, {'formatVersion': 1, 'images': [None]}):
+                with self.subTest(manifest=manifest):
+                    (root / 'ArtworkManifest.json').write_text(json.dumps(manifest))
+                    self.assertTrue(verify(root))
+
+    def test_aliases_require_a_safe_filename_with_matching_dimensions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            key = '2x1-' + 'a' * 64
+            path = root / (key + '.png')
+            Image.new('RGBA', (8, 4)).save(path)
+            record = dict(key='2x1-' + 'b' * 64, width=2, height=1, scale=4, file=path.name,
+                          pngSHA256=hashlib.sha256(path.read_bytes()).hexdigest())
+            manifest = {'formatVersion': 1, 'images': [record]}
+            (root / 'ArtworkManifest.json').write_text(json.dumps(manifest))
+            self.assertEqual(verify(root), [])
+            for filename in ('../' + path.name, '3x1-' + 'a' * 64 + '.png', '2x1-invalid.png'):
+                with self.subTest(filename=filename):
+                    record['file'] = filename
+                    (root / 'ArtworkManifest.json').write_text(json.dumps(manifest))
+                    self.assertTrue(any('filename' in issue for issue in verify(root)))
+
     def test_rejects_decoded_pixel_hash_mismatch(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

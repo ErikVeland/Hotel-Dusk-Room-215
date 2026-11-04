@@ -63,6 +63,63 @@ final class OriginalArtworkUpscaleTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(artwork.image(rgba: rgba, width: 2, height: 1)).width, 2)
     }
 
+    func testSharedImageFilePreservesSourceKeysAndReusesDecodedImage() throws {
+        let (_, root, rgba) = try fixture()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let manifestURL = root.appendingPathComponent("ArtworkManifest.json")
+        var manifest = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: manifestURL)) as? [String: Any])
+        var records = try XCTUnwrap(manifest["images"] as? [[String: Any]])
+        let aliasRGBA = Data([0, 0, 255, 255, 255, 255, 255, 255])
+        var alias = records[0]
+        alias["key"] = "2x1-\(OriginalAnimationClip.digest(aliasRGBA))"
+        alias["sources"] = ["OriginalAnimations/fixture.anm#0"]
+        records.append(alias)
+        var badHash = alias
+        badHash["key"] = "2x1-" + String(repeating: "0", count: 64)
+        badHash["pngSHA256"] = String(repeating: "0", count: 64)
+        badHash["sources"] = ["bad-hash"]
+        records.append(badHash)
+        var badScale = alias
+        badScale["key"] = "2x1-" + String(repeating: "1", count: 64)
+        badScale["scale"] = 4
+        badScale["sources"] = ["bad-scale"]
+        records.append(badScale)
+        manifest["images"] = records
+        try JSONSerialization.data(withJSONObject: manifest).write(to: manifestURL)
+
+        let artwork = OriginalArtwork(resourceRoot: root)
+        let original = try XCTUnwrap(artwork.enhancedImage(rgba: rgba, width: 2, height: 1))
+        let shared = try XCTUnwrap(artwork.enhancedImage(rgba: aliasRGBA, width: 2, height: 1))
+        XCTAssertTrue(original === shared)
+        XCTAssertEqual(shared.width, 4)
+        XCTAssertEqual(shared.height, 2)
+        XCTAssertTrue(artwork.animationFrameImage(source: "OriginalAnimations/fixture.anm#0", width: 2, height: 1) === shared)
+        XCTAssertNil(artwork.namedImage(source: "bad-hash"))
+        XCTAssertNil(artwork.namedImage(source: "bad-scale"))
+    }
+
+    func testSharedImageFileRejectsTraversalAndInvalidFilenameDimensions() throws {
+        let (_, root, rgba) = try fixture()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let manifestURL = root.appendingPathComponent("ArtworkManifest.json")
+        var manifest = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: manifestURL)) as? [String: Any])
+        var records = try XCTUnwrap(manifest["images"] as? [[String: Any]])
+        let filename = try XCTUnwrap(records[0]["file"] as? String)
+        let outside = root.deletingLastPathComponent().appendingPathComponent(UUID().uuidString + ".png")
+        try FileManager.default.copyItem(at: root.appendingPathComponent(filename), to: outside)
+        defer { try? FileManager.default.removeItem(at: outside) }
+        let wrongDimensions = "3x1-" + filename.dropFirst("2x1-".count)
+        try FileManager.default.copyItem(at: root.appendingPathComponent(filename), to: root.appendingPathComponent(wrongDimensions))
+
+        for invalid in ["../" + outside.lastPathComponent, "./" + filename, wrongDimensions] {
+            records[0]["file"] = invalid
+            manifest["images"] = records
+            try JSONSerialization.data(withJSONObject: manifest).write(to: manifestURL)
+            let artwork = OriginalArtwork(resourceRoot: root)
+            XCTAssertNil(artwork.enhancedImage(rgba: rgba, width: 2, height: 1), invalid)
+        }
+    }
+
     func testPuzzleMaskCutsEnhancedPixelsAtOriginalCoordinates() throws {
         let (artwork, root, rgba) = try fixture()
         defer { try? FileManager.default.removeItem(at: root) }
