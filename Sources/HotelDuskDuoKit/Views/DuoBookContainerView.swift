@@ -137,7 +137,7 @@ struct BookSettingsMenu: View {
             if session.isReviewingConversations {
                 Button("Return to game") { session.closeConversationHistory() }
             } else if let play = session.play {
-                Button("Previous conversations") { session.reviewConversations() }
+                Button("Read earlier pages") { session.reviewConversations() }
                     .disabled(!play.canReviewConversations)
             }
             if session.play != nil {

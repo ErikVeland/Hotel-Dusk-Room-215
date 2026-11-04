@@ -119,6 +119,53 @@ final class OriginalResumeSaveTests: XCTestCase {
             from: JSONSerialization.data(withJSONObject: record))
     }
 
+    func testWalkingJourneyCapturesTheRouteBeforeCounterInspectionAndSurvivesResume() throws {
+        let game = session()
+        defer { game.endOriginalGame() }
+        let play = try enterLobby(game)
+        let arrival = try XCTUnwrap(play.dialogueNotebook.book.entries.first)
+        XCTAssertEqual(arrival.kind, .arrival)
+        XCTAssertNotNil(arrival.viewPNG)
+        for _ in 0..<20 { play.advanceFrame() }
+        XCTAssertEqual(play.dialogueNotebook.book.entries, [arrival], "Idle updates must not add pages")
+        play.holdLobbyTouch(x: 140, y: 80)
+        for _ in 0..<160 { play.advanceFrame() }
+        play.holdLobbyTouch(x: 70, y: 75)
+        for _ in 0..<46 { play.advanceFrame() }
+        play.releaseLobbyTouch()
+        XCTAssertGreaterThan(play.dialogueNotebook.book.activeVisit?.route.count ?? 0, 1)
+        game.reviewConversations()
+        XCTAssertEqual(play.dialogueNotebook.book.entries.last?.kind, .walk)
+        game.closeConversationHistory()
+        play.inspectLobbyCounter()
+        XCTAssertEqual(play.lobby?.mode, .counter)
+        let interaction = try XCTUnwrap(play.dialogueNotebook.book.entries.last)
+        XCTAssertEqual(interaction.kind, .interaction)
+        XCTAssertEqual(interaction.visitID, arrival.visitID)
+        XCTAssertGreaterThan(interaction.route.count, arrival.route.count)
+        XCTAssertEqual(play.dialogueNotebook.book.entries.first, arrival)
+        try assertRestores(game)
+        let saved = try XCTUnwrap(game.resumeSave?.progress?.notebook?.book)
+        XCTAssertEqual(saved, play.dialogueNotebook.book)
+    }
+
+    func testWalkingSaveRetainsTheBookAndKeepsTheReplayBaseCompact() throws {
+        let game = session()
+        defer { game.endOriginalGame() }
+        let play = try enterLobby(game)
+        let checkpoint = try play.walkingCheckpoint()
+        XCTAssertEqual(checkpoint.notebook?.book, play.dialogueNotebook.book)
+        let progress = try XCTUnwrap(play.progressCheckpoint().progress)
+        let base = try JSONDecoder().decode(OriginalResumeSave.self, from: progress.base)
+        XCTAssertNil(base.notebook, "The replay base must not contain a second copy of the book")
+        let restored = try OriginalPlaySession.restoring(checkpoint, audio: originalRouteTestAudio(),
+            saveStore: OriginalChapterFileStore(directory: FileManager.default.temporaryDirectory),
+            mapRendererFactory: { name, _ in try MapRenderer(name) })
+        defer { restored.stop() }
+        XCTAssertEqual(restored.dialogueNotebook.book, play.dialogueNotebook.book)
+        XCTAssertEqual(restored.dialogueNotebook.ink, play.dialogueNotebook.ink)
+    }
+
     func testChapterOneTitleAppearsAfterEntranceAndContinuesToLobby() throws {
         let game = session()
         defer { game.endOriginalGame() }
@@ -392,11 +439,14 @@ final class OriginalResumeSaveTests: XCTestCase {
         play.inspectLobbyCounter()
         XCTAssertEqual(play.lobby?.mode, .counter)
 
+        let earlierPages = play.dialogueNotebook.book.entries
         game.openPauseMenu()
         XCTAssertTrue(game.canReturnToSafePlace)
         game.returnToSafePlace()
 
         let restored = try XCTUnwrap(game.play)
+        XCTAssertEqual(Array(restored.dialogueNotebook.book.entries.prefix(earlierPages.count)), earlierPages)
+        XCTAssertNotEqual(restored.dialogueNotebook.book.activeVisit?.id, play.dialogueNotebook.book.activeVisit?.id)
         XCTAssertEqual(restored.runner.phase, .exploration(mapID: 2))
         XCTAssertEqual(restored.lobby?.position, safePosition)
         XCTAssertEqual(try resumeStore.checkpoint?.gameState().bytes, try checkpoint.gameState().bytes)
@@ -763,7 +813,7 @@ final class OriginalResumeSaveTests: XCTestCase {
         let book = try XCTUnwrap(game.play).dialogueNotebook
         let size = CGSize(width: 140, height: 115)
         XCTAssertFalse(book.ink.isEmpty)
-        book.configure(DialogueNotebookLayout(runs: book.ink, size: size, fontSize: 18))
+        book.configure(DialogueNotebookLayout(runs: book.ink, size: size, fontSize: 18, book: book.book))
         book.write(count: 12)
         let before = book.reader
         let ink = book.ink
@@ -772,7 +822,7 @@ final class OriginalResumeSaveTests: XCTestCase {
         defer { fresh.endOriginalGame() }
         fresh.continueSavedGame()
         let restored = try XCTUnwrap(fresh.play, fresh.saveError ?? "Resume failed").dialogueNotebook
-        restored.configure(DialogueNotebookLayout(runs: restored.ink, size: size, fontSize: 18))
+        restored.configure(DialogueNotebookLayout(runs: restored.ink, size: size, fontSize: 18, book: restored.book))
         XCTAssertEqual(restored.ink, ink)
         XCTAssertEqual(restored.reader, before)
     }
@@ -958,7 +1008,7 @@ final class OriginalResumeSaveTests: XCTestCase {
         _ = try enterLobby(game)
         let book = try XCTUnwrap(game.play).dialogueNotebook
         XCTAssertFalse(book.ink.isEmpty)
-        book.configure(DialogueNotebookLayout(runs: book.ink, size: CGSize(width: 240, height: 300), fontSize: 18))
+        book.configure(DialogueNotebookLayout(runs: book.ink, size: CGSize(width: 240, height: 300), fontSize: 18, book: book.book))
         for _ in 0..<12 {
             book.write(count: 1)
             XCTAssertEqual(store.checkpoint?.progress?.notebook?.revealedEnd, book.reader.revealedEnd)
@@ -1002,7 +1052,11 @@ final class OriginalResumeSaveTests: XCTestCase {
         _ = try enterLobby(game)
         let book = try XCTUnwrap(game.play).dialogueNotebook
         let size = CGSize(width: 60, height: 60)
-        book.configure(DialogueNotebookLayout(runs: book.ink, size: size, fontSize: 18))
+        book.configure(DialogueNotebookLayout(runs: book.ink, size: size, fontSize: 18, book: book.book))
+        while book.canTurnBack {
+            book.turnBack()
+            book.finishTurn(revision: book.turnRevision)
+        }
         book.finishWriting()
         XCTAssertTrue(book.canTurnForward)
         book.turnForward()
@@ -1018,7 +1072,7 @@ final class OriginalResumeSaveTests: XCTestCase {
         fresh.continueSavedGame()
         XCTAssertTrue(fresh.isReviewingConversations)
         let restored = try XCTUnwrap(fresh.play, fresh.saveError ?? "Review recall failed").dialogueNotebook
-        restored.configure(DialogueNotebookLayout(runs: restored.ink, size: size, fontSize: 18))
+        restored.configure(DialogueNotebookLayout(runs: restored.ink, size: size, fontSize: 18, book: restored.book))
         XCTAssertEqual(restored.reader, reviewed)
         fresh.closeConversationHistory()
         XCTAssertEqual(restored.reader, live)

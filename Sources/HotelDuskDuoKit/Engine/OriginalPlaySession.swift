@@ -7,6 +7,7 @@ import CoreGraphics
 @MainActor
 public final class OriginalPlaySession: ObservableObject {
     let dialogueNotebook = DialogueNotebook()
+    private var lastWalkingBookView: (state: OriginalMapExploration, game: OriginalGameState, image: CGImage)?
     /// 33,513,982 Hz / (6 × 355 × 263): the DS video update rate.
     public static let updatesPerSecond = 59.8261
 
@@ -352,13 +353,18 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     public func walkingCheckpoint() throws -> OriginalResumeSave {
+        try walkingCheckpoint(includeNotebook: true)
+    }
+
+    private func walkingCheckpoint(includeNotebook: Bool) throws -> OriginalResumeSave {
         guard canSaveWalkingCheckpoint, let lobby else {
             throw OriginalDataError.unsupported("Return to walking before saving")
         }
         var game = runner.game
         game.setMapPosition(lobby.position, facing: lobby.facing)
         return try OriginalResumeSave(game: game, checkpointFacing: lobby.checkpointFacing,
-                                      musicSequenceID: audio.currentSequenceID, savedAt: saveDate())
+                                      musicSequenceID: audio.currentSequenceID, savedAt: saveDate(),
+                                      notebook: includeNotebook ? dialogueNotebook.savedState() : nil)
     }
 
     private func checkpointWalking() {
@@ -565,6 +571,7 @@ public final class OriginalPlaySession: ObservableObject {
         guard !isPaused, case .choice(let choices) = runner.phase,
               let choice = choices.first(where: { $0.id == id }) else { return }
         dialogueNotebook.followNextPassage()
+        dialogueNotebook.recordChoice(choice.label)
         runner.choose(id)
         settle()
         // Some scripts first repeat the selected answer. The choice already
@@ -1930,8 +1937,15 @@ public final class OriginalPlaySession: ObservableObject {
 
     /// Starts whatever the runner's current phase needs from the host.
     private func settle() {
+        switch runner.phase {
+        case .dialogue, .itemNotice, .process, .picture, .choice, .questions:
+            captureBookJourney(.interaction)
+        default: break
+        }
         defer {
-            dialogueNotebook.record(runner.phase, program: runner.program.name)
+            dialogueNotebook.record(runner.phase, program: runner.program.name,
+                portraits: encounterPortraits.map { .init(screen: $0.screen, animationID: $0.animationID,
+                                                         frameIndex: $0.frame.frameIndex) })
             reportRecoverableStopIfNeeded()
         }
         if case .exploration = runner.phase,
@@ -2799,6 +2813,8 @@ public final class OriginalPlaySession: ObservableObject {
                     if let destination, OriginalMapExploration.supportedMaps[destination] == nil {
                         throw OriginalDataError.unsupported("Chapter destination \(destination)")
                     }
+                    captureBookJourney(.departure)
+                    dialogueNotebook.book.leave()
                     try runner.prepareChapter(UInt16(request.value), position: lobby.position,
                                               facing: lobby.checkpointFacing, destination: destination)
                     handledMapRequests = runner.processRequests.count
@@ -2884,6 +2900,9 @@ public final class OriginalPlaySession: ObservableObject {
                   runner.game.chapter > 0 || runner.game.value(for: .eventFlag(group: 2, index: 2)) == true else { return }
             do {
                 if lobby?.mapID != map {
+                    captureBookJourney(.departure)
+                    dialogueNotebook.book.leave()
+                    lastWalkingBookView = nil
                     lobby = try OriginalMapExploration.bundled(mapID: map, previousMapID: runner.game.previousMapID,
                         savedGame: runner.game.previousMapID == map ? runner.game : nil)
                     let renderer = try mapRendererFactory(mapName, nil)
@@ -2924,6 +2943,7 @@ public final class OriginalPlaySession: ObservableObject {
                     hasReturnedFromDunningIntroduction = true
                 }
                 try renderLobby()
+                observeBookWalking()
                 beginRoomTransitionIfNeeded()
                 if lobby?.mode == .walking { audio.playWalkingMusic(mapID: map, game: runner.game) }
                 checkpointWalking()
@@ -3022,11 +3042,14 @@ public final class OriginalPlaySession: ObservableObject {
                 lobby?.update(heldPageTouch: lobbyTouch, people: people)
             }
             if let previousPosition, let lobby, lobby.mode == .walking {
+                observeBookWalking()
                 audio.advanceWalkingAudio(mapID: lobby.mapID, from: previousPosition, to: lobby.position,
                                           hasInput: lobbyTouch != nil || firstPersonMovement != nil)
             }
             guard lobbyTouch != nil || firstPersonMovement != nil else { return }
+            let beforeWalkingEvent = runner.game
             if let region = lobby?.eventRegion, runner.enterMapRegion(region) {
+                captureBookJourney(.interaction, sourceGame: beforeWalkingEvent)
                 lobbyTouch = nil
                 firstPersonMovement = nil
                 return settle()
@@ -3035,7 +3058,9 @@ public final class OriginalPlaySession: ObservableObject {
                 lobbyTouch = nil
                 firstPersonMovement = nil
                 let requestStart = runner.processRequests.count
+                let beforeDeparture = runner.game
                 if runner.beginMapDeparture(to: destination) {
+                    captureBookJourney(.interaction, sourceGame: beforeDeparture)
                     pendingDeparture = (destination, requestStart)
                     return settle()
                 }
@@ -4572,6 +4597,7 @@ public final class OriginalPlaySession: ObservableObject {
             connections.first { table.door(id: UInt16(bitPattern: $0.id)) != nil }
         } ?? connections.first
         guard let connection else { return }
+        captureBookJourney(.interaction)
         let doorRecord = searchTable?.door(id: UInt16(bitPattern: connection.id))
         routeTrace?.write(kind: "doorInspection", fields: routeTraceFields(extra: [
             "destinationMap": String(destination), "doorID": String(connection.id),
@@ -4685,6 +4711,7 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, closeup == nil, door == nil, case .exploration = runner.phase,
               let person = lobby?.nearbyPerson(in: runner.game) else { return }
+        captureBookJourney(.interaction)
         lobbyTouch = nil
         firstPersonMovement = nil
         runner.talkToPerson(person)
@@ -4696,6 +4723,7 @@ public final class OriginalPlaySession: ObservableObject {
         defer { endProgressInput(recordsProgress) }
         guard !isPaused, chapterTransition == nil, notebook == nil, closeup == nil, door == nil, case .exploration = runner.phase,
               var lobby, lobby.canInspectCounter(in: runner.game), let area = lobby.nearbySearchArea else { return }
+        captureBookJourney(.interaction)
         do {
             if area != lobby.searchAreaID {
                 let suffix = String(format: "%02d", area)
@@ -4781,6 +4809,7 @@ public final class OriginalPlaySession: ObservableObject {
         let recordsProgress = beginProgressInput(.inspectPantryDoor)
         defer { endProgressInput(recordsProgress) }
         guard canInspectPantryDoor else { return }
+        captureBookJourney(.interaction)
         dispatchChapterNinePantryQuiz()
     }
 
@@ -4797,6 +4826,7 @@ public final class OriginalPlaySession: ObservableObject {
             let visible = lobby.objectVisibility.visibleNodes(in: lobby.room, map: lobby.mapID, area: nil, game: runner.game)
             guard let node = try lobby.pickedRoomObject(page: SIMD2(x, y), visibleNodes: visible),
                   let subarea = OriginalMapExploration.subarea(node: node) else { return }
+            captureBookJourney(.interaction)
             routeTrace?.write(kind: "roomObjectHit", fields: routeTraceFields(extra: [
                 "pickedNode": node, "area": String(area), "subarea": String(subarea)
             ]))
@@ -4993,7 +5023,61 @@ public final class OriginalPlaySession: ObservableObject {
 
     private func renderLobby() throws {
         lobbyRenderRequestID &+= 1
-        if let lobby { lobbyImage = try lobbyRenderer?.render(lobby, game: runner.game) }
+        if let lobby {
+            lobbyImage = try lobbyRenderer?.render(lobby, game: runner.game)
+            if lobby.mode == .walking, let image = lobbyImage {
+                lastWalkingBookView = (lobby, runner.game, image)
+            }
+        }
+    }
+
+    private func observeBookWalking() {
+        guard !isReplayingProgress, let lobby, lobby.mode == .walking, door == nil, closeup == nil else { return }
+        let point = lobby.mapPoint(for: lobby.position) - lobby.mapBitmapOffset
+        let startsVisit = dialogueNotebook.book.activeVisit?.mapID != lobby.mapID
+            || dialogueNotebook.book.activeVisit?.chapter != Int(runner.game.chapter)
+        if startsVisit {
+            dialogueNotebook.book.visit(mapID: lobby.mapID, chapter: Int(runner.game.chapter),
+                name: OriginalMapExploration.displayName(for: lobby.mapID),
+                mapSize: SIMD2(Float(lobbyMap?.artworkWidth ?? 256), Float(lobbyMap?.artworkHeight ?? 256)), point: point)
+            captureBookJourney(.arrival)
+        }
+        dialogueNotebook.book.walk(to: point)
+        dialogueNotebook.book.resumeWalking()
+    }
+
+    /// A retry changes game state while the player's earlier journey stays written.
+    func retainBook(from previous: OriginalPlaySession) {
+        previous.captureBookJourney(.departure)
+        previous.dialogueNotebook.endReview()
+        dialogueNotebook.restore(previous.dialogueNotebook.savedState())
+        dialogueNotebook.book.leave()
+        observeBookWalking()
+    }
+
+    func recordCurrentWalk() {
+        guard case .exploration = runner.phase, let visit = dialogueNotebook.book.activeVisit,
+              visit.route.count > (dialogueNotebook.book.entries.last(where: { $0.visitID == visit.id })?.route.count ?? 0) else { return }
+        captureBookJourney(.walk)
+    }
+
+    private func captureBookJourney(_ kind: BookJourney.Kind, sourceGame: OriginalGameState? = nil) {
+        guard !isReplayingProgress, let lobby, lobby.mode == .walking,
+              let visit = dialogueNotebook.book.activeVisit, visit.mapID == lobby.mapID,
+              kind != .interaction || !visit.interacting else { return }
+        dialogueNotebook.book.walk(to: lobby.mapPoint(for: lobby.position) - lobby.mapBitmapOffset, force: true)
+        let game = sourceGame ?? runner.game
+        let image: CGImage?
+        if let previous = lastWalkingBookView, previous.state.mapID == lobby.mapID,
+           previous.state.position == lobby.position, previous.state.facing == lobby.facing,
+           previous.game.bytes == game.bytes {
+            image = previous.image
+        } else {
+            image = try? lobbyRenderer?.render(lobby, game: game)
+        }
+        dialogueNotebook.recordJourney(kind, facing: lobby.facing,
+            view: image.flatMap { JourneySketch.make($0) },
+            floorPlan: lobbyMap.flatMap { JourneySketch.make($0, floorPlan: true) })
     }
 
     private func beginRoomTransitionIfNeeded() {
@@ -5060,11 +5144,15 @@ public final class OriginalPlaySession: ObservableObject {
         }
         lobbyRenderRequestID &+= 1
         let requestID = lobbyRenderRequestID
+        let bookViewGame = runner.game
         let request = OriginalMapRenderQueue.Request(id: requestID, renderer: renderer, state: lobby,
             game: runner.game, scale: CGFloat(lobbyRenderScale)) { [weak self] id, image, failure in
                 guard let self, id == self.lobbyRenderRequestID else { return }
                 if let image {
                     self.lobbyImage = image
+                    if lobby.mode == .walking {
+                        self.lastWalkingBookView = (lobby, bookViewGame, image)
+                    }
                 } else if let failure {
                     self.runner.halt("The map could not be drawn: \(failure)")
                     self.stopTimer()
@@ -5107,6 +5195,11 @@ public final class OriginalPlaySession: ObservableObject {
     }
 
     private func moveToMap(_ map: Int16, relocationMarker: Int? = nil) {
+        if lobby?.mapID != map {
+            captureBookJourney(.departure)
+            dialogueNotebook.book.leave()
+            lastWalkingBookView = nil
+        }
         do {
             guard let name = OriginalMapExploration.supportedMaps[map] else {
                 throw OriginalDataError.unsupported("Map \(map) in this chapter")
@@ -5147,6 +5240,8 @@ public final class OriginalPlaySession: ObservableObject {
             lobbyMap = renderer.map
             lobbyImage = nil
             presentedPacketOffset = nil
+            try? renderLobby()
+            observeBookWalking()
             settle()
         } catch { runner.halt("The next map could not be loaded: \(error)"); stopTimer() }
     }
@@ -5268,6 +5363,7 @@ public final class OriginalPlaySession: ObservableObject {
             }
             if let notebook = journal.notebook { play.dialogueNotebook.restore(notebook) }
             play.isReplayingProgress = false
+            if case .exploration = play.runner.phase { play.observeBookWalking() }
             play.pause()
             restored = true
             return play
@@ -5308,8 +5404,12 @@ public final class OriginalPlaySession: ObservableObject {
         play.lobbyRenderer = renderer
         play.lobbyMap = renderer.map
         try play.renderLobby()
+        if let notebook = checkpoint.notebook { play.dialogueNotebook.restore(notebook) }
         if let sequence = checkpoint.musicSequenceID { try? audio.playOriginalSequence(id: sequence) }
-        play.prepareProgress(OriginalPlayProgress(origin: .walking, base: try JSONEncoder().encode(checkpoint)))
+        let base = try OriginalResumeSave(game: game, checkpointFacing: checkpoint.checkpointFacing,
+            musicSequenceID: checkpoint.musicSequenceID, savedAt: checkpoint.savedAt)
+        play.prepareProgress(OriginalPlayProgress(origin: .walking, base: try JSONEncoder().encode(base)))
+        play.observeBookWalking()
         return play
     }
 
@@ -5359,7 +5459,11 @@ public final class OriginalPlaySession: ObservableObject {
                                    bowlingRendererFactory: bowlingRendererFactory,
                                    toiletTankRendererFactory: toiletTankRendererFactory,
                                    bagSearchRendererFactory: bagSearchRendererFactory)
-        play.prepareProgress(OriginalPlayProgress(origin: .chapter, base: try JSONEncoder().encode(checkpoint)))
+        if let notebook = checkpoint.notebook { play.dialogueNotebook.restore(notebook) }
+        var base = checkpoint
+        base.notebook = nil
+        base.notebookSHA256 = nil
+        play.prepareProgress(OriginalPlayProgress(origin: .chapter, base: try JSONEncoder().encode(base)))
         return play
     }
 
@@ -5565,7 +5669,7 @@ extension OriginalPlaySession {
         progressInputActive = false
         if canSaveWalkingCheckpoint, lobbyTouch == nil, firstPersonMovement == nil {
             do {
-                let checkpoint = try walkingCheckpoint()
+                let checkpoint = try walkingCheckpoint(includeNotebook: false)
                 let previous = progressJournal?.origin == .walking
                     ? try progressJournal.map { try JSONDecoder().decode(OriginalResumeSave.self, from: $0.base) } : nil
                 let unchanged = previous?.state == checkpoint.state &&
@@ -5650,7 +5754,8 @@ extension OriginalPlaySession {
         }
         let date = saveDate()
         do {
-            let checkpoint = try OriginalChapterSave(game: runner.game, savedAt: date)
+            var checkpoint = try OriginalChapterSave(game: runner.game, savedAt: date)
+            try checkpoint.attachNotebook(dialogueNotebook.savedState())
             try saveStore.save(checkpoint, slot: slot)
             progressJournal?.chapterWrites.append(.init(date: date, failure: nil))
             return checkpoint

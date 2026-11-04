@@ -24,6 +24,8 @@ final class OriginalInstantSaveLog {
         let chapterSlotReads: [[OriginalChapterSave?]]?
         let chapterWrites: [OriginalPlayProgress.ChapterWrite]?
         let notebookInk: [DialogueNotebook.SavedState.Ink]?
+        var bookDelta: BookJourney.Delta?
+        let bookPresent: Bool?
         let nativeNotebookPages: [String: Data]?
         let readingAnchor: Int?
         let revealedEnd: Int?
@@ -77,6 +79,14 @@ final class OriginalInstantSaveLog {
             chapterSlotReads = old.chapterSlotReads == new.chapterSlotReads ? nil : new.chapterSlotReads
             chapterWrites = old.chapterWrites == new.chapterWrites ? nil : new.chapterWrites
             notebookInk = oldNotebook.ink == newNotebook.ink ? nil : newNotebook.ink
+            if oldNotebook.book != newNotebook.book {
+                guard let delta = BookJourney.Delta(previous: oldNotebook.book ?? .init(), next: newNotebook.book ?? .init()) else { return nil }
+                bookDelta = delta
+                bookPresent = newNotebook.book != nil
+            } else {
+                bookDelta = nil
+                bookPresent = nil
+            }
             nativeNotebookPages = old.nativeNotebookPages == new.nativeNotebookPages ? nil : new.nativeNotebookPages
             readingAnchor = oldNotebook.readingAnchor == newNotebook.readingAnchor ? nil : newNotebook.readingAnchor
             revealedEnd = oldNotebook.revealedEnd == newNotebook.revealedEnd ? nil : newNotebook.revealedEnd
@@ -111,10 +121,11 @@ final class OriginalInstantSaveLog {
             if let chapterSlotReads { journal.chapterSlotReads = chapterSlotReads }
             if let chapterWrites { journal.chapterWrites = chapterWrites }
             if let nativeNotebookPages { journal.nativeNotebookPages = nativeNotebookPages }
+            let book = bookPresent == false ? nil : try bookDelta?.applying(to: notebook.book ?? .init()) ?? notebook.book
             journal.notebook = .init(ink: notebookInk ?? notebook.ink,
                 readingAnchor: readingAnchor ?? notebook.readingAnchor, revealedEnd: revealedEnd ?? notebook.revealedEnd,
                 reviewAnchor: reviewAnchor, retraceEnd: retraceEnd, furthestRevealedEnd: furthestRevealedEnd,
-                reviewPassageEnd: reviewPassageEnd, reviewRevealedEnd: reviewRevealedEnd)
+                reviewPassageEnd: reviewPassageEnd, reviewRevealedEnd: reviewRevealedEnd, book: book)
             journal.program = program
             journal.eventIndex = eventIndex
             journal.phase = phase
@@ -165,6 +176,7 @@ final class OriginalInstantSaveLog {
                 start = end + 1
             }
         }
+        saved = try BookArtworkStore(directory: directory).map(saved, storing: false)
         previous = saved
         baseID = identifier
         baseInode = try inode()
@@ -177,9 +189,13 @@ final class OriginalInstantSaveLog {
         lock.lock()
         defer { lock.unlock() }
         _ = try saved.gameState()
-        if let previous, sequence < 128, byteCount < 1_048_576,
+        let artwork = BookArtworkStore(directory: directory)
+        let illustrated = !(saved.progress?.notebook?.book?.entries.isEmpty ?? true)
+            || !(saved.notebook?.book?.entries.isEmpty ?? true)
+        if let previous, sequence < (illustrated ? 4096 : 128), byteCount < 1_048_576,
            (try? inode()) == baseInode, (try? logSize()) == byteCount,
-           let step = Step(baseID: baseID, sequence: sequence + 1, previous: previous, next: saved) {
+           var step = Step(baseID: baseID, sequence: sequence + 1, previous: previous, next: saved) {
+            if let entries = step.bookDelta?.entries { step.bookDelta?.entries = try artwork.storing(entries) }
             var data = try JSONEncoder().encode(step)
             data.append(10)
             let handle = try FileHandle(forWritingTo: stepsURL)
@@ -191,7 +207,7 @@ final class OriginalInstantSaveLog {
             sequence += 1
         } else {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            let data = try JSONEncoder().encode(saved)
+            let data = try JSONEncoder().encode(artwork.map(saved, storing: true))
             try data.write(to: baseURL, options: .atomic)
             try Data().write(to: stepsURL, options: .atomic)
             previous = saved

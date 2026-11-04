@@ -220,7 +220,9 @@ struct OriginalPlayPage: View {
     }
 
     @ViewBuilder private var retainedNotes: some View {
-        if !play.dialogueNotebook.ink.isEmpty {
+        if let entry = play.dialogueNotebook.book.entries.last {
+            NotebookJourneyReference(entry: entry)
+        } else if !play.dialogueNotebook.ink.isEmpty {
             NotebookDialogueView(play: play, notebook: play.dialogueNotebook, screen: screen)
         } else {
             Color.clear

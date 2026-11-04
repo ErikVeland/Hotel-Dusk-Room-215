@@ -72,29 +72,74 @@ final class DialogueNotebookTests: XCTestCase {
         }
     }
 
-    func testWrittenInkKeepsItsWrapWhenThePortraitChanges() throws {
-        func outline(_ inset: CGFloat) -> OriginalAnimationContour {
-            // A solid block whose edges sit `inset` of the canvas in from each side.
-            var rgba = Data(repeating: 0, count: 64 * 64 * 4)
-            for y in 0..<64 { for x in Int(inset * 64)..<Int((1 - inset) * 64) { rgba[(y * 64 + x) * 4 + 3] = 255 } }
-            return OriginalAnimationContour(frame: OriginalAnimationFrame(width: 64, height: 64, frameIndex: 0,
-                rgba: rgba, originalIndexData: Data(), originalPaletteData: Data()))
+    func testAppendedPassagesAndMenusKeepWrittenInkInPlace() throws {
+        let runs: [OriginalDialogueLines.Run] = [
+            .init(text: String(repeating: "Room two fifteen keeps its secrets. ", count: 16), colour: 0)
+        ]
+        let size = CGSize(width: 260, height: 320), portrait = CGSize(width: 160, height: 150)
+        let original = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18, portraitSize: portrait)
+        let appended = DialogueNotebookLayout(runs: runs + [.init(text: "\n\nA new arrival at the hotel.", colour: 0)],
+            size: size, fontSize: 18, portraitSize: portrait,
+            menu: [.init(text: "Ask about the room", selectable: true)])
+        XCTAssertEqual(NSMaxRange(try XCTUnwrap(appended.pages.last)), appended.text.length)
+        XCTAssertEqual(Array(appended.pages.prefix(original.pages.count - 1)), Array(original.pages.dropLast()))
+        for index in original.pages.indices {
+            let before = try inkPixels(original, page: index)
+            let after = try inkPixels(appended, page: index, revealedEnd: original.text.length)
+            XCTAssertTrue(before == after, "A new passage or menu moved ink on page \(index)")
         }
-        let runs: [OriginalDialogueLines.Run] = [.init(text: String(repeating: "Room two fifteen keeps its secrets. ", count: 40), colour: 0)]
-        let size = CGSize(width: 260, height: 320), portrait = CGSize(width: 160, height: 200)
-        let narrow = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
-            portraitContours: [1: outline(0.4)], portraitSize: portrait)
-        let wide = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
-            portraitContours: [1: outline(0.05)], portraitSize: portrait)
-        XCTAssertNotEqual(narrow.pages.first, wide.pages.first, "The fixture must change the wrap")
-        let written = try XCTUnwrap(narrow.pages.first).length / 2
-        let kept = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
-            portraitContours: [1: outline(0.05)], portraitSize: portrait, preserving: narrow, revealedEnd: written)
-        XCTAssertEqual(kept.pages.first, narrow.pages.first, "Ink on the page must not reflow")
-        XCTAssertEqual(kept.pages.dropFirst().first?.location, narrow.pages.dropFirst().first?.location)
-        let fresh = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
-            portraitContours: [1: outline(0.05)], portraitSize: portrait, preserving: narrow, revealedEnd: 0)
-        XCTAssertEqual(fresh.pages, wide.pages, "Unwritten pages take the new outline")
+    }
+
+    func testDialogueAndMenusStayOutsideBothPortraitFrames() throws {
+        let runs: [OriginalDialogueLines.Run] = [
+            .init(text: String(repeating: "Room two fifteen keeps its secrets. ", count: 16), colour: 0)
+        ]
+        let wide = DialogueSpreadMetrics(size: CGSize(width: 951, height: 669))
+        let stacked = DialogueSpreadMetrics(size: CGSize(width: 669, height: 951), stacked: true)
+        for (size, portrait) in [
+            (CGSize(width: 260, height: 320), CGSize(width: 160, height: 150)),
+            (CGSize(width: 440, height: 260), CGSize(width: 160, height: 150)),
+            (wide.textSize, wide.portraitSize), (stacked.textSize, stacked.portraitSize)
+        ] {
+            for fontSize: CGFloat in [18, 28] {
+                let layout = DialogueNotebookLayout(runs: runs, size: size, fontSize: fontSize,
+                    portraitSize: portrait,
+                    menu: [.init(text: "Ask about the room", selectable: true)])
+                XCTAssertEqual(NSMaxRange(try XCTUnwrap(layout.pages.last)), layout.text.length)
+                for index in layout.pages.indices {
+                    let pixels = try inkPixels(layout, page: index)
+                    let left = index.isMultiple(of: 2)
+                    let frame = CGRect(x: left ? 0 : size.width - portrait.width,
+                                       y: size.height - portrait.height,
+                                       width: portrait.width, height: portrait.height)
+                    XCTAssertEqual(layout.portraitFrame(pageIndex: index), frame,
+                                   "Portraits must stay in the outer corners of the spread")
+                    var overlap = 0
+                    var ink = 0
+                    for y in 0..<Int(size.height) {
+                        for x in 0..<Int(size.width) where pixels[(y * Int(size.width) + x) * 4 + 3] > 0 {
+                            ink += 1
+                            if frame.contains(CGPoint(x: x, y: y)) { overlap += 1 }
+                        }
+                    }
+                    XCTAssertGreaterThan(ink, 0, "The page must render ink")
+                    XCTAssertEqual(overlap, 0, "Ink crossed the portrait frame on page \(index), font size: \(fontSize)")
+                }
+            }
+        }
+    }
+
+    private func inkPixels(_ layout: DialogueNotebookLayout, page: Int, revealedEnd: Int? = nil) throws -> [UInt8] {
+        let width = Int(layout.size.width), height = Int(layout.size.height)
+        let context = try XCTUnwrap(CGContext(data: nil, width: width, height: height,
+            bitsPerComponent: 8, bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue | CGBitmapInfo.byteOrder32Big.rawValue))
+        // Match the downward y axis of the SwiftUI canvas.
+        context.translateBy(x: 0, y: CGFloat(height))
+        context.scaleBy(x: 1, y: -1)
+        layout.draw(page: layout.pages[page], revealedEnd: revealedEnd ?? layout.text.length, in: context)
+        return Array(UnsafeBufferPointer(start: try XCTUnwrap(context.data).assumingMemoryBound(to: UInt8.self),
+                                        count: width * height * 4))
     }
 
     func testMenuFollowsTheInkWithoutBeingWrittenOrMovingIt() throws {
@@ -105,7 +150,7 @@ final class DialogueNotebookTests: XCTestCase {
                     .init(text: "Say, a suite sounds nice.", selectable: true),
                     .init(text: "Suites are for chumps.", selectable: true)]
         let withMenu = DialogueNotebookLayout(runs: runs, size: size, fontSize: 18,
-            preserving: plain, revealedEnd: plain.text.length, menu: menu)
+            menu: menu)
         XCTAssertEqual(withMenu.inkLength, plain.text.length)
         XCTAssertEqual(Array(withMenu.pages.prefix(plain.pages.count - 1)), Array(plain.pages.dropLast()),
                        "Written pages must not reflow for a menu")

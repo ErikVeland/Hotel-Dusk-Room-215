@@ -13,8 +13,9 @@ struct DialogueSpreadMetrics: Equatable {
                height: max(0, pageSize.height - textOrigin.y - bottom - 56 - (itemArtworkSize > 0 ? itemArtworkSize + 12 : 0)))
     }
     var portraitSize: CGSize {
-        CGSize(width: min(pageSize.width * 0.5, textSize.width * 0.62),
-               height: min(pageSize.height * 0.48, textSize.height * 0.58))
+        let aspect: CGFloat = 0.75
+        let height = min(textSize.height * 0.76, textSize.width * 0.72 / aspect)
+        return CGSize(width: height * aspect, height: height)
     }
     init(size: CGSize, safeArea: EdgeInsets = EdgeInsets(), showsItem: Bool = false, stacked: Bool = false) {
         self.stacked = stacked
@@ -85,7 +86,6 @@ struct NotebookDialogueSpread: View {
         let visible: Bool
         let singlePage: Bool
         let reviewing: Bool
-        let portraitSignature: [String]
         let portraitSize: CGSize
         let menu: [DialogueNotebookLayout.MenuEntry]
     }
@@ -104,10 +104,6 @@ struct NotebookDialogueSpread: View {
             let key = LayoutKey(size: metrics.textSize, font: fontSize, ink: notebook.ink,
                 visible: isVisible && scenePhase == .active, singlePage: inspection,
                 reviewing: notebook.isReviewing,
-                // Each pose has its own outline; pages with ink keep theirs.
-                portraitSignature: notebook.isReviewing ? [] : play.encounterPortraits.map {
-                    "\($0.screen):\($0.animationID)"
-                }.sorted(),
                 portraitSize: metrics.portraitSize,
                 menu: notebook.isReviewing ? [] : DialogueMenu(play: play)?.entries ?? [])
             let writing = WritingKey(end: notebook.reader.spreadEnd, revision: notebook.passageRevision,
@@ -139,20 +135,10 @@ struct NotebookDialogueSpread: View {
                 }
             }
             .environment(\.layoutDirection, .leftToRight)
-            .onChange(of: key, initial: true) { old, value in
+            .onChange(of: key, initial: true) { _, value in
                 guard value.visible else { return }
-                // Review drops the portraits, so its pages start fresh on the way in and out.
-                let previous = old.reviewing == value.reviewing && !value.reviewing
-                    && old.singlePage == value.singlePage && old.portraitSize == value.portraitSize
-                    && old.portraitSignature == value.portraitSignature
-                    ? notebook.layout : nil
-                let contours = notebook.isReviewing ? [:] : Dictionary(uniqueKeysWithValues:
-                    play.encounterPortraits.map { ($0.screen, $0.contour) })
                 notebook.configure(DialogueNotebookLayout(runs: value.ink, size: value.size, fontSize: value.font,
-                    portraitContours: contours, portraitSize: value.portraitSize,
-                    portraitBottomInset: metrics.itemArtworkSize > 0 ? metrics.itemArtworkSize + 12 : 0,
-                    singlePage: value.singlePage, preserving: previous,
-                    revealedEnd: notebook.reader.revealedEnd, menu: value.menu),
+                    portraitSize: value.portraitSize, menu: value.menu, book: notebook.book),
                                    singlePage: value.singlePage)
             }
             .onChange(of: notebook.turnRevision) { _, revision in
@@ -289,18 +275,26 @@ struct NotebookDialogueLeaf: View {
                 .lineLimit(1).minimumScaleFactor(0.7)
                 .position(x: metrics.margin + 53, y: metrics.top + 10)
                 .accessibilityHidden(true)
-            if !notebook.isReviewing, let portrait = play.encounterPortraits.first(where: { $0.screen == (right ? 0 : 1) }) {
-                OriginalAnimationFrameView(frame: portrait.frame)
-                    .frame(width: metrics.portraitSize.width, height: metrics.portraitSize.height)
+            if layout.journey(on: page) == nil {
+                let frame = layout.portraitFrame(pageIndex: pageIndex)
+                Group {
+                    if notebook.hasLivePortraits(on: page),
+                       let portrait = play.encounterPortraits.first(where: { $0.screen == (right ? 0 : 1) }) {
+                        OriginalAnimationFrameView(frame: portrait.frame)
+                    } else if let portrait = notebook.portraits(on: page).first(where: { $0.screen == (right ? 0 : 1) }) {
+                        RecordedBookPortrait(portrait: portrait)
+                    }
+                }
+                    .frame(width: frame.width, height: frame.height)
+                    .clipped()
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if interactive, !notebook.isTurning { play.advanceWrittenDialogue() }
                     }
                     .allowsHitTesting(interactive)
                     .accessibilityHidden(true)
-                    .position(x: right ? metrics.pageSize.width - metrics.margin - metrics.portraitSize.width / 2
-                                       : metrics.margin + metrics.portraitSize.width / 2,
-                              y: metrics.pageSize.height - metrics.bottom - 56 - metrics.portraitSize.height / 2)
+                    .position(x: metrics.textOrigin.x + frame.midX,
+                              y: metrics.textOrigin.y + frame.midY)
             }
             Canvas { context, _ in
                 context.withCGContext { layout.draw(page: page, revealedEnd: notebook.reader.revealedEnd, in: $0) }
@@ -418,6 +412,41 @@ struct NotebookDialogueLeaf: View {
     }
 }
 
+/// Historical leaves resolve their own source pose instead of the live cast.
+private struct RecordedBookPortrait: View {
+    let portrait: BookJourney.Portrait
+
+    var body: some View {
+        Group {
+            if let frame = RecordedBookFrames.frame(portrait) { OriginalAnimationFrameView(frame: frame) }
+        }
+    }
+}
+
+@MainActor
+private enum RecordedBookFrames {
+    private final class Cached: NSObject {
+        let frame: OriginalAnimationFrame
+        init(_ frame: OriginalAnimationFrame) { self.frame = frame }
+    }
+    private static let cache: NSCache<NSString, Cached> = {
+        let cache = NSCache<NSString, Cached>()
+        cache.countLimit = 24
+        return cache
+    }()
+
+    static func frame(_ portrait: BookJourney.Portrait) -> OriginalAnimationFrame? {
+        let key = "\(portrait.animationID):\(portrait.frameIndex)" as NSString
+        if let cached = cache.object(forKey: key) { return cached.frame }
+        guard let library = try? OriginalAnimationLibrary.bundled(),
+              let clip = try? library.load(id: portrait.animationID) else { return nil }
+        var decoder = OriginalAnimationDecoder(clip: clip)
+        guard let frame = try? decoder.seek(frame: portrait.frameIndex) else { return nil }
+        cache.setObject(Cached(frame), forKey: key)
+        return frame
+    }
+}
+
 /// Retained ink on an otherwise unused gameplay page. It does not run another
 /// clock or repaginate the book when a puzzle or question menu is shown.
 struct NotebookDialogueView: View {
@@ -437,6 +466,22 @@ struct NotebookDialogueView: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(layout.accessibleText(page: page))
             }
+        }
+    }
+}
+
+/// The last world view stays beside an interaction on an otherwise unused page.
+struct NotebookJourneyReference: View {
+    let entry: BookJourney.Entry
+    @ScaledMetric(relativeTo: .body) private var fontSize: CGFloat = 18
+
+    var body: some View {
+        GeometryReader { proxy in
+            Canvas { context, _ in
+                context.withCGContext { JourneySketch.draw(entry, size: proxy.size, fontSize: fontSize, in: $0) }
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Last place visited: \(entry.name). A pencil view and the route walked.")
         }
     }
 }

@@ -197,7 +197,9 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
     func encoded() throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys
-        return try encoder.encode(self)
+        var fingerprint = self
+        fingerprint.notebook = notebook?.fingerprint
+        return try encoder.encode(fingerprint)
     }
 
     func validate() throws {
@@ -230,6 +232,7 @@ struct OriginalPlayProgress: Codable, Equatable, Sendable {
             _ = try JSONDecoder().decode(OriginalChapterSave.self, from: base).gameState()
         }
         if let notebook {
+            try notebook.validateBook()
             let length = notebook.ink.reduce(0) { $0 + ($1.text as NSString).length }
             guard (0...length).contains(notebook.readingAnchor), (0...length).contains(notebook.revealedEnd) else {
                 throw OriginalDataError.invalid("Saved reading position")

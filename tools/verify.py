@@ -119,6 +119,32 @@ def route_checkpoint_state(directory):
                  for path in files)
 
 
+def progress_fingerprint(progress, directory):
+    """Check saved artwork and hash the same sketch references as Swift."""
+    result = json.loads(json.dumps(progress))
+    notebook = (result.get("notebook") or {}) if isinstance(result, dict) else {}
+    if not isinstance(notebook, dict):
+        raise ValueError("invalid saved notebook")
+    book = notebook.get("book") or {}
+    if not isinstance(book, dict):
+        raise ValueError("invalid saved journey")
+    for entry in book.get("entries", []):
+        if not isinstance(entry, dict):
+            raise ValueError("invalid saved journey leaf")
+        for pixels_key, digest_key in (("viewPNG", "viewSHA256"), ("floorPlanPNG", "floorPlanSHA256")):
+            digest = entry.get(digest_key)
+            if digest is None:
+                continue
+            if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+                raise ValueError("invalid saved sketch reference")
+            pixels = (base64.b64decode(entry[pixels_key], validate=True) if pixels_key in entry
+                      else (directory / "book-art" / (digest + ".png")).read_bytes())
+            if hashlib.sha256(pixels).hexdigest() != digest:
+                raise ValueError("invalid saved sketch checksum")
+            entry.pop(pixels_key, None)
+    return result
+
+
 def fresh_route_checkpoint_result(directory):
     """Require intact saves at the expected fresh-route handoffs."""
     expected = {"chapter3-entry": (2, 31), "chapter10-ending": (9, 31)}
@@ -136,7 +162,7 @@ def fresh_route_checkpoint_result(directory):
                 detail = f"save is not at Chapter {chapter + 1}, map {map_id}"
             elif valid and record["version"] == 2:
                 progress = record.get("progress")
-                progress_bytes = json.dumps(progress, sort_keys=True, separators=(",", ":"),
+                progress_bytes = json.dumps(progress_fingerprint(progress, path.parent), sort_keys=True, separators=(",", ":"),
                                             ensure_ascii=False, allow_nan=False).encode("utf-8")
                 progress_digest = hashlib.sha256(progress_bytes).hexdigest()
                 if not isinstance(progress, dict) or progress_digest != record.get("progressSHA256"):

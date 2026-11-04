@@ -208,6 +208,32 @@ Test Case '-[HotelDuskDuoTests.OriginalCellarTraceTests testCellarBackShelfClose
         self.assertIn("invalid checksum",
                       result["reasons"]["fresh-route-checkpoints/chapter10-ending"])
 
+    def test_fresh_route_gate_accepts_content_addressed_journey_sketches(self):
+        with TemporaryDirectory() as temporary_directory:
+            root = Path(temporary_directory)
+            entry = root / "chapter3-entry"
+            entry.mkdir()
+            (entry / "resume.json").write_text(json.dumps(self.route_save(2, 31)))
+            ending = root / "chapter10-ending"
+            ending.mkdir()
+            record = self.route_save(9, 31, version=2)
+            pixels = b"saved pencil drawing"
+            digest = hashlib.sha256(pixels).hexdigest()
+            fingerprint = {"notebook": {"book": {"entries": [{"viewSHA256": digest}]}}}
+            record["progressSHA256"] = hashlib.sha256(json.dumps(
+                fingerprint, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            record["progress"] = json.loads(json.dumps(fingerprint))
+            record["progress"]["notebook"]["book"]["entries"][0]["viewPNG"] = base64.b64encode(pixels).decode()
+            (ending / "resume.json").write_text(json.dumps(record))
+            self.assertEqual(verify.fresh_route_checkpoint_result(root)["status"], "passed")
+            record["progress"]["notebook"]["book"]["entries"][0].pop("viewPNG")
+            (ending / "resume.json").write_text(json.dumps(record))
+            self.assertEqual(verify.fresh_route_checkpoint_result(root)["status"], "failed")
+            art = ending / "book-art"
+            art.mkdir()
+            (art / (digest + ".png")).write_bytes(pixels)
+            self.assertEqual(verify.fresh_route_checkpoint_result(root)["status"], "passed")
+
     def test_reference_result_keeps_failures_from_earlier_passes(self):
         case = 'OriginalStoryContinuationTests/testChapterNineRoute'
         results = [

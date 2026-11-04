@@ -19,6 +19,28 @@ final class DialogueNotebook: ObservableObject {
         var furthestRevealedEnd: Int? = nil
         var reviewPassageEnd: Int? = nil
         var reviewRevealedEnd: Int? = nil
+        var book: BookJourney.Record? = nil
+
+        func encoded() throws -> Data {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .sortedKeys
+            return try encoder.encode(fingerprint)
+        }
+
+        var fingerprint: Self {
+            var result = self
+            result.book = book?.fingerprint
+            return result
+        }
+
+        func validateBook() throws {
+            let text = ink.map(\.text).joined()
+            let length = (text as NSString).length
+            guard (0...length).contains(readingAnchor), (0...length).contains(revealedEnd) else {
+                throw OriginalDataError.invalid("Saved book bookmark")
+            }
+            try book?.validate(ink: text)
+        }
     }
 
     var onSaveProgress: ((Bool) -> Void)?
@@ -28,10 +50,12 @@ final class DialogueNotebook: ObservableObject {
             readingAnchor: isTurning && (isHoldingTurn || !turnWillComplete) ? turnAnchor : readingAnchor,
             revealedEnd: reader.revealedEnd, reviewAnchor: reviewAnchor,
             retraceEnd: reader.passageEnd, furthestRevealedEnd: max(furthestRevealedEnd, reader.revealedEnd),
-            reviewPassageEnd: reviewPassageEnd, reviewRevealedEnd: reviewRevealedEnd)
+            reviewPassageEnd: reviewPassageEnd, reviewRevealedEnd: reviewRevealedEnd,
+            book: book == BookJourney.Record() ? nil : book)
     }
 
     func restore(_ saved: SavedState) {
+        book = saved.book ?? BookJourney.Record()
         ink = saved.ink.map { .init(text: $0.text, colour: $0.colour, person: $0.person, verbatim: $0.verbatim ?? false) }
         readingAnchor = saved.readingAnchor
         reader = Reader(revealedEnd: saved.revealedEnd, passageEnd: saved.retraceEnd)
@@ -71,6 +95,7 @@ final class DialogueNotebook: ObservableObject {
     @Published private(set) var ink: [OriginalDialogueLines.Run] = []
     @Published private(set) var reader = Reader()
     @Published private(set) var layout: DialogueNotebookLayout?
+    var book = BookJourney.Record()
     @Published private(set) var isTurning = false
     @Published private(set) var isHoldingTurn = false
     @Published private(set) var turnProgress = 0.0
@@ -79,6 +104,7 @@ final class DialogueNotebook: ObservableObject {
     private(set) var turnRevision = 0
     private var lastPhase: OriginalEventRunner.Phase?
     private var lastProgram: String?
+    private var choiceEcho: String?
     private var pendingLayout = false
     // Keep the source offset across temporary cover sizes and repeated reflows.
     private var readingAnchor = 0
@@ -102,6 +128,7 @@ final class DialogueNotebook: ObservableObject {
 
     func beginReview() {
         guard reviewAnchor == nil else { return }
+        freezeVisibleArtwork()
         reviewAnchor = readingAnchor
         reviewPassageEnd = reader.passageEnd
         reviewRevealedEnd = reader.revealedEnd
@@ -136,6 +163,7 @@ final class DialogueNotebook: ObservableObject {
     }
 
     private func turn(to spread: Int) {
+        freezeVisibleArtwork()
         turnAnchor = readingAnchor
         turnProgress = 0
         turnWillComplete = true
@@ -167,7 +195,7 @@ final class DialogueNotebook: ObservableObject {
 
     func endPresentation() { lastPhase = nil }
 
-    func record(_ phase: OriginalEventRunner.Phase, program: String) {
+    func record(_ phase: OriginalEventRunner.Phase, program: String, portraits: [BookJourney.Portrait] = []) {
         guard phase != lastPhase || program != lastProgram else { return }
         lastPhase = phase
         lastProgram = program
@@ -191,9 +219,21 @@ final class DialogueNotebook: ObservableObject {
             passage.append(contentsOf: paragraph)
         }
         guard !passage.isEmpty else { return }
+        if let echo = choiceEcho {
+            choiceEcho = nil
+            if passage.map(\.text).joined().split(whereSeparator: \.isWhitespace).joined(separator: " ") == echo {
+                return
+            }
+        }
         passageRevision += 1
         furthestRevealedEnd = max(furthestRevealedEnd, reader.revealedEnd)
-        if let index = ink.indices.first(where: { start in
+        let boundary = book.entries.last?.inkOffset ?? -1
+        var sourceOffset = 0
+        let eligible = ink.indices.filter { index in
+            defer { sourceOffset += (ink[index].text as NSString).length }
+            return sourceOffset > boundary
+        }
+        if let index = eligible.first(where: { start in
             start + passage.count <= ink.count && Array(ink[start..<(start + passage.count)]) == passage
         }) {
             readingAnchor = ink[..<index].reduce(0) { $0 + ($1.text as NSString).length }
@@ -214,9 +254,45 @@ final class DialogueNotebook: ObservableObject {
         }
         var next = ink
         if !next.isEmpty { next.append(.init(text: "\n\n", colour: 0)) }
+        book.portraits.append(.init(inkOffset: next.reduce(0) { $0 + ($1.text as NSString).length }, portraits: portraits))
         next.append(contentsOf: passage)
         pendingLayout = true
         ink = next
+    }
+
+    @discardableResult
+    func recordJourney(_ kind: BookJourney.Kind, facing: Float, view: Data?, floorPlan: Data?) -> Bool {
+        let offset = ink.reduce(0) { $0 + ($1.text as NSString).length } + (ink.isEmpty ? 0 : 2)
+        guard book.capture(kind, at: offset, facing: facing, view: view, floorPlan: floorPlan) else { return false }
+        freezeVisibleArtwork()
+        book.portraits.append(.init(inkOffset: offset, portraits: []))
+        if !ink.isEmpty { ink.append(.init(text: "\n\n", colour: 0)) }
+        ink.append(.init(text: BookJourney.marker, colour: 0, verbatim: true))
+        readingAnchor = offset
+        furthestRevealedEnd = max(furthestRevealedEnd, reader.revealedEnd, offset + 1)
+        reader.revealedEnd = furthestRevealedEnd
+        reader.passageEnd = nil
+        followsNextPassage = false
+        pendingLayout = true
+        passageRevision += 1
+        lastPhase = nil
+        choiceEcho = nil
+        return true
+    }
+
+    /// Keep the selected source answer even when the script does not repeat it.
+    func recordChoice(_ text: String) {
+        guard !book.entries.isEmpty else { return }
+        if !ink.isEmpty { ink.append(.init(text: "\n\n", colour: 0)) }
+        readingAnchor = ink.reduce(0) { $0 + ($1.text as NSString).length }
+        ink.append(.init(text: text, colour: 0, person: 1))
+        reader.revealedEnd = readingAnchor + (text as NSString).length
+        furthestRevealedEnd = max(furthestRevealedEnd, reader.revealedEnd)
+        reader.passageEnd = nil
+        followsNextPassage = false
+        choiceEcho = text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        pendingLayout = true
+        passageRevision += 1
     }
 
     func configure(_ layout: DialogueNotebookLayout, singlePage: Bool = false) {
@@ -229,6 +305,7 @@ final class DialogueNotebook: ObservableObject {
         next.pagesPerSpread = singlePage ? 1 : 2
         let anchorPage = layout.pages.firstIndex { NSLocationInRange(anchor, $0) } ?? max(0, layout.pages.count - 1)
         next.spreadIndex = anchorPage / next.pagesPerSpread
+        if next.spreadIndex != reader.spreadIndex { freezeVisibleArtwork() }
         if isTurning, next.pages != reader.pages {
             let sourceAnchor = isHoldingTurn || !turnWillComplete ? turnAnchor : readingAnchor
             let sourcePage = layout.pages.firstIndex { NSLocationInRange(sourceAnchor, $0) } ?? max(0, layout.pages.count - 1)
@@ -241,6 +318,29 @@ final class DialogueNotebook: ObservableObject {
         self.layout = layout
         reader = next
         pendingLayout = !ink.isEmpty && layout.pages.isEmpty
+    }
+
+    func portraits(on page: NSRange) -> [BookJourney.Portrait] {
+        let boundary = book.entries.last(where: { $0.inkOffset <= page.location })?.inkOffset ?? -1
+        return book.leafArt.first(where: { $0.inkOffset == page.location })?.portraits
+            ?? book.portraits.last(where: { $0.inkOffset >= boundary && $0.inkOffset < NSMaxRange(page) })?.portraits ?? []
+    }
+
+    func hasLivePortraits(on page: NSRange) -> Bool {
+        !isReviewing && !book.leafArt.contains(where: { $0.inkOffset == page.location })
+            && (book.portraits.last.map { !$0.portraits.isEmpty } ?? true)
+            && (book.portraits.last.map { NSMaxRange(page) > $0.inkOffset } ?? true)
+    }
+
+    private func freezeVisibleArtwork() {
+        for index in reader.leftIndex..<(reader.leftIndex + reader.pagesPerSpread) {
+            let page = reader.page(at: index)
+            guard page.length > 0, page.location < reader.revealedEnd,
+                  layout?.journey(on: page) == nil,
+                  !book.leafArt.contains(where: { $0.inkOffset == page.location }) else { continue }
+            let cast = portraits(on: page)
+            book.leafArt.append(.init(inkOffset: page.location, portraits: cast))
+        }
     }
 
     func write(count: Int = 2) {

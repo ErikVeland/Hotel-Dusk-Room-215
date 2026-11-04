@@ -71,6 +71,14 @@ ARM9 is compressed in the ROM. The old assembly listing under `extracted/binarie
 
 The display is split at its physical centre before content safe-area margins are applied. Paper fills both screens. Handedness swaps page roles without moving the binding. Partial openings retain the two-page book layout.
 
+Dialogue pages reserve fixed portrait frames with a clear gap around the artwork. Larger portraits stay in the outer corners, with eye-lines across the spread. Text wraps above and beside them. Poses, speaker changes, inspection mode and transcript review keep the same text shape. New dialogue and menus follow the existing ink. Changes to page dimensions, margins or text size can repaginate the book.
+
+The book also keeps the player's journey. Each place visited has an arrival page. Later pages retain the walked route, a pencil view before an interaction, and departures. Return visits stay separate. Opening the earlier pages also records the current walk if it has progressed. The drawings come from the actual room view and recovered floor plan. An otherwise unused interaction page keeps the last place visible.
+
+Earlier leaves retain their own portraits, including empty corners. Selected answers remain in the narrative even when the script does not repeat them. Walking, interaction and native chapter saves retain the book. In-game retries and returns to a safe place keep the existing record and start a fresh visit. An explicit new game starts a new book. Loading an older save restores that save's book. Older saves remain readable, with new journey entries recorded from that point onward.
+
+Resume saves store each drawing once in `book-art` beside the save files. Incremental updates append new entries and route points. Checksums cover the image references, and loading verifies the drawing data. Keep the `book-art` directory with a resume-save backup.
+
 `Metal/BookPaper.metal` provides the paper stock, curvature lighting and binding. Fixed grain avoids a crawling texture. Each opening produces a small, independently seeded, damped settling response on each page. Lighting stops updating after 1.8 seconds, while hidden, when closed or when inactive. Reduce Motion disables settling. Text and touch targets stay fixed. The shaded spine widens and deepens as the hinge closes.
 
 The closed cover uses the weathered paperback treatment of `Source/Cover`, fills the entire display and adds no text. The app owns its session above the display windows. A cover-to-inner-screen transition preserves loaded data, original animation buffers, notebook drafts and jigsaw placements. The jigsaw responds to the first explicit open report; it does not require 180 degrees. These checks cover the running session. Native walking checkpoints now persist across process termination. Native interaction saves retain conversations and puzzle input progress. Original DS save-game compatibility remains unfinished.

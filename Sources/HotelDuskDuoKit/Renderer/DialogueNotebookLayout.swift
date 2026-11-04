@@ -18,17 +18,17 @@ struct DialogueNotebookLayout {
     let size: CGSize
     let pages: [NSRange]
     let fontSize: CGFloat
+    let portraitSize: CGSize
+    let book: BookJourney.Record
     private let frames: [Int: CTFrame]
-    /// The wrap shape each page was set in, keyed by its first character.
-    private let paths: [Int: CGPath]
 
     init(runs: [OriginalDialogueLines.Run], size: CGSize, fontSize: CGFloat,
-         portraitContours: [UInt8: OriginalAnimationContour] = [:], portraitSize: CGSize = .zero,
-         portraitBottomInset: CGFloat = 0,
-         singlePage: Bool = false, preserving previous: DialogueNotebookLayout? = nil, revealedEnd: Int = 0,
-         menu: [MenuEntry] = []) {
+         portraitSize: CGSize = .zero,
+         menu: [MenuEntry] = [], book: BookJourney.Record = .init()) {
         self.size = size
         self.fontSize = fontSize
+        self.portraitSize = portraitSize
+        self.book = book
         let text = NSMutableAttributedString(string: "")
         let font = CTFontCreateWithName("Georgia" as CFString, fontSize, nil)
         var lineSpacing: CGFloat = 6
@@ -86,37 +86,30 @@ struct DialogueNotebookLayout {
         guard size.width > 0, size.height >= CTFontGetAscent(font) + CTFontGetDescent(font) else {
             pages = []
             frames = [:]
-            paths = [:]
             return
         }
         let setter = CTFramesetterCreateWithAttributedString(text)
         var ranges: [NSRange] = []
         var frames: [Int: CTFrame] = [:]
-        var paths: [Int: CGPath] = [:]
-        // Pages that already hold ink keep their wrap shape, so a new pose or
-        // speaker never moves words the reader has seen.
-        let frozen: [Int: CGPath]
-        if let previous, previous.size == size, previous.fontSize == fontSize,
-           revealedEnd > 0, revealedEnd <= min(text.length, previous.text.length),
-           text.attributedSubstring(from: NSRange(location: 0, length: revealedEnd))
-               .isEqual(to: previous.text.attributedSubstring(from: NSRange(location: 0, length: revealedEnd))) {
-            frozen = previous.paths.filter { $0.key < revealedEnd }
-        } else {
-            frozen = [:]
-        }
         var offset = 0
         var pageIndex = 0
         while offset < text.length {
-            let screen: UInt8 = singlePage ? 0 : pageIndex.isMultiple(of: 2) ? 1 : 0
-            let path = frozen[offset] ?? Self.framePath(size: size,
-                padding: max(14, fontSize * 0.8), portraitSize: portraitSize,
-                portraitBottomInset: portraitBottomInset,
-                contour: portraitContours[screen], screen: screen)
-            let frame = CTFramesetterCreateFrame(setter, CFRange(location: offset, length: 0), path, nil)
+            if book.entries.contains(where: { $0.inkOffset == offset }) {
+                var end = offset + 1
+                let string = text.string as NSString
+                while end < text.length, string.character(at: end) == 10 { end += 1 }
+                ranges.append(NSRange(location: offset, length: end - offset))
+                offset = end
+                pageIndex += 1
+                continue
+            }
+            let boundary = book.entries.first(where: { $0.inkOffset > offset })?.inkOffset ?? text.length
+            let path = Self.framePath(size: size, padding: max(14, fontSize * 0.8),
+                                      portraitSize: portraitSize, portraitAtLeadingEdge: pageIndex.isMultiple(of: 2))
+            let frame = CTFramesetterCreateFrame(setter, CFRange(location: offset, length: boundary - offset), path, nil)
             let visible = CTFrameGetVisibleStringRange(frame)
             guard visible.length > 0 else { break }
             frames[offset] = frame
-            paths[offset] = path
             var end = offset + visible.length
             // Keep paragraph separators on the preceding leaf so the next
             // passage starts at the top margin, even at an exact page break.
@@ -128,48 +121,39 @@ struct DialogueNotebookLayout {
         }
         pages = ranges
         self.frames = frames
-        self.paths = paths
+    }
+
+    /// Portraits stay in the outer corners. The view uses these text-canvas coordinates.
+    func portraitFrame(pageIndex: Int) -> CGRect {
+        CGRect(x: pageIndex.isMultiple(of: 2) ? 0 : size.width - portraitSize.width,
+               y: size.height - portraitSize.height,
+               width: portraitSize.width, height: portraitSize.height)
     }
 
     private static func framePath(size: CGSize, padding: CGFloat, portraitSize: CGSize,
-                                  portraitBottomInset: CGFloat,
-                                  contour: OriginalAnimationContour?, screen: UInt8) -> CGPath {
+                                  portraitAtLeadingEdge: Bool) -> CGPath {
         let path = CGMutablePath()
-        guard let contour, !contour.leftEdge.isEmpty, !contour.rightEdge.isEmpty,
-              portraitSize.width > 0, portraitSize.height > 0 else {
+        guard portraitSize.width > 0, portraitSize.height > 0 else {
             path.addRect(CGRect(origin: .zero, size: size))
             return path
         }
-        let scale = min(portraitSize.width / CGFloat(contour.width), portraitSize.height / CGFloat(contour.height))
-        let imageSize = CGSize(width: CGFloat(contour.width) * scale, height: CGFloat(contour.height) * scale)
-        let frameX = screen == 1 ? 0 : size.width - portraitSize.width
-        let imageX = frameX + (portraitSize.width - imageSize.width) / 2
-        let imageY = size.height + portraitBottomInset - portraitSize.height
-            + (portraitSize.height - imageSize.height) / 2
-        let left = contour.leftEdge.map(\.x).min() ?? 0
-        let right = contour.rightEdge.map(\.x).max() ?? 1
-        let top = min(contour.leftEdge.first?.y ?? 0, contour.rightEdge.first?.y ?? 0)
-        let bottom = max(contour.leftEdge.last?.y ?? 1, contour.rightEdge.last?.y ?? 1)
-        let boxLeft = min(size.width, max(0, imageX + left * imageSize.width - padding))
-        let boxRight = min(size.width, max(0, imageX + right * imageSize.width + padding))
-        let boxTop = min(size.height, max(0, size.height - imageY - top * imageSize.height + padding))
-        let boxBottom = min(size.height, max(0, size.height - imageY - bottom * imageSize.height - padding))
+        let width = min(size.width, portraitSize.width + padding)
+        let height = min(size.height, portraitSize.height + padding)
 
-        // Keep text outside the portrait's padded bounds. The clear regions can
-        // follow the animation's silhouette without letting glyphs cross it.
-        if screen == 1 {
-            path.move(to: CGPoint(x: 0, y: boxTop))
+        // Reserve the full portrait frame, even while it is empty. Poses and
+        // speakers can change without moving ink or entering its space.
+        if portraitAtLeadingEdge {
+            path.move(to: CGPoint(x: 0, y: height))
             path.addLine(to: CGPoint(x: 0, y: size.height))
             path.addLine(to: CGPoint(x: size.width, y: size.height))
-            path.addLine(to: CGPoint(x: size.width, y: boxBottom))
-            path.addLine(to: CGPoint(x: boxRight, y: boxBottom))
-            path.addLine(to: CGPoint(x: boxRight, y: boxTop))
+            path.addLine(to: CGPoint(x: size.width, y: 0))
+            path.addLine(to: CGPoint(x: width, y: 0))
+            path.addLine(to: CGPoint(x: width, y: height))
         } else {
-            path.move(to: CGPoint(x: 0, y: boxTop))
-            path.addLine(to: CGPoint(x: 0, y: 0))
-            path.addLine(to: CGPoint(x: boxLeft, y: 0))
-            path.addLine(to: CGPoint(x: boxLeft, y: boxBottom))
-            path.addLine(to: CGPoint(x: size.width, y: boxBottom))
+            path.move(to: CGPoint(x: 0, y: 0))
+            path.addLine(to: CGPoint(x: size.width - width, y: 0))
+            path.addLine(to: CGPoint(x: size.width - width, y: height))
+            path.addLine(to: CGPoint(x: size.width, y: height))
             path.addLine(to: CGPoint(x: size.width, y: size.height))
             path.addLine(to: CGPoint(x: 0, y: size.height))
         }
@@ -204,6 +188,10 @@ struct DialogueNotebookLayout {
     }
 
     func draw(page: NSRange, revealedEnd: Int, in context: CGContext) {
+        if let entry = journey(on: page) {
+            JourneySketch.draw(entry, size: size, fontSize: fontSize, in: context)
+            return
+        }
         guard let frame = frames[page.location], page.length > 0 else { return }
         // A menu appears whole once the ink before it is written.
         let revealedEnd = !menuRanges.isEmpty && revealedEnd >= inkLength ? text.length : revealedEnd
@@ -254,7 +242,19 @@ struct DialogueNotebookLayout {
     }
 
     func accessibleText(page: NSRange) -> String {
+        if let entry = journey(on: page) {
+            return "\(entry.name). Chapter \(entry.chapter + 1). \(entry.kind.rawValue.capitalized). A pencil view and the route walked on this visit."
+        }
         guard NSMaxRange(page) <= text.length else { return "" }
         return (text.string as NSString).substring(with: page)
+    }
+
+    func journey(on page: NSRange) -> BookJourney.Entry? {
+        book.entries.first { $0.inkOffset == page.location }
+    }
+
+    func portraits(on page: NSRange) -> [BookJourney.Portrait] {
+        guard journey(on: page) == nil else { return [] }
+        return book.portraits.last(where: { $0.inkOffset < NSMaxRange(page) })?.portraits ?? []
     }
 }

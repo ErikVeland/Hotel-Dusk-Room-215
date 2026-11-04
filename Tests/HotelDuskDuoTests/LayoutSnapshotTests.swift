@@ -175,6 +175,143 @@ final class LayoutSnapshotTests: XCTestCase {
         }, size: size, name: "conversation_participant_ink")
     }
 
+    #if os(macOS)
+    func testRenderPermanentJourneySketchAndWalkedRoute() throws {
+        let audio = originalRouteTestAudio()
+        let play = try OriginalPlaySession.chapterOne(audio: audio)
+        defer { play.stop() }
+        var room = try OriginalMapExploration.bundled()
+        let renderer = try OriginalMapRenderer(mapName: room.mapName)
+        let game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        let book = DialogueNotebook()
+        func point() -> SIMD2<Float> { room.mapPoint(for: room.position) - room.mapBitmapOffset }
+        book.book.visit(mapID: room.mapID, chapter: 0, name: OriginalMapExploration.displayName(for: room.mapID),
+            mapSize: SIMD2(Float(renderer.map.artworkWidth), Float(renderer.map.artworkHeight)), point: point())
+        let floor = try XCTUnwrap(JourneySketch.make(renderer.map, floorPlan: true))
+        book.recordJourney(.arrival, facing: room.facing,
+            view: try JourneySketch.make(renderer.render(room, game: game)), floorPlan: floor)
+        for _ in 0..<160 {
+            room.update(heldPageTouch: SIMD2(140, 80))
+            book.book.walk(to: point())
+        }
+        book.recordJourney(.interaction, facing: room.facing,
+            view: try JourneySketch.make(renderer.render(room, game: game)), floorPlan: floor)
+        let size = CGSize(width: 951, height: 669)
+        let metrics = DialogueSpreadMetrics(size: size)
+        let layout = DialogueNotebookLayout(runs: book.ink, size: metrics.textSize, fontSize: 18, book: book.book)
+        book.configure(layout)
+        book.finishWriting()
+        XCTAssertEqual(layout.pages.count, 2)
+        XCTAssertGreaterThan(book.book.entries[1].route.count, 1)
+        try capture(HStack(spacing: 0) {
+            NotebookDialogueLeaf(play: play, notebook: book, layout: layout, metrics: metrics, pageIndex: 0)
+            NotebookDialogueLeaf(play: play, notebook: book, layout: layout, metrics: metrics, pageIndex: 1)
+        }.frame(width: size.width, height: size.height), size: size,
+                    name: "permanent_journey_room_and_route", settlingTime: 0.1)
+        let last = try XCTUnwrap(book.book.entries.last)
+        try capture(NotebookJourneyReference(entry: last).padding(32).background(PaperSurface())
+            .frame(width: metrics.pageSize.width, height: metrics.pageSize.height),
+                    size: metrics.pageSize, name: "last_place_interaction_reference", settlingTime: 0.1)
+    }
+
+    func testPortraitPosesAndReviewKeepTheSamePrintedPages() throws {
+        let catalog = try OriginalScriptCatalog.bundled()
+        var game = try OriginalGameState.newGame(defaults: .bundled(), timestamp: 0)
+        game.setMap(2, previous: 1)
+        try game.apply(.keywordAvailable([0, 1, 2]))
+        let program = try catalog.loadProgram("EP1_R102")
+        for (name, size, stacked, type) in [
+            ("wide", CGSize(width: 951, height: 669), false, DynamicTypeSize.large),
+            ("stacked", CGSize(width: 669, height: 951), true, .large),
+            ("large_text", CGSize(width: 951, height: 669), false, .accessibility1)
+        ] {
+            let runner = try OriginalEventRunner(program: program, game: game,
+                keywords: OriginalKeywordTable(decoded: catalog.decodedFile("EP1_.ttk")),
+                selection: .init(sceneID: 2, blockID: 4, modeID: 8, eventID: 28,
+                                 nowTime: game.nowTime, mapID: 2))
+            let play = OriginalPlaySession(runner: runner, audio: originalRouteTestAudio(), catalog: catalog)
+            defer { play.stop() }
+            play.ask(0)
+            play.pause()
+            XCTAssertFalse(play.encounterPortraits.isEmpty)
+
+            // Hold the transcript constant while the source conversation changes poses.
+            let book = DialogueNotebook()
+            for start in stride(from: 178, through: 211, by: 3) {
+                let entries = Array(program.text.entries[start..<(start + 3)])
+                let tokens = try entries.flatMap { entry in
+                    try OriginalDialogueControl.tokens(for: entry) + [
+                        OriginalDialogueToken(textIndex: entry.index, byteOffset: entry.bytes.count, kind: .glyph(10))
+                    ]
+                }
+                book.record(.itemNotice(itemID: 1, page: .init(page: 0, entries: entries, tokens: tokens)), program: program.name)
+            }
+            let view = NotebookDialogueSpread(play: play, notebook: book, stacked: stacked)
+                .environment(\.scenePhase, .active)
+                .environment(\.dynamicTypeSize, type)
+                .frame(width: size.width, height: size.height)
+            let host = NSHostingView(rootView: view)
+            let window = NSWindow(contentRect: CGRect(origin: .zero, size: size),
+                                  styleMask: .borderless, backing: .buffered, defer: false)
+            window.isReleasedWhenClosed = false
+            window.contentView = host
+            defer {
+                window.contentView = nil
+                window.close()
+            }
+            func settleLayout() {
+                host.layoutSubtreeIfNeeded()
+                RunLoop.main.run(until: Date().addingTimeInterval(0.05))
+                host.layoutSubtreeIfNeeded()
+            }
+            settleLayout()
+            book.finishWriting()
+            let initial = try XCTUnwrap(book.layout)
+            let pages = initial.pages
+            func ink(_ layout: DialogueNotebookLayout) throws -> Data {
+                let image = ImageRenderer(content: Canvas { context, _ in
+                    context.withCGContext {
+                        layout.draw(page: pages[0], revealedEnd: NSMaxRange(pages[0]), in: $0)
+                    }
+                }.frame(width: layout.size.width, height: layout.size.height))
+                image.scale = 1
+                return try XCTUnwrap(image.cgImage?.dataProvider?.data) as Data
+            }
+            let printed = try ink(initial)
+            var poses: Set<String> = []
+            for _ in 0..<8 {
+                guard case .dialogue = play.runner.phase else { break }
+                poses.formUnion(play.encounterPortraits.map(\.animationID))
+                let current = try XCTUnwrap(book.layout)
+                XCTAssertEqual(current.pages, pages, "A pose moved page breaks")
+                XCTAssertTrue(try ink(current) == printed, "A pose moved printed ink")
+                play.resume()
+                play.advanceDialogue()
+                if case .questions(let topics) = play.runner.phase, let next = topics.first {
+                    play.ask(next.keyword)
+                }
+                play.pause()
+                settleLayout()
+            }
+            if name == "wide" { XCTAssertGreaterThan(poses.count, 1, "Exercise different portrait poses") }
+            let current = try XCTUnwrap(book.layout)
+            let metrics = DialogueSpreadMetrics(size: size, stacked: stacked)
+            try capture(AnyLayout(stacked ? AnyLayout(VStackLayout(spacing: 0)) : AnyLayout(HStackLayout(spacing: 0))) {
+                NotebookDialogueLeaf(play: play, notebook: book, layout: current, metrics: metrics, pageIndex: 0)
+                NotebookDialogueLeaf(play: play, notebook: book, layout: current, metrics: metrics, pageIndex: 1)
+            }.frame(width: size.width, height: size.height),
+                        size: size, name: "stable_portraits_\(name)", settlingTime: 0.05)
+            book.beginReview()
+            settleLayout()
+            XCTAssertEqual(book.layout?.pages, pages, "Review must retain page breaks")
+            XCTAssertTrue(try ink(XCTUnwrap(book.layout)) == printed, "Review moved printed ink")
+            book.endReview()
+            settleLayout()
+            XCTAssertEqual(book.layout?.pages, pages, "Returning to the game moved page breaks")
+        }
+    }
+    #endif
+
     func testRenderWrittenDialoguePages() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }

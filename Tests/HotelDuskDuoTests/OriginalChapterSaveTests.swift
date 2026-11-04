@@ -91,6 +91,9 @@ final class OriginalChapterSaveTests: XCTestCase {
         let store = Store()
         let saving = try self.play(store: store)
         defer { saving.stop() }
+        saving.dialogueNotebook.book.visit(mapID: 2, chapter: 0, name: "Lobby",
+            mapSize: SIMD2(256, 256), point: SIMD2(10, 20))
+        saving.dialogueNotebook.recordJourney(.departure, facing: 0, view: nil, floorPlan: nil)
         saving.answerChapterSave(true)
         saving.confirmChapterSaveSlot()
         XCTAssertTrue(store.slots.isEmpty)
@@ -115,6 +118,7 @@ final class OriginalChapterSaveTests: XCTestCase {
         XCTAssertEqual(fresh.chapterSaves[1], checkpoint)
         fresh.loadChapterSave(slot: 1)
         let restored = try XCTUnwrap(fresh.play)
+        XCTAssertEqual(restored.dialogueNotebook.savedState().book, saving.dialogueNotebook.savedState().book)
         defer { fresh.endOriginalGame() }
         XCTAssertEqual(restored.chapterTransition?.stage, .title)
         XCTAssertEqual(restored.runner.game, saving.runner.game)

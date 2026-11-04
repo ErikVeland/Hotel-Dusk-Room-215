@@ -9,6 +9,13 @@ public struct OriginalChapterSave: Codable, Equatable, Sendable {
     public let state: Data
     public let conditionGlobalByte: UInt8?
     public let stateSHA256: String
+    var notebook: DialogueNotebook.SavedState? = nil
+    var notebookSHA256: String? = nil
+
+    mutating func attachNotebook(_ saved: DialogueNotebook.SavedState) throws {
+        notebook = saved
+        notebookSHA256 = OriginalScriptCatalog.digest(try saved.encoded())
+    }
 
     public init(game: OriginalGameState, savedAt: Date) throws {
         try Self.validate(game)
@@ -20,6 +27,12 @@ public struct OriginalChapterSave: Codable, Equatable, Sendable {
     }
 
     public func gameState() throws -> OriginalGameState {
+        if let notebook {
+            guard try OriginalScriptCatalog.digest(notebook.encoded()) == notebookSHA256 else {
+                throw OriginalDataError.checksum("Saved chapter book")
+            }
+            try notebook.validateBook()
+        }
         guard version == 1 else { throw OriginalDataError.unsupported("Chapter save version") }
         guard OriginalScriptCatalog.digest(state) == stateSHA256 else { throw OriginalDataError.checksum("Chapter save") }
         let game = try OriginalGameState(snapshot: state, conditionGlobalByte: conditionGlobalByte)

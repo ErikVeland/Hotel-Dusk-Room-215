@@ -11,9 +11,11 @@ public struct OriginalResumeSave: Codable, Equatable, Sendable {
     public let musicSequenceID: Int?
     let progress: OriginalPlayProgress?
     let progressSHA256: String?
+    var notebook: DialogueNotebook.SavedState? = nil
+    var notebookSHA256: String? = nil
 
     init(game: OriginalGameState, checkpointFacing: Float, musicSequenceID: Int?, savedAt: Date,
-         progress: OriginalPlayProgress? = nil) throws {
+         progress: OriginalPlayProgress? = nil, notebook: DialogueNotebook.SavedState? = nil) throws {
         version = progress == nil ? 1 : 2
         self.savedAt = savedAt
         state = Data(game.bytes)
@@ -23,10 +25,18 @@ public struct OriginalResumeSave: Codable, Equatable, Sendable {
         self.musicSequenceID = musicSequenceID
         self.progress = progress
         progressSHA256 = try progress.map { OriginalScriptCatalog.digest(try $0.encoded()) }
+        self.notebook = notebook
+        notebookSHA256 = try notebook.map { OriginalScriptCatalog.digest(try $0.encoded()) }
         _ = try gameState()
     }
 
     public func gameState() throws -> OriginalGameState {
+        if let notebook {
+            guard try OriginalScriptCatalog.digest(notebook.encoded()) == notebookSHA256 else {
+                throw OriginalDataError.checksum("Saved book")
+            }
+            try notebook.validateBook()
+        }
         guard version == 1 || version == 2 else { throw OriginalDataError.unsupported("Resume save version") }
         if version == 2 {
             guard let progress, let progressSHA256,

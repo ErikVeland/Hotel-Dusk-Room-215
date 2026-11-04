@@ -136,11 +136,16 @@ public final class GameSession: ObservableObject {
 
     /// Starts a new game at the recovered hotel arrival.
     public func startOriginalGame() {
+        startOriginalGame(retainingBookFrom: nil)
+    }
+
+    private func startOriginalGame(retainingBookFrom previous: OriginalPlaySession?) {
         play?.stop()
         do {
             let next = try OriginalPlaySession.chapterOne(audio: audioController, saveStore: saveStore,
                 rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory)
+            if let previous { next.retainBook(from: previous) }
             attachPlay(next)
         } catch {
             sourceError = String(describing: error)
@@ -172,6 +177,7 @@ public final class GameSession: ObservableObject {
             let next = try OriginalPlaySession.restoring(checkpoint, audio: audioController,
                 saveStore: saveStore, rumbleFeedback: rumbleFeedback,
                 mapRendererFactory: mapRendererFactory)
+            next.retainBook(from: play)
             play.stop()
             saveError = nil
             attachPlay(next)
@@ -248,7 +254,7 @@ public final class GameSession: ObservableObject {
         defer { restoringAfterStop = false }
         guard let checkpoint = safePlaceSave else {
             recoveryNotice = "This interaction could not continue. Play returned to the beginning."
-            startOriginalGame()
+            startOriginalGame(retainingBookFrom: play)
             return
         }
         do {
@@ -258,6 +264,7 @@ public final class GameSession: ObservableObject {
             if case .halted(let restoreHalt) = next.runner.phase {
                 throw OriginalDataError.invalid("Safe-place restore stopped at \(restoreHalt.program)")
             }
+            if let previous = play { next.retainBook(from: previous) }
             play?.stop()
             let location = "\(halt.program)\(halt.eventIndex.map { " event \($0)" } ?? "")"
             recoveryNotice = "The \(location) interaction could not continue. Play returned to the last safe place."
@@ -265,7 +272,7 @@ public final class GameSession: ObservableObject {
         } catch {
             recoveryNotice = "The \(halt.program) interaction could not continue. Play returned to the beginning."
             saveError = "The safe-place checkpoint could not be restored: \(error)"
-            startOriginalGame()
+            startOriginalGame(retainingBookFrom: play)
         }
     }
 
@@ -283,6 +290,7 @@ public final class GameSession: ObservableObject {
             if case .halted(let halt) = next.runner.phase {
                 throw OriginalDataError.invalid("Safe-place restore stopped at \(halt.program)")
             }
+            if let previous = play { next.retainBook(from: previous) }
             play?.stop()
             saveError = nil
             recoveryNotice = "Play returned to the last safe place. The unfinished interaction may need to be repeated."
@@ -290,7 +298,7 @@ public final class GameSession: ObservableObject {
         } catch {
             recoveryNotice = "The last safe place could not be restored. Play returned to the beginning."
             saveError = "The safe-place checkpoint could not be restored: \(error)"
-            startOriginalGame()
+            startOriginalGame(retainingBookFrom: play)
         }
     }
 
@@ -377,6 +385,7 @@ public final class GameSession: ObservableObject {
 
     public func reviewConversations() {
         guard let play, play.canReviewConversations, !isPauseMenuOpen else { return }
+        play.recordCurrentWalk()
         play.dialogueNotebook.beginReview()
         isReviewingConversations = true
         updatePlayActivity()
